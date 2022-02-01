@@ -1,0 +1,43 @@
+# Specify format for the log outputs
+[logformat]
+filename = msgs.log
+datefmt = %%Y-%%d-%%m %%H:%%M:%%S
+file_format= %%(asctime)s | %%(levelname)-8s | %%(message)s
+file_level = INFO
+cons_level = DEBUG
+cons_format = %%(levelname)-8s | %%(message)s
+
+[CorpusGeneration]
+#Minimum number of words to keep document in corpus
+min_lemas = 15
+#Remove words with less than no_below occurrences
+no_below=10
+#Remove words appearing in more than a given percentage of documents
+no_above=0.6
+#Maximum number of words in vocabulary
+keep_n=500000
+#Regular expression for token identification
+token_regexp=[\p{L}\p{N}][\p{L}\p{N}\p{P}]*\p{L}
+
+[TM]
+mallet_path=mallet
+#Mallet regular expression for token identification
+mallet_regexp=[\p{L}\p{N}][\p{L}\p{N}\p{P}]*\p{L}
+runs_many=5
+num_topics_many=25,40,75,100,150,200,250,300
+alphas_many=0.1,1,5
+optimize_interval_many=10,0
+num_threads=4
+num_iterations=20
+doc_topic_thr=0
+thetas_thr=3e-3
+sparse_block=0
+num_iterations_inf=100
+pathlabeling=./topicmodeler/NETL-topic-labeler/
+
+[TMedit]
+n_palabras=20
+round_size=6
+NETLworkers=3
+LDAvis_ndocs=25000
+LDAvis_njobs=15
