@@ -7,6 +7,10 @@ file_level = INFO
 cons_level = DEBUG
 cons_format = %%(levelname)-8s | %%(message)s
 
+
+
+
+
 [CorpusGeneration]
 #Minimum number of words to keep document in corpus
 min_lemas = 15

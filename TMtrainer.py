@@ -12,8 +12,8 @@ The application structure is derived from: https://github.com/Orieus/menuNavigat
 
 import os
 import argparse
-from TMnavigator.menu_navigator import MenuNavigator
-from TMnavigator.TMmanager import TaskManager
+from ITMTnavigator.menu_navigator import MenuNavigator
+from ITMTnavigator.ITMTmanager import TaskManager
 import time
 
 # ####################
@@ -55,7 +55,7 @@ tm = TaskManager(project_path)
 # Prepare user interaction
 # ########################
 paths2data = {}
-path2menu = './TMnavigator/TMmenu.yaml'
+path2menu = './ITMTnavigator/ITMTmenu.yaml'
 
 # ##############
 # Call navigator
