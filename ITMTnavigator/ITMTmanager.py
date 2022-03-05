@@ -12,6 +12,8 @@ It implements the functions needed to
 import shutil
 import configparser
 import logging
+import datetime as DT
+import json
 #import numpy as np
 #import time
 #import re
@@ -19,7 +21,7 @@ import logging
 import sys
 from pathlib import Path
 #from gensim import corpora
-#from gensim.utils import check_output
+from gensim.utils import check_output
 #from sklearn.preprocessing import normalize
 #from utils.misc import var_num_keyboard, query_options, request_confirmation
 #from utils.misc import printgr, printred, printmag
@@ -215,11 +217,68 @@ class TaskManager(object):
         """
         Generate a training corpus for topic modeling or other tasks
 
-        This needs to be linked with the Data mediator from IntelComp
+        This needs to be linked with the Data mediator
         """
 
-        print('generateCorpus')
+        ############################################################
+        ## IMT Interface: New Dataset POPUP
+        ############################################################
 
+        # We need the user to specify table, fields to include, filtering conditions
+
+        parquet_table = "parquet.`/export/ml4ds/IntelComp/Datalake/SemanticScholar/20220201/papers.parquet`"
+        pt = input(f"Parquet table [{parquet_table}]: ")
+        if len(pt):
+            parquet_table = pt
+
+        selectFields = ["id", "lemmas"]
+        sf = input(f"Fields to include in dataset [{selectFields}]: ")
+        if len(sf):
+            selectFields = sf.split(",")
+
+        filterCondition = "array_contains(fieldsOfStudy, 'Computer Science')"
+        fc = input(f"Filter to apply [{filterCondition}]: ")
+        if len(fc):
+            filterCondition = fc
+
+        # We also need a name for the dataset
+        dtsName = ""
+        while not len(dtsName):
+            dtsName = input('Introduce a name for the dataset: ')
+        path_dataset = self.p2p.joinpath(
+            self._dir_struct['datasets']).joinpath(dtsName)
+        path_dataset.mkdir(parents=True, exist_ok=True)
+
+        #
+        #Now, we can call the "fake Data Mediator"
+        query = "SELECT " + (",").join(selectFields) + \
+                " FROM " + parquet_table
+        if len(filterCondition.strip()):
+            query += " WHERE " + filterCondition
+
+        datasetMeta = {
+            "name"          : dtsName,
+            "query"         : query,
+            "validfor"      : ["TM"],
+            "date"          : DT.datetime.now()
+            }
+
+        with path_dataset.joinpath('config.json').open('w', encoding='utf-8') as outfile:
+            json.dump(datasetMeta, outfile, ensure_ascii=False, indent=2, default=str)
+
+        cmd = '/export/usuarios_ml4ds/jarenas/script-spark/script-spark ' + \
+              '-C /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json ' + \
+              '-c 4 -N 10 -S "generateCorpus.py --p ' + \
+              path_dataset.as_posix() + '"'
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Generation of script failed')
+
+        return
+
+        
     def removeCorpus(self):
         """
         Remove a training corpus from the Interactive Topic Model Trainer

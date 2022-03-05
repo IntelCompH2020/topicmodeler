@@ -1,1 +1,5 @@
 pyyaml==6.0
+langdetect==1.0.9
+scikit-learn==1.0.2
+numpy
+gensim==4.0.1
