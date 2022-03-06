@@ -1,7 +1,6 @@
 """
 Created on Mar 05 2022
-@author: José Antonio Espinosa Melchor
-         Jerónimo Arenas García
+@author: Jerónimo Arenas García
 
 Temporary routine for generation of CSV datasets
 for demonstration purposes
