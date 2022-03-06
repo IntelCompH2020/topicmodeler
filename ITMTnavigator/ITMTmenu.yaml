@@ -15,6 +15,8 @@ root:
     #- load      may have been selected by the starting command>
     - generateCorpus
     - removeCorpus
+    - corpus2JSON
+
     - trainTM
     - extractPipe
     - inference
@@ -35,6 +37,8 @@ generateCorpus:
 removeCorpus:
   title: Remove a Traning dataset
 
+corpus2JSON:
+  title: Extract JSON for Solr ingestion
 
 
 

@@ -287,6 +287,33 @@ class TaskManager(object):
         print('removeCorpus')
 
 
+    def corpus2JSON(self):
+        """
+        Remove a training corpus from the Interactive Topic Model Trainer
+
+        This is linked to the ITMTrainer only tentatively, since it should
+        be part of WP4 tools
+
+        Right now, it only runs the generation of the JSON files that are
+        needed for ingestion of the corpus in Solr
+        """
+
+        print('corpus2JSON')
+
+        cmd = '/export/usuarios_ml4ds/jarenas/script-spark/script-spark ' + \
+              '-C /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json ' + \
+              '-c 4 -N 10 -S "corpus2JSON.py"'
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Generation of script failed')
+
+        return
+
+
+
+
 
 
 
