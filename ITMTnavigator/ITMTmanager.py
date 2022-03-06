@@ -283,9 +283,16 @@ class TaskManager(object):
         """
         Remove a training corpus from the Interactive Topic Model Trainer
         """
-
-        print('removeCorpus')
-
+        ############################################################
+        ## IMT Interface: Datasets window - remove selected datasets
+        ############################################################
+        dtSets = self.p2p.joinpath(self._dir_struct['datasets']).iterdir()
+        for el in dtSets:
+            if el.is_dir():
+                Y_or_N = input(f"Remove Training Set {el.name} [Y/N]?:")
+                if Y_or_N.upper() == "Y":
+                    shutil.rmtree(el)
+        
 
     def corpus2JSON(self):
         """
