@@ -16,8 +16,9 @@ root:
     - generateCorpus
     - removeCorpus
     - corpus2JSON
-
     - trainTM
+
+
     - extractPipe
     - inference
     - editTM
@@ -40,22 +41,21 @@ removeCorpus:
 corpus2JSON:
   title: Extract JSON for Solr ingestion
 
-
-
-
-
-
-
-
-
-
-
 trainTM:
   title: Train a Topic Model
   options:
     - parameters:
         mallet: Mallet Topic Model Training
         ctm: Contextualized Topic Model (deep learning)
+
+
+
+
+
+
+
+
+
 
 extractPipe:
   title: Extracción del pipeline para importación de datos con Mallet (previo a inferencia)

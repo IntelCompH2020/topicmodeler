@@ -7,11 +7,7 @@ file_level = INFO
 cons_level = DEBUG
 cons_format = %%(levelname)-8s | %%(message)s
 
-
-
-
-
-[CorpusGeneration]
+[MalletTM]
 #Minimum number of words to keep document in corpus
 min_lemas = 15
 #Remove words with less than no_below occurrences
@@ -22,6 +18,17 @@ no_above=0.6
 keep_n=500000
 #Regular expression for token identification
 token_regexp=[\p{L}\p{N}][\p{L}\p{N}\p{P}]*\p{L}
+#Path to mallet binary
+mallet_path=./mallet-2.0.8/bin/mallet
+#default STWs
+default_stw_file=./aux/stop-words-english5
+#default equivalencies
+default_eq_file=./aux/equivalents.txt
+
+
+
+
+
 
 [TM]
 mallet_path=mallet

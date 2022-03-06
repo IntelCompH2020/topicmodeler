@@ -3,3 +3,4 @@ langdetect==1.0.9
 scikit-learn==1.0.2
 numpy
 gensim==4.0.1
+colored==1.4.2

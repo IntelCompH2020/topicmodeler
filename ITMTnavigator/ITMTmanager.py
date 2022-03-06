@@ -23,6 +23,7 @@ from pathlib import Path
 #from gensim import corpora
 from gensim.utils import check_output
 #from sklearn.preprocessing import normalize
+from utils.misc import query_options
 #from utils.misc import var_num_keyboard, query_options, request_confirmation
 #from utils.misc import printgr, printred, printmag
 
@@ -319,22 +320,35 @@ class TaskManager(object):
         return
 
 
-
-
-
-
-
-
-
     def trainTM(self, trainer):
         """
-        Prepare a corpus for Topic Modeling with Mallet
-        This includes calculation of the BoW representation
+        Topic modeling trainer. Initial training of a topic model
+
+        Args:
+        :param trainer: TM optimizer [mallet/ctm]
         """
-        print(trainer)
+        
+        ############################################################
+        ## IMT Interface: Topic Model Trainer Window
+        ############################################################
+
+        self.logger.info(f'-- Topic Model Training')
+        
+        #First thing to do is to select a corpus
+        #Ask user which dataset should be used for model training
+        dtSets = self.p2p.joinpath(self._dir_struct['datasets']).iterdir()
+        dtSets = sorted([d for d in dtSets if d.is_dir()])
+        display_dtSets = [d.name for d in dtSets]
+        selection = query_options(display_dtSets, "Select Training Dataset")
+        path_dtSet = dtSets[selection]
+        #Retrieve all CSV files that form the selected dataset
+        dtSetCSV = sorted([f for f in path_dtSet.joinpath("CSV").iterdir()
+                                if f.name.endswith(".csv")])
+        self.logger.info(f'-- -- Selected corpus is {path_dtSet.name}')
+        
+        #Retrieve parameters for training
         return
         
-        self.logger.info(f'-- Corpus and Vocabulary generation. Dataset is {corpus}')
         min_lemas = int(self.cf.get('CorpusGeneration', 'min_lemas'))
         no_below=int(self.cf.get('CorpusGeneration','no_below'))
         no_above=float(self.cf.get('CorpusGeneration','no_above'))
