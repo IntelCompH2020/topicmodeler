@@ -192,7 +192,7 @@ if __name__ == "__main__":
     #configuration file, and run the training using class MalletTrainer
     if args.train:
         configFile = Path(args.config)
-        if configparser.is_file():
+        if configFile.is_file():
             cf = configparser.ConfigParser()
             cf.read(configFile)
             if cf['Training']['trainer'] == 'mallet':
