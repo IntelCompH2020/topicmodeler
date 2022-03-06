@@ -268,9 +268,8 @@ class TaskManager(object):
 
         cmd = '/export/usuarios_ml4ds/jarenas/script-spark/script-spark ' + \
               '-C /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json ' + \
-              '-c 4 -N 10 -S "prueba.py"'
-              # generateCorpus.py --p ' + \
-              # path_dataset.as_posix() + '"'
+              '-c 4 -N 10 -S "generateCorpus.py --p ' + \
+              path_dataset.as_posix() + '"'
         try:
             self.logger.info(f'-- -- Running command {cmd}')
             check_output(args=cmd, shell=True)
