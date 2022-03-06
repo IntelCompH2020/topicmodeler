@@ -23,8 +23,7 @@ from pathlib import Path
 #from gensim import corpora
 from gensim.utils import check_output
 #from sklearn.preprocessing import normalize
-from utils.misc import query_options
-#from utils.misc import var_num_keyboard, query_options, request_confirmation
+from utils.misc import query_options, var_num_keyboard, request_confirmation
 #from utils.misc import printgr, printred, printmag
 
 #from topicmodeler.topicmodeling import MalletTrainer, TMmodel
@@ -292,7 +291,8 @@ class TaskManager(object):
             if el.is_dir():
                 Y_or_N = input(f"Remove Training Set {el.name} [Y/N]?:")
                 if Y_or_N.upper() == "Y":
-                    shutil.rmtree(el)
+                    if request_confirmation(msg='Model ' + el.name + ' will be deleted. Proceed?'):
+                        shutil.rmtree(el)
         
 
     def corpus2JSON(self):
@@ -347,47 +347,95 @@ class TaskManager(object):
         self.logger.info(f'-- -- Selected corpus is {path_dtSet.name}')
         
         #Retrieve parameters for training
+        if trainer=="mallet":
+            #Default values are read from config file
+            min_lemas = int(self.cf.get('MalletTM', 'min_lemas'))
+            no_below = int(self.cf.get('MalletTM','no_below'))
+            no_above = float(self.cf.get('MalletTM','no_above'))
+            keep_n = int(self.cf.get('MalletTM','keep_n'))
+            token_regexp = self.cf.get('MalletTM','token_regexp')
+            mallet_path = self.cf.get('MalletTM','mallet_path')
+            stw_file = [self.cf.get('MalletTM', 'default_stw_file')]
+            eq_file = [self.cf.get('MalletTM', 'default_eq_file')]
+
+            #Some of them can be confirmed/modified by the user
+            min_lemas = var_num_keyboard('int', min_lemas, 
+                'Enter minimum number of lemas for the documents in the training set')
+            no_below = var_num_keyboard('int', no_below, 
+                'Minimum number occurrences to keep words in vocabulary')
+            no_above = var_num_keyboard('float', no_above, 
+                'Maximum proportion of documents to keep a word in vocabulary')
+            keep_n = var_num_keyboard('int', keep_n, 
+                'Maximum vocabulary size')
+            tk = input(f'Regular expresion for tokenizer [{token_regexp}]: ')
+            if len(tk):
+                token_regexp = tk
+            print(f'Stopwords will be read from file {stw_file[0]}')
+            swf = input('Enter the path of additional files of stopwords (separated by commas): ')
+            if len(swf):
+                for f in swf.split(','):
+                    if Path(f.strip()).is_file():
+                        stw_file.append(f.strip())
+            print(f'Word equivalences will be read from file {eq_file[0]}')
+            eq = input('Enter the path of additional files of equivalences (separated by commas): ')
+            if len(eq):
+                for f in eq.split(','):
+                    if Path(f.strip()).is_file():
+                        eq_file.append(f.strip())
+
+            # Create folder for corpus, backup existing folder if necessary
+            modelname = input('Enter a name to save the new model: ')
+            modeldir = self.p2p.joinpath(self._dir_struct['LDAmodels']).joinpath(modelname)
+            if modeldir.exists():
+
+                # Remove current backup folder, if it exists
+                old_model_dir = Path(str(modeldir) + '_old/')
+                if old_model_dir.exists():
+                    shutil.rmtree(old_model_dir)
+
+                # Copy current project folder to the backup folder.
+                shutil.move(modeldir, old_model_dir)
+                self.logger.info(f'-- -- Creating backup of existing model in {old_model_dir}')
+
+            # Create corpus_folder and save model training configuration
+            modeldir.mkdir()
+            configFile = modeldir.joinpath('train.config')
+            with configFile.open('w', encoding='utf8') as fout:
+                fout.write('[Preproc]\n')
+                fout.write('min_lemas = ' + str(min_lemas) + '\n')
+                fout.write('no_below = ' + str(no_below) + '\n')
+                fout.write('no_above = ' + str(no_above) + '\n')
+                fout.write('keep_n = ' + str(keep_n) + '\n')
+                fout.write('stw_file = ' + ','.join(stw_file) + '\n')
+                fout.write('eq_file = ' + ','.join(eq_file) + '\n')
+                fout.write('\n[Training]\n')
+                fout.write('trainer = mallet\n')
+                fout.write('token_regexp = ' + str(token_regexp) + '\n')
+                fout.write('mallet_path = ' + mallet_path + '\n')
+                fout.write('training_files = ' + ','.join([el.as_posix() for el in dtSetCSV])+'\n')
+
+            #############################################################
+            ## END IMT Interface: Next, the actual training should happen
+            #############################################################
+
+            # Run command for training model
+            cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Command execution failed')
+
+        if trainer=="ctm":
+            #Other trainers will be available
+            pass
+
         return
         
-        min_lemas = int(self.cf.get('CorpusGeneration', 'min_lemas'))
-        no_below=int(self.cf.get('CorpusGeneration','no_below'))
-        no_above=float(self.cf.get('CorpusGeneration','no_above'))
-        keep_n=int(self.cf.get('CorpusGeneration','keep_n'))
-        token_regexp=javare.compile(self.cf.get('CorpusGeneration','token_regexp'))
-        mallet_path = Path(self.cf.get('TM','mallet_path'))
-        stw_file = Path(self.cf.get('Lemmatizer', 'default_stw_file'))
-        corpus_stw = Path(self.cf.get(corpus,'stw_file'))
-        corpus_eqs = Path(self.cf.get(corpus,'eq_file'))
 
         #Initialize lemmatizer
         stwEQ = stwEQcleaner(stw_files=[stw_file, corpus_stw], dict_eq_file=corpus_eqs,
                              logger=self.logger)
-
-        min_lemas = var_num_keyboard('int', min_lemas, 
-                'Enter minimum number of lemas for the documents in corpus')
-
-        # Create folder for corpus, backup existing folder if necessary
-        corpus_dir = self.p2p.joinpath(corpus).joinpath(self._dir_struct['corpus']).joinpath(corpus)
-        if corpus_dir.exists():
-
-            # Remove current backup folder, if it exists
-            old_corpus_dir = Path(str(corpus_dir) + '_old/')
-            if old_corpus_dir.exists():
-                shutil.rmtree(old_corpus_dir)
-
-            # Copy current project folder to the backup folder.
-            shutil.move(corpus_dir, old_corpus_dir)
-            self.logger.info(f'-- -- Creating backup of existing corpus in {old_corpus_dir}')
-
-        # Create corpus_folder and save import configuration
-        corpus_dir.mkdir()
-        import_config = corpus_dir.joinpath('import.config')
-        with import_config.open('w', encoding='utf8') as fout:
-            fout.write('min_lemas = ' + str(min_lemas) + '\n')
-            fout.write('no_below = ' + str(no_below) + '\n')
-            fout.write('no_above = ' + str(no_above) + '\n')
-            fout.write('keep_n = ' + str(keep_n) + '\n')
-            fout.write('token_regexp = ' + str(token_regexp) + '\n')
 
         #Identification of words that are too rare or common that need to be 
         #removed from the dictionary. 
