@@ -30,7 +30,7 @@ if __name__ == "__main__":
     sc = spark.sparkContext
     #We need to add the Inferncer to the list of .py files, so that
     #workers can use it
-    sc.addPyFile("TMinferencer.py")
+    sc.addPyFile("/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/TMinferencer.py")
 
     # Read subtable from parquet file
     S2papers = spark.sql("SELECT id, year, venue, title, paperAbstract FROM parquet.`/export/ml4ds/IntelComp/Datalake/SemanticScholar/20220201/papers.parquet` where array_contains(fieldsOfStudy, 'Computer Science')")
