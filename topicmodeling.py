@@ -8,6 +8,12 @@ Provides several classes for Topic Modeling
     - MalletTrainer: To train a topic model from a given corpus
 """
 
+import numpy as np
+from sklearn.preprocessing import normalize
+from scipy import sparse
+#from scipy.spatial.distance import jensenshannon
+#import pyLDAvis
+import matplotlib.pyplot as plt
 import argparse
 import configparser
 import logging
@@ -21,6 +27,14 @@ import ipdb
 from gensim import corpora
 from gensim.utils import check_output, tokenize
 logging.getLogger("gensim").setLevel(logging.WARNING)
+
+
+def file_lines(fname):
+    #Count number of lines in file
+    with fname.open('r',encoding='utf8') as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
 
 
 class stwEQcleaner (object):
@@ -196,6 +210,20 @@ class MalletTrainer(object):
         self._train()
         return
 
+    def _SaveThrFig(self, thetas32):
+        """
+        Creates a figure to illustrate the effect of thresholding
+        The distribution of thetas is plotted, together with the value
+        that the trainer is programmed to use for the thresholding
+        """
+        allvalues = np.sort(thetas32.flatten())
+        step = int(np.round(len(allvalues)/1000))
+        plt.semilogx(allvalues[::step], (100/len(allvalues))*np.arange(0,len(allvalues))[::step])
+        plt.semilogx([self._sparse_thr, self._sparse_thr], [0,100], 'r')
+        plot_file = self._modelFolder.joinpath('thetas_dist.pdf')
+        plt.savefig(plot_file)
+        plt.close()
+
     def _preproc(self):
         """Preprocessing of files
         For the training we have access (in self._corpusFiles) to a number of lemmatized
@@ -215,7 +243,7 @@ class MalletTrainer(object):
         #### Corpus that can be used for Topic Modeling must contain
         #### two fields: ["id", "lemmas"]
         print('Processing files for vocabulary creation')
-        pbar = tqdm(self._corpusFiles[:3])
+        pbar = tqdm(self._corpusFiles)
         for csvFile in pbar:
             df = pd.read_csv(csvFile, escapechar="\\", on_bad_lines="skip")
             if "id" not in df.columns or "lemmas" not in df.columns:
@@ -266,7 +294,7 @@ class MalletTrainer(object):
         fcorpus = corpus_file.open('w', encoding='utf-8')
         
         print('Processing files for training dataset creation')
-        pbar = tqdm(self._corpusFiles[:3])
+        pbar = tqdm(self._corpusFiles)
         for csvFile in pbar:
             #Document preprocessing is same as before, but now we apply an additional filter
             #and keep only words in the vocabulary
@@ -304,7 +332,10 @@ class MalletTrainer(object):
         return
 
     def _train(self):
-        """Rutina de entrenamiento
+        """Mallet training. It does the following:
+        1) Trains a Mallet model using the settings provided by the user
+        2) It sparsifies thetas matrix and save a figure to report the effect
+        3) It saves model matrices: alphas, betas, thetas (sparse)
         """
         config_file = self._modelFolder.joinpath('mallet.config')
         corpus_mallet = self._modelFolder.joinpath('training_data.mallet')
@@ -319,88 +350,54 @@ class MalletTrainer(object):
             fout.write('doc-topics-threshold = ' + str(self._docTopicsThreshold) + '\n')
             #fout.write('output-state = ' + os.path.join(self._outputFolder, 'topic-state.gz') + '\n')
             fout.write('output-doc-topics = ' + \
-                self._modelFolder.joinpath('doc-topics.txt').as_posix() + '\n')
+                self._modelFolder.joinpath('mallet_output').joinpath('doc-topics.txt').as_posix() + '\n')
             fout.write('word-topic-counts-file = ' + \
-                self._modelFolder.joinpath('word-topic-counts.txt').as_posix() + '\n')
+                self._modelFolder.joinpath('mallet_output').joinpath('word-topic-counts.txt').as_posix() + '\n')
             fout.write('diagnostics-file = ' + \
-                self._modelFolder.joinpath('diagnostics.xml ').as_posix() + '\n')
+                self._modelFolder.joinpath('mallet_output').joinpath('diagnostics.xml ').as_posix() + '\n')
             fout.write('xml-topic-report = ' + \
-                self._modelFolder.joinpath('topic-report.xml').as_posix() + '\n')
+                self._modelFolder.joinpath('mallet_output').joinpath('topic-report.xml').as_posix() + '\n')
             fout.write('output-topic-keys = ' + \
-                self._modelFolder.joinpath('topickeys.txt').as_posix() + '\n')
+                self._modelFolder.joinpath('mallet_output').joinpath('topickeys.txt').as_posix() + '\n')
             fout.write('inferencer-filename = ' + \
-                self._modelFolder.joinpath('inferencer.mallet').as_posix() + '\n')
+                self._modelFolder.joinpath('mallet_output').joinpath('inferencer.mallet').as_posix() + '\n')
             #fout.write('output-model = ' + \
-            #    self._outputFolder.joinpath('modelo.bin').as_posix() + '\n')
+            #    self._outputFolder.joinpath('mallet_output').joinpath('modelo.bin').as_posix() + '\n')
             #fout.write('topic-word-weights-file = ' + \
-            #    self._outputFolder.joinpath('topic-word-weights.txt').as_posix() + '\n')
+            #    self._outputFolder.joinpath('mallet_output').joinpath('topic-word-weights.txt').as_posix() + '\n')
 
         cmd = str(self._mallet_path) + ' train-topics --config ' + str(config_file)
 
         try:
             self.logger.info(f'-- -- Training mallet topic model. Command is {cmd}')
-            check_output(args=cmd, shell=True)
+            #check_output(args=cmd, shell=True)
         except:
             self.logger.error('-- -- Model training failed. Revise command')
             return
 
-        return
-        thetas_file = self._outputFolder.joinpath('doc-topics.txt')
-        #Modified to allow for non integer identifier
+        thetas_file = self._modelFolder.joinpath('mallet_output').joinpath('doc-topics.txt')
+        
         cols = [k for k in np.arange(2,self._numTopics+2)]
 
-        if self._sparse_block==0:
-            self.logger.debug('-- -- Sparsifying doc-topics matrix')
-            thetas32 = np.loadtxt(thetas_file, delimiter='\t', dtype=np.float32, usecols=cols)
-            #thetas32 = np.loadtxt(thetas_file, delimiter='\t', dtype=np.float32)[:,2:]
-            #Save figure to check thresholding is correct
-            allvalues = np.sort(thetas32.flatten())
-            step = int(np.round(len(allvalues)/1000))
-            plt.semilogx(allvalues[::step], (100/len(allvalues))*np.arange(0,len(allvalues))[::step])
-            plt.semilogx([self._sparse_thr, self._sparse_thr], [0,100], 'r')
-            plot_file = self._outputFolder.joinpath('thetas_dist.pdf')
-            plt.savefig(plot_file)
-            plt.close()
-            #sparsify thetas
-            thetas32[thetas32<self._sparse_thr] = 0
-            thetas32 = normalize(thetas32,axis=1,norm='l1')
-            thetas32_sparse = sparse.csr_matrix(thetas32, copy=True)
+        #Sparsification of thetas matrix
+        self.logger.debug('-- -- Sparsifying doc-topics matrix')
+        thetas32 = np.loadtxt(thetas_file, delimiter='\t', dtype=np.float32, usecols=cols)
+        #thetas32 = np.loadtxt(thetas_file, delimiter='\t', dtype=np.float32)[:,2:]
+        #Create figure to check thresholding is correct
+        self._SaveThrFig(thetas32)
+        #Set to zeros all thetas below threshold, and renormalize
+        thetas32[thetas32<self._sparse_thr] = 0
+        thetas32 = normalize(thetas32,axis=1,norm='l1')
+        thetas32 = sparse.csr_matrix(thetas32, copy=True)
 
-        else:
-            self.logger.debug('-- -- Sparsifying doc-topics matrix using blocks')
-            #Leemos la matriz en bloques
-            ndocs = file_len(thetas_file)
-            thetas32 = np.loadtxt(thetas_file, delimiter='\t', dtype=np.float32,
-                                     usecols=cols, max_rows=self._sparse_block)
-            #Save figure to check thresholding is correct
-            #In this case, the figure will be calculated over just one block of thetas
-            allvalues = np.sort(thetas32.flatten())
-            step = int(np.round(len(allvalues)/1000))
-            plt.semilogx(allvalues[::step], (100/len(allvalues))*np.arange(0,len(allvalues))[::step])
-            plt.semilogx([self._sparse_thr, self._sparse_thr], [0,100], 'r')
-            plot_file = self._outputFolder.joinpath('thetas_dist.pdf')
-            plt.savefig(plot_file)
-            plt.close()
-            #sparsify thetas
-            thetas32[thetas32<self._sparse_thr] = 0
-            thetas32 = normalize(thetas32,axis=1,norm='l1')
-            thetas32_sparse = sparse.csr_matrix(thetas32, copy=True)
-            for init_pos in np.arange(0,ndocs,self._sparse_block)[1:]:
-                thetas32_b = np.loadtxt(thetas_file, delimiter='\t', dtype=np.float32,
-                                         usecols=cols, max_rows=self._sparse_block,
-                                         skiprows=init_pos)
-                #sparsify thetas
-                thetas32_b[thetas32_b<self._sparse_thr] = 0
-                thetas32_b = normalize(thetas32_b,axis=1,norm='l1')
-                thetas32_b_sparse = sparse.csr_matrix(thetas32_b, copy=True)
-                thetas32_sparse = sparse.vstack([thetas32_sparse, thetas32_b_sparse])
+        #Recalculate topic weights to avoid errors due to sparsification
+        alphas = np.asarray(np.mean(thetas32,axis=0)).ravel()
 
-        #Recalculamos alphas para evitar errores de redondeo por la sparsification
-        alphas = np.asarray(np.mean(thetas32_sparse,axis=0)).ravel()
-
-        #Create vocabulary files
-        wtcFile = self._outputFolder.joinpath('word-topic-counts.txt')
-        vocab_size = file_len(wtcFile)
+        #Create vocabulary files and calculate beta matrix
+        #A vocabulary is available with words in alphabetic order,
+        #but the new files will use the order used by mallet
+        wtcFile = self._modelFolder.joinpath('mallet_output').joinpath('word-topic-counts.txt')
+        vocab_size = file_lines(wtcFile)
         betas = np.zeros((self._numTopics,vocab_size))
         vocab = []
         term_freq = np.zeros((vocab_size,))
@@ -416,18 +413,20 @@ class MalletTrainer(object):
                     term_freq[i] += cnt
         betas = normalize(betas,axis=1,norm='l1')
         #save vocabulary and frequencies
-        with self._outputFolder.joinpath('vocab.txt').open('w', encoding='utf8') as fout:
-            [fout.write(el+'\n') for el in vocab]
-        with self._outputFolder.joinpath('vocab_freq.txt').open('w', encoding='utf8') as fout:
+        with self._modelFolder.joinpath('vocab_freq_mallet.txt').open('w', encoding='utf8') as fout:
             [fout.write(el[0]+'\t'+str(int(el[1]))+'\n') for el in zip(vocab,term_freq)]
-        self.logger.debug('-- -- Mallet training: Vocabulary files generated')
+        self.logger.debug('-- -- Mallet training: Vocabulary file generated')
 
-        tmodel = TMmodel(betas=betas,thetas=thetas32_sparse,alphas=alphas,
-                            vocabfreq_file=self._outputFolder.joinpath('vocab_freq.txt'),
-                            logger=self.logger)
-        tmodel.save_npz(self._outputFolder.joinpath('modelo.npz'))
+        #We end by saving the model for future use
+        modelVarsDir = self._modelFolder.joinpath('model_vars')
+        modelVarsDir.mkdir()
+        np.save(modelVarsDir.joinpath('alpha_orig.npy'), alphas)
+        np.save(modelVarsDir.joinpath('beta_orig.npy'), betas)
+        np.savez(modelVarsDir.joinpath('thetas_orig.npz'),
+            thetas_data=thetas32.data, thetas_indices=thetas32.indices,
+            thetas_indptr=thetas32.indptr, thetas_shape=thetas32.shape)
 
-        #Remove doc-topics file. It is no longer needed
+        #Remove doc-topics file. It is no longer needed and takes a lot of space
         thetas_file.unlink()
 
         return
