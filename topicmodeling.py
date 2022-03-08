@@ -370,7 +370,7 @@ class MalletTrainer(object):
 
         try:
             self.logger.info(f'-- -- Training mallet topic model. Command is {cmd}')
-            #check_output(args=cmd, shell=True)
+            check_output(args=cmd, shell=True)
         except:
             self.logger.error('-- -- Model training failed. Revise command')
             return
