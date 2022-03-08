@@ -7,6 +7,10 @@ file_level = INFO
 cons_level = DEBUG
 cons_format = %%(levelname)-8s | %%(message)s
 
+[TM]
+#Default setting for number of topics
+ntopics=25
+
 [MalletTM]
 #Minimum number of words to keep document in corpus
 min_lemas = 15
@@ -21,29 +25,23 @@ token_regexp=[\p{L}\p{N}][\p{L}\p{N}\p{P}]*\p{L}
 #Path to mallet binary
 mallet_path=./mallet-2.0.8/bin/mallet
 #default STWs
-default_stw_file=./aux/stop-words-english5
+default_stw_file=./aux/stop-words-english5.txt
 #default equivalencies
 default_eq_file=./aux/equivalents.txt
 
-
-
-
-
-
-[TM]
-mallet_path=mallet
-#Mallet regular expression for token identification
-mallet_regexp=[\p{L}\p{N}][\p{L}\p{N}\p{P}]*\p{L}
-runs_many=5
-num_topics_many=25,40,75,100,150,200,250,300
-alphas_many=0.1,1,5
-optimize_interval_many=10,0
+#Settings for mallet training and doctopics postprocessing
+alpha=5
+optimize_interval=10
 num_threads=4
-num_iterations=20
+num_iterations=1000
 doc_topic_thr=0
 thetas_thr=3e-3
-sparse_block=0
 num_iterations_inf=100
+
+
+
+
+[TMold]
 pathlabeling=./topicmodeler/NETL-topic-labeler/
 
 [TMedit]

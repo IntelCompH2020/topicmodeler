@@ -4,3 +4,6 @@ scikit-learn==1.0.2
 numpy
 gensim==4.0.1
 colored==1.4.2
+regex==2021.11.2
+pandas==1.4.1
+tqdm==4.62.3

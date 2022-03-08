@@ -25,7 +25,6 @@ from gensim.utils import check_output
 #from sklearn.preprocessing import normalize
 from utils.misc import query_options, var_num_keyboard, request_confirmation
 #from utils.misc import printgr, printred, printmag
-
 #from topicmodeler.topicmodeling import MalletTrainer, TMmodel
 
 class TaskManager(object):
@@ -345,7 +344,12 @@ class TaskManager(object):
         dtSetCSV = sorted([f for f in path_dtSet.joinpath("CSV").iterdir()
                                 if f.name.endswith(".csv")])
         self.logger.info(f'-- -- Selected corpus is {path_dtSet.name}')
-        
+
+        #We also need the user to select/confirm number of topics
+        ntopics = int(self.cf.get('TM','ntopics'))
+        ntopics = var_num_keyboard('int', ntopics, 
+                'Please, select the number of topics')
+
         #Retrieve parameters for training
         if trainer=="mallet":
             #Default values are read from config file
@@ -357,31 +361,51 @@ class TaskManager(object):
             mallet_path = self.cf.get('MalletTM','mallet_path')
             stw_file = [self.cf.get('MalletTM', 'default_stw_file')]
             eq_file = [self.cf.get('MalletTM', 'default_eq_file')]
+            alpha = float(self.cf.get('MalletTM','alpha'))
+            optimize_interval = int(self.cf.get('MalletTM','optimize_interval'))
+            num_threads = int(self.cf.get('MalletTM','num_threads'))
+            num_iterations = int(self.cf.get('MalletTM','num_iterations'))
+            doc_topic_thr = float(self.cf.get('MalletTM','doc_topic_thr'))
+            thetas_thr = float(self.cf.get('MalletTM','thetas_thr'))
 
-            #Some of them can be confirmed/modified by the user
-            min_lemas = var_num_keyboard('int', min_lemas, 
-                'Enter minimum number of lemas for the documents in the training set')
-            no_below = var_num_keyboard('int', no_below, 
-                'Minimum number occurrences to keep words in vocabulary')
-            no_above = var_num_keyboard('float', no_above, 
-                'Maximum proportion of documents to keep a word in vocabulary')
-            keep_n = var_num_keyboard('int', keep_n, 
-                'Maximum vocabulary size')
-            tk = input(f'Regular expresion for tokenizer [{token_regexp}]: ')
-            if len(tk):
-                token_regexp = tk
-            print(f'Stopwords will be read from file {stw_file[0]}')
-            swf = input('Enter the path of additional files of stopwords (separated by commas): ')
-            if len(swf):
-                for f in swf.split(','):
-                    if Path(f.strip()).is_file():
-                        stw_file.append(f.strip())
-            print(f'Word equivalences will be read from file {eq_file[0]}')
-            eq = input('Enter the path of additional files of equivalences (separated by commas): ')
-            if len(eq):
-                for f in eq.split(','):
-                    if Path(f.strip()).is_file():
-                        eq_file.append(f.strip())
+            #The following settings will only be accessed in the "advance settings panel"
+            Y_or_N = input(f"Do you wish to access the advance settings panel [Y/N]?:")
+            if Y_or_N.upper() == "Y":
+                #Some of them can be confirmed/modified by the user
+                min_lemas = var_num_keyboard('int', min_lemas, 
+                    'Enter minimum number of lemas for the documents in the training set')
+                no_below = var_num_keyboard('int', no_below, 
+                    'Minimum number occurrences to keep words in vocabulary')
+                no_above = var_num_keyboard('float', no_above, 
+                    'Maximum proportion of documents to keep a word in vocabulary')
+                keep_n = var_num_keyboard('int', keep_n, 
+                    'Maximum vocabulary size')
+                tk = input(f'Regular expresion for tokenizer [{token_regexp}]: ')
+                if len(tk):
+                    token_regexp = tk
+                print(f'Stopwords will be read from file {stw_file[0]}')
+                swf = input('Enter the path of additional files of stopwords (separated by commas): ')
+                if len(swf):
+                    for f in swf.split(','):
+                        if Path(f.strip()).is_file():
+                            stw_file.append(f.strip())
+                print(f'Word equivalences will be read from file {eq_file[0]}')
+                eq = input('Enter the path of an alternative file with equivalent terms: ')
+                if len(eq):
+                    if Path(eq.strip()).is_file():
+                        eq_file = eq.strip()
+                alpha = var_num_keyboard('float', alpha, 
+                    'Prior parameter for the Dirichlet for doc generation')
+                optimize_interval = var_num_keyboard('int', optimize_interval, 
+                    'Iterations between Dirichlet priors optimization')
+                num_threads = var_num_keyboard('int', num_threads, 
+                    'Number of threads for mallet parallelization')
+                num_iterations = var_num_keyboard('int', num_iterations, 
+                    'Number of Gibbs Sampling iterations')
+                doc_topic_thr = var_num_keyboard('float', doc_topic_thr, 
+                    'Threshold for topic activation in a doc (mallet training)')
+                thetas_thr = var_num_keyboard('float', thetas_thr, 
+                    'Threshold for topic activation in a doc (sparsification)')
 
             # Create folder for corpus, backup existing folder if necessary
             modelname = input('Enter a name to save the new model: ')
@@ -412,8 +436,15 @@ class TaskManager(object):
                 fout.write('trainer = mallet\n')
                 fout.write('token_regexp = ' + str(token_regexp) + '\n')
                 fout.write('mallet_path = ' + mallet_path + '\n')
+                fout.write('ntopics = ' + str(ntopics) + '\n')
+                fout.write('alpha = ' + str(alpha) + '\n')
+                fout.write('optimize_interval = ' + str(optimize_interval) + '\n')
+                fout.write('num_threads = ' + str(num_threads) + '\n')
+                fout.write('num_iterations = ' + str(num_iterations) + '\n')
+                fout.write('doc_topic_thr = ' + str(doc_topic_thr) + '\n')
+                fout.write('thetas_thr = ' + str(thetas_thr) + '\n')
                 fout.write('training_files = ' + ','.join([el.as_posix() for el in dtSetCSV])+'\n')
-
+                
             #############################################################
             ## END IMT Interface: Next, the actual training should happen
             #############################################################
@@ -431,168 +462,10 @@ class TaskManager(object):
             pass
 
         return
-        
 
-        #Initialize lemmatizer
-        stwEQ = stwEQcleaner(stw_files=[stw_file, corpus_stw], dict_eq_file=corpus_eqs,
-                             logger=self.logger)
 
-        #Identification of words that are too rare or common that need to be 
-        #removed from the dictionary. 
-        self.logger.info('-- -- Corpus Generation: Vocabulary generation')
-        dictionary = corpora.Dictionary()
 
-        #Read reference table, and important columns for the specific corpus
-        ref_table = self.cf.get(corpus, 'ref_table')
-        ref_col = self.cf.get(corpus, 'ref_col')
-        meta_fields = self.cf.get(corpus, 'meta_fields').split(',')
-        meta_fields = [el for el in meta_fields if len(el)]
 
-        selectOptions = ref_col + ',LEMAS'
-        filterOptions = 'LEMAS IS NOT NULL'
-
-        for df in self.DMs[corpus].readDBchunks(ref_table, ref_col, chunksize=chunksize,
-                                    selectOptions=selectOptions, limit=None,
-                                    filterOptions=filterOptions, verbose=True):
-            id_lemas = df.values.tolist()
-            id_lemas = [[el[0], ' '.join(token_regexp.findall(el[1].replace('\n',' ').strip()))]
-                            for el in id_lemas]
-            id_lemas = [[el[0], stwEQ.cleanstr(el[1]).split()] for el in id_lemas]
-            id_lemas = [el for el in id_lemas if len(el[1])>=min_lemas]
-            #id_lemas = [[el[0], el[1].replace('\n',' ').strip().split()] for el in id_lemas]
-            #id_lemas = [el for el in id_lemas if len(el[1])>=min_lemas]
-            all_lemas = [el[1] for el in id_lemas]
-            dictionary.add_documents(all_lemas)
-
-        #Remove words that appear in less than no_below documents, or in more than
-        #no_above, and keep at most keep_n most frequent terms, keep track of removed
-        #words for debugging purposes
-        all_words = [dictionary[idx] for idx in range(len(dictionary))]
-        dictionary.filter_extremes(no_below=no_below, no_above=no_above, keep_n=keep_n)
-        kept_words = set([dictionary[idx] for idx in range(len(dictionary))])
-        rmv_words = [el for el in all_words if el not in kept_words]
-        #Save extreme words that will be removed
-        self.logger.info(f'-- -- Saving {len(rmv_words)} extreme words to file')
-        rmv_file = corpus_dir.joinpath(corpus + '_commonrare_words.txt')
-        with rmv_file.open('w', encoding='utf-8') as fout:
-            [fout.write(el+'\n') for el in sorted(rmv_words)]
-        #Save dictionary to file
-        self.logger.info(f'-- -- Saving dictionary to file. Number of words: {len(kept_words)}')
-        vocab_txt = corpus_dir.joinpath(corpus + '_vocabulary.txt')
-        with vocab_txt.open('w', encoding='utf-8') as fout:
-            [fout.write(el+'\n') for el in sorted(kept_words)]
-        #Save also in gensim text format
-        vocab_gensim = corpus_dir.joinpath(corpus + '_vocabulary.gensim')
-        dictionary.save_as_text(vocab_gensim)
-        
-        ##################################################
-        #Create corpus and metadata files
-        self.logger.info('-- -- Corpus generation: Corpus and Metadata files')
-        
-        meta_file = corpus_dir.joinpath(corpus + '_metadata.csv')
-        corpus_file = corpus_dir.joinpath(corpus + '_corpus.txt')
-        corpus_mallet = corpus_dir.joinpath(corpus + '_corpus.mallet')
-
-        if len(meta_fields):
-            firstLineMeta = ref_col + ',' + ','.join(meta_fields)
-        else:
-            firstLineMeta = ref_col
-        self.logger.debug(f'-- -- Heading of metadata file: {firstLineMeta}')
-
-        selectOptions = firstLineMeta + ',LEMAS'
-
-        fmeta = meta_file.open('w', encoding='utf-8')
-        fmeta.write(firstLineMeta + '\n')
-        fcorpus = corpus_file.open('w', encoding='utf-8')
-        
-        for df in self.DMs[corpus].readDBchunks(ref_table, ref_col, chunksize=chunksize,
-                            selectOptions=selectOptions, limit=None,
-                            filterOptions=filterOptions, verbose=True):
-            id_lemas = df.applymap(str).values.tolist()
-            id_lemas = [el[:-1] + [token_regexp.findall(el[-1].replace('\n',' ').strip())]
-                            for el in id_lemas]
-            id_lemas = [el[:-1] + [[tk for tk in el[-1] if tk in kept_words]]
-                            for el in id_lemas]
-            id_lemas = [el[:-1] + [stwEQ.cleanstr(' '.join(el[-1])).split()]
-                            for el in id_lemas]
-            id_lemas = [el for el in id_lemas if len(el[-1])>=min_lemas]
-            #Write to corpus file
-            [fcorpus.write(el[0] + ' 0 ' + ' '.join(el[-1]) + '\n') for el in id_lemas]
-            #Write to metadata file
-            if len(meta_fields):
-                #Remove commas and new lines
-                id_meta = [[el2.replace(',',' ').replace('\n',' ') for el2 in el[:-1]]
-                            for el in id_lemas]
-                [fmeta.write(','.join(el)+'\n') for el in id_meta]
-            else:
-                [fmeta.write(el[0]+'\n') for el in id_lemas]
-
-        fmeta.close()
-        fcorpus.close()
-        
-        ##################################################
-        #Importing Data to mallet
-        self.logger.info('-- -- Corpus Generation: Mallet Data Import')
-
-        mallet_regexp=self.cf.get('TM','mallet_regexp')
-        
-        cmd = str(mallet_path) + \
-              ' import-file --preserve-case --keep-sequence ' + \
-              '--remove-stopwords --token-regex "' + mallet_regexp + '" ' + \
-              '--input %s --output %s'
-        cmd = cmd % (corpus_file, corpus_mallet)
-
-        try:
-            self.logger.info(f'-- -- Running command {cmd}')
-            check_output(args=cmd, shell=True)
-        except:
-            self.logger.error('-- -- Mallet failed to import data. Revise command')
-
-        return
-
-    def trainTM_old(self, corpus):
-
-        #A proper corpus with BoW, vocabulary, etc .. should exist
-        path_corpus = self.p2p.joinpath(corpus).joinpath(self._dir_struct['corpus'])
-        path_corpus = path_corpus.joinpath(corpus).joinpath(corpus+'_corpus.mallet')
-        if path_corpus.is_file():
-            self.logger.info(f'-- Training topic model on corpus: {corpus}')
-        else:
-            self.logger.error(f'-- Corpus {corpus} does not exist')
-            return
-
-        #Read default values for some parameters
-        mallet_path = Path(self.cf.get('TM', 'mallet_path'))
-        num_threads = int(self.cf.get('TM', 'num_threads'))
-        num_iterations = int(self.cf.get('TM', 'num_iterations'))
-        doc_topic_thr = float(self.cf.get('TM', 'doc_topic_thr'))
-        thetas_thr = float(self.cf.get('TM', 'thetas_thr'))
-        sparse_block = int(self.cf.get('TM', 'sparse_block'))
-
-        #Ask user to introduce manually the name for the Model
-        givenName = input('Introduce a name for the model: ')
-        #An automatic model_name will be generated according to existing
-        #final models and the model name provided by the user
-        #Final models are enumerated as corpusN_givenName
-        path_model = self.p2p.joinpath(corpus).joinpath(self._dir_struct['modtm'])
-        path_model = path_model.joinpath(givenName.replace(' ', '_'))
-        if path_model.exists():
-            if request_confirmation(msg='A model with that name already exists. ¿Overwrite?'):
-                shutil.rmtree(path_model)
-            else:
-                return
-        path_model.mkdir()
-
-        #Create Topic model
-        MallTr = MalletTrainer(corpusFile=path_corpus, outputFolder=path_model,
-                        mallet_path=mallet_path, numThreads=num_threads,
-                        numIterations=num_iterations, docTopicsThreshold=doc_topic_thr,
-                        sparse_thr=thetas_thr, sparse_block=sparse_block,
-                        logger = self.logger)
-        MallTr.adj_settings()
-        MallTr.fit()
-        
-        return
 
     def extractPipe(self, corpus):
 
