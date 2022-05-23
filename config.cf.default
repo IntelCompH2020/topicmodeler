@@ -7,6 +7,16 @@ file_level = INFO
 cons_level = DEBUG
 cons_format = %%(levelname)-8s | %%(message)s
 
+[Spark]
+script_spark = /export/usuarios_ml4ds/jarenas/script-spark/script-spark
+token_spark = /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json
+
+[HDFS]
+#This paths are specific to UC3M deployment
+Semantic Scholar = /export/ml4ds/IntelComp/Datalake/SemanticScholar/20220201/papers.parquet
+PATSTAT = /export/ml4ds/IntelComp/Datalake/PATSTAT/2021_Autumn/patstat_appln.parquet
+CORDIS = /export/ml4ds/IntelComp/Datalake/CORDIS/20220221/new_parquet/projects.parquet
+
 [TM]
 #Default setting for number of topics
 ntopics=25

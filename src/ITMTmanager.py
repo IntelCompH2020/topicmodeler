@@ -14,6 +14,8 @@ import configparser
 import logging
 import datetime as DT
 import json
+import pandas as pd
+import pyarrow.parquet as pt
 #import numpy as np
 #import time
 #import re
@@ -21,10 +23,12 @@ import json
 import sys
 from pathlib import Path
 #from gensim import corpora
-from gensim.utils import check_output
+#from gensim.utils import check_output
+import subprocess
+from subprocess import check_output
 #from sklearn.preprocessing import normalize
-from utils.misc import query_options, var_num_keyboard, request_confirmation
-#from utils.misc import printgr, printred, printmag
+from .utils.misc import query_options, var_num_keyboard, request_confirmation
+from .utils.misc import printgr, printred, printmag
 #from topicmodeler.topicmodeling import MalletTrainer, TMmodel
 
 class TaskManager(object):
@@ -48,7 +52,7 @@ class TaskManager(object):
 
     _config_fname = 'config.cf'
 
-    def __init__(self, p2p):
+    def __init__(self, p2p, p2parquet):
         """
         Initiates the Task Manager object
 
@@ -56,14 +60,18 @@ class TaskManager(object):
         If no value is available, they are set to None and will be
         initialized later
 
-        Args:
+        Parameters
+        ----------
+        p2p : pathlib.Path
+            Path to the application project
 
-        : p2p: String containing the name of the project
-               (also the name of the folder that contains the project)
+        p2parquet : pathlib.Path
+            Path to the folder hosting the parquet datasets
         """
 
         # Important directories for the project
-        self.p2p = Path(p2p)
+        self.p2p = p2p
+        self.p2parquet = p2parquet
 
         # Configuration file
         self.p2config = self.p2p.joinpath(self._config_fname)
@@ -92,6 +100,7 @@ class TaskManager(object):
         Creates a project instance for the Topic Model Trainer
         To do so, it defines the main folder structure, and creates (or cleans)
         the project folder, specified in self.p2p
+
         """
 
         # Check and clean project folder location
@@ -161,6 +170,7 @@ class TaskManager(object):
 
         # Loads configuration file
         self.cf = configparser.ConfigParser()
+        self.cf.optionxform = str #Preserves case of keys in config file
         self.cf.read(self.p2config)
         self.state['cfReady'] = True
 
@@ -212,86 +222,325 @@ class TaskManager(object):
 
         return
 
-    def generateCorpus(self):
+    def fromHDFS(self):
         """
-        Generate a training corpus for topic modeling or other tasks
+        This method simulates the download of a corpus from the IntelComp data space
+        
+        In the version that will be taken to production, this method will not be necessary
+        and data will be directly retrieved from the data datalogue using IntelComp mediators
 
         This needs to be linked with the Data mediator
         """
 
-        ############################################################
-        ## IMT Interface: New Dataset POPUP
-        ############################################################
+        displaytext = """
+        *************************************************************************************
+        This method simulates the download of a corpus from the IntelComp data space
+        
+        In the version that will be taken to production, this method will not be necessary
+        and data will be directly retrieved from the data catalogue using IntelComp mediators
+
+        This needs to be linked with the Data mediator
+        *************************************************************************************
+        """
+        printred(displaytext)
 
         # We need the user to specify table, fields to include, filtering conditions
+        # Available tables in HDFS are read from config file
+        tables = {}
+        for key in self.cf['HDFS']:
+            tables[key] = self.cf['HDFS'][key]
+        tables_list = [el for el in tables.keys()]
+        table_opt = query_options(tables_list, 'Select the dataset you wish to download')
+        parquet_table = tables[tables_list[table_opt]]
 
-        parquet_table = "parquet.`/export/ml4ds/IntelComp/Datalake/SemanticScholar/20220201/papers.parquet`"
-        pt = input(f"Parquet table [{parquet_table}]: ")
-        if len(pt):
-            parquet_table = pt
-
-        selectFields = ["id", "lemmas"]
-        sf = input(f"Fields to include in dataset [{selectFields}]: ")
-        if len(sf):
-            selectFields = sf.split(",")
+        #Select fields to include
+        print('\nReference to available fields: https://intelcomp-uc3m.atlassian.net/wiki/spaces/INTELCOMPU/pages/884737/Status+of+UC3M+data+sets+for+WP2')
+        selectFields = "fieldsOfStudy, year, ... (id not necessary)"
+        sf = ''
+        while not len(sf):
+            sf = input(f"Fields to include in dataset [{selectFields}]: ")
+        selectFields = ",".join([el.strip() for el in sf.split(',')])
 
         filterCondition = "array_contains(fieldsOfStudy, 'Computer Science')"
-        fc = input(f"Filter to apply [{filterCondition}]: ")
-        if len(fc):
-            filterCondition = fc
-
-        # We also need a name for the dataset
+        filterCondition = input(f"Filter to apply [{filterCondition}]: ")
+        # This is not very smart. Used for being able to send arguments with
+        # "'" or " " to the spark job
+        filterCondition = filterCondition.replace(' ','SsS').replace("'","XxX")
+        
+        # We need a name for the dataset
         dtsName = ""
         while not len(dtsName):
             dtsName = input('Introduce a name for the dataset: ')
-        path_dataset = self.p2p.joinpath(
-            self._dir_struct['datasets']).joinpath(dtsName)
+        if not dtsName.endswith('.parquet'):
+            dtsName += '.parquet'
+        path_dataset = self.p2parquet.joinpath(dtsName)
         path_dataset.mkdir(parents=True, exist_ok=True)
 
-        #
-        #Now, we can call the "fake Data Mediator"
-        query = "SELECT " + (",").join(selectFields) + \
-                " FROM " + parquet_table
-        if len(filterCondition.strip()):
-            query += " WHERE " + filterCondition
+        # Introduce a description for the dataset
+        dtsDesc = ""
+        while not len(dtsDesc):
+            dtsDesc = input('Introduce a description for the dataset: ')
 
-        datasetMeta = {
-            "name"          : dtsName,
-            "query"         : query,
-            "validfor"      : ["TM"],
-            "date"          : DT.datetime.now()
-            }
+        #Define privacy level of dataset
+        privacy = ['Public', 'Private']
+        opt = query_options(privacy, 'Define visibility for the dataset')
+        privacy = privacy[opt]
 
-        with path_dataset.joinpath('config.json').open('w', encoding='utf-8') as outfile:
-            json.dump(datasetMeta, outfile, ensure_ascii=False, indent=2, default=str)
 
-        cmd = '/export/usuarios_ml4ds/jarenas/script-spark/script-spark ' + \
-              '-C /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json ' + \
-              '-c 4 -N 10 -S "generateCorpus.py --p ' + \
-              path_dataset.as_posix() + '"'
+        #printgr('Parquet_table: ' + parquet_table)
+        #printgr('SelectFields: ' + selectFields)
+        #printgr('filterCondition: '  + filterCondition)
+        #printgr('Pathdataset: ' +path_dataset.resolve().as_posix())
+        options = '"-p ' + parquet_table + ' -s ' + selectFields + \
+                  ' -d ' + path_dataset.resolve().as_posix()
+        if len(filterCondition):
+            options = options + ' -f ' + filterCondition + '"'
+        else:
+            options = options + '"'
+        #=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+        # This fragment of code creates a sparck cluster and submits the task
+        # This function is dependent on UC3M local deployment infrastructure
+        # and will not work in BSC production environment
+        # In any case, this function will be replaced by the DataCatalogue
+        # import functionalities, so no need to worry about setting it right,
+        # it will not get into production
+        #=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+        script_spark = self.cf.get('Spark', 'script_spark')
+        token_spark = self.cf.get('Spark', 'token_spark')
+        script_path = '/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/aux/fromHDFS/fromHDFS.py'
+        cmd = script_spark + ' -C ' + token_spark + \
+              ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+        printred(cmd)
         try:
             self.logger.info(f'-- -- Running command {cmd}')
             check_output(args=cmd, shell=True)
         except:
-            self.logger.error('-- -- Generation of script failed')
+            self.logger.error('-- -- Execution of script failed')
+        #=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+        datasetMeta = {
+            "name"          : dtsName,
+            "description"   : dtsDesc,
+            "visibility"    : privacy,
+            "download_date" : DT.datetime.now(),
+            #"records"       : len(pd.read_parquet(path_dataset, columns=[])),
+            "records"       : sum([pt.read_table(el, columns=[]).num_rows 
+                                        for el in path_dataset.iterdir()
+                                        if el.name.endswith('.parquet')]),
+            "source"        : tables_list[table_opt],
+            "schema"        : pt.read_schema([el for el in path_dataset.iterdir()
+                                        if el.name.endswith('.parquet')][0]).names
+            }
+
+        with path_dataset.joinpath('datasetMeta.json').open('w', encoding='utf-8') as outfile:
+            json.dump(datasetMeta, outfile, ensure_ascii=False, indent=2, default=str)
 
         return
-
         
-    def removeCorpus(self):
+    def listDownloaded(self):
         """
-        Remove a training corpus from the Interactive Topic Model Trainer
+        This method shows all Datasets that have been retrieved from HDFS
+        and are available for the Model Trainer
+
+        This is a extremely simple method for the taskmanager that does not
+        require any user interaction
+
         """
-        ############################################################
-        ## IMT Interface: Datasets window - remove selected datasets
-        ############################################################
-        dtSets = self.p2p.joinpath(self._dir_struct['datasets']).iterdir()
-        for el in dtSets:
-            if el.is_dir():
-                Y_or_N = input(f"Remove Training Set {el.name} [Y/N]?:")
-                if Y_or_N.upper() == "Y":
-                    if request_confirmation(msg='Model ' + el.name + ' will be deleted. Proceed?'):
-                        shutil.rmtree(el)
+        cmd = 'python src/manageCorpus/manageCorpus.py --listDownloaded --parquet '
+        cmd = cmd + self.p2parquet.resolve().as_posix()
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            allDtsets = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        allDtsets = json.loads(allDtsets)
+        for Dts in allDtsets.keys():
+            printmag('\nDataset ' + allDtsets[Dts]['name'])
+            print('\tSource:', allDtsets[Dts]['source'])
+            print('\tDescription:', allDtsets[Dts]['description'])
+            print('\tFields:', ', '.join([el for el in allDtsets[Dts]['schema']]))
+            print('\tNumber of docs:', allDtsets[Dts]['records'])
+            print('\tDownload date:', allDtsets[Dts]['download_date'])
+            print('\tVisibility:', allDtsets[Dts]['visibility'])
+        
+        return allDtsets
+
+    def createTMCorpus(self):
+        """
+        This method creates a training dataset for Topic Modeling
+        """
+
+        # We need first to download all available datasets
+        cmd = 'python src/manageCorpus/manageCorpus.py --listDownloaded --parquet '
+        cmd = cmd + self.p2parquet.resolve().as_posix()
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            allDtsets = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        allDtsets = json.loads(allDtsets)
+
+        # Now we start user interaction to gather datasets
+        displaytext = """
+        *************************************************************************************
+        Generation of Training corpus for Topic Modeling
+
+        You need to select one or more data sets; for each data set you need to select:
+
+            1 - The column that will be used as the id
+            2 - The columns that will be used for the rawtext
+            3 - The columns that contain the lemmas
+            4 - Any additional filtering condition in Spark format (advanced users only)
+                (e.g.: array_contains(fieldsOfStudy, 'Computer Science'))
+            5 - A domain selection model (To be implemented)
+            6 - A set of level three FOS codes (To be implemented)
+        
+        *************************************************************************************
+        """
+        printgr(displaytext)
+        
+        Dtsets = [el for el in allDtsets.keys()]
+        options = [allDtsets[el]['name'] for el in Dtsets] + ['Finish selection']
+        TM_Dtset = []
+        exit = False
+        while not exit:
+            opt = query_options(options, '\nSelect a corpus for the training dataset')
+            if opt == len(options)-1:
+                exit = True
+            else:
+                Dtset_loc = Dtsets.pop(opt)
+                Dtset_source = allDtsets[Dtset_loc]['source']
+                options.pop(opt)
+                print('\nProcessing dataset', allDtsets[Dtset_loc]['name'])
+                print('Available columns:', allDtsets[Dtset_loc]['schema'])
+                
+                #id fld
+                Dtset_idfld = ''
+                while Dtset_idfld not in allDtsets[Dtset_loc]['schema']:
+                    Dtset_idfld = input('Select the field to use as identifier: ')
+                
+                #lemmas fields
+                Dtset_lemmas_fld = input('Select fields for lemmas (separated by commas): ')
+                Dtset_lemmas_fld = [el.strip() for el in Dtset_lemmas_fld.split(',')]
+                Dtset_lemmas_fld = [el for el in Dtset_lemmas_fld
+                                        if el in allDtsets[Dtset_loc]['schema']]
+                print('Selected:', ', '.join(Dtset_lemmas_fld))
+                
+                #rawtext fields
+                Dtset_rawtext_fld = input('Select fields for rawtext (separated by commas): ')
+                Dtset_rawtext_fld = [el.strip() for el in Dtset_rawtext_fld.split(',')]
+                Dtset_rawtext_fld = [el for el in Dtset_rawtext_fld
+                                        if el in allDtsets[Dtset_loc]['schema']]
+                print('Selected:', ', '.join(Dtset_rawtext_fld))
+
+                #Spark clause for filtering (advanced users only)
+                Dtset_filter = input('Introduce a filtering condition for Spark clause (advanced users): ')
+                
+                TM_Dtset.append({'parquet'    : Dtset_loc,
+                                 'source'     : Dtset_source,
+                                 'idfld'      : Dtset_idfld,
+                                 'lemmasfld'  : Dtset_lemmas_fld,
+                                 'rawtxtfld'  : Dtset_rawtext_fld,
+                                 'filter'     : Dtset_filter
+                    })
+
+        # We need a name for the dataset
+        dtsName = ""
+        while not len(dtsName):
+            dtsName = input('Introduce a name for the training dataset: ')
+
+        # Introduce a description for the dataset
+        dtsDesc = ""
+        while not len(dtsDesc):
+            dtsDesc = input('Introduce a description: ')
+
+        #Define privacy level of dataset
+        privacy = ['Public', 'Private']
+        opt = query_options(privacy, 'Define visibility for the dataset')
+        privacy = privacy[opt]
+
+        Dtset = {'name'         : dtsName,
+                 'description'  : dtsDesc,
+                 'valid_for'    : "TM",
+                 'visibility'   : privacy,
+                 'Dtsets'       : TM_Dtset
+        }
+
+        cmd = 'echo "' + json.dumps(Dtset).replace('"', '\\"') + '"'
+        cmd = cmd + '| python src/manageCorpus/manageCorpus.py --saveTrDtset --path_datasets '
+        cmd = cmd + self.p2p.joinpath(self._dir_struct['datasets']).resolve().as_posix()
+        
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        return status
+
+    def listTMCorpus(self):
+        """
+        This method shows all (logical) Datasets available for training 
+        Topic Models
+
+        This is a extremely simple method for the taskmanager that does not
+        require any user interaction
+
+        """
+        cmd = 'python src/manageCorpus/manageCorpus.py --listTrDtsets --path_datasets '
+        cmd = cmd + self.p2p.joinpath(self._dir_struct['datasets']).resolve().as_posix()
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            allTrDtsets = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        allTrDtsets = json.loads(allTrDtsets)
+        for TrDts in allTrDtsets.keys():
+            printmag('\nTraining Dataset ' + allTrDtsets[TrDts]['name'])
+            print('\tDescription:', allTrDtsets[TrDts]['description'])
+            print('\tValid for:', allTrDtsets[TrDts]['valid_for'])
+            print('\tCreation date:', allTrDtsets[TrDts]['creation_date'])
+            print('\tVisibility:', allTrDtsets[TrDts]['visibility'])
+        
+        return allTrDtsets
+
+    def deleteTMCorpus(self):
+        """
+        Delete Training Corpus from the Interactive Topic Model Trainer
+        dataset folder
+        """
+
+        allTrDtsets = self.listTMCorpus()
+
+        for TrDts in allTrDtsets.keys():
+            Y_or_N = input(f"\nRemove Training Set {allTrDtsets[TrDts]['name']} [Y/N]?: ")
+            if Y_or_N.upper() == "Y":
+                if request_confirmation(msg='Training Dataset ' + allTrDtsets[TrDts]['name'] + ' will be deleted. Proceed?'):
+                    cmd = 'python src/manageCorpus/manageCorpus.py --deleteTrDtset --path_TrDtset '
+                    cmd = cmd + TrDts
+                    printred(cmd)
+                    try:
+                        self.logger.info(f'-- -- Running command {cmd}')
+                        status = check_output(args=cmd, shell=True)
+                        if status.decode('utf8') == '1':
+                            print('The training set was deleted')
+                        else:
+                            print('Deletion failed')
+                    except:
+                        self.logger.error('-- -- Execution of script failed')
+                        print('Deletion failed')
+
+        return
         
 
     def corpus2JSON(self):
@@ -314,7 +563,7 @@ class TaskManager(object):
             self.logger.info(f'-- -- Running command {cmd}')
             check_output(args=cmd, shell=True)
         except:
-            self.logger.error('-- -- Generation of script failed')
+            self.logger.error('-- -- Execution of script failed')
 
         return
 

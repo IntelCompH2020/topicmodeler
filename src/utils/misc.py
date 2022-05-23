@@ -72,10 +72,12 @@ def request_confirmation(msg="     Are you sure?"):
 def query_options(options, msg):
     """
     Prints a heading and the options, and returns the one selected by the user
-    Args:
-        options        : Complete list of options
-        msg            : Heading message to be printed before the list of
-                         available options
+
+    Parameters
+    ----------
+    options:    Complete list of options
+    msg:        Heading message to be printed before the list of
+                available options
     """
 
     print(msg)

@@ -37,11 +37,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--p', type=str, default=None,
                         help="path to a new or an existing project")
+    parser.add_argument('--parquet', type=str, default=None,
+                        help="path to downloaded parquet datasets")
     parser.add_argument('--f', action='store_true', default=False,
                         help='Force creation of new project. Overwrite existing.')
     args = parser.parse_args()
 
-    if os.path.isdir(project_path):
+    # Read project_path
+    project_path = pathlib.Path(args.p)
+
+    if project_path.is_dir():
         if not args.f:
             print('Loading the selected project')
             option = 'load'
@@ -51,10 +56,20 @@ def main():
     else:
         print('A new project will be created')
         option = 'create'
+
+    # Read project_path
+    parquet_path = pathlib.Path(args.parquet)
+    if not parquet_path.is_dir():
+        try:
+            parquet_path.mkdir(parents=True)
+        except:
+            print('Invalid folder for parquet datasets')
+            return
+
     active_options = None
 
     # Create TaskManager for this project
-    tm = TaskManager(project_path)
+    tm = TaskManager(project_path, parquet_path)
 
     # ########################
     # Prepare user interaction

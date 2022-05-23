@@ -1,6 +1,6 @@
 # *** IntelComp H2020 project ***
 
-# Interactive Topic Model Trainer demonstrator
+# Interactive Topic Model Trainer options for menu Navigator
 
 # This file contains the complete list of options in the main script.
 # It must contain at least a root menu with several options, and a description
@@ -11,18 +11,10 @@
 root:
   type: branch
   options: 
-    #- create   <Some true options may be missed because the appropriate one
+    #- create   <Some true options may be skipped because the appropriate one
     #- load      may have been selected by the starting command>
-    - generateCorpus
-    - removeCorpus
-    - corpus2JSON
-    - trainTM
-
-
-    - extractPipe
-    - inference
-    - editTM
-    - scalability
+    - manageCorpus
+    - TMoptions
 
 
 # LEVEL 1 MENU   
@@ -32,14 +24,40 @@ create:
 load:
   title: Load an existing Topic Model Trainer (ITMT) project
 
-generateCorpus:
-  title: Generate a Training dataset
 
-removeCorpus:
-  title: Remove a Traning dataset
+# LEVEL 2 MENU manageCorpus 
+manageCorpus:
+  title: Corpus Management Options
+  options:
+    - fromHDFS
+    - listDownloaded
+    - listTMCorpus
+    - createTMCorpus
+    - deleteTMCorpus
 
-corpus2JSON:
-  title: Extract JSON for Solr ingestion
+fromHDFS:
+  title: Retrieve data set from data catalogue
+
+listDownloaded:
+  title: List all Datasets retrieved from HDFS
+
+listTMCorpus:
+  title: List all available training corpus for Topic Modeling
+
+createTMCorpus:
+  title: Create a Traning dataset for Topic Modeling
+
+deleteTMCorpus:
+  title: Delete a Traning dataset for Topic Modeling
+
+
+# LEVEL 2 TMoptions
+TMoptions:
+  title: Topic Modeling options
+  options:
+    - trainTM
+    - editTM
+    - inference
 
 trainTM:
   title: Train a Topic Model
@@ -47,9 +65,6 @@ trainTM:
     - parameters:
         mallet: Mallet Topic Model Training
         ctm: Contextualized Topic Model (deep learning)
-
-
-
 
 
 
