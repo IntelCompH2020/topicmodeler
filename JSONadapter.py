@@ -1,14 +1,16 @@
 """
 Convert JSON data to human-readable form.
+
 Usage:
-  prettyJSON.py inputFile [outputFile]
+    prettyJSON.py inputFile [outputFile]
 """
 
 import sys
 
-out = ','.join([line[:-1] for line in sys.stdin.readlines()])
+if __name__ == "__main__":
+    out = ','.join([line[:-1] for line in sys.stdin.readlines()])
 
-sys.stdout.write('['+out+']')
+    sys.stdout.write('['+out+']')
 
 """
 for line in sys.stdin:

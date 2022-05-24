@@ -1,6 +1,6 @@
 """
-*** IntelComp H2020 project ***
-*** Topic Modeling Toolbox  ***
+* *IntelComp H2020 project*
+* *Topic Modeling Toolbox*
 
 Provides several classes for Topic Modeling
     - stwEQcleaner: For string cleaning (stopword removal + equivalent terms)
@@ -41,10 +41,9 @@ class stwEQcleaner (object):
 
     """Simpler version of the english lemmatizer
     It only provides stopword removal and application of equivalences
-    ====================================================
+        
     Public methods:
-    - cleanstr: Apply stopwords and equivalences on provided string
-    =====================================================
+        - cleanstr: Apply stopwords and equivalences on provided string
     """
 
     def __init__(self, stw_files=[], dict_eq_file='', logger=None):
@@ -52,8 +51,13 @@ class stwEQcleaner (object):
         Initilization Method
         Stopwwords and the dictionary of equivalences will be loaded
         during initialization
-        :stw_file: List of files of stopwords
-        :dict_eq_file: Dictionary of equivalent words A : B means A will be replaced by B
+
+        Parameters
+        ----------
+        stw_file: list
+            List of files of stopwords
+        dict_eq_file: pathlib.Path
+            Dictionary of equivalent words A : B means A will be replaced by B
 
         """
         self.__stopwords = []
@@ -88,7 +92,11 @@ class stwEQcleaner (object):
 
     def cleanstr(self, rawtext):
         """Function to remove stopwords and apply equivalences
-        :param rawtext: string with the text to lemmatize
+
+        Parameters
+        ----------
+        rawtext: str
+            string with the text to lemmatize
         """
         if rawtext==None or rawtext=='':
             return ''
@@ -103,7 +111,11 @@ class stwEQcleaner (object):
     def __loadStopFile(self, file):
         """Function to load the stopwords from a file. The stopwords will be
         read from the file, one stopword per line
-        :param file: The file to read the stopwords from
+
+        Parameters
+        ----------
+        file:
+            The file to read the stopwords from
         """
         with open(file, encoding='utf-8') as f:
             stopw = f.read().splitlines()
@@ -114,7 +126,11 @@ class stwEQcleaner (object):
         """Function to load equivalences from a file. The equivalence file
         will contain an equivalence per line in the format original : target
         where original will be changed to target after lemmatization
-        :param file: The file to read the equivalences from
+
+        Parameters
+        ----------
+        file:
+            The file to read the equivalences from
         """
         unigrams = []
         with open(file, 'r', encoding='utf-8') as f:
@@ -135,7 +151,11 @@ class stwEQcleaner (object):
 
     def __removeSTW(self, tokens):
         """Removes stopwords from the provided list
-        :param tokens: Input list of string to be cleaned from stw
+
+        Parameters
+        ----------
+        tokens:
+            Input list of string to be cleaned from stw
         """
         return [el for el in tokens if el not in self.__stopwords]
 
@@ -177,13 +197,19 @@ class TMmodel(object):
         Ademas de inicializar las correspondientes variables del objeto, se recalcula el Vector
         beta con downscoring (palabras comunes son penalizadas), y se calculan las
         entropias de cada topico.
-        :param betas: Matriz numpy de tamaño n_topics x n_words (vocab de cada tópico)
-        :param thetas: Matriz numpy de tamaño n_docs x n_topics (composición documental)
-        :param alphas: Vector de longitud n_topics, con la importancia de cada perfil
-        :param vocabfreq_file: Ruta a un fichero con el vocabulario correspondiente al modelo
-                               Contiene también la frecuencia de cada términos del vocabulario
-        :param from_file: If not None, contains the name of a file from which the object
-                          can be initialized
+
+        Parameters
+        ----------
+        betas:
+            Matriz numpy de tamaño n_topics x n_words (vocab de cada tópico)
+        thetas:
+            Matriz numpy de tamaño n_docs x n_topics (composición documental)
+        alphas:
+            Vector de longitud n_topics, con la importancia de cada perfil
+        vocabfreq_file:
+            Ruta a un fichero con el vocabulario correspondiente al modelo. Contiene también la frecuencia de cada términos del vocabulario
+        from_file:
+            If not None, contains the name of a file from which the object can be initialized
         """
         if logger:
             self.logger = logger
@@ -345,9 +371,13 @@ class TMmodel(object):
 
     def set_description(self, desc_tpc, tpc):
         """Set description of topic tpc to desc_tpc
-        Args:
-        :Param desc_tpc: String with the description for the topic
-        :Param tpc: Number of topic
+        
+        Parameters
+        ----------
+        desc_tpc:
+            String with the description for the topic
+        tpc:
+            Number of topic
         """
         if tpc>self._ntopics-1:
             print('Error setting topic description: Topic ID is larger than number of topics')
@@ -361,9 +391,14 @@ class TMmodel(object):
         utilizando el id de la palabra como clave
         Devuelve también la lista de frequencias de cada término del vocabulario
         
-        Parametro de entrada:
-            * vocabfreq_path     : Path con la ruta al vocabulario
-        Salida: (vocab_w2id,vocab_id2w)
+        Parameters
+        ----------
+        vocabfreq_path: pathlib.Path
+            Path con la ruta al vocabulario
+        
+        Returns
+        -------
+        : tuple(vocab_w2id,vocab_id2w)
             * vocab_w2id         : Diccionario {pal_i : id_pal_i}
             * vocab_id2w         : Diccionario {i     : pal_i}
         """
@@ -381,7 +416,11 @@ class TMmodel(object):
 
     def save_npz(self,npzfile):
         """Salva las matrices que caracterizan el modelo de tópicos en un fichero npz de numpy
-        :param npzfile: Nombre del fichero en el que se guardará el modelo
+
+        Parameters
+        ----------
+        npzfile:
+            Nombre del fichero en el que se guardará el modelo
         """
         if isinstance(self._thetas,sparse.csr_matrix):
             np.savez(npzfile,alphas=self._alphas,betas=self._betas,
@@ -405,7 +444,11 @@ class TMmodel(object):
 
     def thetas2sparse(self, thr):
         """Convert thetas matrix to CSR format
-        :param thr: Threshold to umbralize the matrix
+
+        Parameters
+        ----------
+        thr:
+            Threshold to umbralize the matrix
         """
         self._thetas[self._thetas<thr] = 0
         self._thetas = sparse.csr_matrix(self._thetas, copy=True)
@@ -416,11 +459,15 @@ class TMmodel(object):
 
     def muestra_perfiles(self,n_palabras=10,tfidf=True,tpc=None):
         """Muestra por pantalla los perfiles del modelo lda por pantalla
-        :Param n_palabas: Número de palabras a mostrar para cada perfil
-        :Param tfidf: Si True, se hace downscaling de palabras poco
-                        específicas (Blei and Lafferty, 2009)
-        :Param tpc: If not None, se imprimen los tópicos con ID en la lista tpc
-                    e.g.: tpc = [0,3,4]
+
+        Parameters
+        ----------
+        n_palabas:
+            Número de palabras a mostrar para cada perfil
+        tfidf:
+            Si True, se hace downscaling de palabras poco específicas (Blei and Lafferty, 2009)
+        tpc:
+            If not None, se imprimen los tópicos con ID en la lista tpc e.g.: tpc = [0,3,4]
         """
         if not tpc:
             tpc = range(self._ntopics)
@@ -436,8 +483,11 @@ class TMmodel(object):
 
     def muestra_descriptions(self,tpc=None,simple=False):
         """Muestra por pantalla las descripciones de los perfiles del modelo lda
-        :Param tpc: If not None, se imprimen los tópicos con ID en la lista tpc
-                    e.g.: tpc = [0,3,4]
+        
+        Parameters
+        ----------
+        tpc:
+            If not None, se imprimen los tópicos con ID en la lista tpc e.g.: tpc = [0,3,4]
         """
         if not tpc:
             tpc = range(self._ntopics)
@@ -449,11 +499,15 @@ class TMmodel(object):
 
     def get_topic_word_descriptions(self,n_palabras=15,tfidf=True,tpc=None):
         """Devuelve una lista con las descripciones del modelo de tópicos
-        :Param n_palabas: Número de palabras a mostrar para cada perfil
-        :Param tfidf: Si True, se hace downscaling de palabras poco
-                        específicas (Blei and Lafferty, 2009)
-        :Param tpc: If not None, se devuelven las descripciones de los tópicos
-                    con ID en la lista tpc e.g.: tpc = [0,3,4]                        
+
+        Parameters
+        ----------
+        n_palabas:
+            Número de palabras a mostrar para cada perfil
+        tfidf:
+            Si True, se hace downscaling de palabras poco específicas (Blei and Lafferty, 2009)
+        tpc:
+            If not None, se devuelven las descripciones de los tópicos con ID en la lista tpc e.g.: tpc = [0,3,4]                        
         """
         if not tpc:
             tpc = range(self._ntopics)
@@ -470,13 +524,19 @@ class TMmodel(object):
 
     def most_significant_words_per_topic(self,n_palabras=10,tfidf=True,tpc=None):
         """Devuelve una lista de listas de tuplas, en el formato:
-           [  [(palabra1tpc1, beta), (palabra2tpc1, beta)],
-              [(palabra1tpc2, beta), (palabra2tpc2, beta)]   ]
-        :Param n_palabas: Número de palabras que se devuelven para cada perfil
-        :Param tfidf: Si True, para la relevancia se emplea el downscaling
-                      de palabras poco específicas de (Blei and Lafferty, 2009)
-        :Param tpc: If not None, se devuelven únicamente las descripciones de los
-                    tópicos con ID en la lista tpc e.g.: tpc = [0,3,4]                        
+        ::
+
+            [  [(palabra1tpc1, beta), (palabra2tpc1, beta)],
+            [   (palabra1tpc2, beta), (palabra2tpc2, beta)]   ]
+        
+        Parameters
+        ----------
+        n_palabas:
+            Número de palabras que se devuelven para cada perfil
+        tfidf:
+            Si True, para la relevancia se emplea el downscaling de palabras poco específicas de (Blei and Lafferty, 2009)
+        tpc:
+            If not None, se devuelven únicamente las descripciones de los tópicos con ID en la lista tpc e.g.: tpc = [0,3,4]                        
         """
         if not tpc:
             tpc = range(self._ntopics)
@@ -497,8 +557,11 @@ class TMmodel(object):
 
     def delete_topic(self, tpc):
         """Deletes the indicated topic
-        Args:
-        :Param tpc: The topic to delete (an integer in range 0:ntopics)
+        
+        Parameters
+        ----------
+        tpc:
+            The topic to delete (an integer in range 0:ntopics)
         """
         #Keep record of model changes
         self._edits.append('d ' + str(tpc))
@@ -520,8 +583,11 @@ class TMmodel(object):
 
     def fuse_topics(self, tpcs):
         """Hard fusion of several topics
-        Args:
-        :Param tpcs: List of topics for the fusion
+        
+        Parameters
+        ----------
+        tpcs:
+            List of topics for the fusion
         """
         #Keep record of model chages
         tpcs = sorted(tpcs)
@@ -554,8 +620,7 @@ class TMmodel(object):
         return
 
     def sort_topics(self):
-        """Sort topics according to topic size
-        """
+        """Sort topics according to topic size"""
         # Indexes for topics reordering
         idx = np.argsort(self._alphas)[::-1]
         self._edits.append('s ' + ' '.join([str(el) for el in idx]))
@@ -582,9 +647,15 @@ class TMmodel(object):
     def pyLDAvis(self, htmlfile, ndocs, njobs=-1):
         """Generación de la visualización de pyLDAvis
         La visualización se almacena en el fichero que se recibe como argumento
-        :Param htmlfile: Path to generated html file
-        :Param ndocs: Number of documents used to compute the visualization
-        :Param njobs: Number of jobs used to accelerate pyLDAvis
+
+        Parameters
+        ----------
+        htmlfile:
+            Path to generated html file
+        ndocs:
+            Number of documents used to compute the visualization
+        njobs:
+            Number of jobs used to accelerate pyLDAvis
         """
         if len([el for el in self._edits if el.startswith('d')]):
             self.logger.error('-- -- -- pyLDAvis: El modelo ha sido editado y se han eliminado tópicos.')
@@ -613,15 +684,27 @@ class TMmodel(object):
     def automatic_topic_labeling(self, pathlabeling, ranking='unsupervised', nwords=10,workers=3,
                                     num_candidates=19, num_unsup_labels=5, num_sup_labels=5):
         """Genera vector de descripciones para los tópcios de un modelo
-        Las descripciones o títulos de los tópicos se guardan en self._descriptions
-        :Param pathlabeling: Root path to NETL files
-        :Param ranking: Method to rank candidates ('supervised','unsupervised','both')
-        :Param nwords: Number of words for representing a topic.
-        :Param workers: Number of workers for parallel computation
-        :Param num_candidates: Number of candidates for each topic
-        :Param num_unsup_labels: Top N unsupervised labels to propose
-        :Param num_sup_labels: Top N supervised labels to propose
-        @ Simón Roca Sotelo
+        Las descripciones o títulos de los tópicos se guardan en `self._descriptions`
+
+        .. sectionauthor:: Simón Roca Sotelo
+
+        Parameters
+        ----------
+        pathlabeling:
+            Root path to NETL files
+        ranking:
+            Method to rank candidates ('supervised','unsupervised','both')
+        nwords:
+            Number of words for representing a topic.
+        workers:
+            Number of workers for parallel computation
+        num_candidates:
+            Number of candidates for each topic
+        num_unsup_labels:
+            Top N unsupervised labels to propose
+        num_sup_labels:
+            Top N supervised labels to propose
+        
         """
 
         self.logger.info('-- -- -- NETL: Running automatic_topic_labeling ...')
@@ -815,8 +898,7 @@ class MalletTrainer(object):
         return
 
     def _SaveThrFig(self, thetas32):
-        """
-        Creates a figure to illustrate the effect of thresholding
+        """Creates a figure to illustrate the effect of thresholding
         The distribution of thetas is plotted, together with the value
         that the trainer is programmed to use for the thresholding
         """
@@ -832,9 +914,9 @@ class MalletTrainer(object):
         """Preprocessing of files
         For the training we have access (in self._corpusFiles) to a number of lemmatized
         documents. This function:
-        1) Carries out a first set of cleaning and homogeneization tasks
-        2) Allow to reduce the size of the vocabulary (removing very rare or common terms)
-        3) Import the training corpus into Mallet format
+            1) Carries out a first set of cleaning and homogeneization tasks
+            2) Allow to reduce the size of the vocabulary (removing very rare or common terms)
+            3) Import the training corpus into Mallet format
         """
 
         #Identification of words that are too rare or common that need to be 
@@ -937,9 +1019,9 @@ class MalletTrainer(object):
 
     def _train(self):
         """Mallet training. It does the following:
-        1) Trains a Mallet model using the settings provided by the user
-        2) It sparsifies thetas matrix and save a figure to report the effect
-        3) It saves model matrices: alphas, betas, thetas (sparse)
+            1) Trains a Mallet model using the settings provided by the user
+            2) It sparsifies thetas matrix and save a figure to report the effect
+            3) It saves model matrices: alphas, betas, thetas (sparse)
         """
         config_file = self._modelFolder.joinpath('mallet.config')
         corpus_mallet = self._modelFolder.joinpath('training_data.mallet')

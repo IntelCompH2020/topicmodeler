@@ -1,12 +1,13 @@
 """
-*** IntelComp H2020 project ***
+* *IntelComp H2020 project*
 
 Task Manager for the Interactive Topic Model Trainer App
 It implements the functions needed to
-  - Generate training datasets from datalake collections
-  - Train topic models
-  - Curate topic models
-  - Do inference with topic models
+
+    - Generate training datasets from datalake collections
+    - Train topic models
+    - Curate topic models
+    - Do inference with topic models
 """
 
 import shutil
@@ -39,8 +40,7 @@ class TaskManager(object):
     dictionary self.state, with the followin entries:
 
     - 'isProject'   : If True, project created. Metadata variables loaded
-    - 'cfReady'     : If True, config file succesfully loaded. Datamanager
-                      activated.
+    - 'cfReady'     : If True, config file succesfully loaded. Datamanager activated.
     """
 
     # This is a dictionary that contains a list to all subdirectories
@@ -572,8 +572,10 @@ class TaskManager(object):
         """
         Topic modeling trainer. Initial training of a topic model
 
-        Args:
-        :param trainer: TM optimizer [mallet/ctm]
+        Parameters
+        ----------
+        trainer:
+            TM optimizer [mallet/ctm]
         """
         
         ############################################################
@@ -1369,7 +1371,7 @@ class TaskManager(object):
     def show_subtrain_results(self):
         """
         Shows the results of the topic model validation in
-        self.validate_subtrain_models()
+        `self.validate_subtrain_models()`
         """
 
         # Path to the validation folder for the given corpus

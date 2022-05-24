@@ -1,5 +1,5 @@
 """
-*** IntelComp H2020 project ***
+* *IntelComp H2020 project*
 
 Contains the class implementing the functionality required
 by the Interactive Model Trainer for creating training datasets
@@ -81,14 +81,15 @@ class CorpusManager(object):
         path_dataset : pathlib.Path
             Path to the folder hosting the training datasets
 
-        Dtset : Dictionary with Training Dataset information
+        Dtset :
+            Dictionary with Training Dataset information
 
         Returns
         -------
-        status : 
-            0 if the dataset could not be created
-            1 if the dataset was created successfully
-            2 if the dataset replaced an existing dataset
+        status: int
+            - 0 if the dataset could not be created
+            - 1 if the dataset was created successfully
+            - 2 if the dataset replaced an existing dataset
         """
         
         if not path_datasets.is_dir():
@@ -121,9 +122,9 @@ class CorpusManager(object):
 
         Returns
         -------
-        status : 
-            0 if the dataset could not be deleted
-            1 if the dataset was deleted successfully
+        status : int
+            - 0 if the dataset could not be deleted
+            - 1 if the dataset was deleted successfully
         """
         
         if not path_TrDtset.is_file():
