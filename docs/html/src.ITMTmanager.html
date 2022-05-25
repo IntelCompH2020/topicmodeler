@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.ITMTmanager &mdash; Topic Modeler documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="topicmodeling" href="topicmodeling.html" />
+    <link rel="prev" title="src.utils.misc" href="src.utils.misc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> IntelComp_Topic_Modeler
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="JSONadapter.html">JSONadapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TMinferencer.html">TMinferencer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus2JSON.html">corpus2JSON</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="src.html">src</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="src.html#packages">Packages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#modules">Modules</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">src.ITMTmanager</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="topicmodeling.html">topicmodeling</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IntelComp_Topic_Modeler</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="src.html">src</a> &raquo;</li>
+      <li>src.ITMTmanager</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.ITMTmanager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-src.ITMTmanager">
+<span id="src-itmtmanager"></span><h1>src.ITMTmanager<a class="headerlink" href="#module-src.ITMTmanager" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><em>IntelComp H2020 project</em></p></li>
+</ul>
+<p>Task Manager for the Interactive Topic Model Trainer App
+It implements the functions needed to</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Generate training datasets from datalake collections</p></li>
+<li><p>Train topic models</p></li>
+<li><p>Curate topic models</p></li>
+<li><p>Do inference with topic models</p></li>
+</ul>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.ITMTmanager.</span></span><span class="sig-name descname"><span class="pre">TaskManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Main class to manage functionality of the Topic Model Interactive Trainer</p>
+<p>The behavior of this class depends on the state of the project, in
+dictionary self.state, with the followin entries:</p>
+<ul class="simple">
+<li><p>‘isProject’   : If True, project created. Metadata variables loaded</p></li>
+<li><p>‘cfReady’     : If True, config file succesfully loaded. Datamanager activated.</p></li>
+</ul>
+<p>Initiates the Task Manager object</p>
+<p>We declare here all variables that will be used by the TaskManager
+If no value is available, they are set to None and will be
+initialized later</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
+<li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initiates the Task Manager object</p>
+<p>We declare here all variables that will be used by the TaskManager
+If no value is available, they are set to None and will be
+initialized later</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
+<li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.create" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a project instance for the Topic Model Trainer
+To do so, it defines the main folder structure, and creates (or cleans)
+the project folder, specified in self.p2p</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.load" title="Permalink to this definition"></a></dt>
+<dd><p>Loads an existing Interactive Topic Modeling Trainer project</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.fromHDFS">
+<span class="sig-name descname"><span class="pre">fromHDFS</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.fromHDFS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.fromHDFS" title="Permalink to this definition"></a></dt>
+<dd><p>This method simulates the download of a corpus from the IntelComp data space</p>
+<p>In the version that will be taken to production, this method will not be necessary
+and data will be directly retrieved from the data datalogue using IntelComp mediators</p>
+<p>This needs to be linked with the Data mediator</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.listDownloaded">
+<span class="sig-name descname"><span class="pre">listDownloaded</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.listDownloaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.listDownloaded" title="Permalink to this definition"></a></dt>
+<dd><p>This method shows all Datasets that have been retrieved from HDFS
+and are available for the Model Trainer</p>
+<p>This is a extremely simple method for the taskmanager that does not
+require any user interaction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.createTMCorpus">
+<span class="sig-name descname"><span class="pre">createTMCorpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.createTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.createTMCorpus" title="Permalink to this definition"></a></dt>
+<dd><p>This method creates a training dataset for Topic Modeling</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.listTMCorpus">
+<span class="sig-name descname"><span class="pre">listTMCorpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.listTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.listTMCorpus" title="Permalink to this definition"></a></dt>
+<dd><p>This method shows all (logical) Datasets available for training
+Topic Models</p>
+<p>This is a extremely simple method for the taskmanager that does not
+require any user interaction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.deleteTMCorpus">
+<span class="sig-name descname"><span class="pre">deleteTMCorpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.deleteTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.deleteTMCorpus" title="Permalink to this definition"></a></dt>
+<dd><p>Delete Training Corpus from the Interactive Topic Model Trainer
+dataset folder</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.corpus2JSON">
+<span class="sig-name descname"><span class="pre">corpus2JSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.corpus2JSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.corpus2JSON" title="Permalink to this definition"></a></dt>
+<dd><p>Remove a training corpus from the Interactive Topic Model Trainer</p>
+<p>This is linked to the ITMTrainer only tentatively, since it should
+be part of WP4 tools</p>
+<p>Right now, it only runs the generation of the JSON files that are
+needed for ingestion of the corpus in Solr</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.trainTM">
+<span class="sig-name descname"><span class="pre">trainTM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trainer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.trainTM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.trainTM" title="Permalink to this definition"></a></dt>
+<dd><p>Topic modeling trainer. Initial training of a topic model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trainer</strong> – TM optimizer [mallet/ctm]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.extractPipe">
+<span class="sig-name descname"><span class="pre">extractPipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.extractPipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.extractPipe" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.inference">
+<span class="sig-name descname"><span class="pre">inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.inference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.inference" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.editTM">
+<span class="sig-name descname"><span class="pre">editTM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.editTM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.editTM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.compute_all_sim_graphs">
+<span class="sig-name descname"><span class="pre">compute_all_sim_graphs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.compute_all_sim_graphs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.compute_all_sim_graphs" title="Permalink to this definition"></a></dt>
+<dd><p>Computes all similarity graphs from the available topic models for a
+given corpus, and save them in a supergraph structure, to be used
+later in validation processes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus</strong> (<em>str</em>) – Corpus (S24Ever: Semantic Scholar, Crunch4Ever: Crunchbase)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.compute_reference_graph">
+<span class="sig-name descname"><span class="pre">compute_reference_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.compute_reference_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.compute_reference_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Computes a reference graph for a given corpus, based on metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Name of the corpus</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.validate_topic_models">
+<span class="sig-name descname"><span class="pre">validate_topic_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.validate_topic_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.validate_topic_models" title="Permalink to this definition"></a></dt>
+<dd><p>Analyzes the influence of the topic model on te quality of the
+similarity graphs</p>
+<p>The similarity graph is validated using a citations graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.show_validation_results">
+<span class="sig-name descname"><span class="pre">show_validation_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.show_validation_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.show_validation_results" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the results of the topic model validation in
+self.validate_topic_models()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.analyze_variability">
+<span class="sig-name descname"><span class="pre">analyze_variability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.analyze_variability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.analyze_variability" title="Permalink to this definition"></a></dt>
+<dd><p>Analyzes the influence of the topic model on te quality of the
+similarity graphs</p>
+<p>The similarity graph is validated from the analisys of the variability
+of node relationships in the graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.show_variability_results">
+<span class="sig-name descname"><span class="pre">show_variability_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.show_variability_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.show_variability_results" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the results of the topic model validation in
+self.validate_topic_models()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.analyze_scalability">
+<span class="sig-name descname"><span class="pre">analyze_scalability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.analyze_scalability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.analyze_scalability" title="Permalink to this definition"></a></dt>
+<dd><p>Analyzes the influence of the topic model on te quality of the
+similarity graphs</p>
+<p>The similarity graph is validated using a citations graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.show_scalability_results">
+<span class="sig-name descname"><span class="pre">show_scalability_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.show_scalability_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.show_scalability_results" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the results of the topic model validation in
+self.validate_topic_models()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.validate_subtrain_models">
+<span class="sig-name descname"><span class="pre">validate_subtrain_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.validate_subtrain_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.validate_subtrain_models" title="Permalink to this definition"></a></dt>
+<dd><p>Validates topics models obtained using a reduced corpus, using a
+gold standard based o a large corpus</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ITMTmanager.TaskManager.show_subtrain_results">
+<span class="sig-name descname"><span class="pre">show_subtrain_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ITMTmanager.html#TaskManager.show_subtrain_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ITMTmanager.TaskManager.show_subtrain_results" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the results of the topic model validation in
+<cite>self.validate_subtrain_models()</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.utils.misc.html" class="btn btn-neutral float-left" title="src.utils.misc" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="topicmodeling.html" class="btn btn-neutral float-right" title="topicmodeling" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, J. Arenas-García, L. Calvo-Bartolomé, J. A. Espinosa-Melchor.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

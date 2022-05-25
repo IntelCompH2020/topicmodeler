@@ -16,7 +16,11 @@ def printmag(text):
 def is_integer(user_str):
     """Check if input string can be converted to integer
     param user_str: string to be converted to an integer value
-    Return: The integer conversion of user_str if possible; None otherwise
+
+    Returns
+    -------
+    :
+        The integer conversion of user_str if possible; None otherwise
     """
     try:
         return int(user_str)
@@ -27,7 +31,11 @@ def is_integer(user_str):
 def is_float(user_str):
     """Check if input string can be converted to float
     param user_str: string to be converted to an integer value
-    Return: The integer conversion of user_str if possible; None otherwise
+
+    Returns
+    -------
+    :
+        The integer conversion of user_str if possible; None otherwise
     """
     try:
         return float(user_str)
@@ -37,10 +45,20 @@ def is_float(user_str):
 
 def var_num_keyboard(vartype,default,question):
     """Read a numeric variable from the keyboard
-    param vartype: Type of numeric variable to expect 'int' or 'float'
-    param default: Default value for the variable
-    param question: Text for querying the user the variable value
-    Return: The value provided by the user, or the default value
+
+    Parameters
+    ----------        
+    vartype:
+        Type of numeric variable to expect 'int' or 'float'
+    default:
+        Default value for the variable
+    question:
+        Text for querying the user the variable value
+    
+    Returns
+    -------
+    :
+        The value provided by the user, or the default value
     """
     aux = input(question + ' [' + str(default) + ']: ')
     if vartype == 'int':
@@ -75,9 +93,11 @@ def query_options(options, msg):
 
     Parameters
     ----------
-    options:    Complete list of options
-    msg:        Heading message to be printed before the list of
-                available options
+    options:
+        Complete list of options
+    msg:
+        Heading message to be printed before the list of
+        available options
     """
 
     print(msg)

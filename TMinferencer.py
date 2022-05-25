@@ -1,7 +1,8 @@
 """
 Convert JSON data to human-readable form.
+
 Usage:
-  prettyJSON.py inputFile [outputFile]
+    prettyJSON.py inputFile [outputFile]
 """
 
 import sys

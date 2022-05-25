@@ -1,15 +1,16 @@
 """
-Created on Mar 06 2022
-@author: Jerónimo Arenas García
-
 Temporary routine for generation of JSON files
 simulating the creation of files required for the
 BI tool
 
 If other datasets want to be ingested, we need to
-1) Change the SELECT statement accordingly
-2) Change the fields as necessary
-3) Change the name of the folder where the JSON will be save
+    1) Change the SELECT statement accordingly
+    2) Change the fields as necessary
+    3) Change the name of the folder where the JSON will be save
+
+Created on Mar 06 2022
+
+.. codeauthor:: Jerónimo Arenas García
 """
 
 import TMinferencer

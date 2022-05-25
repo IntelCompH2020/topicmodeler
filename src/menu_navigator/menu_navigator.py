@@ -5,8 +5,9 @@ menu.
 
 Created on March. 04, 2019
 
-@author: Jesús Cid Sueiro
-         Based on former menu manager scripts by Jerónimo Arenas.
+.. codeauthor:: Jesús Cid Sueiro
+
+.. note:: Based on former menu manager scripts by Jerónimo Arenas.
 """
 
 import os
@@ -38,9 +39,8 @@ class MenuNavigator(object):
             actions selected by the user through the menu interaction. Thus, it
             must contain:
 
-            (1) One action method per method specified in the menu structure
-            (2) Data collection methods, required for some menus with dynamic
-            options.
+                (1) One action method per method specified in the menu structure
+                (2) Data collection methods, required for some menus with dynamic options.
 
         path2menu : str
             The route to the yaml file containing the menu structure

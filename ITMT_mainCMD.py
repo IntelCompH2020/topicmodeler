@@ -1,21 +1,22 @@
 """
-*** IntelComp H2020 project ***
-*** Interactive Topic Model Trainer ***
+* *IntelComp H2020 project*
+* *Interactive Topic Model Trainer*
 
 Application for the interactive training of Topic Models
 
 It implements a command line tool for the training and curation of topic models
 exploiting the tools available in topicmodeling.py:
+
    - Different LDA implementations
    - Topic assessment tools
    - Topic curation tools
 
-Contributors: José Antonio Espinosa-Melchor
-              Lorena Calvo-Bartolomé
+.. codeauthor:: José Antonio Espinosa-Melchor,
+              Lorena Calvo-Bartolomé,
               Jerónimo Arenas-García (jarenas@ing.uc3m.es)
 
-Menú navigator is based on the base class created by Jesús Cid-Sueiro
-(https://github.com/Orieus/menuNavigator)
+.. note:: Menú navigator is based on the base class created by Jesús Cid-Sueiro
+    (https://github.com/Orieus/menuNavigator)
 """
 
 import pathlib
