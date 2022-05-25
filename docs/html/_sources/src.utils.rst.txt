@@ -9,9 +9,6 @@ Modules
 
    src.utils.misc
 
-.. Module contents
-.. ---------------
-
 .. .. automodule:: src.utils
 ..    :members:
 ..    :undoc-members:

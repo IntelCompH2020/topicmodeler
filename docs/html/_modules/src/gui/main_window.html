@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.gui.main_window &mdash; Topic Modeler documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> IntelComp_Topic_Modeler
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ITMT_mainGUI.html">ITMT_mainGUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../JSONadapter.html">JSONadapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../TMinferencer.html">TMinferencer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../corpus2JSON.html">corpus2JSON</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../topicmodeling.html">topicmodeling</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">IntelComp_Topic_Modeler</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>src.gui.main_window</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.gui.main_window</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+
+<span class="kn">from</span> <span class="nn">PyQt6</span> <span class="kn">import</span> <span class="n">QtGui</span>
+<span class="kn">from</span> <span class="nn">PyQt6.QtWidgets</span> <span class="kn">import</span> <span class="n">QMainWindow</span><span class="p">,</span> <span class="n">QFileDialog</span><span class="p">,</span> <span class="n">QPushButton</span>
+<span class="kn">from</span> <span class="nn">PyQt6.uic</span> <span class="kn">import</span> <span class="n">loadUi</span>
+<span class="kn">from</span> <span class="nn">PyQt6.QtCore</span> <span class="kn">import</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">QThreadPool</span>
+<span class="kn">from</span> <span class="nn">PyQt6.QtWebEngineWidgets</span> <span class="kn">import</span> <span class="n">QWebEngineView</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">from</span> <span class="nn">src.gui.train_model_window</span> <span class="kn">import</span> <span class="n">TrainModelWindow</span>
+<span class="kn">from</span> <span class="nn">src.gui.utils</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">src.gui.utils.output_wrapper</span> <span class="kn">import</span> <span class="n">OutputWrapper</span>
+<span class="kn">from</span> <span class="nn">src.gui.utils.constants</span> <span class="kn">import</span> <span class="n">Constants</span>
+<span class="kn">from</span> <span class="nn">src.gui.utils.utils</span> <span class="kn">import</span> <span class="n">execute_in_thread</span>
+<span class="kn">from</span> <span class="nn">src.project_manager.itmt_task_manager</span> <span class="kn">import</span> <span class="n">ITMTTaskManagerGUI</span>
+
+
+<div class="viewcode-block" id="MainWindow"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow">[docs]</a><span class="k">class</span> <span class="nc">MainWindow</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
+<div class="viewcode-block" id="MainWindow.__init__"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parquet_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the application&#39;s main window.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        project_folder : pathlib.Path (default=None)</span>
+<span class="sd">           Path to the application project</span>
+<span class="sd">        parquet_folder : pathlib.Path (default=None)</span>
+<span class="sd">           Path to the folder containing the parquet files</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">MainWindow</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Load UI</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="n">loadUi</span><span class="p">(</span><span class="s2">&quot;src/gui/uis/main_window.ui&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Attributes</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Attributes to redirect stdout and stderr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">OutputWrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">OutputWrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Attributes for creating TM object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span> <span class="o">=</span> <span class="n">project_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span> <span class="o">=</span> <span class="n">parquet_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tm</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">configure_tm</span><span class="p">()</span>
+
+        <span class="c1"># Attributes for displaying PyLDAvis in home page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Other attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_corpus_button</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Get home in any operating system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">home</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">())</span>
+
+        <span class="c1"># Creation of subwindows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_model_subwindow</span> <span class="o">=</span> <span class="n">TrainModelWindow</span><span class="p">()</span>
+
+        <span class="c1"># Threads for executing in parallel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread_pool</span> <span class="o">=</span> <span class="n">QThreadPool</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Multithreading with maximum&quot;</span>
+              <span class="s2">&quot; </span><span class="si">%d</span><span class="s2"> threads&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_pool</span><span class="o">.</span><span class="n">maxThreadCount</span><span class="p">())</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Connect pages</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="n">menu_buttons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">id_button</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MAX_MENU_BUTTONS</span><span class="p">):</span>
+            <span class="n">menu_button_name</span> <span class="o">=</span> <span class="s2">&quot;menu_button_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">id_button</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">menu_button_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">menu_button_name</span><span class="p">)</span>
+            <span class="n">menu_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">menu_button_widget</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">menu_button</span> <span class="ow">in</span> <span class="n">menu_buttons</span><span class="p">:</span>
+            <span class="n">menu_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_change_menu_button</span><span class="p">,</span> <span class="n">menu_button</span><span class="p">))</span>
+
+        <span class="c1"># PAGE 1: Home</span>
+        <span class="c1">###############</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_button_1</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_tabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_home</span><span class="p">))</span>
+
+        <span class="c1"># PAGE 2: Corpus</span>
+        <span class="c1">#################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_button_2</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_tabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_corpus</span><span class="p">))</span>
+
+        <span class="n">corpus_buttons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">id_button</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MAX_CORPUS_BUTTONS</span><span class="p">):</span>
+            <span class="n">corpus_button_name</span> <span class="o">=</span> <span class="s2">&quot;corpus_button_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">id_button</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">corpus_button_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">corpus_button_name</span><span class="p">)</span>
+            <span class="n">corpus_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corpus_button_widget</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">corpus_button</span> <span class="ow">in</span> <span class="n">corpus_buttons</span><span class="p">:</span>
+            <span class="n">corpus_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_change_corpus_button</span><span class="p">,</span> <span class="n">corpus_button</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">corpus_button_1</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">corpus_tabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_local_corpus</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">corpus_button_2</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">corpus_tabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_training_datasets</span><span class="p">))</span>
+
+        <span class="c1"># PAGE 3: Models</span>
+        <span class="c1">#################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_button_3</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_tabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_models</span><span class="p">))</span>
+
+        <span class="c1"># PAGE 4: Settings</span>
+        <span class="c1">###################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_button_4</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_tabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_general_settings</span><span class="p">))</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Widgets initial configuration</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># PAGE 1: Home</span>
+
+        <span class="c1"># PAGE 2: Corpus</span>
+        <span class="c1"># Configure tables</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">configure_table_header</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">CORPUS_TABLES</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># PAGE 3: Models</span>
+        <span class="c1"># Configure tables</span>
+
+        <span class="c1"># PAGE 4: Settings</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">configure_table_header</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MODELS_TABLES</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Connect buttons</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_open_project_folder</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_project_folder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_open_parquet_folder</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_parquet_folder</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_train_dataset</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_train_dataset</span><span class="p">)</span></div>
+
+    <span class="c1">#####################################################################################</span>
+    <span class="c1"># TASK MANAGER COMMUNICATION METHODS</span>
+    <span class="c1">#####################################################################################</span>
+<div class="viewcode-block" id="MainWindow.configure_tm"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.configure_tm">[docs]</a>    <span class="k">def</span> <span class="nf">configure_tm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tm</span> <span class="o">=</span> <span class="n">ITMTTaskManagerGUI</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A new project folder was selected. Proceeding with &quot;</span>
+                      <span class="s2">&quot;its configuration...&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;An existing project folder was selected. Proceeding with &quot;</span>
+                      <span class="s2">&quot;its loading...&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+            <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MainWindow.load_data"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">listDownloaded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">listTMCorpus</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+    <span class="c1">#####################################################################################</span>
+    <span class="c1"># HANDLERS</span>
+    <span class="c1">#####################################################################################</span>
+<div class="viewcode-block" id="MainWindow.get_project_folder"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.get_project_folder">[docs]</a>    <span class="k">def</span> <span class="nf">get_project_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Select an existing project or create a new one&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit_current_project</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+
+        <span class="c1"># Create Task Manager object if possible</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_tm</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindow.get_parquet_folder"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.get_parquet_folder">[docs]</a>    <span class="k">def</span> <span class="nf">get_parquet_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Select the folder with the parquet files&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit_current_parquet</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+
+        <span class="c1"># Create Task Manager object if possible</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_tm</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainWindow.clicked_change_menu_button"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.clicked_change_menu_button">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_change_menu_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">menu_button</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to control the selection of one of the buttons in the menu bar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Put unpressed color for the previous pressed menu button</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span><span class="o">.</span><span class="n">objectName</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;menu_button_1&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">HOME_BUTTON_UNSELECTED_STYLESHEET</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">OTHER_BUTTONS_UNSELECTED_STYLESHEET</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span> <span class="o">=</span> <span class="n">menu_button</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span><span class="o">.</span><span class="n">objectName</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;menu_button_1&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">HOME_BUTTON_SELECTED_STYLESHEET</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">OTHER_BUTTONS_SELECTED_STYLESHEET</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MainWindow.clicked_change_corpus_button"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.clicked_change_corpus_button">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_change_corpus_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corpus_button</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to control the selection of one of the buttons in the train bar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Put unpressed color for the previous pressed train button</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_corpus_button</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_corpus_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">TRAIN_BUTTONS_UNSELECTED_STYLESHEET</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_corpus_button</span> <span class="o">=</span> <span class="n">corpus_button</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_corpus_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">TRAIN_BUTTONS_SELECTED_STYLESHEET</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+    <span class="c1"># CORPUS FUNCTIONS</span>
+<div class="viewcode-block" id="MainWindow.clicked_train_dataset"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.clicked_train_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_train_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_model_subwindow</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span></div>
+
+    <span class="c1"># MODELS FUNCTIONS</span>
+
+<div class="viewcode-block" id="MainWindow.get_pyldavis_home"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.get_pyldavis_home">[docs]</a>    <span class="k">def</span> <span class="nf">get_pyldavis_home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web</span> <span class="o">=</span> <span class="n">QWebEngineView</span><span class="p">()</span>
+        <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">QUrl</span><span class="o">.</span><span class="n">fromLocalFile</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s2">&quot;/src/gui/resources/pyLDAvis.html&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout_plot_pyldavis</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">web</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, J. Arenas-García, L. Calvo-Bartolomé, J. A. Espinosa-Melchor.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

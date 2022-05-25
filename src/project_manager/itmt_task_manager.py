@@ -1,12 +1,13 @@
 """
-*** IntelComp H2020 project ***
+* *IntelComp H2020 project*
 
 Task Manager for the Interactive Topic Model Trainer App
 It implements the functions needed to
-  - Generate training datasets from datalake collections
-  - Train topic models
-  - Curate topic models
-  - Do inference with topic models
+
+    - Generate training datasets from datalake collections
+    - Train topic models
+    - Curate topic models
+    - Do inference with topic models
 """
 
 import shutil
@@ -163,14 +164,15 @@ class ITMTTaskManager(BaseTaskManager):
 
         Parameters
         ----------
-        dt_set : Dictionary with Training Dataset information
+        dt_set :
+            Dictionary with Training Dataset information
 
         Returns
         -------
         status : int
-            0 if the dataset could not be created
-            1 if the dataset was created successfully
-            2 if the dataset replaced an existing dataset
+            - 0 if the dataset could not be created
+            - 1 if the dataset was created successfully
+            - 2 if the dataset replaced an existing dataset
         """
 
         cmd = 'echo "' + json.dumps(dt_set).replace('"', '\\"') + '"'
@@ -202,9 +204,9 @@ class ITMTTaskManager(BaseTaskManager):
 
         Returns
         -------
-        status :
-            0 if the dataset could not be deleted
-            1 if the dataset was deleted successfully
+        status : int
+            - 0 if the dataset could not be deleted
+            - 1 if the dataset was deleted successfully
         """
 
         cmd = 'python src/manageCorpus/manageCorpus.py --deleteTrDtset --path_TrDtset '
@@ -554,8 +556,10 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         """
         Topic modeling trainer. Initial training of a topic model
 
-        Args:
-        :param trainer: TM optimizer [mallet/ctm]
+        Parameters
+        ----------
+        trainer:
+            TM optimizer [mallet/ctm]
         """
 
         ############################################################
@@ -1256,7 +1260,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
     def show_variability_results(self, corpus_name):
         """
         Shows the results of the topic model validation in
-        self.validate_topic_models()
+        `self.validate_topic_models()`
 
         Parameters
         ----------
@@ -1304,7 +1308,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
     def show_scalability_results(self, corpus_name):
         """
         Shows the results of the topic model validation in
-        self.validate_topic_models()
+        `self.validate_topic_models()`
 
         Parameters
         ----------

@@ -11,7 +11,7 @@ matplotlib==3.5.1
 ##fastparquet==0.1.5
 pyarrow==8.0.0
 pyyaml==6.0
-click==7.1.2
+# click==7.1.2
 PyQt6==6.3.0
 PyQt6-Qt6==6.3.0
 PyQt6-sip==13.3.1

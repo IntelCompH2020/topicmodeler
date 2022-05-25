@@ -1,5 +1,5 @@
 """
-*** IntelComp H2020 project ***
+* *IntelComp H2020 project*
 
 Base Task Manager for the Interactive Topic Model Trainer App
 It implements the functions needed to create, load and set up an
@@ -170,10 +170,11 @@ class BaseTaskManager(object):
     def _load_metadata(self):
         """
         Loads metadata file
+
         Returns
         -------
-            metadata : dict
-                Metadata dictionary
+        metadata : dict
+            Metadata dictionary
         """
 
         # Save metadata

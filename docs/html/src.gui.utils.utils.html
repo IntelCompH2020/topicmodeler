@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.gui.utils.utils &mdash; Topic Modeler documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.gui.utils.worker" href="src.gui.utils.worker.html" />
+    <link rel="prev" title="src.gui.utils.output_wrapper" href="src.gui.utils.output_wrapper.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> IntelComp_Topic_Modeler
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ITMT_mainGUI.html">ITMT_mainGUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="JSONadapter.html">JSONadapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TMinferencer.html">TMinferencer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus2JSON.html">corpus2JSON</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="src.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#packages">Packages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.gui.html">src.gui</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="src.gui.html#packages">Packages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#modules">Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.neural_models.html">src.neural_models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.project_manager.html">src.project_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.utils.html">src.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#modules">Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="topicmodeling.html">topicmodeling</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IntelComp_Topic_Modeler</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="src.html">src</a> &raquo;</li>
+          <li><a href="src.gui.html">src.gui</a> &raquo;</li>
+          <li><a href="src.gui.utils.html">src.gui.utils</a> &raquo;</li>
+      <li>src.gui.utils.utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.gui.utils.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-src.gui.utils.utils">
+<span id="src-gui-utils-utils"></span><h1>src.gui.utils.utils<a class="headerlink" href="#module-src.gui.utils.utils" title="Permalink to this headline"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.utils.utils.configure_table_header">
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">configure_table_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_tables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#configure_table_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.configure_table_header" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.utils.utils.initialize_progress_bar">
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">initialize_progress_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_progress_bars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#initialize_progress_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.initialize_progress_bar" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.utils.utils.execute_in_thread">
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">execute_in_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gui</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_bar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#execute_in_thread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.execute_in_thread" title="Permalink to this definition"></a></dt>
+<dd><p>Method to execute a function in the secondary thread while showing
+a progress bar at the time the function is being executed if a progress bar object is provided.
+When finished, it forces the execution of the method to be
+executed after the function executing in a thread is completed.
+Based on the functions provided in the manual available at:
+<a class="reference external" href="https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/">https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gui</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>MainWindow</em></a>) – <p>…</p>
+</p></li>
+<li><p><strong>function</strong> (<em>UDF</em>) – Function to be executed in thread</p></li>
+<li><p><strong>function_output</strong> (<em>UDF</em>) – Function to be executed at the end of the thread</p></li>
+<li><p><strong>progress_bar</strong> (<em>QProgressBar</em>) – If a QProgressBar object is provided, it shows a progress bar in the
+main thread while the main task is being carried out in a secondary thread</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.utils.utils.signal_accept">
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">signal_accept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">progress_bar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#signal_accept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.signal_accept" title="Permalink to this definition"></a></dt>
+<dd><p>Makes the progress bar passed as an argument visible and configures it for
+an event whose duration is unknown by setting both its minimum and maximum
+both to 0, thus the bar shows a busy indicator instead of a percentage of steps.
+:param progress_bar: Progress bar object in which the progress is going to be displayed.
+:type progress_bar: QProgressBar</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.gui.utils.output_wrapper.html" class="btn btn-neutral float-left" title="src.gui.utils.output_wrapper" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.gui.utils.worker.html" class="btn btn-neutral float-right" title="src.gui.utils.worker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, J. Arenas-García, L. Calvo-Bartolomé, J. A. Espinosa-Melchor.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

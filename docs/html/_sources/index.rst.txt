@@ -11,6 +11,7 @@ Topic Modeler documentation
    :caption: Contents:
 
    ITMT_mainCMD
+   ITMT_mainGUI
    JSONadapter
    TMinferencer
    corpus2JSON

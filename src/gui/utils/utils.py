@@ -30,7 +30,7 @@ def execute_in_thread(gui, function, function_output, progress_bar):
     Parameters
     ----------
     gui: MainWindow
-        ....
+        ...
     function: UDF
         Function to be executed in thread
     function_output: UDF

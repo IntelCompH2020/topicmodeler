@@ -10,9 +10,15 @@ class WhiteSpacePreprocessing():
     def __init__(self, documents, stopwords_language="english", vocabulary_size=2000):
         """
 
-        :param documents: list of strings
-        :param stopwords_language: string of the language of the stopwords (see nltk stopwords)
-        :param vocabulary_size: the number of most frequent words to include in the documents. Infrequent words will be discarded from the list of preprocessed documents
+        Parameters
+        ----------
+        documents: List[str]
+            list of strings
+        stopwords_language: str
+            string of the language of the stopwords (see nltk stopwords)
+        vocabulary_size: int
+            the number of most frequent words to include in the documents.
+            Infrequent words will be discarded from the list of preprocessed documents
         """
         self.documents = documents
         self.stopwords = set(stop_words.words(stopwords_language))
@@ -23,7 +29,14 @@ class WhiteSpacePreprocessing():
         Note that if after filtering some documents do not contain words we remove them. That is why we return also the
         list of unpreprocessed documents.
 
-        :return: preprocessed documents, unpreprocessed documents and the vocabulary list
+        Returns
+        -------
+        preprocessed_docs:
+            preprocessed documents
+        unpreprocessed_docs:
+            unpreprocessed documents
+        vocabulary: list[str]
+            vocabulary list
         """
         preprocessed_docs_tmp = self.documents
         preprocessed_docs_tmp = [doc.lower() for doc in preprocessed_docs_tmp]

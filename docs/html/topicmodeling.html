@@ -39,6 +39,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ITMT_mainGUI.html">ITMT_mainGUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="JSONadapter.html">JSONadapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="TMinferencer.html">TMinferencer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus2JSON.html">corpus2JSON</a></li>
@@ -440,6 +441,50 @@ Initializes relevant variables from config file</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="topicmodeling.MalletTrainer.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/topicmodeling.html#MalletTrainer.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#topicmodeling.MalletTrainer.fit" title="Permalink to this definition"></a></dt>
+<dd><p>To fit the model we need to preprocess training data, and then
+carry out the training itself</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="topicmodeling.ProdLDATrainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">topicmodeling.</span></span><span class="sig-name descname"><span class="pre">ProdLDATrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelFolder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topicmodeling.html#ProdLDATrainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#topicmodeling.ProdLDATrainer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Object initializer
+Initializes relevant variables from config file</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="topicmodeling.ProdLDATrainer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelFolder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topicmodeling.html#ProdLDATrainer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#topicmodeling.ProdLDATrainer.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Object initializer
+Initializes relevant variables from config file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="topicmodeling.ProdLDATrainer.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/topicmodeling.html#ProdLDATrainer.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#topicmodeling.ProdLDATrainer.fit" title="Permalink to this definition"></a></dt>
+<dd><p>To fit the model we need to preprocess training data, and then
+carry out the training itself</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="topicmodeling.CTMTrainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">topicmodeling.</span></span><span class="sig-name descname"><span class="pre">CTMTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelFolder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topicmodeling.html#CTMTrainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#topicmodeling.CTMTrainer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Object initializer
+Initializes relevant variables from config file</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="topicmodeling.CTMTrainer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelFolder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topicmodeling.html#CTMTrainer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#topicmodeling.CTMTrainer.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Object initializer
+Initializes relevant variables from config file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="topicmodeling.CTMTrainer.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/topicmodeling.html#CTMTrainer.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#topicmodeling.CTMTrainer.fit" title="Permalink to this definition"></a></dt>
 <dd><p>To fit the model we need to preprocess training data, and then
 carry out the training itself</p>
 </dd></dl>

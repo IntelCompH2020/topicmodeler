@@ -503,10 +503,11 @@ class AVITM(object):
 
     def get_topic_word_matrix(self):
         """
-        Gets the topic-word matrix associated with the trained model. If model_type is LDA, the matrix is normalized; otherwise, it is unnormalized.
+        Gets the topic-word matrix associated with the trained model. If model_type is LDA, the matrix is normalized;
+        otherwise, it is unnormalized.
 
-        Returns:
-        --------
+        Returns
+        -------
         topic_word_mat: numpy.ndarray
             A CxV matrix where C is the number of components and V is the vocabulary length
         """
@@ -561,8 +562,8 @@ class AVITM(object):
         """
         Formats the file in which the trained model will be saved if specified
 
-        Returns:
-        --------
+        Returns
+        -------
         model_dir: os.PathLike object
             Directory in which the trained model will be saved
         """

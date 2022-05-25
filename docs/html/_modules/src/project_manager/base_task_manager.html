@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.project_manager.base_task_manager &mdash; Topic Modeler documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> IntelComp_Topic_Modeler
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ITMT_mainGUI.html">ITMT_mainGUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../JSONadapter.html">JSONadapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../TMinferencer.html">TMinferencer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../corpus2JSON.html">corpus2JSON</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../topicmodeling.html">topicmodeling</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">IntelComp_Topic_Modeler</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>src.project_manager.base_task_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.project_manager.base_task_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">* *IntelComp H2020 project*</span>
+
+<span class="sd">Base Task Manager for the Interactive Topic Model Trainer App</span>
+<span class="sd">It implements the functions needed to create, load and set up an</span>
+<span class="sd">execution project from the main application.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="BaseTaskManager"><a class="viewcode-back" href="../../../src.project_manager.base_task_manager.html#src.project_manager.base_task_manager.BaseTaskManager">[docs]</a><span class="k">class</span> <span class="nc">BaseTaskManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main class to manage functionality of the Topic Model Interactive Trainer</span>
+
+<span class="sd">    The behavior of this class depends on the state of the project, which is stored </span>
+<span class="sd">    in the dictionary self.state, characterized by the following entries:</span>
+
+<span class="sd">    - &#39;isProject&#39;   : If True, project created. Metadata variables loaded</span>
+<span class="sd">    - &#39;configReady&#39; : If True, config file successfully loaded. Datamanager</span>
+<span class="sd">                      activated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BaseTaskManager.__init__"><a class="viewcode-back" href="../../../src.project_manager.base_task_manager.html#src.project_manager.base_task_manager.BaseTaskManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="s1">&#39;config.cf&#39;</span><span class="p">,</span>
+                 <span class="n">metadata_fname</span><span class="o">=</span><span class="s1">&#39;metadata.yaml&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the main attributes to manage tasks over a specific application</span>
+<span class="sd">        project.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        p2p : pathlib.Path</span>
+<span class="sd">            Path to the application project</span>
+<span class="sd">        p2parquet : pathlib.Path</span>
+<span class="sd">            Path to the folder hosting the parquet datasets</span>
+<span class="sd">        config_fname : str, optional (default=&#39;config.cf&#39;)</span>
+<span class="sd">            Name of the configuration file</span>
+<span class="sd">        metadata_fname : str or None, optional (default=metadata.yaml)</span>
+<span class="sd">            Name of the project metadata file.</span>
+<span class="sd">            If None, no metadata file is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Important directories for the project</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span> <span class="o">=</span> <span class="n">p2p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2parquet</span> <span class="o">=</span> <span class="n">p2parquet</span>
+
+        <span class="c1"># Configuration file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span> <span class="o">/</span> <span class="n">config_fname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cf</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Handler to the config file</span>
+
+        <span class="c1"># Metadata file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path2metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span> <span class="o">/</span> <span class="n">metadata_fname</span>
+        <span class="c1"># Metadata attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata_fname</span> <span class="o">=</span> <span class="n">metadata_fname</span>
+
+        <span class="c1"># These are the default file and folder names for the folder</span>
+        <span class="c1"># structure of the project. It can be modified by entering other</span>
+        <span class="c1"># names as arguments of the create or the load method.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dir_struct</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># State variables that will be loaded from the metadata file</span>
+        <span class="c1"># when the project was loaded.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;isProject&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># True if the project exist.</span>
+            <span class="s1">&#39;configReady&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>  <span class="c1"># True if config file could be loaded</span>
+
+        <span class="c1"># The default metadata dictionary only contains the state dictionary.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;state&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">}</span>
+
+        <span class="c1"># Logger object (that will be activated by _set_logs() method)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logformat</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Other class variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ready2setup</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># True after create() or load() are called</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-- Task Manager object successfully initialized&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure logging messages.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logformat</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logformat&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;datefmt&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logformat&#39;</span><span class="p">,</span> <span class="s1">&#39;datefmt&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;file_format&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logformat&#39;</span><span class="p">,</span> <span class="s1">&#39;file_format&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;file_level&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logformat&#39;</span><span class="p">,</span> <span class="s1">&#39;file_level&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;cons_level&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logformat&#39;</span><span class="p">,</span> <span class="s1">&#39;cons_level&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;cons_format&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logformat&#39;</span><span class="p">,</span> <span class="s1">&#39;cons_format&#39;</span><span class="p">)}</span>
+
+        <span class="c1"># Log to file and console</span>
+        <span class="n">fpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">logformat</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+            <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logformat</span><span class="p">[</span><span class="s1">&#39;file_level&#39;</span><span class="p">],</span>
+            <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logformat</span><span class="p">[</span><span class="s1">&#39;file_format&#39;</span><span class="p">],</span>
+            <span class="n">datefmt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logformat</span><span class="p">[</span><span class="s1">&#39;datefmt&#39;</span><span class="p">],</span> <span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">fpath</span><span class="p">),</span>
+            <span class="n">filemode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Define a Handler which writes messages to the sys.stderr</span>
+        <span class="n">console</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logformat</span><span class="p">[</span><span class="s1">&#39;cons_level&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Set a simple format for console use</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logformat</span><span class="p">[</span><span class="s1">&#39;cons_format&#39;</span><span class="p">],</span>
+                                      <span class="n">datefmt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logformat</span><span class="p">[</span><span class="s1">&#39;datefmt&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Tell the handler to use this format</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="c1"># add the handler to the root logger</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Logs activated&#39;</span><span class="p">)</span>
+
+        <span class="c1"># This is a logger objet, that can be used by specific modules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_update_folders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_dir_struct</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates or updates the project folder structure using the file and</span>
+<span class="sd">        folder names in _dir_struct.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        _dir_struct: dict or None, optional (default=None)</span>
+<span class="sd">            Contains all information related to the structure of project files</span>
+<span class="sd">            and folders:</span>
+<span class="sd">                - paths (relative to the project path in self.path2projetc)</span>
+<span class="sd">                - file names</span>
+<span class="sd">                - suffixes, prefixes or extensions that could be used to define</span>
+<span class="sd">                  other files or folders.</span>
+<span class="sd">            If None, names are taken from the current self._dir_struct attribute</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># ######################</span>
+        <span class="c1"># Project file structure</span>
+
+        <span class="c1"># Overwrite default names in self._dir_struct dictionary by those</span>
+        <span class="c1"># specified in _dir_struct</span>
+        <span class="k">if</span> <span class="n">_dir_struct</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dir_struct</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_dir_struct</span><span class="p">)</span>
+
+        <span class="c1"># In the following, we assume that all files in self._dir_struct are</span>
+        <span class="c1"># subfolders of self.p2p. If this is not the case, this method</span>
+        <span class="c1"># should be modified by a child class</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_struct</span><span class="p">:</span>
+            <span class="n">path2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_struct</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path2d</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">path2d</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_save_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save metadata into a pickle file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Save metadata</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path2metadata</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_load_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads metadata file</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            Metadata dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Save metadata</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-- Loading metadata file...&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path2metadata</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">metadata</span>
+
+<div class="viewcode-block" id="BaseTaskManager.create"><a class="viewcode-back" href="../../../src.project_manager.base_task_manager.html#src.project_manager.base_task_manager.BaseTaskManager.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a project instance for the Topic Model Trainer</span>
+<span class="sd">        To do so, it defines the main folder structure, and creates (or cleans)</span>
+<span class="sd">        the project folder, specified in self.p2p</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">*** CREATING NEW PROJECT&quot;</span><span class="p">)</span>
+
+        <span class="c1"># #####################</span>
+        <span class="c1"># Create project folder</span>
+
+        <span class="c1"># Check and clean project folder location</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+
+            <span class="c1"># Remove current backup folder, if it exists</span>
+            <span class="n">old_p2p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_old&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">old_p2p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">old_p2p</span><span class="p">)</span>
+
+            <span class="c1"># Copy current project folder to the backup folder.</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="p">,</span> <span class="n">old_p2p</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Existing project with same name moved to </span><span class="si">{</span><span class="n">old_p2p</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Create project folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+
+        <span class="c1"># ########################</span>
+        <span class="c1"># Add files and subfolders</span>
+
+        <span class="c1"># Subfolders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_folders</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># Place a copy of a default configuration file in the project folder.</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="s1">&#39;config.cf.default&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2config</span><span class="p">)</span>
+
+        <span class="c1"># #####################</span>
+        <span class="c1"># Update project status</span>
+
+        <span class="c1"># Update the state of the project.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;isProject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;state&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">})</span>
+
+        <span class="c1"># Save metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_metadata</span><span class="p">()</span>
+
+        <span class="c1"># The project is ready to setup, but the user should edit the</span>
+        <span class="c1"># configuration file first</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ready2setup</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-- Project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="si">}</span><span class="s2"> created.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---- Project metadata saved in </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata_fname</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---- A default config file has been located in the project &quot;</span>
+              <span class="s2">&quot;folder.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---- Open it and set your configuration variables properly.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---- Once the config file is ready, activate it.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="BaseTaskManager.load"><a class="viewcode-back" href="../../../src.project_manager.base_task_manager.html#src.project_manager.base_task_manager.BaseTaskManager.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads an existing Interactive Topic Modeling Trainer project, by reading the metadata file in the project</span>
+<span class="sd">        folder.</span>
+<span class="sd">        It can be used to modify file or folder names, or paths, by specifying</span>
+<span class="sd">        the new names/paths in the _dir_struct dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># ########################</span>
+        <span class="c1"># Load an existing project</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">*** LOADING PROJECT&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check and clean project folder location</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path2metadata</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- ERROR: Metadata file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path2metadata</span><span class="si">}</span><span class="s1"> does not&#39;</span>
+                 <span class="s1">&#39;   exist.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="s1">&#39;   This is likely not a project folder. Select another &#39;</span>
+                 <span class="s1">&#39;project or create a new one.&#39;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Load project metadata</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_metadata</span><span class="p">()</span>
+
+            <span class="c1"># Store state</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span>
+
+            <span class="c1"># The following is used to automatically update any changes in the</span>
+            <span class="c1"># keys of the self._dir_struct dictionary. This will be likely</span>
+            <span class="c1"># unnecesary once a stable version of the code is reached, but it</span>
+            <span class="c1"># is useful to update older application projects.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_folders</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_struct</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;configReady&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ready2setup</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- Project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="si">}</span><span class="s1"> succesfully loaded.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- WARNING: Project </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="si">}</span><span class="s1"> loaded, but &#39;</span>
+                     <span class="s1">&#39;configuration file could not be activated. You can: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                     <span class="s1">&#39;(1) revise and reactivate the configuration file, or</span><span class="se">\n</span><span class="s1">&#39;</span>
+                     <span class="s1">&#39;(2) delete the project folder to restart&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="BaseTaskManager.setup"><a class="viewcode-back" href="../../../src.project_manager.base_task_manager.html#src.project_manager.base_task_manager.BaseTaskManager.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the project. To do so:</span>
+<span class="sd">            - Loads the configuration file</span>
+<span class="sd">            - Activates the logger objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># #################################################</span>
+        <span class="c1"># Activate configuration file and load data Manager</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">*** ACTIVATING CONFIGURATION FILE&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready2setup</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">exit</span><span class="p">(</span><span class="s2">&quot;---- Error: you cannot setup a project that has not been &quot;</span>
+                 <span class="s2">&quot;created or loaded&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Loads configuration file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cf</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">optionxform</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># Preserves case of keys in config file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;configReady&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Set up the logging format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_logs</span><span class="p">()</span>
+
+        <span class="c1"># Save the state of the project.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_metadata</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Project setup finished&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, J. Arenas-García, L. Calvo-Bartolomé, J. A. Espinosa-Melchor.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

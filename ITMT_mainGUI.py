@@ -1,18 +1,19 @@
 """
-*** IntelComp H2020 project ***
-*** Interactive Topic Model Trainer ***
+* *IntelComp H2020 project*
+* *Interactive Topic Model Trainer*
 
 Graphical User Interface for the interactive training of Topic Models
 
 It implements graphical user interface based on PyQT6 for the training and curation of topic models
 exploiting the tools available in topicmodeling.py:
-   - Different LDA implementations
-   - Topic assessment tools
-   - Topic curation tools
 
-Contributors: José Antonio Espinosa-Melchor
-              Lorena Calvo-Bartolomé
-              Jerónimo Arenas-García (jarenas@ing.uc3m.es)
+    - Different LDA implementations
+    - Topic assessment tools
+    - Topic curation tools
+
+.. codeauthor:: Jerónimo Arenas-García (jarenas@ing.uc3m.es),
+              Lorena Calvo-Bartolomé,
+              José Antonio Espinosa-Melchor
 """
 import argparse
 import pathlib

@@ -157,10 +157,17 @@ class TopicModelDataPreparation:
     def fit(self, text_for_contextual, text_for_bow, labels=None, custom_embeddings=None):
         """
         This method fits the vectorizer and gets the embeddings from the contextual model
-        :param text_for_contextual: list of unpreprocessed documents to generate the contextualized embeddings
-        :param text_for_bow: list of preprocessed documents for creating the bag-of-words
-        :param custom_embeddings: np.ndarray type object to use custom embeddings (optional).
-        :param labels: list of labels associated with each document (optional).
+
+        Parameters
+        ----------
+        text_for_contextual:
+            list of unpreprocessed documents to generate the contextualized embeddings
+        text_for_bow:
+            list of preprocessed documents for creating the bag-of-words
+        custom_embeddings:
+            np.ndarray type object to use custom embeddings (optional).
+        labels:
+            list of labels associated with each document (optional).
         """
 
         if custom_embeddings is not None:
@@ -206,11 +213,19 @@ class TopicModelDataPreparation:
         """
         This method create the input for the prediction. Essentially, it creates the embeddings with the contextualized
         model of choice and with trained vectorizer.
+        
         If text_for_bow is missing, it should be because we are using ZeroShotTM
-        :param text_for_contextual: list of unpreprocessed documents to generate the contextualized embeddings
-        :param text_for_bow: list of preprocessed documents for creating the bag-of-words
-        :param custom_embeddings: np.ndarray type object to use custom embeddings (optional).
-        :param labels: list of labels associated with each document (optional).
+
+        Parameters
+        ----------
+        text_for_contextual:
+            list of unpreprocessed documents to generate the contextualized embeddings
+        text_for_bow:
+            list of preprocessed documents for creating the bag-of-words
+        custom_embeddings:
+            np.ndarray type object to use custom embeddings (optional).
+        labels:
+            list of labels associated with each document (optional).
         """
 
         if custom_embeddings is not None:

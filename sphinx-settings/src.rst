@@ -7,8 +7,11 @@ Packages
 .. toctree::
    :maxdepth: 4
 
+   src.gui
    src.manageCorpus
    src.menu_navigator
+   src.neural_models
+   src.project_manager
    src.utils
 
 Modules

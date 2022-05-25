@@ -4,6 +4,7 @@ simulating the creation of files required for the
 BI tool
 
 If other datasets want to be ingested, we need to
+
     1) Change the SELECT statement accordingly
     2) Change the fields as necessary
     3) Change the name of the folder where the JSON will be save

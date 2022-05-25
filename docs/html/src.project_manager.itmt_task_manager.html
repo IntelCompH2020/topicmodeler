@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.project_manager.itmt_task_manager &mdash; Topic Modeler documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.utils" href="src.utils.html" />
+    <link rel="prev" title="src.project_manager.base_task_manager" href="src.project_manager.base_task_manager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> IntelComp_Topic_Modeler
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ITMT_mainGUI.html">ITMT_mainGUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="JSONadapter.html">JSONadapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TMinferencer.html">TMinferencer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus2JSON.html">corpus2JSON</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="src.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#packages">Packages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.gui.html">src.gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.neural_models.html">src.neural_models</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="src.project_manager.html">src.project_manager</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="src.project_manager.html#modules">Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.utils.html">src.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#modules">Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="topicmodeling.html">topicmodeling</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IntelComp_Topic_Modeler</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="src.html">src</a> &raquo;</li>
+          <li><a href="src.project_manager.html">src.project_manager</a> &raquo;</li>
+      <li>src.project_manager.itmt_task_manager</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.project_manager.itmt_task_manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-src.project_manager.itmt_task_manager">
+<span id="src-project-manager-itmt-task-manager"></span><h1>src.project_manager.itmt_task_manager<a class="headerlink" href="#module-src.project_manager.itmt_task_manager" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><em>IntelComp H2020 project</em></p></li>
+</ul>
+<p>Task Manager for the Interactive Topic Model Trainer App
+It implements the functions needed to</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Generate training datasets from datalake collections</p></li>
+<li><p>Train topic models</p></li>
+<li><p>Curate topic models</p></li>
+<li><p>Do inference with topic models</p></li>
+</ul>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.itmt_task_manager.</span></span><span class="sig-name descname"><span class="pre">ITMTTaskManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parameters.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="src.project_manager.base_task_manager.html#src.project_manager.base_task_manager.BaseTaskManager" title="src.project_manager.base_task_manager.BaseTaskManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.project_manager.base_task_manager.BaseTaskManager</span></code></a></p>
+<p>This class extends the functionality of the baseTaskManager class for a
+specific example application
+This class inherits from the baseTaskManager class, which provides the
+basic method to create, load and set up an application project.
+The behavior of this class might depend on the state of the project, in
+dictionary self.state, with the following entries:
+- ‘isProject’   : If True, project created. Metadata variables loaded
+- ‘configReady’ : If True, config file successfully loaded.</p>
+<p>Initializes an ITMTTaskManager object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
+<li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
+<li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
+If None, no metadata file is used.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parameters.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes an ITMTTaskManager object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
+<li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
+<li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
+If None, no metadata file is used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.load" title="Permalink to this definition"></a></dt>
+<dd><p>Extends the load method from the parent class to load into execution time the datasets that have been
+retrieved from HDFS and are available in the p2parquet provided by the user, as well as all the (logical)
+Datasets available for the training of topic models which were created in previous executions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.load_listDownloaded">
+<span class="sig-name descname"><span class="pre">load_listDownloaded</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.load_listDownloaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.load_listDownloaded" title="Permalink to this definition"></a></dt>
+<dd><p>This method loads all the datasets that have been retrieved from HDFS and are available for the Model Trainer
+into the ITMTTaskManager’s ‘allDtsets’ attribute as a dictionary object, which is characterized by one dictionary
+entry per dataset, the key and the value being the absolute path to the dataset and a dictionary with the
+corresponding metadata, respectively. To do so, it invokes the script from the folder ‘src/manageCorpus’ with
+the option ‘listDownloaded’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.load_listTrDtsets">
+<span class="sig-name descname"><span class="pre">load_listTrDtsets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.load_listTrDtsets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.load_listTrDtsets" title="Permalink to this definition"></a></dt>
+<dd><p>This method loads all the (logical) datasets that are available for the training of topic models into the
+ITMTTaskManager’s ‘allTrDtsets’ attribute as a dictionary object, which is characterized by one dictionary
+entry per dataset, the key and the value being the absolute path to the dataset and a dictionary with the
+corresponding metadata, respectively. To do so, it invokes the script from the folder ‘src/manageCorpus’ with
+the option ‘listTrDtsets’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.save_TrDtset">
+<span class="sig-name descname"><span class="pre">save_TrDtset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt_set</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.save_TrDtset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.save_TrDtset" title="Permalink to this definition"></a></dt>
+<dd><p>This method saves the (logical) training dataset specified by ‘dt_set’ in the dataset folder contained within
+the project folder. To do so, it invokes the script from the folder ‘src/manageCorpus’ with the option
+‘saveTrDtset’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dt_set</strong> – Dictionary with Training Dataset information</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>status</strong> –</p>
+<ul class="simple">
+<li><p>0 if the dataset could not be created</p></li>
+<li><p>1 if the dataset was created successfully</p></li>
+<li><p>2 if the dataset replaced an existing dataset</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.delete_TrDtset">
+<span class="sig-name descname"><span class="pre">delete_TrDtset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt_set</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.delete_TrDtset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.delete_TrDtset" title="Permalink to this definition"></a></dt>
+<dd><p>This method deletes the (logical) training dataset specified by ‘dt_set’ from the dataset folder contained
+within the project folder. To do so, it invokes the script from the folder ‘src/manageCorpus’ with the option
+‘deleteTrDtset’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dt_set</strong> (<em>str</em>) – String representation of the path to the json file with the training dataset information</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>status</strong> –</p>
+<ul class="simple">
+<li><p>0 if the dataset could not be deleted</p></li>
+<li><p>1 if the dataset was deleted successfully</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.itmt_task_manager.</span></span><span class="sig-name descname"><span class="pre">ITMTTaskManagerCMD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.project_manager.itmt_task_manager.ITMTTaskManager" title="src.project_manager.itmt_task_manager.ITMTTaskManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.project_manager.itmt_task_manager.ITMTTaskManager</span></code></a></p>
+<p>Provides extra functionality to the task manager, requesting parameters
+from users from a command window.</p>
+<p>Initializes an ITMTTaskManagerCMD object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
+<li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
+<li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
+If None, no metadata file is used.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes an ITMTTaskManagerCMD object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
+<li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
+<li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
+If None, no metadata file is used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.fromHDFS">
+<span class="sig-name descname"><span class="pre">fromHDFS</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.fromHDFS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.fromHDFS" title="Permalink to this definition"></a></dt>
+<dd><p>This method simulates the download of a corpus from the IntelComp data space</p>
+<p>In the version that will be taken to production, this method will not be necessary
+and data will be directly retrieved from the data datalogue using IntelComp mediators</p>
+<p>This needs to be linked with the Data mediator</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.listDownloaded">
+<span class="sig-name descname"><span class="pre">listDownloaded</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.listDownloaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.listDownloaded" title="Permalink to this definition"></a></dt>
+<dd><p>This method shows all Datasets that have been retrieved from HDFS
+and are available for the Model Trainer in the command line window.</p>
+<p>This is an extremely simple method for the taskmanager that does not
+require any user interaction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.createTMCorpus">
+<span class="sig-name descname"><span class="pre">createTMCorpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.createTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.createTMCorpus" title="Permalink to this definition"></a></dt>
+<dd><p>This method creates a training dataset for Topic Modeling</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.listTMCorpus">
+<span class="sig-name descname"><span class="pre">listTMCorpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.listTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.listTMCorpus" title="Permalink to this definition"></a></dt>
+<dd><p>This method shows all (logical) Datasets available for training
+Topic Models in the command line window.</p>
+<p>This is an extremely simple method for the taskmanager that does not
+require any user interaction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.deleteTMCorpus">
+<span class="sig-name descname"><span class="pre">deleteTMCorpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.deleteTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.deleteTMCorpus" title="Permalink to this definition"></a></dt>
+<dd><p>Delete Training Corpus from the Interactive Topic Model Trainer
+dataset folder</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.corpus2JSON">
+<span class="sig-name descname"><span class="pre">corpus2JSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.corpus2JSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.corpus2JSON" title="Permalink to this definition"></a></dt>
+<dd><p>Remove a training corpus from the Interactive Topic Model Trainer</p>
+<p>This is linked to the ITMTrainer only tentatively, since it should
+be part of WP4 tools</p>
+<p>Right now, it only runs the generation of the JSON files that are
+needed for ingestion of the corpus in Solr</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.trainTM">
+<span class="sig-name descname"><span class="pre">trainTM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trainer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.trainTM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.trainTM" title="Permalink to this definition"></a></dt>
+<dd><p>Topic modeling trainer. Initial training of a topic model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trainer</strong> – TM optimizer [mallet/ctm]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.extractPipe">
+<span class="sig-name descname"><span class="pre">extractPipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.extractPipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.extractPipe" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.inference">
+<span class="sig-name descname"><span class="pre">inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.inference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.inference" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.editTM">
+<span class="sig-name descname"><span class="pre">editTM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.editTM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.editTM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.compute_all_sim_graphs">
+<span class="sig-name descname"><span class="pre">compute_all_sim_graphs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.compute_all_sim_graphs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.compute_all_sim_graphs" title="Permalink to this definition"></a></dt>
+<dd><p>Computes all similarity graphs from the available topic models for a
+given corpus, and save them in a supergraph structure, to be used
+later in validation processes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus</strong> (<em>str</em>) – Corpus (S24Ever: Semantic Scholar, Crunch4Ever: Crunchbase)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.compute_reference_graph">
+<span class="sig-name descname"><span class="pre">compute_reference_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.compute_reference_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.compute_reference_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Computes a reference graph for a given corpus, based on metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Name of the corpus</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.validate_topic_models">
+<span class="sig-name descname"><span class="pre">validate_topic_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.validate_topic_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.validate_topic_models" title="Permalink to this definition"></a></dt>
+<dd><p>Analyzes the influence of the topic model on te quality of the
+similarity graphs</p>
+<p>The similarity graph is validated using a citations graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.show_validation_results">
+<span class="sig-name descname"><span class="pre">show_validation_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.show_validation_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.show_validation_results" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the results of the topic model validation in
+self.validate_topic_models()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.analyze_variability">
+<span class="sig-name descname"><span class="pre">analyze_variability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.analyze_variability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.analyze_variability" title="Permalink to this definition"></a></dt>
+<dd><p>Analyzes the influence of the topic model on te quality of the
+similarity graphs</p>
+<p>The similarity graph is validated from the analisys of the variability
+of node relationships in the graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.show_variability_results">
+<span class="sig-name descname"><span class="pre">show_variability_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.show_variability_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.show_variability_results" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the results of the topic model validation in
+<cite>self.validate_topic_models()</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.analyze_scalability">
+<span class="sig-name descname"><span class="pre">analyze_scalability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.analyze_scalability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.analyze_scalability" title="Permalink to this definition"></a></dt>
+<dd><p>Analyzes the influence of the topic model on te quality of the
+similarity graphs</p>
+<p>The similarity graph is validated using a citations graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.show_scalability_results">
+<span class="sig-name descname"><span class="pre">show_scalability_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.show_scalability_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.show_scalability_results" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the results of the topic model validation in
+<cite>self.validate_topic_models()</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>corpus_name</strong> (<em>str</em>) – Corpus (Pu: Semantic Scholar, or Co: Crunchbase data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.validate_subtrain_models">
+<span class="sig-name descname"><span class="pre">validate_subtrain_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.validate_subtrain_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.validate_subtrain_models" title="Permalink to this definition"></a></dt>
+<dd><p>Validates topics models obtained using a reduced corpus, using a
+gold standard based o a large corpus</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.show_subtrain_results">
+<span class="sig-name descname"><span class="pre">show_subtrain_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.show_subtrain_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.show_subtrain_results" title="Permalink to this definition"></a></dt>
+<dd><p>Shows the results of the topic model validation in
+self.validate_subtrain_models()</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.itmt_task_manager.</span></span><span class="sig-name descname"><span class="pre">ITMTTaskManagerGUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.project_manager.itmt_task_manager.ITMTTaskManager" title="src.project_manager.itmt_task_manager.ITMTTaskManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.project_manager.itmt_task_manager.ITMTTaskManager</span></code></a></p>
+<p>Provides extra functionality to the task manager, to be used by the
+Graphical User Interface (GUI)</p>
+<p>Initializes an ITMTTaskManagerGUI object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
+<li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
+<li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
+If None, no metadata file is used.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes an ITMTTaskManagerGUI object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
+<li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
+<li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
+If None, no metadata file is used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.listDownloaded">
+<span class="sig-name descname"><span class="pre">listDownloaded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gui</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.listDownloaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.listDownloaded" title="Permalink to this definition"></a></dt>
+<dd><p>This method gets all Datasets that have been retrieved from HDFS and are available for the Model Trainer and
+displays them in the corresponding table within the GUI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gui</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>src.gui.main_window.MainWindow</em></a>) – QMainWindow object associated which the GUI</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.createTMCorpus">
+<span class="sig-name descname"><span class="pre">createTMCorpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.createTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.createTMCorpus" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.listTMCorpus">
+<span class="sig-name descname"><span class="pre">listTMCorpus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gui</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.listTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.listTMCorpus" title="Permalink to this definition"></a></dt>
+<dd><p>This method shows all (logical) Datasets available for training Topic Models in the corresponding table
+within the GUI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gui</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>src.gui.main_window.MainWindow</em></a>) – QMainWindow object associated which the GUI</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.deleteTMCorpus">
+<span class="sig-name descname"><span class="pre">deleteTMCorpus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_to_delete</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.deleteTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.deleteTMCorpus" title="Permalink to this definition"></a></dt>
+<dd><p>Deletes the training corpus given by ‘corpus_to_delete’ from the Interactive Topic Model Trainer dataset folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>corpus_to_delete</strong> (<em>str</em>) – Name of the corpus selected by the user in the GUI to be deleted</p></li>
+<li><p><strong>gui</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>src.gui.main_window.MainWindow</em></a>) – QMainWindow object associated which the GUI</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.project_manager.base_task_manager.html" class="btn btn-neutral float-left" title="src.project_manager.base_task_manager" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.utils.html" class="btn btn-neutral float-right" title="src.utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, J. Arenas-García, L. Calvo-Bartolomé, J. A. Espinosa-Melchor.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

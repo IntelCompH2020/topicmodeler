@@ -213,8 +213,8 @@ class CTM(object):
             Output of the encoder network that defines the covariance parameter (Σ1) of the logistic normal distribution
              used to approximate the Dirichlet prior ((p(θ|α))according to the Laplace approximation
         
-        Returns:
-        --------
+        Returns
+        -------
         KL: torch.Tensor
             KL term
         RL: torch.Tensor
@@ -255,8 +255,8 @@ class CTM(object):
         loader: DataLoader
             Python iterable over the training dataset with which the epoch is going to be trained.
 
-        Returns:
-        --------
+        Returns
+        -------
         samples_processed: int
             Number of processed samples
         train_loss: float
@@ -324,8 +324,8 @@ class CTM(object):
         loader: DataLoader
             Python iterable over the validation dataset with which the epoch is going to be evaluated.
             
-        Returns:
-        --------
+        Returns
+        -------
         samples_processed: int
             Number of processed samples
         val_loss: float

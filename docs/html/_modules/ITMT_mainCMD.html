@@ -37,6 +37,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ITMT_mainGUI.html">ITMT_mainGUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../JSONadapter.html">JSONadapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../TMinferencer.html">TMinferencer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../corpus2JSON.html">corpus2JSON</a></li>
@@ -90,13 +91,13 @@
 <span class="sd">    (https://github.com/Orieus/menuNavigator)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 
 <span class="c1">#Local imports</span>
 <span class="kn">from</span> <span class="nn">src.menu_navigator.menu_navigator</span> <span class="kn">import</span> <span class="n">MenuNavigator</span>
-<span class="kn">from</span> <span class="nn">src.ITMTmanager</span> <span class="kn">import</span> <span class="n">TaskManager</span>
+<span class="kn">from</span> <span class="nn">src.project_manager.itmt_task_manager</span> <span class="kn">import</span> <span class="n">ITMTTaskManagerCMD</span>
+<span class="c1">#from src.ITMTmanager import TaskManager</span>
 
 <span class="c1"># ########################</span>
 <span class="c1"># Main body of application</span>
@@ -129,7 +130,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;A new project will be created&#39;</span><span class="p">)</span>
         <span class="n">option</span> <span class="o">=</span> <span class="s1">&#39;create&#39;</span>
 
-    <span class="c1"># Read project_path</span>
+    <span class="c1"># Read parquet_path</span>
     <span class="n">parquet_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">parquet</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">parquet_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>
@@ -141,7 +142,8 @@
     <span class="n">active_options</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># Create TaskManager for this project</span>
-    <span class="n">tm</span> <span class="o">=</span> <span class="n">TaskManager</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">parquet_path</span><span class="p">)</span>
+    <span class="n">tm</span> <span class="o">=</span> <span class="n">ITMTTaskManagerCMD</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">parquet_path</span><span class="p">)</span>
+    <span class="c1">#tm = TaskManager(project_path, parquet_path)</span>
 
     <span class="c1"># ########################</span>
     <span class="c1"># Prepare user interaction</span>
