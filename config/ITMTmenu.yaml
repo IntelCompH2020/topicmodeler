@@ -11,6 +11,7 @@
 root:
   type: branch
   options: 
+    - setup
     #- create   <Some true options may be skipped because the appropriate one
     #- load      may have been selected by the starting command>
     - manageCorpus
@@ -24,6 +25,8 @@ create:
 load:
   title: Load an existing Topic Model Trainer (ITMT) project
 
+setup:
+  title: Activate configuration file
 
 # LEVEL 2 MENU manageCorpus 
 manageCorpus:

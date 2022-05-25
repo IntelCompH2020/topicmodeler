@@ -3,7 +3,7 @@
 
 Contains the class implementing the functionality required
 by the Interactive Model Trainer for creating training datasets
-that can be used for topiv modeling, domain classification, etc
+that can be used for topic modeling, domain classification, etc
 
 """
 
@@ -13,6 +13,7 @@ import json
 import argparse
 from pathlib import Path
 import datetime as DT
+
 
 class CorpusManager(object):
     """
@@ -45,7 +46,6 @@ class CorpusManager(object):
 
         return allDtsets
 
-
     def listTrDtsets(self, path_dataset):
         """
         Returns a dictionary with all datasets downloaded from the Data Catalogue 
@@ -63,14 +63,13 @@ class CorpusManager(object):
             value is a dictionary with metadata
         """
         allTrDtsets = {}
-        jsonfiles = [el for el in path_dataset.iterdir() if el.suffix=='.json']
-        
+        jsonfiles = [el for el in path_dataset.iterdir() if el.suffix == '.json']
+
         for TrDts in jsonfiles:
             with open(TrDts, 'r', encoding='utf8') as fin:
                 allTrDtsets[TrDts.resolve().as_posix()] = json.load(fin)
-        
-        return allTrDtsets
 
+        return allTrDtsets
 
     def saveTrDtset(self, path_datasets, Dtset):
         """
@@ -90,25 +89,24 @@ class CorpusManager(object):
             1 if the dataset was created successfully
             2 if the dataset replaced an existing dataset
         """
-        
+
         if not path_datasets.is_dir():
             return 0
         else:
-            #Add current date to Dtset creation
+            # Add current date to Dtset creation
             Dtset['creation_date'] = DT.datetime.now()
-            path_Dtset = path_datasets.joinpath(Dtset['name']+'.json')
+            path_Dtset = path_datasets.joinpath(Dtset['name'] + '.json')
             if path_Dtset.is_file():
                 # Copy current json file to the backup folder
-                path_old = path_datasets.joinpath(Dtset['name']+'.json.old')
+                path_old = path_datasets.joinpath(Dtset['name'] + '.json.old')
                 shutil.move(path_Dtset, path_old)
                 with path_Dtset.open('w', encoding='utf-8') as fout:
-                    json.dump(Dtset,fout, ensure_ascii=False, indent=2, default=str)
+                    json.dump(Dtset, fout, ensure_ascii=False, indent=2, default=str)
                 return 2
             else:
                 with path_Dtset.open('w', encoding='utf-8') as fout:
-                    json.dump(Dtset,fout, ensure_ascii=False, indent=2, default=str)
+                    json.dump(Dtset, fout, ensure_ascii=False, indent=2, default=str)
                 return 1
-
 
     def deleteTrDtset(self, path_TrDtset):
         """
@@ -125,7 +123,7 @@ class CorpusManager(object):
             0 if the dataset could not be deleted
             1 if the dataset was deleted successfully
         """
-        
+
         if not path_TrDtset.is_file():
             return 0
         else:
@@ -134,7 +132,6 @@ class CorpusManager(object):
                 return 1
             except:
                 return 0
-
 
 
 if __name__ == "__main__":
@@ -155,7 +152,7 @@ if __name__ == "__main__":
     parser.add_argument('--path_TrDtset', type=str, default=None,
                         help="path to Training dataset that will be deleted")
     args = parser.parse_args()
-    
+
     cm = CorpusManager()
 
     if args.listDownloaded:
@@ -170,7 +167,7 @@ if __name__ == "__main__":
             sys.exit('You need to indicate the location of training datasets')
         Dtset = [line for line in sys.stdin][0]
         Dtset = json.loads(Dtset.replace('\\"', '"'))
-        
+
         status = cm.saveTrDtset(Path(args.path_datasets), Dtset)
         sys.stdout.write(str(status))
 

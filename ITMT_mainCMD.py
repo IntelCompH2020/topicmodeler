@@ -18,13 +18,13 @@ Menú navigator is based on the base class created by Jesús Cid-Sueiro
 (https://github.com/Orieus/menuNavigator)
 """
 
-import os
 import pathlib
 import argparse
 
 #Local imports
 from src.menu_navigator.menu_navigator import MenuNavigator
-from src.ITMTmanager import TaskManager
+from src.project_manager.itmt_task_manager import ITMTTaskManagerCMD
+#from src.ITMTmanager import TaskManager
 
 # ########################
 # Main body of application
@@ -57,7 +57,7 @@ def main():
         print('A new project will be created')
         option = 'create'
 
-    # Read project_path
+    # Read parquet_path
     parquet_path = pathlib.Path(args.parquet)
     if not parquet_path.is_dir():
         try:
@@ -69,7 +69,8 @@ def main():
     active_options = None
 
     # Create TaskManager for this project
-    tm = TaskManager(project_path, parquet_path)
+    tm = ITMTTaskManagerCMD(project_path, parquet_path)
+    #tm = TaskManager(project_path, parquet_path)
 
     # ########################
     # Prepare user interaction
