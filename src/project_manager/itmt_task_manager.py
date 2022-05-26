@@ -1430,8 +1430,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
     def createTMCorpus(self, dict_to_tm_corpus, dtsName, dtsDesc, privacy):
 
-        # @ TODO: To be implemented when UI ready
-
         # We need first to get all available (downloaded) datasets
         allDtsets = json.loads(self.allDtsets)
 
