@@ -14,13 +14,15 @@ import numpy as np
 import os
 import pathlib
 
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QPushButton
+from PyQt6 import QtCore
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QPushButton, QMessageBox
 from PyQt6.uic import loadUi
 from PyQt6.QtCore import QUrl, QThreadPool
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from functools import partial
 
 # Local imports
+from src.gui.generate_tm_corpus_window import GenerateTMCorpus
 from src.gui.train_model_window import TrainModelWindow
 from src.gui.utils import utils
 from src.gui.utils.output_wrapper import OutputWrapper
@@ -76,6 +78,7 @@ class MainWindow(QMainWindow):
 
         # Creation of subwindows
         self.train_model_subwindow = TrainModelWindow()
+        self.create_tm_corpus_subwindow = None
 
         # Threads for executing in parallel
         self.thread_pool = QThreadPool()
@@ -172,7 +175,9 @@ class MainWindow(QMainWindow):
         self.pushButton_open_project_folder.clicked.connect(self.get_project_folder)
         self.pushButton_open_parquet_folder.clicked.connect(self.get_parquet_folder)
 
-        self.pushButton_train_dataset.clicked.connect(self.clicked_train_dataset)
+        self.pushButton_generate_training_dataset.clicked.connect(self.clicked_pushButton_generate_training_dataset)
+        self.pushButton_train_trdtst.clicked.connect(self.clicked_train_dataset)
+        self.pushButton_delete_trdtst.clicked.connect(self.clicked_delete_dataset)
 
     #####################################################################################
     # TASK MANAGER COMMUNICATION METHODS
@@ -333,8 +338,43 @@ class MainWindow(QMainWindow):
         return
 
     # CORPUS FUNCTIONS
+    def clicked_pushButton_generate_training_dataset(self):
+        checked_list = []
+        for i in range(self.table_available_local_corpus.rowCount()):
+            item = self.table_available_local_corpus.item(i, self.table_available_local_corpus.columnCount() - 1)
+            if item.checkState() == QtCore.Qt.CheckState.Checked:
+                checked_list.append(i)
+
+        self.create_tm_corpus_subwindow = GenerateTMCorpus(checked_list, self.tm)
+        self.create_tm_corpus_subwindow.exec()
+
+        # Update data in table
+        self.load_data()
+
+        # Show information message about the TM corpus creation completion
+        # @ TODO: Add this to TM
+        if self.create_tm_corpus_subwindow.status == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_0)
+        elif self.create_tm_corpus_subwindow.status == 1:
+            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_1)
+        elif self.create_tm_corpus_subwindow.status == 2:
+            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_2)
+
+        return
+
+    def clicked_delete_dataset(self):
+        r = self.table_available_training_datasets.currentRow()
+        corpus_to_delete = self.table_available_training_datasets.item(r, 0).text()
+        self.tm.deleteTMCorpus(corpus_to_delete, self)
+
+        self.load_data()
+
+        return
+
     def clicked_train_dataset(self):
         self.train_model_subwindow.exec()
+
+        return
 
     # MODELS FUNCTIONS
 

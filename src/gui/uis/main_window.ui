@@ -2209,6 +2209,12 @@ QHeaderView::section:horizontal
                                  </item>
                                  <item>
                                   <widget class="QPushButton" name="pushButton_generate_training_dataset">
+                                   <property name="minimumSize">
+                                    <size>
+                                     <width>0</width>
+                                     <height>30</height>
+                                    </size>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -2506,7 +2512,13 @@ QHeaderView::section:horizontal
                                   </spacer>
                                  </item>
                                  <item>
-                                  <widget class="QPushButton" name="pushButton_train_dataset">
+                                  <widget class="QPushButton" name="pushButton_train_trdtst">
+                                   <property name="minimumSize">
+                                    <size>
+                                     <width>0</width>
+                                     <height>30</height>
+                                    </size>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -2542,7 +2554,13 @@ QPushButton:pressed {
                                   </spacer>
                                  </item>
                                  <item>
-                                  <widget class="QPushButton" name="pushButton_2">
+                                  <widget class="QPushButton" name="pushButton_delete_trdtst">
+                                   <property name="minimumSize">
+                                    <size>
+                                     <width>0</width>
+                                     <height>30</height>
+                                    </size>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -2986,6 +3004,12 @@ border:none;</string>
                                 </item>
                                 <item>
                                  <widget class="QPushButton" name="pushButton">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
                                   <property name="styleSheet">
                                    <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -3368,7 +3392,7 @@ QTableWidget::verticalHeader {
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
-  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources_widget_tm_corpus.qrc"/>
  </resources>
  <connections/>
 </ui>

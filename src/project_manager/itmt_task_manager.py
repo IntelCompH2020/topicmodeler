@@ -223,6 +223,9 @@ class ITMTTaskManager(BaseTaskManager):
             self.logger.error('-- -- Execution of script failed')
             print('Deletion failed')
 
+        # Reload the list of training datasets to consider the ones deleted during the current execution
+        self.load_listTrDtsets()
+
         return status
 
 
@@ -1425,9 +1428,52 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         return
 
-    def createTMCorpus(self):
+    def createTMCorpus(self, dict_to_tm_corpus, dtsName, dtsDesc, privacy):
+
         # @ TODO: To be implemented when UI ready
-        return
+
+        # We need first to get all available (downloaded) datasets
+        allDtsets = json.loads(self.allDtsets)
+
+        TM_Dtset = []
+        list_ids_dts = [int(el) for el in dict_to_tm_corpus.keys()]
+        for corpus_id in list_ids_dts:
+            Dtsets = [el for el in allDtsets.keys()]
+            Dtset_loc = Dtsets.pop(corpus_id)
+            Dtset_source = allDtsets[Dtset_loc]['source']
+            print('\nProcessing dataset', allDtsets[Dtset_loc]['name'])
+
+            # id fld
+            dict_tm_corpus_loc = list_ids_dts.pop(corpus_id)
+            Dtset_idfld = dict_to_tm_corpus[dict_tm_corpus_loc]['identifier_field']
+            print("Field to use as identifier ", str(Dtset_idfld))
+
+            # lemmas fields
+            Dtset_lemmas_fld = dict_to_tm_corpus[dict_tm_corpus_loc]['fields_for_lemmas']
+            print('Selected lemmas:', ', '.join(Dtset_lemmas_fld))
+
+            # rawtext fields
+            Dtset_rawtext_fld = dict_to_tm_corpus[dict_tm_corpus_loc]['fields_for_raw']
+
+            # Spark clause for filtering (advanced users only)
+            Dtset_filter = dict_to_tm_corpus[dict_tm_corpus_loc]['filtering_condition']
+
+            TM_Dtset.append({'parquet': Dtset_loc,
+                             'source': Dtset_source,
+                             'idfld': Dtset_idfld,
+                             'lemmasfld': Dtset_lemmas_fld,
+                             'rawtxtfld': Dtset_rawtext_fld,
+                             'filter': Dtset_filter
+                             })
+
+        Dtset = {'name': dtsName,
+                 'description': dtsDesc,
+                 'valid_for': "TM",
+                 'visibility': privacy,
+                 'Dtsets': TM_Dtset
+                 }
+
+        return self.save_TrDtset(Dtset)
 
     def listTMCorpus(self, gui):
         """
@@ -1470,12 +1516,16 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         if self.allTrDtsets:
             allTrDtsets = json.loads(self.allTrDtsets)
             for TrDts in allTrDtsets.keys():
+                print(corpus_to_delete)
+                print(allTrDtsets[TrDts]['name'])
                 if allTrDtsets[TrDts]['name'] == corpus_to_delete:
                     reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
                                                  allTrDtsets[TrDts]['name'] + ' will be deleted. Proceed?',
-                                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-                    if reply == QMessageBox.Yes:
+                                                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                                 QMessageBox.StandardButton.No)
+                    if reply == QMessageBox.StandardButton.Yes:
                         status = self.delete_TrDtset(TrDts)
+                        # @TODO: Revise. Status is being returned as a byte object (b'1')
                         if status == 0:
                             QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
                                                 allTrDtsets[TrDts]['name'] + ' could not be deleted.')
