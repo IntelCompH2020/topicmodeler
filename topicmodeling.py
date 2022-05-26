@@ -26,6 +26,7 @@ from tqdm import tqdm
 import ipdb
 from gensim import corpora
 from gensim.utils import check_output, tokenize
+import pickle
 
 # Local imports
 from src.neural_models.pytorchavitm.utils.data_preparation import prepare_dataset

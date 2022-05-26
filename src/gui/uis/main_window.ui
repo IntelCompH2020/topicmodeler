@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1039</width>
-    <height>652</height>
+    <width>1060</width>
+    <height>772</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -964,7 +964,7 @@ font: 63 34pt &quot;Phosphate&quot;;</string>
                       <property name="frameShadow">
                        <enum>QFrame::Raised</enum>
                       </property>
-                      <layout class="QVBoxLayout" name="verticalLayout_17">
+                      <layout class="QVBoxLayout" name="verticalLayout_12">
                        <property name="spacing">
                         <number>0</number>
                        </property>
@@ -981,56 +981,149 @@ font: 63 34pt &quot;Phosphate&quot;;</string>
                         <number>0</number>
                        </property>
                        <item>
-                        <layout class="QHBoxLayout" name="horizontalLayout_11">
-                         <property name="spacing">
-                          <number>0</number>
+                        <widget class="QFrame" name="frame_home_center">
+                         <property name="frameShape">
+                          <enum>QFrame::StyledPanel</enum>
                          </property>
-                         <item>
-                          <layout class="QVBoxLayout" name="verticalLayout_18">
-                           <property name="spacing">
-                            <number>0</number>
-                           </property>
-                           <item>
-                            <layout class="QHBoxLayout" name="horizontalLayout_12">
-                             <property name="spacing">
-                              <number>0</number>
-                             </property>
+                         <property name="frameShadow">
+                          <enum>QFrame::Raised</enum>
+                         </property>
+                         <layout class="QHBoxLayout" name="horizontalLayout_4">
+                          <item>
+                           <widget class="QFrame" name="frame_start_recent_pyldavis">
+                            <property name="styleSheet">
+                             <string notr="true">border:none;
+background-color:white;</string>
+                            </property>
+                            <property name="frameShape">
+                             <enum>QFrame::StyledPanel</enum>
+                            </property>
+                            <property name="frameShadow">
+                             <enum>QFrame::Raised</enum>
+                            </property>
+                            <layout class="QVBoxLayout" name="verticalLayout_3">
                              <item>
-                              <layout class="QHBoxLayout" name="horizontalLayout_13">
-                               <property name="spacing">
-                                <number>0</number>
+                              <widget class="QFrame" name="frame_start_buttons">
+                               <property name="styleSheet">
+                                <string notr="true">background-color: #F2F2F2;</string>
                                </property>
-                               <item>
-                                <widget class="QFrame" name="frame_start_buttons_2">
-                                 <property name="styleSheet">
-                                  <string notr="true">background-color: #F2F2F2;</string>
-                                 </property>
-                                 <property name="frameShape">
-                                  <enum>QFrame::NoFrame</enum>
-                                 </property>
-                                 <property name="frameShadow">
-                                  <enum>QFrame::Raised</enum>
-                                 </property>
-                                 <layout class="QVBoxLayout" name="verticalLayout_19">
-                                  <property name="spacing">
-                                   <number>0</number>
+                               <property name="frameShape">
+                                <enum>QFrame::NoFrame</enum>
+                               </property>
+                               <property name="frameShadow">
+                                <enum>QFrame::Raised</enum>
+                               </property>
+                               <layout class="QVBoxLayout" name="verticalLayout_20">
+                                <property name="spacing">
+                                 <number>0</number>
+                                </property>
+                                <property name="leftMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="topMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="rightMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="bottomMargin">
+                                 <number>0</number>
+                                </property>
+                                <item>
+                                 <widget class="QLabel" name="label_home_start_4">
+                                  <property name="sizePolicy">
+                                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                   </sizepolicy>
                                   </property>
-                                  <property name="leftMargin">
-                                   <number>0</number>
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
                                   </property>
-                                  <property name="topMargin">
-                                   <number>0</number>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
                                   </property>
-                                  <property name="rightMargin">
-                                   <number>0</number>
+                                  <property name="font">
+                                   <font>
+                                    <family>Avenir</family>
+                                    <pointsize>18</pointsize>
+                                    <weight>10</weight>
+                                    <italic>false</italic>
+                                    <bold>false</bold>
+                                   </font>
                                   </property>
-                                  <property name="bottomMargin">
-                                   <number>0</number>
+                                  <property name="styleSheet">
+                                   <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;</string>
                                   </property>
+                                  <property name="text">
+                                   <string>Start</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="pushButton_open_project_folder">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QPushButton {	
+	font: 87 13pt &quot;Avenir&quot;;
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	color:#1A2E40;
+}
+
+QPushButton[Active=true] {
+	color:#4D6F8C;
+}
+
+QPushButton:pressed {
+	color:#4D6F8C;
+}</string>
+                                  </property>
+                                  <property name="text">
+                                   <string>Open project folder</string>
+                                  </property>
+                                  <property name="icon">
+                                   <iconset>
+                                    <normaloff>../resources/images/create_folder.png</normaloff>../resources/images/create_folder.png</iconset>
+                                  </property>
+                                  <property name="iconSize">
+                                   <size>
+                                    <width>30</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <layout class="QHBoxLayout" name="horizontalLayout_15">
                                   <item>
-                                   <widget class="QLabel" name="label_home_start">
+                                   <widget class="QLabel" name="label_5">
                                     <property name="sizePolicy">
-                                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                       <horstretch>0</horstretch>
                                       <verstretch>0</verstretch>
                                      </sizepolicy>
@@ -1041,381 +1134,577 @@ font: 63 34pt &quot;Phosphate&quot;;</string>
                                       <height>45</height>
                                      </size>
                                     </property>
-                                    <property name="maximumSize">
+                                    <property name="font">
+                                     <font>
+                                      <family>Avenir</family>
+                                      <pointsize>13</pointsize>
+                                      <weight>75</weight>
+                                      <italic>false</italic>
+                                      <bold>true</bold>
+                                     </font>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">padding-left: 10px;
+font: 87 13pt &quot;Avenir&quot;;
+color:#1A2E40;
+font-weight: bold;
+</string>
+                                    </property>
+                                    <property name="text">
+                                     <string>Selected project   </string>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLineEdit" name="lineEdit_current_project">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                    </property>
+                                    <property name="readOnly">
+                                     <bool>true</bool>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <spacer name="horizontalSpacer_3">
+                                    <property name="orientation">
+                                     <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                     <enum>QSizePolicy::Fixed</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
                                      <size>
-                                      <width>16777215</width>
+                                      <width>15</width>
+                                      <height>20</height>
+                                     </size>
+                                    </property>
+                                   </spacer>
+                                  </item>
+                                 </layout>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="pushButton_open_parquet_folder">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QPushButton {	
+	font: 87 13pt &quot;Avenir&quot;;
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	color:#1A2E40;
+}
+
+QPushButton[Active=true] {
+	color:#4D6F8C;
+}
+
+QPushButton:pressed {
+	color:#4D6F8C;
+}</string>
+                                  </property>
+                                  <property name="text">
+                                   <string>Open parquet folder</string>
+                                  </property>
+                                  <property name="icon">
+                                   <iconset>
+                                    <normaloff>../resources/images/open_folder.png</normaloff>../resources/images/open_folder.png</iconset>
+                                  </property>
+                                  <property name="iconSize">
+                                   <size>
+                                    <width>30</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <layout class="QHBoxLayout" name="horizontalLayout_16">
+                                  <item>
+                                   <widget class="QLabel" name="label_current_parquet_folder">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="minimumSize">
+                                     <size>
+                                      <width>0</width>
                                       <height>45</height>
                                      </size>
                                     </property>
                                     <property name="font">
                                      <font>
                                       <family>Avenir</family>
-                                      <pointsize>18</pointsize>
-                                      <weight>10</weight>
+                                      <pointsize>13</pointsize>
+                                      <weight>75</weight>
                                       <italic>false</italic>
-                                      <bold>false</bold>
+                                      <bold>true</bold>
                                      </font>
                                     </property>
                                     <property name="styleSheet">
-                                     <string notr="true">color:#1A2E40;
-font: 87 18pt &quot;Avenir&quot;;
-padding-left: 10px;</string>
-                                    </property>
-                                    <property name="text">
-                                     <string>Start</string>
-                                    </property>
-                                   </widget>
-                                  </item>
-                                  <item>
-                                   <widget class="QPushButton" name="pushButton_open_project_folder">
-                                    <property name="minimumSize">
-                                     <size>
-                                      <width>0</width>
-                                      <height>45</height>
-                                     </size>
-                                    </property>
-                                    <property name="maximumSize">
-                                     <size>
-                                      <width>16777215</width>
-                                      <height>45</height>
-                                     </size>
-                                    </property>
-                                    <property name="styleSheet">
-                                     <string notr="true">QPushButton {	
-	font: 87 13pt &quot;Avenir&quot;;
-	background-image: ICON_REPLACE;
-	background-position: left center;
-	background-repeat: no-repeat;
-	border: none;
-	background-color: transparent;
-	text-align: left;
-	padding-left: 10px;
-	color:#1A2E40;
-}
-
-QPushButton[Active=true] {
-	color:#4D6F8C;
-}
-
-QPushButton:pressed {
-	color:#4D6F8C;
-}</string>
-                                    </property>
-                                    <property name="text">
-                                     <string>Open project folder</string>
-                                    </property>
-                                    <property name="icon">
-                                     <iconset>
-                                      <normaloff>../resources/images/create_folder.png</normaloff>../resources/images/create_folder.png</iconset>
-                                    </property>
-                                    <property name="iconSize">
-                                     <size>
-                                      <width>30</width>
-                                      <height>30</height>
-                                     </size>
-                                    </property>
-                                   </widget>
-                                  </item>
-                                  <item>
-                                   <layout class="QHBoxLayout" name="horizontalLayout_15">
-                                    <item>
-                                     <widget class="QLabel" name="label_5">
-                                      <property name="sizePolicy">
-                                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                       </sizepolicy>
-                                      </property>
-                                      <property name="minimumSize">
-                                       <size>
-                                        <width>0</width>
-                                        <height>45</height>
-                                       </size>
-                                      </property>
-                                      <property name="font">
-                                       <font>
-                                        <family>Avenir</family>
-                                        <pointsize>13</pointsize>
-                                        <weight>75</weight>
-                                        <italic>false</italic>
-                                        <bold>true</bold>
-                                       </font>
-                                      </property>
-                                      <property name="styleSheet">
-                                       <string notr="true">padding-left: 10px;
+                                     <string notr="true">padding-left: 10px;
 font: 87 13pt &quot;Avenir&quot;;
 color:#1A2E40;
 font-weight: bold;
 </string>
-                                      </property>
-                                      <property name="text">
-                                       <string>Selected project   </string>
-                                      </property>
-                                     </widget>
-                                    </item>
-                                    <item>
-                                     <widget class="QLineEdit" name="lineEdit_current_project">
-                                      <property name="sizePolicy">
-                                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                       </sizepolicy>
-                                      </property>
-                                      <property name="styleSheet">
-                                       <string notr="true">QLineEdit {	
+                                    </property>
+                                    <property name="text">
+                                     <string>Selected parquet folder   </string>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLineEdit" name="lineEdit_current_parquet">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">QLineEdit {	
 	background-color: #FFFFFF;
 	font: 87 italic 12pt &quot;Avenir&quot;;
 	border-radius: 5px;
 	border: 1px solid #1A2E40;
 	color:black;
 }</string>
-                                      </property>
-                                      <property name="readOnly">
-                                       <bool>true</bool>
-                                      </property>
-                                     </widget>
-                                    </item>
-                                    <item>
-                                     <spacer name="horizontalSpacer_3">
-                                      <property name="orientation">
-                                       <enum>Qt::Horizontal</enum>
-                                      </property>
-                                      <property name="sizeType">
-                                       <enum>QSizePolicy::Fixed</enum>
-                                      </property>
-                                      <property name="sizeHint" stdset="0">
-                                       <size>
-                                        <width>15</width>
-                                        <height>20</height>
-                                       </size>
-                                      </property>
-                                     </spacer>
-                                    </item>
-                                   </layout>
-                                  </item>
-                                  <item>
-                                   <widget class="QPushButton" name="pushButton_open_parquet_folder">
-                                    <property name="minimumSize">
-                                     <size>
-                                      <width>0</width>
-                                      <height>45</height>
-                                     </size>
                                     </property>
-                                    <property name="maximumSize">
-                                     <size>
-                                      <width>16777215</width>
-                                      <height>45</height>
-                                     </size>
-                                    </property>
-                                    <property name="styleSheet">
-                                     <string notr="true">QPushButton {	
-	font: 87 13pt &quot;Avenir&quot;;
-	background-image: ICON_REPLACE;
-	background-position: left center;
-	background-repeat: no-repeat;
-	border: none;
-	background-color: transparent;
-	text-align: left;
-	padding-left: 10px;
-	color:#1A2E40;
-}
-
-QPushButton[Active=true] {
-	color:#4D6F8C;
-}
-
-QPushButton:pressed {
-	color:#4D6F8C;
-}</string>
-                                    </property>
-                                    <property name="text">
-                                     <string>Open parquet folder</string>
-                                    </property>
-                                    <property name="icon">
-                                     <iconset>
-                                      <normaloff>../resources/images/open_folder.png</normaloff>../resources/images/open_folder.png</iconset>
-                                    </property>
-                                    <property name="iconSize">
-                                     <size>
-                                      <width>30</width>
-                                      <height>30</height>
-                                     </size>
+                                    <property name="readOnly">
+                                     <bool>true</bool>
                                     </property>
                                    </widget>
                                   </item>
                                   <item>
-                                   <layout class="QHBoxLayout" name="horizontalLayout_16">
-                                    <item>
-                                     <widget class="QLabel" name="label_current_parquet_folder">
-                                      <property name="sizePolicy">
-                                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                       </sizepolicy>
-                                      </property>
-                                      <property name="minimumSize">
-                                       <size>
-                                        <width>0</width>
-                                        <height>45</height>
-                                       </size>
-                                      </property>
-                                      <property name="font">
-                                       <font>
-                                        <family>Avenir</family>
-                                        <pointsize>13</pointsize>
-                                        <weight>75</weight>
-                                        <italic>false</italic>
-                                        <bold>true</bold>
-                                       </font>
-                                      </property>
-                                      <property name="styleSheet">
-                                       <string notr="true">padding-left: 10px;
-font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-</string>
-                                      </property>
-                                      <property name="text">
-                                       <string>Selected parquet folder   </string>
-                                      </property>
-                                     </widget>
-                                    </item>
-                                    <item>
-                                     <widget class="QLineEdit" name="lineEdit_current_parquet">
-                                      <property name="sizePolicy">
-                                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                       </sizepolicy>
-                                      </property>
-                                      <property name="styleSheet">
-                                       <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                                      </property>
-                                      <property name="readOnly">
-                                       <bool>true</bool>
-                                      </property>
-                                     </widget>
-                                    </item>
-                                    <item>
-                                     <spacer name="horizontalSpacer_4">
-                                      <property name="orientation">
-                                       <enum>Qt::Horizontal</enum>
-                                      </property>
-                                      <property name="sizeType">
-                                       <enum>QSizePolicy::Fixed</enum>
-                                      </property>
-                                      <property name="sizeHint" stdset="0">
-                                       <size>
-                                        <width>15</width>
-                                        <height>20</height>
-                                       </size>
-                                      </property>
-                                     </spacer>
-                                    </item>
-                                   </layout>
+                                   <spacer name="horizontalSpacer_4">
+                                    <property name="orientation">
+                                     <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                     <enum>QSizePolicy::Fixed</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                     <size>
+                                      <width>15</width>
+                                      <height>20</height>
+                                     </size>
+                                    </property>
+                                   </spacer>
                                   </item>
                                  </layout>
-                                </widget>
-                               </item>
-                              </layout>
+                                </item>
+                               </layout>
+                              </widget>
                              </item>
                              <item>
-                              <widget class="QFrame" name="frame_to_fill_right">
-                               <property name="minimumSize">
-                                <size>
-                                 <width>25</width>
-                                 <height>0</height>
-                                </size>
+                              <widget class="QFrame" name="frame_recent">
+                               <property name="styleSheet">
+                                <string notr="true">background-color: #F2F2F2;</string>
                                </property>
                                <property name="frameShape">
-                                <enum>QFrame::StyledPanel</enum>
+                                <enum>QFrame::NoFrame</enum>
                                </property>
                                <property name="frameShadow">
                                 <enum>QFrame::Raised</enum>
                                </property>
+                               <layout class="QVBoxLayout" name="verticalLayout_19">
+                                <property name="spacing">
+                                 <number>0</number>
+                                </property>
+                                <property name="leftMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="topMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="rightMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="bottomMargin">
+                                 <number>0</number>
+                                </property>
+                                <item>
+                                 <widget class="QLabel" name="label_home_start">
+                                  <property name="sizePolicy">
+                                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                   </sizepolicy>
+                                  </property>
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="font">
+                                   <font>
+                                    <family>Avenir</family>
+                                    <pointsize>18</pointsize>
+                                    <weight>10</weight>
+                                    <italic>false</italic>
+                                    <bold>false</bold>
+                                   </font>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;</string>
+                                  </property>
+                                  <property name="text">
+                                   <string>Recent</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLabel" name="label_home_start_2">
+                                  <property name="sizePolicy">
+                                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                   </sizepolicy>
+                                  </property>
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="font">
+                                   <font>
+                                    <family>Avenir</family>
+                                    <pointsize>16</pointsize>
+                                    <weight>10</weight>
+                                    <italic>false</italic>
+                                    <bold>false</bold>
+                                   </font>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">color:#1A2E40;
+font: 87 16pt &quot;Avenir&quot;;
+padding-left: 10px;</string>
+                                  </property>
+                                  <property name="text">
+                                   <string>&gt; &gt; project folders</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="pushButton_recent_project_folder_1">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QPushButton {	
+	font: 87 13pt &quot;Avenir&quot;;
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	color:#1A2E40;
+}
+
+QPushButton[Active=true] {
+	color:#4D6F8C;
+}
+
+QPushButton:pressed {
+	color:#4D6F8C;
+}</string>
+                                  </property>
+                                  <property name="text">
+                                   <string/>
+                                  </property>
+                                  <property name="iconSize">
+                                   <size>
+                                    <width>30</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="pushButton_recent_project_folder_2">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QPushButton {	
+	font: 87 13pt &quot;Avenir&quot;;
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	color:#1A2E40;
+}
+
+QPushButton[Active=true] {
+	color:#4D6F8C;
+}
+
+QPushButton:pressed {
+	color:#4D6F8C;
+}</string>
+                                  </property>
+                                  <property name="text">
+                                   <string/>
+                                  </property>
+                                  <property name="iconSize">
+                                   <size>
+                                    <width>30</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLabel" name="label_home_start_3">
+                                  <property name="sizePolicy">
+                                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                   </sizepolicy>
+                                  </property>
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="font">
+                                   <font>
+                                    <family>Avenir</family>
+                                    <pointsize>16</pointsize>
+                                    <weight>10</weight>
+                                    <italic>false</italic>
+                                    <bold>false</bold>
+                                   </font>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">color:#1A2E40;
+font: 87 16pt &quot;Avenir&quot;;
+padding-left: 10px;</string>
+                                  </property>
+                                  <property name="text">
+                                   <string>&gt; &gt; parquet folders</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="pushButton_recent_parquet_folder_1">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QPushButton {	
+	font: 87 13pt &quot;Avenir&quot;;
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	color:#1A2E40;
+}
+
+QPushButton[Active=true] {
+	color:#4D6F8C;
+}
+
+QPushButton:pressed {
+	color:#4D6F8C;
+}</string>
+                                  </property>
+                                  <property name="text">
+                                   <string/>
+                                  </property>
+                                  <property name="iconSize">
+                                   <size>
+                                    <width>30</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="pushButton_recent_parquet_folder_2">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QPushButton {	
+	font: 87 13pt &quot;Avenir&quot;;
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	color:#1A2E40;
+}
+
+QPushButton[Active=true] {
+	color:#4D6F8C;
+}
+
+QPushButton:pressed {
+	color:#4D6F8C;
+}</string>
+                                  </property>
+                                  <property name="text">
+                                   <string/>
+                                  </property>
+                                  <property name="iconSize">
+                                   <size>
+                                    <width>30</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                 </widget>
+                                </item>
+                               </layout>
                               </widget>
                              </item>
                             </layout>
-                           </item>
-                           <item>
-                            <widget class="QFrame" name="frame_to_fill_bottom">
-                             <property name="minimumSize">
-                              <size>
-                               <width>0</width>
-                               <height>150</height>
-                              </size>
-                             </property>
-                             <property name="frameShape">
-                              <enum>QFrame::StyledPanel</enum>
-                             </property>
-                             <property name="frameShadow">
-                              <enum>QFrame::Raised</enum>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
-                         </item>
-                         <item>
-                          <widget class="QWidget" name="plot_pylavis" native="true">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="minimumSize">
-                            <size>
-                             <width>400</width>
-                             <height>400</height>
-                            </size>
-                           </property>
-                           <property name="styleSheet">
-                            <string notr="true">QWidget {
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QWidget" name="plot_pylavis" native="true">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                             <size>
+                              <width>400</width>
+                              <height>400</height>
+                             </size>
+                            </property>
+                            <property name="styleSheet">
+                             <string notr="true">QWidget {
 	background-color: #F2F2F2;
 }</string>
-                           </property>
-                           <layout class="QVBoxLayout" name="verticalLayout_20">
-                            <property name="spacing">
-                             <number>0</number>
                             </property>
-                            <property name="leftMargin">
-                             <number>0</number>
-                            </property>
-                            <property name="topMargin">
-                             <number>0</number>
-                            </property>
-                            <property name="rightMargin">
-                             <number>0</number>
-                            </property>
-                            <property name="bottomMargin">
-                             <number>0</number>
-                            </property>
-                            <item>
-                             <layout class="QVBoxLayout" name="layout_plot_pyldavis">
-                              <property name="spacing">
-                               <number>0</number>
-                              </property>
-                             </layout>
-                            </item>
-                           </layout>
-                          </widget>
-                         </item>
-                        </layout>
-                       </item>
-                       <item>
-                        <widget class="QFrame" name="to_fill_content_2">
-                         <property name="frameShape">
-                          <enum>QFrame::StyledPanel</enum>
-                         </property>
-                         <property name="frameShadow">
-                          <enum>QFrame::Raised</enum>
-                         </property>
+                            <layout class="QVBoxLayout" name="verticalLayout_23">
+                             <property name="spacing">
+                              <number>0</number>
+                             </property>
+                             <property name="leftMargin">
+                              <number>0</number>
+                             </property>
+                             <property name="topMargin">
+                              <number>0</number>
+                             </property>
+                             <property name="rightMargin">
+                              <number>0</number>
+                             </property>
+                             <property name="bottomMargin">
+                              <number>0</number>
+                             </property>
+                             <item>
+                              <layout class="QVBoxLayout" name="layout_plot_pyldavis">
+                               <property name="spacing">
+                                <number>0</number>
+                               </property>
+                              </layout>
+                             </item>
+                            </layout>
+                           </widget>
+                          </item>
+                         </layout>
                         </widget>
                        </item>
                       </layout>
@@ -1785,6 +2074,9 @@ QHeaderView::section:horizontal
                                    <property name="sizeAdjustPolicy">
                                     <enum>QAbstractScrollArea::AdjustToContents</enum>
                                    </property>
+                                   <attribute name="horizontalHeaderCascadingSectionResizes">
+                                    <bool>false</bool>
+                                   </attribute>
                                    <attribute name="horizontalHeaderStretchLastSection">
                                     <bool>true</bool>
                                    </attribute>
@@ -1794,26 +2086,6 @@ QHeaderView::section:horizontal
                                    <attribute name="verticalHeaderStretchLastSection">
                                     <bool>true</bool>
                                    </attribute>
-                                   <row>
-                                    <property name="text">
-                                     <string>New Row</string>
-                                    </property>
-                                   </row>
-                                   <row>
-                                    <property name="text">
-                                     <string>New Row</string>
-                                    </property>
-                                   </row>
-                                   <row>
-                                    <property name="text">
-                                     <string>New Row</string>
-                                    </property>
-                                   </row>
-                                   <row>
-                                    <property name="text">
-                                     <string>New Row</string>
-                                    </property>
-                                   </row>
                                    <column>
                                     <property name="text">
                                      <string>NAME</string>
@@ -1891,66 +2163,17 @@ QHeaderView::section:horizontal
                                      </font>
                                     </property>
                                    </column>
-                                   <item row="0" column="0">
+                                   <column>
                                     <property name="text">
-                                     <string>dq</string>
+                                     <string>ADD TO TRAIN?</string>
                                     </property>
-                                   </item>
-                                   <item row="0" column="1">
-                                    <property name="text">
-                                     <string>dqe</string>
+                                    <property name="font">
+                                     <font>
+                                      <weight>75</weight>
+                                      <bold>true</bold>
+                                     </font>
                                     </property>
-                                   </item>
-                                   <item row="0" column="2">
-                                    <property name="text">
-                                     <string>dq</string>
-                                    </property>
-                                   </item>
-                                   <item row="1" column="0">
-                                    <property name="text">
-                                     <string>dqe</string>
-                                    </property>
-                                   </item>
-                                   <item row="1" column="1">
-                                    <property name="text">
-                                     <string>dqe</string>
-                                    </property>
-                                   </item>
-                                   <item row="1" column="2">
-                                    <property name="text">
-                                     <string>dq</string>
-                                    </property>
-                                   </item>
-                                   <item row="2" column="0">
-                                    <property name="text">
-                                     <string>dqe</string>
-                                    </property>
-                                   </item>
-                                   <item row="2" column="1">
-                                    <property name="text">
-                                     <string>dq</string>
-                                    </property>
-                                   </item>
-                                   <item row="2" column="2">
-                                    <property name="text">
-                                     <string>dqe</string>
-                                    </property>
-                                   </item>
-                                   <item row="3" column="0">
-                                    <property name="text">
-                                     <string>dqe</string>
-                                    </property>
-                                   </item>
-                                   <item row="3" column="1">
-                                    <property name="text">
-                                     <string>qd</string>
-                                    </property>
-                                   </item>
-                                   <item row="3" column="2">
-                                    <property name="text">
-                                     <string>dq</string>
-                                    </property>
-                                   </item>
+                                   </column>
                                   </widget>
                                  </item>
                                 </layout>
@@ -2137,12 +2360,6 @@ padding-left: 10px;</string>
                                  </item>
                                  <item>
                                   <widget class="QTableWidget" name="table_available_training_datasets">
-                                   <property name="sizePolicy">
-                                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                                     <horstretch>0</horstretch>
-                                     <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QTableWidget {	
 	background-color: #F2F2F2;
@@ -2174,46 +2391,23 @@ QScrollBar:horizontal {
     margin: 2px 0 2px 0;
 	border-radius: 0px;
  }
-QHeaderView::section{
-	background-color: #1A2E40;
-	max-width: 30px;
-	gridline-color: #FFFFFF;
-	font: 87 13pt &quot;Avenir&quot;;
-	color:white;
-	font-weight: bold;
-}
 
-QHeaderView::section:vertical
+QHeaderView::section:horizontal
 {
-    border: 1px solid #FFFFFF;
-}
-
-QTableWidget::horizontalHeader {	
 	background-color: #1A2E40;
+	padding: 3px;
+    border-bottom: 1px solid #FFFFFF;
+    border-right: 1px solid #FFFFFF;
+    border-top: 1px solid #FFFFFF;
+    border-left: 1px solid #FFFFFF;
 	color:white;
-	gridline-color: #FFFFFF;
-}
-
-QTableWidget::verticalHeader {	
-	background-color: #1A2E40;
-	color:white;
-	gridline-color: #FFFFFF;
 }
 
 </string>
                                    </property>
                                    <property name="sizeAdjustPolicy">
-                                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                                    <enum>QAbstractScrollArea::AdjustToContents</enum>
                                    </property>
-                                   <property name="editTriggers">
-                                    <set>QAbstractItemView::NoEditTriggers</set>
-                                   </property>
-                                   <attribute name="horizontalHeaderVisible">
-                                    <bool>false</bool>
-                                   </attribute>
-                                   <attribute name="horizontalHeaderCascadingSectionResizes">
-                                    <bool>false</bool>
-                                   </attribute>
                                    <attribute name="horizontalHeaderStretchLastSection">
                                     <bool>true</bool>
                                    </attribute>
@@ -2223,45 +2417,9 @@ QTableWidget::verticalHeader {
                                    <attribute name="verticalHeaderStretchLastSection">
                                     <bool>true</bool>
                                    </attribute>
-                                   <row>
-                                    <property name="text">
-                                     <string/>
-                                    </property>
-                                   </row>
-                                   <row>
-                                    <property name="text">
-                                     <string>New Row</string>
-                                    </property>
-                                   </row>
-                                   <row>
-                                    <property name="text">
-                                     <string>New Row</string>
-                                    </property>
-                                   </row>
-                                   <row>
-                                    <property name="text">
-                                     <string>New Row</string>
-                                    </property>
-                                   </row>
-                                   <row>
-                                    <property name="text">
-                                     <string>New Row</string>
-                                    </property>
-                                   </row>
                                    <column>
                                     <property name="text">
                                      <string>NAME</string>
-                                    </property>
-                                    <property name="font">
-                                     <font>
-                                      <weight>75</weight>
-                                      <bold>true</bold>
-                                     </font>
-                                    </property>
-                                   </column>
-                                   <column>
-                                    <property name="text">
-                                     <string>DATE</string>
                                     </property>
                                     <property name="font">
                                      <font>
@@ -2281,81 +2439,39 @@ QTableWidget::verticalHeader {
                                      </font>
                                     </property>
                                    </column>
-                                   <item row="0" column="0">
+                                   <column>
                                     <property name="text">
-                                     <string>dqwdq</string>
+                                     <string>VALID FOR</string>
                                     </property>
-                                   </item>
-                                   <item row="0" column="1">
+                                    <property name="font">
+                                     <font>
+                                      <weight>75</weight>
+                                      <bold>true</bold>
+                                     </font>
+                                    </property>
+                                   </column>
+                                   <column>
                                     <property name="text">
-                                     <string>dqwdwqdq</string>
+                                     <string>CREATION DATE</string>
                                     </property>
-                                   </item>
-                                   <item row="0" column="2">
+                                    <property name="font">
+                                     <font>
+                                      <weight>75</weight>
+                                      <bold>true</bold>
+                                     </font>
+                                    </property>
+                                   </column>
+                                   <column>
                                     <property name="text">
-                                     <string>doewinfewofn</string>
+                                     <string>VISIBILITY</string>
                                     </property>
-                                   </item>
-                                   <item row="1" column="0">
-                                    <property name="text">
-                                     <string>dwe</string>
+                                    <property name="font">
+                                     <font>
+                                      <weight>75</weight>
+                                      <bold>true</bold>
+                                     </font>
                                     </property>
-                                   </item>
-                                   <item row="1" column="1">
-                                    <property name="text">
-                                     <string>dw</string>
-                                    </property>
-                                   </item>
-                                   <item row="1" column="2">
-                                    <property name="text">
-                                     <string>fonwefienow</string>
-                                    </property>
-                                   </item>
-                                   <item row="2" column="0">
-                                    <property name="text">
-                                     <string>dwe</string>
-                                    </property>
-                                   </item>
-                                   <item row="2" column="1">
-                                    <property name="text">
-                                     <string>dwe</string>
-                                    </property>
-                                   </item>
-                                   <item row="2" column="2">
-                                    <property name="text">
-                                     <string>fowenfewn</string>
-                                    </property>
-                                   </item>
-                                   <item row="3" column="0">
-                                    <property name="text">
-                                     <string>dwe</string>
-                                    </property>
-                                   </item>
-                                   <item row="3" column="1">
-                                    <property name="text">
-                                     <string>dw</string>
-                                    </property>
-                                   </item>
-                                   <item row="3" column="2">
-                                    <property name="text">
-                                     <string>foewnfwne</string>
-                                    </property>
-                                   </item>
-                                   <item row="4" column="0">
-                                    <property name="text">
-                                     <string>wde</string>
-                                    </property>
-                                   </item>
-                                   <item row="4" column="1">
-                                    <property name="text">
-                                     <string>dw</string>
-                                    </property>
-                                   </item>
-                                   <item row="4" column="2">
-                                    <property name="text">
-                                     <string>fwienfnwe</string>
-                                    </property>
-                                   </item>
+                                   </column>
                                   </widget>
                                  </item>
                                 </layout>
@@ -2409,6 +2525,42 @@ QPushButton:pressed {
                                    </property>
                                    <property name="text">
                                     <string>Train dataset</string>
+                                   </property>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <spacer name="horizontalSpacer_5">
+                                   <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                   </property>
+                                   <property name="sizeHint" stdset="0">
+                                    <size>
+                                     <width>40</width>
+                                     <height>20</height>
+                                    </size>
+                                   </property>
+                                  </spacer>
+                                 </item>
+                                 <item>
+                                  <widget class="QPushButton" name="pushButton_2">
+                                   <property name="styleSheet">
+                                    <string notr="true">QPushButton {
+	background-color: #1A2E40;
+	font: 87 13pt &quot;Avenir&quot;;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+QPushButton:hover {
+	background-color: #4D6F8C;
+ }
+QPushButton:pressed {	
+	background-color: #4D6F8C;
+}
+
+</string>
+                                   </property>
+                                   <property name="text">
+                                    <string>Delete train dataset</string>
                                    </property>
                                   </widget>
                                  </item>
@@ -3215,6 +3367,8 @@ QTableWidget::verticalHeader {
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

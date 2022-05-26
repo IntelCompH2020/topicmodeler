@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>images/corpus.png</file>
+    <file>images/create_folder.png</file>
+    <file>images/home.png</file>
+    <file>images/open_folder.png</file>
+    <file>images/settings.png</file>
+    <file>images/training.png</file>
+    <file>images/adding.png</file>
+    <file>images/drag.png</file>
+    <file>images/aufklappen.png</file>
+  </qresource>
+</RCC>

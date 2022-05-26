@@ -1411,6 +1411,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         if self.allDtsets:
             allDtsets = json.loads(self.allDtsets)
             table = gui.table_available_local_corpus
+            table.setRowCount(len(allDtsets.keys()))
             row = 0
             for Dts in allDtsets.keys():
                 table.setItem(row, 0, QtWidgets.QTableWidgetItem(allDtsets[Dts]['name']))
@@ -1442,6 +1443,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         if self.allTrDtsets:
             allTrDtsets = json.loads(self.allTrDtsets)
             table = gui.table_available_training_datasets
+            table.setRowCount(len(allTrDtsets.keys()))
             row = 0
             for TrDts in allTrDtsets.keys():
                 table.setItem(row, 0, QtWidgets.QTableWidgetItem(allTrDtsets[TrDts]['name']))
