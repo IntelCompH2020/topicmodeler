@@ -445,6 +445,8 @@ class CTM(object):
             e = datetime.datetime.now()
             pbar.update(1)
 
+            self.best_components = self.model.beta
+
             if self.validation_data is not None:
 
                 validation_loader = DataLoader(
@@ -467,15 +469,14 @@ class CTM(object):
                         epoch + 1, self.num_epochs, samples_processed, len(self.train_data) * self.num_epochs,
                         train_loss, val_loss, e - s))
 
-                self.early_stopping(val_loss, self)
-                if self.early_stopping.early_stop:
-                    self.logger.info("Early stopping")
+                if np.isnan(val_loss) or np.isnan(train_loss):
                     break
-            else:
-                # Save last epoch
-                self.best_components = self.model.beta
-                # if save_dir is not None:
-                #   self.save(save_dir)
+                else:
+                    self.early_stopping(val_loss, self)
+                    if self.early_stopping.early_stop:
+                        self.logger.info("Early stopping")
+                        break
+
             pbar.set_description(
                 "Epoch: [{}/{}]\t Seen Samples: [{}/{}]\tTrain Loss: {}\tTime: {}".format(
                     epoch + 1, self.num_epochs, samples_processed, len(self.train_data) * self.num_epochs,
