@@ -51,7 +51,7 @@ class ITMTTaskManager(BaseTaskManager):
     - 'configReady' : If True, config file successfully loaded.
     """
 
-    def __init__(self, p2p, p2parquet, config_fname='parameters.yaml',
+    def __init__(self, p2p, p2parquet, config_fname='config.cf',
                  metadata_fname='metadata.yaml'):
 
         """
