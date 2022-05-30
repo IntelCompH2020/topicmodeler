@@ -1421,7 +1421,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                 table.setItem(row, 1, QtWidgets.QTableWidgetItem(allDtsets[Dts]['source']))
                 table.setItem(row, 2, QtWidgets.QTableWidgetItem(allDtsets[Dts]['description']))
                 table.setItem(row, 3, QtWidgets.QTableWidgetItem(', '.join([el for el in allDtsets[Dts]['schema']])))
-                table.setItem(row, 4, QtWidgets.QTableWidgetItem(allDtsets[Dts]['records']))
+                table.setItem(row, 4, QtWidgets.QTableWidgetItem(str(allDtsets[Dts]['records'])))
                 table.setItem(row, 5, QtWidgets.QTableWidgetItem(allDtsets[Dts]['download_date']))
                 table.setItem(row, 6, QtWidgets.QTableWidgetItem(allDtsets[Dts]['visibility']))
                 row += 1
