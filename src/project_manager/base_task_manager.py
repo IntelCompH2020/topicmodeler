@@ -25,7 +25,7 @@ class BaseTaskManager(object):
                       activated.
     """
 
-    def __init__(self, p2p, p2parquet, config_fname='config.cf',
+    def __init__(self, p2p, p2parquet, p2wdlist, config_fname='config.cf',
                  metadata_fname='metadata.yaml'):
         """
         Sets the main attributes to manage tasks over a specific application
@@ -37,6 +37,8 @@ class BaseTaskManager(object):
             Path to the application project
         p2parquet : pathlib.Path
             Path to the folder hosting the parquet datasets
+        p2wdlist : pathlib.Path
+            Path to the folder hosting the wordlists (stopwords, keywords, etc)
         config_fname : str, optional (default='config.cf')
             Name of the configuration file
         metadata_fname : str or None, optional (default=metadata.yaml)
@@ -47,6 +49,7 @@ class BaseTaskManager(object):
         # Important directories for the project
         self.p2p = p2p
         self.p2parquet = p2parquet
+        self.p2wdlist = p2wdlist
 
         # Configuration file
         self.p2config = self.p2p / config_fname
@@ -241,6 +244,8 @@ class BaseTaskManager(object):
               "folder.")
         print("---- Open it and set your configuration variables properly.")
         print("---- Once the config file is ready, activate it.")
+
+        self.setup()
 
         return
 

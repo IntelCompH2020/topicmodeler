@@ -11,10 +11,11 @@
 root:
   type: branch
   options: 
-    - setup
+    #- setup
     #- create   <Some true options may be skipped because the appropriate one
     #- load      may have been selected by the starting command>
     - manageCorpus
+    - manageLists
     - TMoptions
 
 
@@ -52,6 +53,33 @@ createTMCorpus:
 
 deleteTMCorpus:
   title: Delete a Traning dataset for Topic Modeling
+
+
+# LEVEL 2 MENU manageCorpus 
+manageLists:
+  title: WordLists Management Options
+  options:
+    - listAllWdLists
+    - NewWdList
+    - EditWdList
+    - DelWdList
+
+listAllWdLists:
+  title: List all Available Lists
+
+NewWdList:
+  title: Create a New List
+  options:
+    - parameters:
+        keywords: Create a list of keywords
+        stopwords: Create a list of stopwords
+        equivalences: Create a list of equivalent terms
+
+EditWdList:
+  title: Modify an existing list
+
+DelWdList:
+  title: Delete an Existing wordlist
 
 
 # LEVEL 2 TMoptions

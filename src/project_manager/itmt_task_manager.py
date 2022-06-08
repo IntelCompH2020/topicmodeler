@@ -51,7 +51,7 @@ class ITMTTaskManager(BaseTaskManager):
     - 'configReady' : If True, config file successfully loaded.
     """
 
-    def __init__(self, p2p, p2parquet, config_fname='config.cf',
+    def __init__(self, p2p, p2parquet, p2wdlist, config_fname='config.cf',
                  metadata_fname='metadata.yaml'):
 
         """
@@ -63,6 +63,8 @@ class ITMTTaskManager(BaseTaskManager):
             Path to the application project
         p2parquet : pathlib.Path
             Path to the folder hosting the parquet datasets
+        p2wdlist : pathlib.Path
+            Path to the folder hosting the wordlists (stopwords, keywords, etc)
         config_fname : str, optional (default='config.cf')
             Name of the configuration file
         metadata_fname : str or None, optional (default=metadata.yaml)
@@ -82,11 +84,12 @@ class ITMTTaskManager(BaseTaskManager):
         self.ready2setup = None
         self.logger = None
 
-        # Attributes to load project's associated datasets
+        # Attributes to load project's associated datasets and WordLists
         self.allDtsets = None
         self.allTrDtsets = None
+        self.allWdLists = None
 
-        super().__init__(p2p, p2parquet, config_fname=config_fname,
+        super().__init__(p2p, p2parquet, p2wdlist, config_fname=config_fname,
                          metadata_fname=metadata_fname)
 
         # This is a dictionary that contains a list to all subdirectories
@@ -107,6 +110,7 @@ class ITMTTaskManager(BaseTaskManager):
 
         self.load_listDownloaded()
         self.load_listTrDtsets()
+        self.load_listWdLists()
 
         return
 
@@ -154,6 +158,30 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("Logical datasets loaded")
+        return
+
+    def load_listWdLists(self):
+        """
+        This method loads all the wordlists that are available into the
+        ITMTTaskManager's 'allWdLists' attribute as a dictionary object,
+        which is characterized by one dictionary entry per wordlist,
+        the key and the value being the absolute path to the wordlist
+        and a dictionary with the corresponding metadata, respectively.
+        To do so, it invokes the script from the folder 'src/manageLists' with
+        the option 'listWordLists'.
+        """
+
+        cmd = 'python src/manageLists/manageLists.py --listWordLists --path_wordlists '
+        cmd = cmd + self.p2wdlist.resolve().as_posix()
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            self.allWdLists = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        self.logger.info("All available wordlists were loaded")
         return
 
     def save_TrDtset(self, dt_set):
@@ -228,6 +256,79 @@ class ITMTTaskManager(BaseTaskManager):
 
         return status
 
+    def create_List(self, new_list):
+        """
+        This method saves the stopword list 'stw_list' in the folder self.p2wdlist
+        To do so, it invokes the script from the folder 'src/manageLists'
+        with the option 'createWordList'.
+
+        Parameters
+        ----------
+        new_list :
+            Dictionary with information for the new list
+
+        Returns
+        -------
+        status : int
+            - 0 if the list could not be created
+            - 1 if the list was created successfully
+            - 2 if the list replaced an existing dataset
+        """
+
+        cmd = 'echo "' + json.dumps(new_list).replace('"', '\\"') + '"'
+        cmd = cmd + '| python src/manageLists/manageLists.py --createWordList --path_wordlists '
+        cmd = cmd + self.p2wdlist.resolve().as_posix()
+
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        # Reload the list of word lists to consider the new ones added during the current execution
+        self.load_listWdLists()
+
+        return status
+
+    def delete_WdLst(self, wd_list):
+        """
+        This method deletes the wordlist specified by 'wd_list' from the wordlist folder.
+
+        To do so, it invokes the script from the folder 'src/manageLists' with the option
+        'deleteWordList'.
+
+        Parameters
+        ----------
+        wd_list : str
+            String representation of the path to the json file with the wordlist
+
+        Returns
+        -------
+        status : int
+            - 0 if the wordlist could not be deleted
+            - 1 if the wordlist was deleted successfully
+        """
+
+        cmd = 'python src/manageLists/manageLists.py --deleteWordList --path_WdList '
+        cmd = cmd + wd_list
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+            if status.decode('utf8') == '1':
+                print('The word list was deleted')
+            else:
+                print('Deletion failed')
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            print('Deletion failed')
+
+        # Reload the list of word lists to consider the one deleted during the current execution
+        self.load_listWdLists()
+
+        return status
+
 
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
@@ -238,7 +339,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
     from users from a command window.
     """
 
-    def __init__(self, p2p, p2parquet, config_fname='config.cf',
+    def __init__(self, p2p, p2parquet, p2wdlist, config_fname='config.cf',
                  metadata_fname='metadata.yaml'):
         """
         Initializes an ITMTTaskManagerCMD object.
@@ -249,6 +350,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             Path to the application project
         p2parquet : pathlib.Path
             Path to the folder hosting the parquet datasets
+        p2wdlist : pathlib.Path
+            Path to the folder hosting the wordlists (stopwords, keywords, etc)
         config_fname : str, optional (default='config.cf')
             Name of the configuration file
         metadata_fname : str or None, optional (default=metadata.yaml)
@@ -257,7 +360,10 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         """
 
         super().__init__(
-            p2p, p2parquet, config_fname=config_fname, metadata_fname=metadata_fname)
+            p2p, p2parquet, p2wdlist, config_fname=config_fname,
+            metadata_fname=metadata_fname)
+
+        super().load()
 
     def fromHDFS(self):
         """
@@ -336,7 +442,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         else:
             options = options + '"'
         # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-        # This fragment of code creates a sparck cluster and submits the task
+        # This fragment of code creates a spark cluster and submits the task
         # This function is dependent on UC3M local deployment infrastructure
         # and will not work in BSC production environment
         # In any case, this function will be replaced by the DataCatalogue
@@ -372,6 +478,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         with path_dataset.joinpath('datasetMeta.json').open('w', encoding='utf-8') as outfile:
             json.dump(datasetMeta, outfile, ensure_ascii=False, indent=2, default=str)
+
+        self.load_listDownloaded()
 
         return
 
@@ -531,29 +639,148 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         return
 
-    def corpus2JSON(self):
+    def listAllWdLists(self):
         """
-        Remove a training corpus from the Interactive Topic Model Trainer
+        This method shows all wordlists available for the project
 
-        This is linked to the ITMTrainer only tentatively, since it should
-        be part of WP4 tools
+        This is an extremely simple method for the taskmanager that does not
+        require any user interaction
 
-        Right now, it only runs the generation of the JSON files that are
-        needed for ingestion of the corpus in Solr
         """
 
-        print('corpus2JSON')
-
-        cmd = '/export/usuarios_ml4ds/jarenas/script-spark/script-spark ' + \
-              '-C /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json ' + \
-              '-c 4 -N 10 -S "corpus2JSON.py"'
-        try:
-            self.logger.info(f'-- -- Running command {cmd}')
-            check_output(args=cmd, shell=True)
-        except:
-            self.logger.error('-- -- Execution of script failed')
+        allWdLists = json.loads(self.allWdLists)
+        for WdLst in allWdLists.keys():
+            printmag('\nWordlist ' + allWdLists[WdLst]['name'])
+            print('\tDescription:', allWdLists[WdLst]['description'])
+            print('\tValid for:', allWdLists[WdLst]['valid_for'])
+            print('\tCreation date:', allWdLists[WdLst]['creation_date'])
+            print('\tVisibility:', allWdLists[WdLst]['visibility'])
+            print('\tNumber of elements:', len(allWdLists[WdLst]['wordlist']))
 
         return
+
+    def NewWdList(self, listType):
+        """
+        This method creates a New List of words that can be later used for
+        corpus preprocessing
+
+        Parameters
+        ----------
+        listType : string
+            type of list that will be created [keywords|stopwords|equivalences]
+        """
+
+        displaytext = """
+        *************************************************************************************
+        Generation of a new List
+
+            - Stopwords or keywords: Introduce the words separated by commas (stw1,stw2, ...)
+            - Equivalences: Introduce equivalences separated by commas in the format
+              orig:target (orig1:tgt1, orig2:tgt2, ...)
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        # Obtain lists of words for the list
+        if listType == 'keywords':
+            wds = input('Introduce the keywords: ')
+        elif listType == 'stopwords':
+            wds = input('Introduce the stopwords: ')
+        else: #equivalences
+            wds = input('Introduce the equivalences: ')
+        wds = [el.strip() for el in wds.split(',') if len(el)]
+        wds = sorted(list(set(wds)))
+        
+        # We need a name for the list
+        ListName = ""
+        while not len(ListName):
+            ListName = input('Introduce a name for the new list: ')
+
+        # Introduce a description for the dataset
+        ListDesc = ""
+        while not len(ListDesc):
+            ListDesc = input('Introduce a description: ')
+
+        # Define privacy level of dataset
+        privacy = ['Public', 'Private']
+        opt = query_options(privacy, 'Define visibility for the list')
+        privacy = privacy[opt]
+
+        WdList = {'name': ListName,
+                 'description': ListDesc,
+                 'valid_for': listType,
+                 'visibility': privacy,
+                 'wordlist': wds
+                 }
+
+        return self.create_List(WdList)
+
+    def EditWdList(self):
+        """
+        This method allows the edition of an existing list of words, i.e.
+        adding new words or removing existing words
+        """
+
+        displaytext = """
+        *************************************************************************************
+        Edition of an existing list
+
+            - Stopwords or keywords: Introduce the words separated by commas (stw1,stw2, ...)
+            - Equivalences: Introduce equivalences separated by commas in the format
+              orig:target (orig1:tgt1, orig2:tgt2, ...)
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        self.logger.info(f'-- -- Modifying an existing list of words')
+        # First thing to do is to select a list
+        allWdLists = json.loads(self.allWdLists)
+        wdLsts = [wlst for wlst in allWdLists.keys()]
+        displaywdLsts = [allWdLists[wlst]['name'] + ': ' + 
+            allWdLists[wlst]['description'] for wlst in wdLsts]
+        selection = query_options(displaywdLsts, "Select the list you wish to modify")
+        WdLst = allWdLists[wdLsts[selection]]
+        self.logger.info(f'-- -- Selected list is {WdLst["name"]}')
+
+        Y_or_N = input(f"\nDo you wish to visualize existing words in list [Y/N]?: ")
+        if Y_or_N.upper() == "Y":
+            print('\n'.join(WdLst['wordlist']))
+
+        wds = input('Introduce the elements you wish to remove (separated by commas): ')
+        wds = [el.strip() for el in wds.split(',') if len(el)]
+        WdLst['wordlist'] = sorted(list(set([wd for wd in WdLst['wordlist'] 
+                                                    if wd not in wds])))
+
+        wds = input('Introduce new elements for the list (separated by commas): ')
+        wds = [el.strip() for el in wds.split(',') if len(el)]
+        WdLst['wordlist'] = sorted(list(set(wds + WdLst['wordlist'])))
+
+        #The list will be saved replacing existing list
+        return self.create_List(WdLst)
+
+    def DelWdList(self):
+        """
+        Delete a wordlist from wordlist folder
+        """
+
+        # Show available wordlists
+        self.listAllWdLists()
+
+        allWdLists = json.loads(self.allWdLists)
+        for WdLst in allWdLists.keys():
+            Y_or_N = input(f"\nRemove Word List {allWdLists[WdLst]['name']} [Y/N]?: ")
+            if Y_or_N.upper() == "Y":
+                if request_confirmation(
+                        msg='Word List ' + allWdLists[WdLst]['name'] + ' will be deleted. Proceed?'):
+                    self.delete_WdLst(WdLst)
+
+        return
+
+
+
+
+
+
 
     def trainTM(self, trainer):
         """
@@ -561,27 +788,82 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         Parameters
         ----------
-        trainer:
-            TM optimizer [mallet/ctm]
+        trainer : string
+            Optimizer to use for training the topic model [mallet/ctm]
         """
 
         ############################################################
-        ## IMT Interface: Topic Model Trainer Window
+        ## IMT Interface: Interactive Model Trainer Window
         ############################################################
 
         self.logger.info(f'-- Topic Model Training')
-
+        
+        displaytext = """
+        *************************************************************************************
+        We will retrieve all parameters needed for training the topic model
+        We start with common settings independent of the method used for the training
+        *************************************************************************************
+        """
+        printgr(displaytext)        
+        
         # First thing to do is to select a corpus
         # Ask user which dataset should be used for model training
-        dtSets = self.p2p.joinpath(self._dir_struct['datasets']).iterdir()
-        dtSets = sorted([d for d in dtSets if d.is_dir()])
-        display_dtSets = [d.name for d in dtSets]
-        selection = query_options(display_dtSets, "Select Training Dataset")
-        path_dtSet = dtSets[selection]
-        # Retrieve all CSV files that form the selected dataset
-        dtSetCSV = sorted([f for f in path_dtSet.joinpath("CSV").iterdir()
-                           if f.name.endswith(".csv")])
-        self.logger.info(f'-- -- Selected corpus is {path_dtSet.name}')
+        allTrDtsets = json.loads(self.allTrDtsets)
+        dtSets = [dts for dts in allTrDtsets.keys()]
+        displaydtSets = [allTrDtsets[dts]['name'] + ': ' + 
+            allTrDtsets[dts]['description'] for dts in dtSets]
+        selection = query_options(displaydtSets, "Select Training Dataset")
+        TrDtSet = allTrDtsets[dtSets[selection]]
+        self.logger.info(f'-- -- Selected corpus is {TrDtSet["name"]}')
+        
+        displaytext = """
+        *************************************************************************************
+        We will retrieve all parameters needed for the preprocessing of the lemmas
+        This is also needed for all available topic models
+
+        Many of these settings may be for advanced users. We will need to check with the
+        users which parameters are basic and which ones should only appear for the advanced
+        *************************************************************************************
+        """
+        printgr(displaytext)        
+        
+        # Default values are read from config file
+        min_lemas = int(self.cf.get('MalletTM', 'min_lemas'))
+        no_below = int(self.cf.get('MalletTM', 'no_below'))
+        no_above = float(self.cf.get('MalletTM', 'no_above'))
+        keep_n = int(self.cf.get('MalletTM', 'keep_n'))
+        token_regexp = self.cf.get('MalletTM', 'token_regexp')
+        stw_file = [self.cf.get('MalletTM', 'default_stw_file')]
+        eq_file = [self.cf.get('MalletTM', 'default_eq_file')]
+        
+        # The following settings will only be accessed in the "advance settings panel"
+        Y_or_N = input(f"Do you wish to access the advance settings panel [Y/N]?:")
+        if Y_or_N.upper() == "Y":
+            # Some of them can be confirmed/modified by the user
+            min_lemas = var_num_keyboard('int', min_lemas,
+                                         'Enter minimum number of lemas for the documents in the training set')
+            no_below = var_num_keyboard('int', no_below,
+                                        'Minimum number occurrences to keep words in vocabulary')
+            no_above = var_num_keyboard('float', no_above,
+                                        'Maximum proportion of documents to keep a word in vocabulary')
+            keep_n = var_num_keyboard('int', keep_n,
+                                      'Maximum vocabulary size')
+            tk = input(f'Regular expresion for tokenizer [{token_regexp}]: ')
+            if len(tk):
+                token_regexp = tk
+            print(f'Stopwords will be read from file {stw_file[0]}')
+            swf = input('Enter the path of additional files of stopwords (separated by commas): ')
+            if len(swf):
+                for f in swf.split(','):
+                    if Path(f.strip()).is_file():
+                        stw_file.append(f.strip())
+            print(f'Word equivalences will be read from file {eq_file[0]}')
+            eq = input('Enter the path of an alternative file with equivalent terms: ')
+            if len(eq):
+                if Path(eq.strip()).is_file():
+                    eq_file = eq.strip()
+
+        return
 
         # We also need the user to select/confirm number of topics
         ntopics = int(self.cf.get('TM', 'ntopics'))
@@ -591,14 +873,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # Retrieve parameters for training
         if trainer == "mallet":
             # Default values are read from config file
-            min_lemas = int(self.cf.get('MalletTM', 'min_lemas'))
-            no_below = int(self.cf.get('MalletTM', 'no_below'))
-            no_above = float(self.cf.get('MalletTM', 'no_above'))
-            keep_n = int(self.cf.get('MalletTM', 'keep_n'))
-            token_regexp = self.cf.get('MalletTM', 'token_regexp')
             mallet_path = self.cf.get('MalletTM', 'mallet_path')
-            stw_file = [self.cf.get('MalletTM', 'default_stw_file')]
-            eq_file = [self.cf.get('MalletTM', 'default_eq_file')]
             alpha = float(self.cf.get('MalletTM', 'alpha'))
             optimize_interval = int(self.cf.get('MalletTM', 'optimize_interval'))
             num_threads = int(self.cf.get('MalletTM', 'num_threads'))
@@ -606,44 +881,18 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             doc_topic_thr = float(self.cf.get('MalletTM', 'doc_topic_thr'))
             thetas_thr = float(self.cf.get('MalletTM', 'thetas_thr'))
 
-            # The following settings will only be accessed in the "advance settings panel"
-            Y_or_N = input(f"Do you wish to access the advance settings panel [Y/N]?:")
-            if Y_or_N.upper() == "Y":
-                # Some of them can be confirmed/modified by the user
-                min_lemas = var_num_keyboard('int', min_lemas,
-                                             'Enter minimum number of lemas for the documents in the training set')
-                no_below = var_num_keyboard('int', no_below,
-                                            'Minimum number occurrences to keep words in vocabulary')
-                no_above = var_num_keyboard('float', no_above,
-                                            'Maximum proportion of documents to keep a word in vocabulary')
-                keep_n = var_num_keyboard('int', keep_n,
-                                          'Maximum vocabulary size')
-                tk = input(f'Regular expresion for tokenizer [{token_regexp}]: ')
-                if len(tk):
-                    token_regexp = tk
-                print(f'Stopwords will be read from file {stw_file[0]}')
-                swf = input('Enter the path of additional files of stopwords (separated by commas): ')
-                if len(swf):
-                    for f in swf.split(','):
-                        if Path(f.strip()).is_file():
-                            stw_file.append(f.strip())
-                print(f'Word equivalences will be read from file {eq_file[0]}')
-                eq = input('Enter the path of an alternative file with equivalent terms: ')
-                if len(eq):
-                    if Path(eq.strip()).is_file():
-                        eq_file = eq.strip()
-                alpha = var_num_keyboard('float', alpha,
-                                         'Prior parameter for the Dirichlet for doc generation')
-                optimize_interval = var_num_keyboard('int', optimize_interval,
-                                                     'Iterations between Dirichlet priors optimization')
-                num_threads = var_num_keyboard('int', num_threads,
-                                               'Number of threads for mallet parallelization')
-                num_iterations = var_num_keyboard('int', num_iterations,
-                                                  'Number of Gibbs Sampling iterations')
-                doc_topic_thr = var_num_keyboard('float', doc_topic_thr,
-                                                 'Threshold for topic activation in a doc (mallet training)')
-                thetas_thr = var_num_keyboard('float', thetas_thr,
-                                              'Threshold for topic activation in a doc (sparsification)')
+            alpha = var_num_keyboard('float', alpha,
+                                     'Prior parameter for the Dirichlet for doc generation')
+            optimize_interval = var_num_keyboard('int', optimize_interval,
+                                                 'Iterations between Dirichlet priors optimization')
+            num_threads = var_num_keyboard('int', num_threads,
+                                           'Number of threads for mallet parallelization')
+            num_iterations = var_num_keyboard('int', num_iterations,
+                                              'Number of Gibbs Sampling iterations')
+            doc_topic_thr = var_num_keyboard('float', doc_topic_thr,
+                                             'Threshold for topic activation in a doc (mallet training)')
+            thetas_thr = var_num_keyboard('float', thetas_thr,
+                                          'Threshold for topic activation in a doc (sparsification)')
 
             # Create folder for corpus, backup existing folder if necessary
             modelname = input('Enter a name to save the new model: ')
@@ -700,6 +949,37 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             pass
 
         return
+
+
+
+
+
+
+
+    def corpus2JSON(self):
+        """
+        Remove a training corpus from the Interactive Topic Model Trainer
+
+        This is linked to the ITMTrainer only tentatively, since it should
+        be part of WP4 tools
+
+        Right now, it only runs the generation of the JSON files that are
+        needed for ingestion of the corpus in Solr
+        """
+
+        print('corpus2JSON')
+
+        cmd = '/export/usuarios_ml4ds/jarenas/script-spark/script-spark ' + \
+              '-C /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json ' + \
+              '-c 4 -N 10 -S "corpus2JSON.py"'
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+
+        return
+
 
     def extractPipe(self, corpus):
 

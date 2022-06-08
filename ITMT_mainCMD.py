@@ -40,6 +40,8 @@ def main():
                         help="path to a new or an existing project")
     parser.add_argument('--parquet', type=str, default=None,
                         help="path to downloaded parquet datasets")
+    parser.add_argument('--wdlist', type=str, default=None,
+                        help="path to folder with WordLists")
     parser.add_argument('--f', action='store_true', default=False,
                         help='Force creation of new project. Overwrite existing.')
     args = parser.parse_args()
@@ -67,10 +69,19 @@ def main():
             print('Invalid folder for parquet datasets')
             return
 
+    # Read wordlist_path
+    wdlist_path = pathlib.Path(args.wdlist)
+    if not wdlist_path.is_dir():
+        try:
+            wdlist_path.mkdir(parents=True)
+        except:
+            print('Invalid folder for Word Lists')
+            return
+
     active_options = None
 
     # Create TaskManager for this project
-    tm = ITMTTaskManagerCMD(project_path, parquet_path)
+    tm = ITMTTaskManagerCMD(project_path, parquet_path, wdlist_path)
     #tm = TaskManager(project_path, parquet_path)
 
     # ########################

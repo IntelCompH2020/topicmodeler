@@ -14,14 +14,10 @@ token_spark = /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json
 [HDFS]
 #This paths are specific to UC3M deployment
 Semantic Scholar = /export/ml4ds/IntelComp/Datalake/SemanticScholar/20220201/papers.parquet
-PATSTAT = /export/ml4ds/IntelComp/Datalake/PATSTAT/2021_Autumn/patstat_appln.parquet
+PATSTAT = /export/ml4ds/IntelComp/Datalake/PATSTAT/2022_Spring/patstat_appln.parquet
 CORDIS = /export/ml4ds/IntelComp/Datalake/CORDIS/20220221/new_parquet/projects.parquet
 
-[TM]
-#Default setting for number of topics
-ntopics=25
-
-[MalletTM]
+[Preproc]
 #Minimum number of words to keep document in corpus
 min_lemas = 15
 #Remove words with less than no_below occurrences
@@ -32,12 +28,14 @@ no_above=0.6
 keep_n=500000
 #Regular expression for token identification
 token_regexp=[\p{L}\p{N}][\p{L}\p{N}\p{P}]*\p{L}
+
+[TM]
+#Default setting for number of topics
+ntopics=25
+
+[MalletTM]
 #Path to mallet binary
 mallet_path=./mallet-2.0.8/bin/mallet
-#default STWs
-default_stw_file=./aux/stop-words-english5.txt
-#default equivalencies
-default_eq_file=./aux/equivalents.txt
 
 #Settings for mallet training and doctopics postprocessing
 alpha=5
