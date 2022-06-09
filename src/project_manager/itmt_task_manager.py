@@ -24,7 +24,6 @@ import pyarrow.parquet as pt
 import sys
 from pathlib import Path
 # from gensim import corpora
-# from gensim.utils import check_output
 import subprocess
 from subprocess import check_output
 # from sklearn.preprocessing import normalize
@@ -776,12 +775,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         return
 
-
-
-
-
-
-
     def trainTM(self, trainer):
         """
         Topic modeling trainer. Initial training of a topic model
@@ -789,7 +782,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         Parameters
         ----------
         trainer : string
-            Optimizer to use for training the topic model [mallet/ctm]
+            Optimizer to use for training the topic model
+            Possible values are mallet|sparkLDA|ctm
         """
 
         ############################################################
@@ -813,8 +807,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         displaydtSets = [allTrDtsets[dts]['name'] + ': ' + 
             allTrDtsets[dts]['description'] for dts in dtSets]
         selection = query_options(displaydtSets, "Select Training Dataset")
-        TrDtSet = allTrDtsets[dtSets[selection]]
-        self.logger.info(f'-- -- Selected corpus is {TrDtSet["name"]}')
+        TrDtSet = dtSets[selection]
+        self.logger.info(f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
         
         displaytext = """
         *************************************************************************************
@@ -825,18 +819,16 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         users which parameters are basic and which ones should only appear for the advanced
         *************************************************************************************
         """
-        printgr(displaytext)        
+        printgr(displaytext)
         
         # Default values are read from config file
-        min_lemas = int(self.cf.get('MalletTM', 'min_lemas'))
-        no_below = int(self.cf.get('MalletTM', 'no_below'))
-        no_above = float(self.cf.get('MalletTM', 'no_above'))
-        keep_n = int(self.cf.get('MalletTM', 'keep_n'))
-        token_regexp = self.cf.get('MalletTM', 'token_regexp')
-        stw_file = [self.cf.get('MalletTM', 'default_stw_file')]
-        eq_file = [self.cf.get('MalletTM', 'default_eq_file')]
+        min_lemas = int(self.cf.get('Preproc', 'min_lemas'))
+        no_below = int(self.cf.get('Preproc', 'no_below'))
+        no_above = float(self.cf.get('Preproc', 'no_above'))
+        keep_n = int(self.cf.get('Preproc', 'keep_n'))
+        token_regexp = self.cf.get('Preproc', 'token_regexp')
         
-        # The following settings will only be accessed in the "advance settings panel"
+        # The following settings will only be accessed in the "advanced settings panel"
         Y_or_N = input(f"Do you wish to access the advance settings panel [Y/N]?:")
         if Y_or_N.upper() == "Y":
             # Some of them can be confirmed/modified by the user
@@ -851,26 +843,62 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             tk = input(f'Regular expresion for tokenizer [{token_regexp}]: ')
             if len(tk):
                 token_regexp = tk
-            print(f'Stopwords will be read from file {stw_file[0]}')
-            swf = input('Enter the path of additional files of stopwords (separated by commas): ')
-            if len(swf):
-                for f in swf.split(','):
-                    if Path(f.strip()).is_file():
-                        stw_file.append(f.strip())
-            print(f'Word equivalences will be read from file {eq_file[0]}')
-            eq = input('Enter the path of an alternative file with equivalent terms: ')
-            if len(eq):
-                if Path(eq.strip()).is_file():
-                    eq_file = eq.strip()
 
-        return
+        #Stopword selection        
+        allWdLists = json.loads(self.allWdLists)
+        StwLists = [swl for swl in allWdLists.keys() 
+                        if allWdLists[swl]['valid_for']=='stopwords']
+        displayStwLists = [allWdLists[swl]['name'] + ': ' + 
+            allWdLists[swl]['description'] for swl in StwLists]
+        print('\nAvailable lists of stopwords:')
+        print('\n'.join([str(el[0]) + '. ' + el[1] for el in enumerate(displayStwLists)]))
+        msg = "Select all lists of stopwords that should be used (separated by commas): "
+        selection = input(msg)
+        if len(selection):
+            StwLists = [StwLists[int(el)] for el in selection.split(',')]
+        else:
+            StwLists = []
+
+        #Lists of equivalences
+        EqLists = [eql for eql in allWdLists.keys() 
+                        if allWdLists[eql]['valid_for']=='equivalences']
+        displayEqLists = [allWdLists[eql]['name'] + ': ' + 
+            allWdLists[eql]['description'] for eql in EqLists]
+        print('\nAvailable lists of equivalent terms:')
+        print('\n'.join([str(el[0]) + '. ' + el[1] for el in enumerate(displayEqLists)]))
+        msg = "Select all lists of equivalent terms that should be used (separated by commas): "
+        selection = input(msg)
+        if len(selection):
+            EqLists = [EqLists[int(el)] for el in selection.split(',')]
+        else:
+            EqLists = []
+
+        Preproc = {
+                "min_lemas" :   min_lemas,
+                "no_below" :    no_below,
+                "no_above" :    no_above,
+                "keep_n" :      keep_n,
+                "token_regexp": token_regexp,
+                "stopwords" :   StwLists,
+                "equivalences": EqLists
+            }
+            
+        displaytext = """
+        *************************************************************************************
+        We will retrieve all parameters needed for the topic modeling itself
+
+        Most of these settings may be for advanced users. We will need to check with the
+        users which parameters are basic and which ones should only appear for the advanced
+        *************************************************************************************
+        """
+        printgr(displaytext)
 
         # We also need the user to select/confirm number of topics
         ntopics = int(self.cf.get('TM', 'ntopics'))
         ntopics = var_num_keyboard('int', ntopics,
                                    'Please, select the number of topics')
 
-        # Retrieve parameters for training
+        # Retrieve parameters for training. These are dependent on the training algorithm
         if trainer == "mallet":
             # Default values are read from config file
             mallet_path = self.cf.get('MalletTM', 'mallet_path')
@@ -881,72 +909,101 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             doc_topic_thr = float(self.cf.get('MalletTM', 'doc_topic_thr'))
             thetas_thr = float(self.cf.get('MalletTM', 'thetas_thr'))
 
-            alpha = var_num_keyboard('float', alpha,
-                                     'Prior parameter for the Dirichlet for doc generation')
-            optimize_interval = var_num_keyboard('int', optimize_interval,
-                                                 'Iterations between Dirichlet priors optimization')
-            num_threads = var_num_keyboard('int', num_threads,
-                                           'Number of threads for mallet parallelization')
-            num_iterations = var_num_keyboard('int', num_iterations,
-                                              'Number of Gibbs Sampling iterations')
-            doc_topic_thr = var_num_keyboard('float', doc_topic_thr,
-                                             'Threshold for topic activation in a doc (mallet training)')
-            thetas_thr = var_num_keyboard('float', thetas_thr,
-                                          'Threshold for topic activation in a doc (sparsification)')
+            # The following settings will only be accessed in the "advanced settings panel"
+            Y_or_N = input(f"Do you wish to access the advanced settings panel [Y/N]?:")
+            if Y_or_N.upper() == "Y":
 
-            # Create folder for corpus, backup existing folder if necessary
+                alpha = var_num_keyboard('float', alpha,
+                                         'Prior parameter for the Dirichlet for doc generation')
+                optimize_interval = var_num_keyboard('int', optimize_interval,
+                                                     'Iterations between Dirichlet priors optimization')
+                num_threads = var_num_keyboard('int', num_threads,
+                                               'Number of threads for mallet parallelization')
+                num_iterations = var_num_keyboard('int', num_iterations,
+                                                  'Number of Gibbs Sampling iterations')
+                doc_topic_thr = var_num_keyboard('float', doc_topic_thr,
+                                                 'Threshold for topic activation in a doc (mallet training)')
+                thetas_thr = var_num_keyboard('float', thetas_thr,
+                                              'Threshold for topic activation in a doc (sparsification)')
+            LDAparam = {
+                "ntopics" :             ntopics,
+                "alpha" :               alpha,
+                "optimize_interval" :   optimize_interval,
+                "num_threads" :         num_threads,
+                "num_iterations" :      num_iterations,
+                "doc_topic_thr" :       doc_topic_thr,
+                "thetas_thr" :          thetas_thr
+            }
+
+        elif trainer == "sparKLDA":
+            LDAparam = {}
+        elif trainer == "ctm":
+            LDAparam = {}
+
+        displaytext = """
+        *************************************************************************************
+        We will finally request other general information, modelname, description, etc
+        *************************************************************************************
+        """
+        printgr(displaytext)
+        modelname = ''
+        while not len(modelname):
             modelname = input('Enter a name to save the new model: ')
-            modeldir = self.p2p.joinpath(self._dir_struct['LDAmodels']).joinpath(modelname)
-            if modeldir.exists():
+        modeldir = self.p2p.joinpath(self._dir_struct['LDAmodels']).joinpath(modelname)
+        if modeldir.exists():
 
-                # Remove current backup folder, if it exists
-                old_model_dir = Path(str(modeldir) + '_old/')
-                if old_model_dir.exists():
-                    shutil.rmtree(old_model_dir)
+            # Remove current backup folder, if it exists
+            old_model_dir = Path(str(modeldir) + '_old/')
+            if old_model_dir.exists():
+                shutil.rmtree(old_model_dir)
 
-                # Copy current project folder to the backup folder.
-                shutil.move(modeldir, old_model_dir)
-                self.logger.info(f'-- -- Creating backup of existing model in {old_model_dir}')
+            # Copy current project folder to the backup folder.
+            shutil.move(modeldir, old_model_dir)
+            self.logger.info(f'-- -- Creating backup of existing model in {old_model_dir}')
 
-            # Create corpus_folder and save model training configuration
-            modeldir.mkdir()
-            configFile = modeldir.joinpath('train.config')
-            with configFile.open('w', encoding='utf8') as fout:
-                fout.write('[Preproc]\n')
-                fout.write('min_lemas = ' + str(min_lemas) + '\n')
-                fout.write('no_below = ' + str(no_below) + '\n')
-                fout.write('no_above = ' + str(no_above) + '\n')
-                fout.write('keep_n = ' + str(keep_n) + '\n')
-                fout.write('stw_file = ' + ','.join(stw_file) + '\n')
-                fout.write('eq_file = ' + ','.join(eq_file) + '\n')
-                fout.write('\n[Training]\n')
-                fout.write('trainer = mallet\n')
-                fout.write('token_regexp = ' + str(token_regexp) + '\n')
-                fout.write('mallet_path = ' + mallet_path + '\n')
-                fout.write('ntopics = ' + str(ntopics) + '\n')
-                fout.write('alpha = ' + str(alpha) + '\n')
-                fout.write('optimize_interval = ' + str(optimize_interval) + '\n')
-                fout.write('num_threads = ' + str(num_threads) + '\n')
-                fout.write('num_iterations = ' + str(num_iterations) + '\n')
-                fout.write('doc_topic_thr = ' + str(doc_topic_thr) + '\n')
-                fout.write('thetas_thr = ' + str(thetas_thr) + '\n')
-                fout.write('training_files = ' + ','.join([el.as_posix() for el in dtSetCSV]) + '\n')
+        # Introduce a description for the model
+        ModelDesc = ""
+        while not len(ModelDesc):
+            ModelDesc = input('Introduce a description for the model: ')
 
-            #############################################################
-            ## END IMT Interface: Next, the actual training should happen
-            #############################################################
+        # Define privacy level of dataset
+        privacy = ['Public', 'Private']
+        opt = query_options(privacy, 'Define visibility for the model')
+        privacy = privacy[opt]
 
-            # Run command for training model
-            cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
-            try:
-                self.logger.info(f'-- -- Running command {cmd}')
-                check_output(args=cmd, shell=True)
-            except:
-                self.logger.error('-- -- Command execution failed')
+        # Create corpus_folder and save model training configuration
+        modeldir.mkdir()
+        configFile = modeldir.joinpath('trainconfig.json')
 
-        if trainer == "ctm":
-            # Other trainers will be available
-            pass
+        train_config = {
+            "name":         modelname,
+            "description":  ModelDesc,
+            "visibility":   privacy,
+            "trainer":      trainer,
+            "TrDtSet":      TrDtSet,
+            "Preproc" :     Preproc,
+            "LDAparam" :    LDAparam
+        }
+
+        with configFile.open('w', encoding='utf-8') as outfile:
+            json.dump(train_config, outfile, ensure_ascii=False, indent=2, default=str)
+
+        #############################################################
+        ## END IMT Interface: Next, the actual training should happen
+        #############################################################
+
+        return
+
+
+
+
+        # Run command for training model
+        cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Command execution failed')
 
         return
 

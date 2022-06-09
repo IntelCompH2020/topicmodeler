@@ -94,7 +94,8 @@ trainTM:
   title: Train a Topic Model
   options:
     - parameters:
-        mallet: Mallet Topic Model Training
+        mallet: Mallet Topic Modeling
+        sparkLDA: Spark MLLIB Topic Modeling
         ctm: Contextualized Topic Model (deep learning)
 
 

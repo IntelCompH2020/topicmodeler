@@ -137,7 +137,7 @@ class CorpusManager(object):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Script de ejemplo para lanzar en el cluster')
+    parser = argparse.ArgumentParser(description='Scripts for Corpus Management Service')
     parser.add_argument('--listDownloaded', action='store_true', default=False,
                         help='List datasets downloaded from HDFS with metadata.')
     parser.add_argument('--saveTrDtset', action='store_true', default=False,
