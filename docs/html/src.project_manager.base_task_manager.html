@@ -48,6 +48,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="src.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="src.gui.html">src.gui</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.manageLists.html">src.manageLists</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.neural_models.html">src.neural_models</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="src.project_manager.html">src.project_manager</a><ul class="current">
@@ -99,7 +100,7 @@ It implements the functions needed to create, load and set up an
 execution project from the main application.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.project_manager.base_task_manager.BaseTaskManager">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.base_task_manager.</span></span><span class="sig-name descname"><span class="pre">BaseTaskManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/base_task_manager.html#BaseTaskManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.base_task_manager.BaseTaskManager" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.base_task_manager.</span></span><span class="sig-name descname"><span class="pre">BaseTaskManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2wdlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/base_task_manager.html#BaseTaskManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.base_task_manager.BaseTaskManager" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Main class to manage functionality of the Topic Model Interactive Trainer</p>
 <p>The behavior of this class depends on the state of the project, which is stored
@@ -119,6 +120,7 @@ project.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
 <li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>p2wdlist</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the wordlists (stopwords, keywords, etc)</p></li>
 <li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
 <li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
 If None, no metadata file is used.</p></li>
@@ -127,7 +129,7 @@ If None, no metadata file is used.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.project_manager.base_task_manager.BaseTaskManager.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/base_task_manager.html#BaseTaskManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.base_task_manager.BaseTaskManager.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2wdlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/base_task_manager.html#BaseTaskManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.base_task_manager.BaseTaskManager.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Sets the main attributes to manage tasks over a specific application
 project.</p>
 <dl class="field-list simple">
@@ -135,6 +137,7 @@ project.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
 <li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>p2wdlist</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the wordlists (stopwords, keywords, etc)</p></li>
 <li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
 <li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
 If None, no metadata file is used.</p></li>

@@ -3,9 +3,9 @@
 
 Contains the class implementing the functionality required
 by the Interactive Model Trainer for creating lists of
-* keywords
-* equivalent terms
-* stopwords
+    * keywords
+    * equivalent terms
+    * stopwords
 """
 
 import sys

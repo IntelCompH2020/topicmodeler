@@ -52,6 +52,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.manageLists.html">src.manageLists</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.neural_models.html">src.neural_models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.project_manager.html">src.project_manager</a></li>
@@ -93,24 +94,25 @@
              
   <section id="module-src.gui.utils.utils">
 <span id="src-gui-utils-utils"></span><h1>src.gui.utils.utils<a class="headerlink" href="#module-src.gui.utils.utils" title="Permalink to this headline"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="src.gui.utils.utils.configure_table_header">
-<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">configure_table_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_tables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#configure_table_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.configure_table_header" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.gui.utils.utils.initialize_progress_bar">
-<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">initialize_progress_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_progress_bars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#initialize_progress_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.initialize_progress_bar" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<ul class="simple">
+<li><p><em>IntelComp H2020 project</em></p></li>
+</ul>
+<p>Python module with a set of auxiliary methods for the Interactive Topic Model Trainer’s GUI
+Among others, it implements the functions needed to</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Execute certain high computational load tasks in a secondary thread so the GUI does not freeze</p></li>
+<li><p>Configure a set of QWidget objects with some specific criteria</p></li>
+<li><p>Keep track of recent projects and parquet folders</p></li>
+</ul>
+</div></blockquote>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.gui.utils.utils.execute_in_thread">
 <span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">execute_in_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gui</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_bar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#execute_in_thread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.execute_in_thread" title="Permalink to this definition"></a></dt>
-<dd><p>Method to execute a function in the secondary thread while showing
-a progress bar at the time the function is being executed if a progress bar object is provided.
-When finished, it forces the execution of the method to be
-executed after the function executing in a thread is completed.
-Based on the functions provided in the manual available at:
+<dd><p>Method to execute a certain function in a secondary thread while keeping the GUI’s execution in the main thread.
+A progress bar is shown at the time the function is being executed if a progress bar object is provided. When
+finished, it forces the execution of the method to be executed after the function executing in a thread is
+completed. Based on the functions provided in the manual available at:
 <a class="reference external" href="https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/">https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -131,9 +133,86 @@ main thread while the main task is being carried out in a secondary thread</p></
 <span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">signal_accept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">progress_bar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#signal_accept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.signal_accept" title="Permalink to this definition"></a></dt>
 <dd><p>Makes the progress bar passed as an argument visible and configures it for
 an event whose duration is unknown by setting both its minimum and maximum
-both to 0, thus the bar shows a busy indicator instead of a percentage of steps.
-:param progress_bar: Progress bar object in which the progress is going to be displayed.
-:type progress_bar: QProgressBar</p>
+both to 0, thus the bar shows a busy indicator instead of a percentage of steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>progress_bar</strong> (<em>QProgressBar</em>) – Progress bar object in which the progress is going to be displayed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.utils.utils.configure_table_header">
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">configure_table_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_tables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#configure_table_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.configure_table_header" title="Permalink to this definition"></a></dt>
+<dd><p>Configures all the tables defined in the list given by “list_tables” in the sense that it makes their horizontal
+headers visible disables the functionality of highlighting sections and resizes their rows to fit their content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_tables</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List with the names of the QTableWidget objects to configure</p></li>
+<li><p><strong>window</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>MainWindow</em></a>) – Window to which the tables belong to</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.utils.utils.initialize_progress_bar">
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">initialize_progress_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_progress_bars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#initialize_progress_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.initialize_progress_bar" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes all the progress bars defined in the list given by “list_progress_bars” in the sense that it makes
+them invisible to the user and establishes their progress at 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_progress_bars</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List with the names of the QProgressBar objects to configure</p></li>
+<li><p><strong>window</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>MainWindow</em></a>) – Window to which the progress bars belong to</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.utils.utils.add_checkboxes_to_table">
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">add_checkboxes_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#add_checkboxes_to_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.add_checkboxes_to_table" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a checkbox at the last column of every row of the table specified by “table”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>table</strong> (<em>QTableWidget</em>) – Table to which the checkboxes will be added to</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.utils.utils.save_recent">
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">save_recent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_parquet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#save_recent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.save_recent" title="Permalink to this definition"></a></dt>
+<dd><p>Saves in a pickle file a dictionary structure with a list of the last used projects and parquet folders. If the
+file exists, the current project and parquet folders are added to the corresponding lists in the dictionary with
+the condition that they are not equal to their corresponding pair in the previous execution. If the file does not
+exist, a new dictionary is instantiated with each of its lists being conformed by just the current project and
+parquet folder, respectively,</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current_project</strong> (<em>pathlib.Path</em>) – Route to the project folder of the current execution</p></li>
+<li><p><strong>current_parquet</strong> (<em>pathlib.Path</em>) – Route to the parquet folder of the current execution</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.utils.utils.set_recent_buttons">
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">set_recent_buttons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#set_recent_buttons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.set_recent_buttons" title="Permalink to this definition"></a></dt>
+<dd><p>Loads the dictionary of recent projects and parquet folders into execution time. If the dictionary is not empty,
+it looks for the last two project folders and parquet folders. After checking if the routes still exist in the
+user’s OS, it adds the route as text in the corresponding buttons. Otherwise, in case the dictionary is empty and
+thus there are no recent projects, the frame that contains the buttons for the recent folders is hidden from the
+window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>window</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>MainWindow</em></a>) – Window in which the buttons are going to be configured</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

@@ -48,6 +48,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="src.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="src.gui.html">src.gui</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.manageLists.html">src.manageLists</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.neural_models.html">src.neural_models</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="src.project_manager.html">src.project_manager</a><ul class="current">
@@ -106,7 +107,7 @@ It implements the functions needed to</p>
 </div></blockquote>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.itmt_task_manager.</span></span><span class="sig-name descname"><span class="pre">ITMTTaskManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parameters.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.itmt_task_manager.</span></span><span class="sig-name descname"><span class="pre">ITMTTaskManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2wdlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="src.project_manager.base_task_manager.html#src.project_manager.base_task_manager.BaseTaskManager" title="src.project_manager.base_task_manager.BaseTaskManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.project_manager.base_task_manager.BaseTaskManager</span></code></a></p>
 <p>This class extends the functionality of the baseTaskManager class for a
 specific example application
@@ -122,6 +123,7 @@ dictionary self.state, with the following entries:
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
 <li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>p2wdlist</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the wordlists (stopwords, keywords, etc)</p></li>
 <li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
 <li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
 If None, no metadata file is used.</p></li>
@@ -130,13 +132,14 @@ If None, no metadata file is used.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parameters.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2wdlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Initializes an ITMTTaskManager object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
 <li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>p2wdlist</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the wordlists (stopwords, keywords, etc)</p></li>
 <li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
 <li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
 If None, no metadata file is used.</p></li>
@@ -171,6 +174,18 @@ ITMTTaskManager’s ‘allTrDtsets’ attribute as a dictionary object, which is
 entry per dataset, the key and the value being the absolute path to the dataset and a dictionary with the
 corresponding metadata, respectively. To do so, it invokes the script from the folder ‘src/manageCorpus’ with
 the option ‘listTrDtsets’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.load_listWdLists">
+<span class="sig-name descname"><span class="pre">load_listWdLists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.load_listWdLists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.load_listWdLists" title="Permalink to this definition"></a></dt>
+<dd><p>This method loads all the wordlists that are available into the
+ITMTTaskManager’s ‘allWdLists’ attribute as a dictionary object,
+which is characterized by one dictionary entry per wordlist,
+the key and the value being the absolute path to the wordlist
+and a dictionary with the corresponding metadata, respectively.
+To do so, it invokes the script from the folder ‘src/manageLists’ with
+the option ‘listWordLists’.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -222,11 +237,60 @@ within the project folder. To do so, it invokes the script from the folder ‘sr
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.create_List">
+<span class="sig-name descname"><span class="pre">create_List</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.create_List"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.create_List" title="Permalink to this definition"></a></dt>
+<dd><p>This method saves the stopword list ‘stw_list’ in the folder self.p2wdlist
+To do so, it invokes the script from the folder ‘src/manageLists’
+with the option ‘createWordList’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>new_list</strong> – Dictionary with information for the new list</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>status</strong> –</p>
+<ul class="simple">
+<li><p>0 if the list could not be created</p></li>
+<li><p>1 if the list was created successfully</p></li>
+<li><p>2 if the list replaced an existing dataset</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManager.delete_WdLst">
+<span class="sig-name descname"><span class="pre">delete_WdLst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wd_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManager.delete_WdLst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManager.delete_WdLst" title="Permalink to this definition"></a></dt>
+<dd><p>This method deletes the wordlist specified by ‘wd_list’ from the wordlist folder.</p>
+<p>To do so, it invokes the script from the folder ‘src/manageLists’ with the option
+‘deleteWordList’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>wd_list</strong> (<em>str</em>) – String representation of the path to the json file with the wordlist</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>status</strong> –</p>
+<ul class="simple">
+<li><p>0 if the wordlist could not be deleted</p></li>
+<li><p>1 if the wordlist was deleted successfully</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.itmt_task_manager.</span></span><span class="sig-name descname"><span class="pre">ITMTTaskManagerCMD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.itmt_task_manager.</span></span><span class="sig-name descname"><span class="pre">ITMTTaskManagerCMD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2wdlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#src.project_manager.itmt_task_manager.ITMTTaskManager" title="src.project_manager.itmt_task_manager.ITMTTaskManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.project_manager.itmt_task_manager.ITMTTaskManager</span></code></a></p>
 <p>Provides extra functionality to the task manager, requesting parameters
 from users from a command window.</p>
@@ -236,6 +300,7 @@ from users from a command window.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
 <li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>p2wdlist</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the wordlists (stopwords, keywords, etc)</p></li>
 <li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
 <li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
 If None, no metadata file is used.</p></li>
@@ -244,13 +309,14 @@ If None, no metadata file is used.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2wdlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Initializes an ITMTTaskManagerCMD object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
 <li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>p2wdlist</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the wordlists (stopwords, keywords, etc)</p></li>
 <li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
 <li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
 If None, no metadata file is used.</p></li>
@@ -300,13 +366,36 @@ dataset folder</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.corpus2JSON">
-<span class="sig-name descname"><span class="pre">corpus2JSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.corpus2JSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.corpus2JSON" title="Permalink to this definition"></a></dt>
-<dd><p>Remove a training corpus from the Interactive Topic Model Trainer</p>
-<p>This is linked to the ITMTrainer only tentatively, since it should
-be part of WP4 tools</p>
-<p>Right now, it only runs the generation of the JSON files that are
-needed for ingestion of the corpus in Solr</p>
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.listAllWdLists">
+<span class="sig-name descname"><span class="pre">listAllWdLists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.listAllWdLists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.listAllWdLists" title="Permalink to this definition"></a></dt>
+<dd><p>This method shows all wordlists available for the project</p>
+<p>This is an extremely simple method for the taskmanager that does not
+require any user interaction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.NewWdList">
+<span class="sig-name descname"><span class="pre">NewWdList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listType</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.NewWdList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.NewWdList" title="Permalink to this definition"></a></dt>
+<dd><p>This method creates a New List of words that can be later used for
+corpus preprocessing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>listType</strong> (<em>string</em>) – type of list that will be created [keywords|stopwords|equivalences]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.EditWdList">
+<span class="sig-name descname"><span class="pre">EditWdList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.EditWdList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.EditWdList" title="Permalink to this definition"></a></dt>
+<dd><p>This method allows the edition of an existing list of words, i.e.
+adding new words or removing existing words</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.DelWdList">
+<span class="sig-name descname"><span class="pre">DelWdList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.DelWdList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.DelWdList" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a wordlist from wordlist folder</p>
 </dd></dl>
 
 <dl class="py method">
@@ -315,9 +404,20 @@ needed for ingestion of the corpus in Solr</p>
 <dd><p>Topic modeling trainer. Initial training of a topic model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>trainer</strong> – TM optimizer [mallet/ctm]</p>
+<dd class="field-odd"><p><strong>trainer</strong> (<em>string</em>) – Optimizer to use for training the topic model
+Possible values are mallet|sparkLDA|ctm</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.corpus2JSON">
+<span class="sig-name descname"><span class="pre">corpus2JSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerCMD.corpus2JSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.corpus2JSON" title="Permalink to this definition"></a></dt>
+<dd><p>Remove a training corpus from the Interactive Topic Model Trainer</p>
+<p>This is linked to the ITMTrainer only tentatively, since it should
+be part of WP4 tools</p>
+<p>Right now, it only runs the generation of the JSON files that are
+needed for ingestion of the corpus in Solr</p>
 </dd></dl>
 
 <dl class="py method">
@@ -500,7 +600,7 @@ displays them in the corresponding table within the GUI.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.createTMCorpus">
-<span class="sig-name descname"><span class="pre">createTMCorpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.createTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.createTMCorpus" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">createTMCorpus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_to_tm_corpus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtsName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtsDesc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">privacy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.createTMCorpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.createTMCorpus" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

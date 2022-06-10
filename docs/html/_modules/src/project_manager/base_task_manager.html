@@ -97,7 +97,7 @@
 <span class="sd">                      activated.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BaseTaskManager.__init__"><a class="viewcode-back" href="../../../src.project_manager.base_task_manager.html#src.project_manager.base_task_manager.BaseTaskManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="s1">&#39;config.cf&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="BaseTaskManager.__init__"><a class="viewcode-back" href="../../../src.project_manager.base_task_manager.html#src.project_manager.base_task_manager.BaseTaskManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">p2wdlist</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="s1">&#39;config.cf&#39;</span><span class="p">,</span>
                  <span class="n">metadata_fname</span><span class="o">=</span><span class="s1">&#39;metadata.yaml&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the main attributes to manage tasks over a specific application</span>
@@ -109,6 +109,8 @@
 <span class="sd">            Path to the application project</span>
 <span class="sd">        p2parquet : pathlib.Path</span>
 <span class="sd">            Path to the folder hosting the parquet datasets</span>
+<span class="sd">        p2wdlist : pathlib.Path</span>
+<span class="sd">            Path to the folder hosting the wordlists (stopwords, keywords, etc)</span>
 <span class="sd">        config_fname : str, optional (default=&#39;config.cf&#39;)</span>
 <span class="sd">            Name of the configuration file</span>
 <span class="sd">        metadata_fname : str or None, optional (default=metadata.yaml)</span>
@@ -119,6 +121,7 @@
         <span class="c1"># Important directories for the project</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span> <span class="o">=</span> <span class="n">p2p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p2parquet</span> <span class="o">=</span> <span class="n">p2parquet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2wdlist</span> <span class="o">=</span> <span class="n">p2wdlist</span>
 
         <span class="c1"># Configuration file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p2config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span> <span class="o">/</span> <span class="n">config_fname</span>
@@ -313,6 +316,8 @@
               <span class="s2">&quot;folder.&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---- Open it and set your configuration variables properly.&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---- Once the config file is ready, activate it.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
         <span class="k">return</span></div>
 

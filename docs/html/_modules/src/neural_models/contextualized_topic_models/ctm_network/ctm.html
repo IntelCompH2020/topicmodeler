@@ -517,6 +517,8 @@
             <span class="n">e</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
             <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">beta</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 
                 <span class="n">validation_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
@@ -539,15 +541,14 @@
                         <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span><span class="p">,</span> <span class="n">samples_processed</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span><span class="p">,</span>
                         <span class="n">train_loss</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="n">e</span> <span class="o">-</span> <span class="n">s</span><span class="p">))</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="p">(</span><span class="n">val_loss</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">early_stop</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Early stopping&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val_loss</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">train_loss</span><span class="p">):</span>
                     <span class="k">break</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Save last epoch</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">best_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">beta</span>
-                <span class="c1"># if save_dir is not None:</span>
-                <span class="c1">#   self.save(save_dir)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="p">(</span><span class="n">val_loss</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_stopping</span><span class="o">.</span><span class="n">early_stop</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Early stopping&quot;</span><span class="p">)</span>
+                        <span class="k">break</span>
+
             <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span>
                 <span class="s2">&quot;Epoch: [</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">]</span><span class="se">\t</span><span class="s2"> Seen Samples: [</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">]</span><span class="se">\t</span><span class="s2">Train Loss: </span><span class="si">{}</span><span class="se">\t</span><span class="s2">Time: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span><span class="p">,</span> <span class="n">samples_processed</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span><span class="p">,</span>

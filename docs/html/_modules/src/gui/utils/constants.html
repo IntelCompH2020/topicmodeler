@@ -74,13 +74,21 @@
     <span class="n">MAX_MENU_BUTTONS</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">MAX_TRAIN_OPTIONS</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">MAX_CORPUS_BUTTONS</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">MAX_RECENT_PROJECTS</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">MAX_RECENT_PARQUETS</span> <span class="o">=</span> <span class="mi">2</span>
 
     <span class="n">LONG_TIME_SHOW_SB</span> <span class="o">=</span> <span class="mi">10000</span>
 
     <span class="n">SMOOTH_SPOON_MSG</span> <span class="o">=</span> <span class="s1">&#39;Smooth Spoon message&#39;</span>
+    <span class="n">TM_CORPUS_MSG_STATUS_0</span> <span class="o">=</span> <span class="s2">&quot;The dataset could not be created.&quot;</span>
+    <span class="n">TM_CORPUS_MSG_STATUS_1</span> <span class="o">=</span> <span class="s2">&quot;The dataset was created successfully.&quot;</span>
+    <span class="n">TM_CORPUS_MSG_STATUS_2</span> <span class="o">=</span> <span class="s2">&quot;The dataset replaced an existing dataset&quot;</span>
 
     <span class="n">CORPUS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_available_local_corpus&quot;</span><span class="p">,</span> <span class="s2">&quot;table_available_training_datasets&quot;</span><span class="p">]</span>
     <span class="n">DOWNLOAD_CORPUS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_available_fields&quot;</span><span class="p">,</span> <span class="s2">&quot;table_fields_to_include&quot;</span><span class="p">,</span> <span class="s2">&quot;table_filters&quot;</span><span class="p">]</span>
+    <span class="n">CREATE_TM_CORPUS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tableWidget_available_fields_raw&quot;</span><span class="p">,</span> <span class="s2">&quot;tableWidget_fields_to_include_raw&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;tableWidget_available_fields_lemmas&quot;</span><span class="p">,</span> <span class="s2">&quot;tableWidget_fields_to_include_lemmas&quot;</span><span class="p">]</span>
+
     <span class="n">MODELS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_available_models&quot;</span><span class="p">,</span> <span class="s2">&quot;table_topics_edit_model&quot;</span><span class="p">]</span>
     <span class="n">TRAIN_MODEL_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_training_resultsLDA&quot;</span><span class="p">,</span> <span class="s2">&quot;table_training_results_AVITM&quot;</span><span class="p">,</span> <span class="s2">&quot;table_training_results_CTM&quot;</span><span class="p">]</span>
     <span class="n">TRAIN_LOADING_BARS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;progress_bar_LDA&quot;</span><span class="p">,</span> <span class="s2">&quot;progress_bar_AVITM&quot;</span><span class="p">,</span> <span class="s2">&quot;progress_bar_CTM&quot;</span><span class="p">]</span>
@@ -212,9 +220,17 @@
 
 <span class="sd">        QPushButton:pressed {</span>
 <span class="sd">            border-bottom: 4px solid #4D6F8C;</span>
-<span class="sd">             background-color: #F2F2F2;</span>
-<span class="sd">        }</span>
-<span class="sd">&quot;&quot;&quot;</span></div>
+<span class="sd">            background-color: #F2F2F2;</span>
+<span class="sd">        }&quot;&quot;&quot;</span>
+
+    <span class="n">Q_LABEL_EDIT_STYLESHEET</span> <span class="o">=</span> \
+        <span class="sd">&quot;&quot;&quot;QLabel {	</span>
+<span class="sd">            background-color: #FFFFFF;</span>
+<span class="sd">            font: 87 italic 12pt &quot;Avenir&quot;;</span>
+<span class="sd">            border-radius: 5px;</span>
+<span class="sd">            border: 1px solid #1A2E40;</span>
+<span class="sd">            color:black;</span>
+<span class="sd">        }&quot;&quot;&quot;</span></div>
 </pre></div>
 
            </div>

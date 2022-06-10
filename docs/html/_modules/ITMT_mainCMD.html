@@ -112,6 +112,8 @@
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to a new or an existing project&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--parquet&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to downloaded parquet datasets&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--wdlist&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to folder with WordLists&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--f&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Force creation of new project. Overwrite existing.&#39;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
@@ -139,10 +141,19 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Invalid folder for parquet datasets&#39;</span><span class="p">)</span>
             <span class="k">return</span>
 
+    <span class="c1"># Read wordlist_path</span>
+    <span class="n">wdlist_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">wdlist</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">wdlist_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wdlist_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Invalid folder for Word Lists&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
     <span class="n">active_options</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># Create TaskManager for this project</span>
-    <span class="n">tm</span> <span class="o">=</span> <span class="n">ITMTTaskManagerCMD</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">parquet_path</span><span class="p">)</span>
+    <span class="n">tm</span> <span class="o">=</span> <span class="n">ITMTTaskManagerCMD</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">parquet_path</span><span class="p">,</span> <span class="n">wdlist_path</span><span class="p">)</span>
     <span class="c1">#tm = TaskManager(project_path, parquet_path)</span>
 
     <span class="c1"># ########################</span>

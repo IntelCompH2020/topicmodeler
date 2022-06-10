@@ -70,17 +70,31 @@
            <div itemprop="articleBody">
              
   <h1>Source code for src.gui.main_window</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">* *IntelComp H2020 project*</span>
+
+<span class="sd">Class that defines the Graphical user interface&#39;s main window  for the Interactive Topic Model Trainer App</span>
+<span class="sd">It implements the functions needed to</span>
+
+<span class="sd">    - Configure the GUI widgets defined in the corresponding UI file (main_window.ui)</span>
+<span class="sd">    - Connect the GUI and the project manager (ITMTTaskManager)</span>
+<span class="sd">    - Implement handler functions to control the interaction between the user and the different widgets</span>
+<span class="sd">    - Control the opening of secondary windows for specific functionalities (training, curation, etc.)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
 
-<span class="kn">from</span> <span class="nn">PyQt6</span> <span class="kn">import</span> <span class="n">QtGui</span>
-<span class="kn">from</span> <span class="nn">PyQt6.QtWidgets</span> <span class="kn">import</span> <span class="n">QMainWindow</span><span class="p">,</span> <span class="n">QFileDialog</span><span class="p">,</span> <span class="n">QPushButton</span>
+<span class="kn">from</span> <span class="nn">PyQt6</span> <span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt6.QtWidgets</span> <span class="kn">import</span> <span class="n">QMainWindow</span><span class="p">,</span> <span class="n">QFileDialog</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QMessageBox</span>
 <span class="kn">from</span> <span class="nn">PyQt6.uic</span> <span class="kn">import</span> <span class="n">loadUi</span>
 <span class="kn">from</span> <span class="nn">PyQt6.QtCore</span> <span class="kn">import</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">QThreadPool</span>
 <span class="kn">from</span> <span class="nn">PyQt6.QtWebEngineWidgets</span> <span class="kn">import</span> <span class="n">QWebEngineView</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
+<span class="c1"># Local imports</span>
+<span class="kn">from</span> <span class="nn">src.gui.generate_tm_corpus_window</span> <span class="kn">import</span> <span class="n">GenerateTMCorpus</span>
 <span class="kn">from</span> <span class="nn">src.gui.train_model_window</span> <span class="kn">import</span> <span class="n">TrainModelWindow</span>
 <span class="kn">from</span> <span class="nn">src.gui.utils</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">src.gui.utils.output_wrapper</span> <span class="kn">import</span> <span class="n">OutputWrapper</span>
@@ -128,14 +142,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">web</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Other attributes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">previous_corpus_button</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="s2">&quot;menu_button_1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_corpus_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="s2">&quot;corpus_button_1&quot;</span><span class="p">)</span>
 
         <span class="c1"># Get home in any operating system</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">home</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">())</span>
 
         <span class="c1"># Creation of subwindows</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_model_subwindow</span> <span class="o">=</span> <span class="n">TrainModelWindow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tm_corpus_subwindow</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Threads for executing in parallel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">thread_pool</span> <span class="o">=</span> <span class="n">QThreadPool</span><span class="p">()</span>
@@ -145,13 +160,13 @@
         <span class="c1">#####################################################################################</span>
         <span class="c1"># Connect pages</span>
         <span class="c1">#####################################################################################</span>
-        <span class="n">menu_buttons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_buttons</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">id_button</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MAX_MENU_BUTTONS</span><span class="p">):</span>
             <span class="n">menu_button_name</span> <span class="o">=</span> <span class="s2">&quot;menu_button_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">id_button</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">menu_button_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">menu_button_name</span><span class="p">)</span>
-            <span class="n">menu_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">menu_button_widget</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">menu_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">menu_button_widget</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">menu_button</span> <span class="ow">in</span> <span class="n">menu_buttons</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">menu_button</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_buttons</span><span class="p">:</span>
             <span class="n">menu_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_change_menu_button</span><span class="p">,</span> <span class="n">menu_button</span><span class="p">))</span>
 
         <span class="c1"># PAGE 1: Home</span>
@@ -159,18 +174,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">menu_button_1</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
             <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_tabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_home</span><span class="p">))</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">home_recent_buttons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">id_button</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MAX_RECENT_PROJECTS</span><span class="p">):</span>
+            <span class="n">home_recent_button_name</span> <span class="o">=</span> <span class="s2">&quot;pushButton_recent_project_folder_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">id_button</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">home_recent_button_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">home_recent_button_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">home_recent_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">home_recent_button_widget</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">id_button</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MAX_RECENT_PARQUETS</span><span class="p">):</span>
+            <span class="n">home_recent_button_name</span> <span class="o">=</span> <span class="s2">&quot;pushButton_recent_parquet_folder_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">id_button</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">home_recent_button_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">home_recent_button_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">home_recent_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">home_recent_button_widget</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">home_recent_button</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">home_recent_buttons</span><span class="p">:</span>
+            <span class="n">home_recent_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_folder_from_recent</span><span class="p">,</span> <span class="n">home_recent_button</span><span class="p">))</span>
+
         <span class="c1"># PAGE 2: Corpus</span>
         <span class="c1">#################</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">menu_button_2</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
             <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_tabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_corpus</span><span class="p">))</span>
 
-        <span class="n">corpus_buttons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">corpus_buttons</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">id_button</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MAX_CORPUS_BUTTONS</span><span class="p">):</span>
             <span class="n">corpus_button_name</span> <span class="o">=</span> <span class="s2">&quot;corpus_button_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">id_button</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">corpus_button_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">corpus_button_name</span><span class="p">)</span>
-            <span class="n">corpus_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corpus_button_widget</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">corpus_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corpus_button_widget</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">corpus_button</span> <span class="ow">in</span> <span class="n">corpus_buttons</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">corpus_button</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">corpus_buttons</span><span class="p">:</span>
             <span class="n">corpus_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_change_corpus_button</span><span class="p">,</span> <span class="n">corpus_button</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">corpus_button_1</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
@@ -191,11 +219,21 @@
         <span class="c1">#####################################################################################</span>
         <span class="c1"># Widgets initial configuration</span>
         <span class="c1">#####################################################################################</span>
+
+        <span class="c1"># MENU BUTTONS</span>
+        <span class="c1"># When the app is first opened, menu buttons are disabled until the user selects properly the project and</span>
+        <span class="c1"># parquet folders</span>
+        <span class="k">for</span> <span class="n">menu_button</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_buttons</span><span class="p">:</span>
+            <span class="n">menu_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
         <span class="c1"># PAGE 1: Home</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">set_recent_buttons</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_page_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">HOME_BUTTON_SELECTED_STYLESHEET</span><span class="p">)</span>
 
         <span class="c1"># PAGE 2: Corpus</span>
         <span class="c1"># Configure tables</span>
         <span class="n">utils</span><span class="o">.</span><span class="n">configure_table_header</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">CORPUS_TABLES</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_corpus_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">TRAIN_BUTTONS_SELECTED_STYLESHEET</span><span class="p">)</span>
 
         <span class="c1"># PAGE 3: Models</span>
         <span class="c1"># Configure tables</span>
@@ -209,15 +247,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_open_project_folder</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_project_folder</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_open_parquet_folder</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_parquet_folder</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_train_dataset</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_train_dataset</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_generate_training_dataset</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_pushButton_generate_training_dataset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_train_trdtst</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_train_dataset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_delete_trdtst</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_delete_dataset</span><span class="p">)</span></div>
 
     <span class="c1">#####################################################################################</span>
     <span class="c1"># TASK MANAGER COMMUNICATION METHODS</span>
     <span class="c1">#####################################################################################</span>
 <div class="viewcode-block" id="MainWindow.configure_tm"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.configure_tm">[docs]</a>    <span class="k">def</span> <span class="nf">configure_tm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tm</span> <span class="o">=</span> <span class="n">ITMTTaskManagerGUI</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Once proper project and parquet folders have been selected by the user, it instantiates a task manager object</span>
+<span class="sd">        and its corresponding configuration functions are invoked according to whether the project selected already</span>
+<span class="sd">        existed or was just created. After this, the selected folders are saved in the dictionary of recent folders</span>
+<span class="sd">        and the menu buttons are unlocked so the user can proceed with the interaction with the GUI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="p">:</span>
+            <span class="c1"># A ITMTTaskManagerGUI is instantiated and configured according to whether the selected project is a new or</span>
+            <span class="c1"># an already utilized one</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tm</span> <span class="o">=</span> <span class="n">ITMTTaskManagerGUI</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A new project folder was selected. Proceeding with &quot;</span>
                       <span class="s2">&quot;its configuration...&quot;</span><span class="p">)</span>
@@ -228,34 +276,105 @@
                       <span class="s2">&quot;its loading...&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+            <span class="c1"># Project and parquet folders are saved in the dict of recent folders to future user-gui interactions</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">save_recent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_user_interaction</span><span class="p">()</span>
+
             <span class="k">return</span></div>
 
 <div class="viewcode-block" id="MainWindow.load_data"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It loads the data and its associated metadata (local datasets available in the parquet folder, corpus for</span>
+<span class="sd">        training and trained models) into the corresponding GUI&#39;s tables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Load datasets available in the parquet folder into &quot;table_available_local_corpus&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">listDownloaded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># Add checkboxes in the last column of &quot;table_available_local_corpus&quot; so the user can select from which of the</span>
+        <span class="c1"># datasets he wants to create a training corpus</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">add_checkboxes_to_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_available_local_corpus</span><span class="p">)</span>
+
+        <span class="c1"># Load available training corpus (if any) into &quot;table_available_training_datasets&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">listTMCorpus</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Update the style of the tables in the corpus page</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">configure_table_header</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">CORPUS_TABLES</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MainWindow.init_user_interaction"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.init_user_interaction">[docs]</a>    <span class="k">def</span> <span class="nf">init_user_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Unlocks the clicking of the menu buttons so the user can proceed with the interaction with the GUI different</span>
+<span class="sd">        from the selection of the project and parquet folders.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Once project and parquet folders are properly selected, app&#39;s functionalities are enabled</span>
+        <span class="k">for</span> <span class="n">menu_button</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_buttons</span><span class="p">:</span>
+            <span class="n">menu_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Already available data is visualized in the corresponding tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
         <span class="k">return</span></div>
 
     <span class="c1">#####################################################################################</span>
     <span class="c1"># HANDLERS</span>
     <span class="c1">#####################################################################################</span>
 <div class="viewcode-block" id="MainWindow.get_project_folder"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.get_project_folder">[docs]</a>    <span class="k">def</span> <span class="nf">get_project_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to control the clicking of the button &quot;pushButton_open_project_folder. When this button is clicked,</span>
+<span class="sd">        the folder selector of the user&#39;s OS is open so the user can select the project folder. Once the project is</span>
+<span class="sd">        selected, if a proper parquet folder was also already selected, the GUI&#39;s associated Task Manager object is</span>
+<span class="sd">        configured.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span>
             <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Select an existing project or create a new one&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit_current_project</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
 
         <span class="c1"># Create Task Manager object if possible</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">configure_tm</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_tm</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
 
 <div class="viewcode-block" id="MainWindow.get_parquet_folder"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.get_parquet_folder">[docs]</a>    <span class="k">def</span> <span class="nf">get_parquet_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to control the clicking of the button &quot;pushButton_open_parquet_folder. When this button is clicked,</span>
+<span class="sd">        the folder selector of the user&#39;s OS is open so the user can select the parquet folder. Once the parquet</span>
+<span class="sd">        folder is selected, if a proper project folder was also already selected, the GUI&#39;s associated Task Manager</span>
+<span class="sd">        object is configured.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span>
             <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Select the folder with the parquet files&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit_current_parquet</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
 
         <span class="c1"># Create Task Manager object if possible</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">configure_tm</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_tm</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MainWindow.get_folder_from_recent"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.get_folder_from_recent">[docs]</a>    <span class="k">def</span> <span class="nf">get_folder_from_recent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recent_button</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to control the clicking of one of the recent buttons. If the recent button relates to a project</span>
+<span class="sd">        folder, such a project folder is loaded directly as the selected project folder and updated in the</span>
+<span class="sd">        corresponding line edit. Otherwise, the same applies but for the parquet folder. If both proper project and</span>
+<span class="sd">        parquet folders have been selected, the GUI&#39;s associated Task Manager object is configured.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s2">&quot;project&quot;</span> <span class="ow">in</span> <span class="n">recent_button</span><span class="o">.</span><span class="n">objectName</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project_folder</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">recent_button</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit_current_project</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">recent_button</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parquet_folder</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">recent_button</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit_current_parquet</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">recent_button</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+
+            <span class="c1"># Create Task Manager object if possible</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">configure_tm</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
 
 <div class="viewcode-block" id="MainWindow.clicked_change_menu_button"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.clicked_change_menu_button">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_change_menu_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">menu_button</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -291,8 +410,43 @@
         <span class="k">return</span></div>
 
     <span class="c1"># CORPUS FUNCTIONS</span>
+<div class="viewcode-block" id="MainWindow.clicked_pushButton_generate_training_dataset"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.clicked_pushButton_generate_training_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_pushButton_generate_training_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">checked_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_available_local_corpus</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()):</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_available_local_corpus</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_available_local_corpus</span><span class="o">.</span><span class="n">columnCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">checkState</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CheckState</span><span class="o">.</span><span class="n">Checked</span><span class="p">:</span>
+                <span class="n">checked_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tm_corpus_subwindow</span> <span class="o">=</span> <span class="n">GenerateTMCorpus</span><span class="p">(</span><span class="n">checked_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tm_corpus_subwindow</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
+
+        <span class="c1"># Update data in table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+        <span class="c1"># Show information message about the TM corpus creation completion</span>
+        <span class="c1"># @ TODO: Add this to TM</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_tm_corpus_subwindow</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">QMessageBox</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Constants</span><span class="o">.</span><span class="n">SMOOTH_SPOON_MSG</span><span class="p">,</span> <span class="n">Constants</span><span class="o">.</span><span class="n">TM_CORPUS_MSG_STATUS_0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_tm_corpus_subwindow</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">QMessageBox</span><span class="o">.</span><span class="n">information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Constants</span><span class="o">.</span><span class="n">SMOOTH_SPOON_MSG</span><span class="p">,</span> <span class="n">Constants</span><span class="o">.</span><span class="n">TM_CORPUS_MSG_STATUS_1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_tm_corpus_subwindow</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">QMessageBox</span><span class="o">.</span><span class="n">information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Constants</span><span class="o">.</span><span class="n">SMOOTH_SPOON_MSG</span><span class="p">,</span> <span class="n">Constants</span><span class="o">.</span><span class="n">TM_CORPUS_MSG_STATUS_2</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="MainWindow.clicked_delete_dataset"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.clicked_delete_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_delete_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_available_training_datasets</span><span class="o">.</span><span class="n">currentRow</span><span class="p">()</span>
+        <span class="n">corpus_to_delete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_available_training_datasets</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">deleteTMCorpus</span><span class="p">(</span><span class="n">corpus_to_delete</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
+
 <div class="viewcode-block" id="MainWindow.clicked_train_dataset"><a class="viewcode-back" href="../../../src.gui.main_window.html#src.gui.main_window.MainWindow.clicked_train_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_train_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">train_model_subwindow</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_model_subwindow</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
 
     <span class="c1"># MODELS FUNCTIONS</span>
 

@@ -9,6 +9,7 @@ Packages
 
    src.gui
    src.manageCorpus
+   src.manageLists
    src.menu_navigator
    src.neural_models
    src.project_manager

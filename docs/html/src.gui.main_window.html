@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="src.gui.train_model_window" href="src.gui.train_model_window.html" />
-    <link rel="prev" title="src.gui.utils.worker_signals" href="src.gui.utils.worker_signals.html" /> 
+    <link rel="prev" title="src.gui.generate_tm_corpus_window" href="src.gui.generate_tm_corpus_window.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,6 +52,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.manageLists.html">src.manageLists</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.neural_models.html">src.neural_models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.project_manager.html">src.project_manager</a></li>
@@ -92,6 +93,19 @@
              
   <section id="module-src.gui.main_window">
 <span id="src-gui-main-window"></span><h1>src.gui.main_window<a class="headerlink" href="#module-src.gui.main_window" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><em>IntelComp H2020 project</em></p></li>
+</ul>
+<p>Class that defines the Graphical user interface’s main window  for the Interactive Topic Model Trainer App
+It implements the functions needed to</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Configure the GUI widgets defined in the corresponding UI file (main_window.ui)</p></li>
+<li><p>Connect the GUI and the project manager (ITMTTaskManager)</p></li>
+<li><p>Implement handler functions to control the interaction between the user and the different widgets</p></li>
+<li><p>Control the opening of secondary windows for specific functionalities (training, curation, etc.)</p></li>
+</ul>
+</div></blockquote>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.gui.main_window.MainWindow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.main_window.</span></span><span class="sig-name descname"><span class="pre">MainWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parquet_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow" title="Permalink to this definition"></a></dt>
@@ -122,22 +136,52 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="src.gui.main_window.MainWindow.configure_tm">
 <span class="sig-name descname"><span class="pre">configure_tm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow.configure_tm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow.configure_tm" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Once proper project and parquet folders have been selected by the user, it instantiates a task manager object
+and its corresponding configuration functions are invoked according to whether the project selected already
+existed or was just created. After this, the selected folders are saved in the dictionary of recent folders
+and the menu buttons are unlocked so the user can proceed with the interaction with the GUI.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.gui.main_window.MainWindow.load_data">
 <span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow.load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow.load_data" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>It loads the data and its associated metadata (local datasets available in the parquet folder, corpus for
+training and trained models) into the corresponding GUI’s tables.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.main_window.MainWindow.init_user_interaction">
+<span class="sig-name descname"><span class="pre">init_user_interaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow.init_user_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow.init_user_interaction" title="Permalink to this definition"></a></dt>
+<dd><p>Unlocks the clicking of the menu buttons so the user can proceed with the interaction with the GUI different
+from the selection of the project and parquet folders.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.gui.main_window.MainWindow.get_project_folder">
 <span class="sig-name descname"><span class="pre">get_project_folder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow.get_project_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow.get_project_folder" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Method to control the clicking of the button “pushButton_open_project_folder. When this button is clicked,
+the folder selector of the user’s OS is open so the user can select the project folder. Once the project is
+selected, if a proper parquet folder was also already selected, the GUI’s associated Task Manager object is
+configured.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.gui.main_window.MainWindow.get_parquet_folder">
 <span class="sig-name descname"><span class="pre">get_parquet_folder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow.get_parquet_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow.get_parquet_folder" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Method to control the clicking of the button “pushButton_open_parquet_folder. When this button is clicked,
+the folder selector of the user’s OS is open so the user can select the parquet folder. Once the parquet
+folder is selected, if a proper project folder was also already selected, the GUI’s associated Task Manager
+object is configured.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.main_window.MainWindow.get_folder_from_recent">
+<span class="sig-name descname"><span class="pre">get_folder_from_recent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recent_button</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow.get_folder_from_recent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow.get_folder_from_recent" title="Permalink to this definition"></a></dt>
+<dd><p>Method to control the clicking of one of the recent buttons. If the recent button relates to a project
+folder, such a project folder is loaded directly as the selected project folder and updated in the
+corresponding line edit. Otherwise, the same applies but for the parquet folder. If both proper project and
+parquet folders have been selected, the GUI’s associated Task Manager object is configured.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.gui.main_window.MainWindow.clicked_change_menu_button">
@@ -150,6 +194,16 @@
 <span class="sig-name descname"><span class="pre">clicked_change_corpus_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corpus_button</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow.clicked_change_corpus_button"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow.clicked_change_corpus_button" title="Permalink to this definition"></a></dt>
 <dd><p>Method to control the selection of one of the buttons in the train bar.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.main_window.MainWindow.clicked_pushButton_generate_training_dataset">
+<span class="sig-name descname"><span class="pre">clicked_pushButton_generate_training_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow.clicked_pushButton_generate_training_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow.clicked_pushButton_generate_training_dataset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.main_window.MainWindow.clicked_delete_dataset">
+<span class="sig-name descname"><span class="pre">clicked_delete_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/main_window.html#MainWindow.clicked_delete_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.MainWindow.clicked_delete_dataset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.gui.main_window.MainWindow.clicked_train_dataset">
@@ -169,7 +223,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="src.gui.utils.worker_signals.html" class="btn btn-neutral float-left" title="src.gui.utils.worker_signals" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.gui.generate_tm_corpus_window.html" class="btn btn-neutral float-left" title="src.gui.generate_tm_corpus_window" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="src.gui.train_model_window.html" class="btn btn-neutral float-right" title="src.gui.train_model_window" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

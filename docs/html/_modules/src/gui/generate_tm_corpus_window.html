@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.gui.generate_tm_corpus_window &mdash; Topic Modeler documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> IntelComp_Topic_Modeler
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ITMT_mainGUI.html">ITMT_mainGUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../JSONadapter.html">JSONadapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../TMinferencer.html">TMinferencer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../corpus2JSON.html">corpus2JSON</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../topicmodeling.html">topicmodeling</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">IntelComp_Topic_Modeler</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>src.gui.generate_tm_corpus_window</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.gui.generate_tm_corpus_window</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PyQt6</span> <span class="kn">import</span> <span class="n">QtWidgets</span><span class="p">,</span> <span class="n">QtGui</span>
+<span class="kn">from</span> <span class="nn">PyQt6.QtGui</span> <span class="kn">import</span> <span class="n">QIcon</span>
+<span class="kn">from</span> <span class="nn">PyQt6.QtWidgets</span> <span class="kn">import</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QWidget</span>
+<span class="kn">from</span> <span class="nn">PyQt6.uic</span> <span class="kn">import</span> <span class="n">loadUi</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">from</span> <span class="nn">src.gui.utils</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">src.gui.utils.constants</span> <span class="kn">import</span> <span class="n">Constants</span>
+<span class="kn">from</span> <span class="nn">src.gui.widget_create_tm_corpus</span> <span class="kn">import</span> <span class="n">WidgetCreateTMCorpus</span>
+
+
+<div class="viewcode-block" id="GenerateTMCorpus"><a class="viewcode-back" href="../../../src.gui.generate_tm_corpus_window.html#src.gui.generate_tm_corpus_window.GenerateTMCorpus">[docs]</a><span class="k">class</span> <span class="nc">GenerateTMCorpus</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QDialog</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    @ TODO: Describe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GenerateTMCorpus.__init__"><a class="viewcode-back" href="../../../src.gui.generate_tm_corpus_window.html#src.gui.generate_tm_corpus_window.GenerateTMCorpus.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dts_ids_list</span><span class="p">,</span> <span class="n">tm</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        @ TODO: Describe</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tm : TaskManager</span>
+<span class="sd">            TaskManager object associated with the project</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">GenerateTMCorpus</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Load UI and configure default geometry of the window</span>
+        <span class="c1"># #####################################################################</span>
+        <span class="n">loadUi</span><span class="p">(</span><span class="s2">&quot;src/gui/uis/createTMCorpus.ui&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># ATTRIBUTES</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dts_ids_list</span> <span class="o">=</span> <span class="n">dts_ids_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tm</span> <span class="o">=</span> <span class="n">tm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allDtsets</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">allDtsets</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_dts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_stack</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_stack_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts_widgets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_dts_name_widgets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Widgets initial configuration</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize_stackedWidget_trdts</span><span class="p">()</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Connect buttons</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_trdts_back</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_pushButton_trdts_back</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_trdts_next</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_pushButton_trdts_next</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_create_tm_corpus</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_pushButton_create_tm_corpus</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenerateTMCorpus.init_ui"><a class="viewcode-back" href="../../../src.gui.generate_tm_corpus_window.html#src.gui.generate_tm_corpus_window.GenerateTMCorpus.init_ui">[docs]</a>    <span class="k">def</span> <span class="nf">init_ui</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configures the elements of the GUI window that are not configured in the UI, i.e. icon of the application,</span>
+<span class="sd">        the application&#39;s title, and the position of the window at its opening.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># @ TODO: When icons ready</span>
+        <span class="c1"># self.setWindowIcon(QIcon(&#39;UIs/Images/dc_logo.png&#39;))</span>
+        <span class="c1"># self.setWindowTitle(Messages.WINDOW_TITLE)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GenerateTMCorpus.initialize_stackedWidget_trdts"><a class="viewcode-back" href="../../../src.gui.generate_tm_corpus_window.html#src.gui.generate_tm_corpus_window.GenerateTMCorpus.initialize_stackedWidget_trdts">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_stackedWidget_trdts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">dts_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dts_ids_list</span><span class="p">:</span>
+            <span class="n">Dtsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allDtsets</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+            <span class="n">Dtset_loc</span> <span class="o">=</span> <span class="n">Dtsets</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">dts_id</span><span class="p">)</span>
+            <span class="n">Dtset_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">allDtsets</span><span class="p">[</span><span class="n">Dtset_loc</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">Dtset_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">allDtsets</span><span class="p">[</span><span class="n">Dtset_loc</span><span class="p">][</span><span class="s1">&#39;schema&#39;</span><span class="p">]</span>
+
+            <span class="n">stack</span> <span class="o">=</span> <span class="n">WidgetCreateTMCorpus</span><span class="p">(</span><span class="n">Dtset_columns</span><span class="p">)</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="s1">&#39;stack_dts_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dts_id</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts_widgets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+
+            <span class="n">stack_name</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+            <span class="n">stack_name</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="s1">&#39;stack_name_dts_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dts_id</span><span class="p">))</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="s2">&quot;label_name_dts_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dts_id</span><span class="p">))</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">Dtset_name</span><span class="p">)</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">Q_LABEL_EDIT_STYLESHEET</span><span class="p">)</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">(</span><span class="n">stack_name</span><span class="p">)</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_dts_name</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">stack_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_dts_name_widgets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stack_name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">dts_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">dts_ids_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_stack</span> <span class="o">=</span> <span class="n">stack</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_stack_name</span> <span class="o">=</span> <span class="n">stack_name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_stacks</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GenerateTMCorpus.clicked_pushButton_trdts_back"><a class="viewcode-back" href="../../../src.gui.generate_tm_corpus_window.html#src.gui.generate_tm_corpus_window.GenerateTMCorpus.clicked_pushButton_trdts_back">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_pushButton_trdts_back</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_dts</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_dts</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts_widgets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_dts</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_stack_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_dts_name_widgets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_dts</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_stacks</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="GenerateTMCorpus.clicked_pushButton_trdts_next"><a class="viewcode-back" href="../../../src.gui.generate_tm_corpus_window.html#src.gui.generate_tm_corpus_window.GenerateTMCorpus.clicked_pushButton_trdts_next">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_pushButton_trdts_next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_dts</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dts_ids_list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_dts</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts_widgets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_dts</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_stack_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_dts_name_widgets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_dts</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_stacks</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="GenerateTMCorpus.update_stacks"><a class="viewcode-back" href="../../../src.gui.generate_tm_corpus_window.html#src.gui.generate_tm_corpus_window.GenerateTMCorpus.update_stacks">[docs]</a>    <span class="k">def</span> <span class="nf">update_stacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_stack</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_dts_name</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_stack_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenerateTMCorpus.clicked_pushButton_create_tm_corpus"><a class="viewcode-back" href="../../../src.gui.generate_tm_corpus_window.html#src.gui.generate_tm_corpus_window.GenerateTMCorpus.clicked_pushButton_create_tm_corpus">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_pushButton_create_tm_corpus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dict_to_tm_corpus</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dts_ids_list</span><span class="p">)):</span>
+            <span class="n">i_dts_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dts_ids_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts_widgets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">identifier_field</span> <span class="o">=</span> <span class="n">i_widget</span><span class="o">.</span><span class="n">comboBox_trdts_id</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+            <span class="n">fields_for_lemmas</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i_widget</span><span class="o">.</span><span class="n">tableWidget_fields_to_include_lemmas</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="n">i_widget</span><span class="o">.</span><span class="n">tableWidget_fields_to_include_lemmas</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">fields_for_lemmas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_widget</span><span class="o">.</span><span class="n">tableWidget_fields_to_include_lemmas</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+            <span class="n">fields_for_raw</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i_widget</span><span class="o">.</span><span class="n">tableWidget_fields_to_include_raw</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="n">i_widget</span><span class="o">.</span><span class="n">tableWidget_fields_to_include_raw</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">fields_for_raw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_widget</span><span class="o">.</span><span class="n">tableWidget_fields_to_include_raw</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+            <span class="n">filtering_condition</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># TODO</span>
+
+            <span class="n">i_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;identifier_field&#39;</span><span class="p">:</span> <span class="n">identifier_field</span><span class="p">,</span>
+                      <span class="s1">&#39;fields_for_lemmas&#39;</span><span class="p">:</span> <span class="n">fields_for_lemmas</span><span class="p">,</span>
+                      <span class="s1">&#39;fields_for_raw&#39;</span><span class="p">:</span> <span class="n">fields_for_raw</span><span class="p">,</span>
+                      <span class="s1">&#39;filtering_condition&#39;</span><span class="p">:</span> <span class="n">filtering_condition</span>
+                      <span class="p">}</span>
+            <span class="n">dict_to_tm_corpus</span><span class="p">[</span><span class="n">i_dts_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">i_dict</span>
+
+        <span class="n">dtsName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit_trdts_name</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="n">dtsDesc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">textEdit_trdts_description</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+        <span class="n">privacy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comboBox_privacy_level</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+
+        <span class="c1"># Create TMCorpus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">createTMCorpus</span><span class="p">(</span><span class="n">dict_to_tm_corpus</span><span class="p">,</span> <span class="n">dtsName</span><span class="p">,</span> <span class="n">dtsDesc</span><span class="p">,</span> <span class="n">privacy</span><span class="p">)</span>
+
+        <span class="c1"># Hide window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+        <span class="c1"># Remove widgets</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">i_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts</span><span class="o">.</span><span class="n">widget</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_trdts</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">i_widget</span><span class="p">)</span>
+            <span class="n">i_widget</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_dts_name</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">i_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_dts_name</span><span class="o">.</span><span class="n">widget</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stackedWidget_dts_name</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">i_widget</span><span class="p">)</span>
+            <span class="n">i_widget</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span></div></div>
+
+
+
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, J. Arenas-García, L. Calvo-Bartolomé, J. A. Espinosa-Melchor.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

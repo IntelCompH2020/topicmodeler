@@ -96,7 +96,6 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="c1"># from gensim import corpora</span>
-<span class="c1"># from gensim.utils import check_output</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">check_output</span>
 <span class="c1"># from sklearn.preprocessing import normalize</span>
@@ -123,7 +122,7 @@
 <span class="sd">    - &#39;configReady&#39; : If True, config file successfully loaded.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ITMTTaskManager.__init__"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="s1">&#39;parameters.yaml&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="ITMTTaskManager.__init__"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">p2wdlist</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="s1">&#39;config.cf&#39;</span><span class="p">,</span>
                  <span class="n">metadata_fname</span><span class="o">=</span><span class="s1">&#39;metadata.yaml&#39;</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;</span>
@@ -135,6 +134,8 @@
 <span class="sd">            Path to the application project</span>
 <span class="sd">        p2parquet : pathlib.Path</span>
 <span class="sd">            Path to the folder hosting the parquet datasets</span>
+<span class="sd">        p2wdlist : pathlib.Path</span>
+<span class="sd">            Path to the folder hosting the wordlists (stopwords, keywords, etc)</span>
 <span class="sd">        config_fname : str, optional (default=&#39;config.cf&#39;)</span>
 <span class="sd">            Name of the configuration file</span>
 <span class="sd">        metadata_fname : str or None, optional (default=metadata.yaml)</span>
@@ -154,11 +155,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ready2setup</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="c1"># Attributes to load project&#39;s associated datasets</span>
+        <span class="c1"># Attributes to load project&#39;s associated datasets and WordLists</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allDtsets</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allTrDtsets</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allWdLists</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="n">config_fname</span><span class="p">,</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">p2wdlist</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="n">config_fname</span><span class="p">,</span>
                          <span class="n">metadata_fname</span><span class="o">=</span><span class="n">metadata_fname</span><span class="p">)</span>
 
         <span class="c1"># This is a dictionary that contains a list to all subdirectories</span>
@@ -179,6 +181,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">load_listDownloaded</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_listTrDtsets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_listWdLists</span><span class="p">()</span>
 
         <span class="k">return</span></div>
 
@@ -226,6 +229,30 @@
             <span class="k">return</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Logical datasets loaded&quot;</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="ITMTTaskManager.load_listWdLists"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManager.load_listWdLists">[docs]</a>    <span class="k">def</span> <span class="nf">load_listWdLists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method loads all the wordlists that are available into the</span>
+<span class="sd">        ITMTTaskManager&#39;s &#39;allWdLists&#39; attribute as a dictionary object,</span>
+<span class="sd">        which is characterized by one dictionary entry per wordlist,</span>
+<span class="sd">        the key and the value being the absolute path to the wordlist</span>
+<span class="sd">        and a dictionary with the corresponding metadata, respectively.</span>
+<span class="sd">        To do so, it invokes the script from the folder &#39;src/manageLists&#39; with</span>
+<span class="sd">        the option &#39;listWordLists&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;python src/manageLists/manageLists.py --listWordLists --path_wordlists &#39;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2wdlist</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+        <span class="n">printred</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Running command </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">allWdLists</span> <span class="o">=</span> <span class="n">check_output</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;-- -- Execution of script failed&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;All available wordlists were loaded&quot;</span><span class="p">)</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="ITMTTaskManager.save_TrDtset"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManager.save_TrDtset">[docs]</a>    <span class="k">def</span> <span class="nf">save_TrDtset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt_set</span><span class="p">):</span>
@@ -295,6 +322,82 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;-- -- Execution of script failed&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Deletion failed&#39;</span><span class="p">)</span>
 
+        <span class="c1"># Reload the list of training datasets to consider the ones deleted during the current execution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_listTrDtsets</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">status</span></div>
+
+<div class="viewcode-block" id="ITMTTaskManager.create_List"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManager.create_List">[docs]</a>    <span class="k">def</span> <span class="nf">create_List</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method saves the stopword list &#39;stw_list&#39; in the folder self.p2wdlist</span>
+<span class="sd">        To do so, it invokes the script from the folder &#39;src/manageLists&#39;</span>
+<span class="sd">        with the option &#39;createWordList&#39;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_list :</span>
+<span class="sd">            Dictionary with information for the new list</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        status : int</span>
+<span class="sd">            - 0 if the list could not be created</span>
+<span class="sd">            - 1 if the list was created successfully</span>
+<span class="sd">            - 2 if the list replaced an existing dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;echo &quot;&#39;</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&quot;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">+</span> <span class="s1">&#39;| python src/manageLists/manageLists.py --createWordList --path_wordlists &#39;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2wdlist</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Running command </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">check_output</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;-- -- Execution of script failed&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Reload the list of word lists to consider the new ones added during the current execution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_listWdLists</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">status</span></div>
+
+<div class="viewcode-block" id="ITMTTaskManager.delete_WdLst"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManager.delete_WdLst">[docs]</a>    <span class="k">def</span> <span class="nf">delete_WdLst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wd_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method deletes the wordlist specified by &#39;wd_list&#39; from the wordlist folder.</span>
+
+<span class="sd">        To do so, it invokes the script from the folder &#39;src/manageLists&#39; with the option</span>
+<span class="sd">        &#39;deleteWordList&#39;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wd_list : str</span>
+<span class="sd">            String representation of the path to the json file with the wordlist</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        status : int</span>
+<span class="sd">            - 0 if the wordlist could not be deleted</span>
+<span class="sd">            - 1 if the wordlist was deleted successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;python src/manageLists/manageLists.py --deleteWordList --path_WdList &#39;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">+</span> <span class="n">wd_list</span>
+        <span class="n">printred</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Running command </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">check_output</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">status</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The word list was deleted&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Deletion failed&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;-- -- Execution of script failed&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Deletion failed&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Reload the list of word lists to consider the one deleted during the current execution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_listWdLists</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="n">status</span></div></div>
 
 
@@ -307,7 +410,7 @@
 <span class="sd">    from users from a command window.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ITMTTaskManagerCMD.__init__"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="s1">&#39;config.cf&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="ITMTTaskManagerCMD.__init__"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">p2wdlist</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="s1">&#39;config.cf&#39;</span><span class="p">,</span>
                  <span class="n">metadata_fname</span><span class="o">=</span><span class="s1">&#39;metadata.yaml&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes an ITMTTaskManagerCMD object.</span>
@@ -318,6 +421,8 @@
 <span class="sd">            Path to the application project</span>
 <span class="sd">        p2parquet : pathlib.Path</span>
 <span class="sd">            Path to the folder hosting the parquet datasets</span>
+<span class="sd">        p2wdlist : pathlib.Path</span>
+<span class="sd">            Path to the folder hosting the wordlists (stopwords, keywords, etc)</span>
 <span class="sd">        config_fname : str, optional (default=&#39;config.cf&#39;)</span>
 <span class="sd">            Name of the configuration file</span>
 <span class="sd">        metadata_fname : str or None, optional (default=metadata.yaml)</span>
@@ -326,7 +431,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="n">config_fname</span><span class="p">,</span> <span class="n">metadata_fname</span><span class="o">=</span><span class="n">metadata_fname</span><span class="p">)</span></div>
+            <span class="n">p2p</span><span class="p">,</span> <span class="n">p2parquet</span><span class="p">,</span> <span class="n">p2wdlist</span><span class="p">,</span> <span class="n">config_fname</span><span class="o">=</span><span class="n">config_fname</span><span class="p">,</span>
+            <span class="n">metadata_fname</span><span class="o">=</span><span class="n">metadata_fname</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ITMTTaskManagerCMD.fromHDFS"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.fromHDFS">[docs]</a>    <span class="k">def</span> <span class="nf">fromHDFS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -405,7 +513,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">options</span> <span class="o">=</span> <span class="n">options</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
         <span class="c1"># =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*</span>
-        <span class="c1"># This fragment of code creates a sparck cluster and submits the task</span>
+        <span class="c1"># This fragment of code creates a spark cluster and submits the task</span>
         <span class="c1"># This function is dependent on UC3M local deployment infrastructure</span>
         <span class="c1"># and will not work in BSC production environment</span>
         <span class="c1"># In any case, this function will be replaced by the DataCatalogue</span>
@@ -441,6 +549,8 @@
 
         <span class="k">with</span> <span class="n">path_dataset</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;datasetMeta.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">datasetMeta</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_listDownloaded</span><span class="p">()</span>
 
         <span class="k">return</span></div>
 
@@ -600,6 +710,381 @@
 
         <span class="k">return</span></div>
 
+<div class="viewcode-block" id="ITMTTaskManagerCMD.listAllWdLists"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.listAllWdLists">[docs]</a>    <span class="k">def</span> <span class="nf">listAllWdLists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method shows all wordlists available for the project</span>
+
+<span class="sd">        This is an extremely simple method for the taskmanager that does not</span>
+<span class="sd">        require any user interaction</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">allWdLists</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allWdLists</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">WdLst</span> <span class="ow">in</span> <span class="n">allWdLists</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">printmag</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Wordlist &#39;</span> <span class="o">+</span> <span class="n">allWdLists</span><span class="p">[</span><span class="n">WdLst</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Description:&#39;</span><span class="p">,</span> <span class="n">allWdLists</span><span class="p">[</span><span class="n">WdLst</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Valid for:&#39;</span><span class="p">,</span> <span class="n">allWdLists</span><span class="p">[</span><span class="n">WdLst</span><span class="p">][</span><span class="s1">&#39;valid_for&#39;</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Creation date:&#39;</span><span class="p">,</span> <span class="n">allWdLists</span><span class="p">[</span><span class="n">WdLst</span><span class="p">][</span><span class="s1">&#39;creation_date&#39;</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Visibility:&#39;</span><span class="p">,</span> <span class="n">allWdLists</span><span class="p">[</span><span class="n">WdLst</span><span class="p">][</span><span class="s1">&#39;visibility&#39;</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Number of elements:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">allWdLists</span><span class="p">[</span><span class="n">WdLst</span><span class="p">][</span><span class="s1">&#39;wordlist&#39;</span><span class="p">]))</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="ITMTTaskManagerCMD.NewWdList"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.NewWdList">[docs]</a>    <span class="k">def</span> <span class="nf">NewWdList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listType</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method creates a New List of words that can be later used for</span>
+<span class="sd">        corpus preprocessing</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        listType : string</span>
+<span class="sd">            type of list that will be created [keywords|stopwords|equivalences]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">displaytext</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        Generation of a new List</span>
+
+<span class="s2">            - Stopwords or keywords: Introduce the words separated by commas (stw1,stw2, ...)</span>
+<span class="s2">            - Equivalences: Introduce equivalences separated by commas in the format</span>
+<span class="s2">              orig:target (orig1:tgt1, orig2:tgt2, ...)</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">printgr</span><span class="p">(</span><span class="n">displaytext</span><span class="p">)</span>
+
+        <span class="c1"># Obtain lists of words for the list</span>
+        <span class="k">if</span> <span class="n">listType</span> <span class="o">==</span> <span class="s1">&#39;keywords&#39;</span><span class="p">:</span>
+            <span class="n">wds</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Introduce the keywords: &#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">listType</span> <span class="o">==</span> <span class="s1">&#39;stopwords&#39;</span><span class="p">:</span>
+            <span class="n">wds</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Introduce the stopwords: &#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1">#equivalences</span>
+            <span class="n">wds</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Introduce the equivalences: &#39;</span><span class="p">)</span>
+        <span class="n">wds</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">wds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">el</span><span class="p">)]</span>
+        <span class="n">wds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">wds</span><span class="p">)))</span>
+        
+        <span class="c1"># We need a name for the list</span>
+        <span class="n">ListName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">ListName</span><span class="p">):</span>
+            <span class="n">ListName</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Introduce a name for the new list: &#39;</span><span class="p">)</span>
+
+        <span class="c1"># Introduce a description for the dataset</span>
+        <span class="n">ListDesc</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">ListDesc</span><span class="p">):</span>
+            <span class="n">ListDesc</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Introduce a description: &#39;</span><span class="p">)</span>
+
+        <span class="c1"># Define privacy level of dataset</span>
+        <span class="n">privacy</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Public&#39;</span><span class="p">,</span> <span class="s1">&#39;Private&#39;</span><span class="p">]</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">query_options</span><span class="p">(</span><span class="n">privacy</span><span class="p">,</span> <span class="s1">&#39;Define visibility for the list&#39;</span><span class="p">)</span>
+        <span class="n">privacy</span> <span class="o">=</span> <span class="n">privacy</span><span class="p">[</span><span class="n">opt</span><span class="p">]</span>
+
+        <span class="n">WdList</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">ListName</span><span class="p">,</span>
+                 <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">ListDesc</span><span class="p">,</span>
+                 <span class="s1">&#39;valid_for&#39;</span><span class="p">:</span> <span class="n">listType</span><span class="p">,</span>
+                 <span class="s1">&#39;visibility&#39;</span><span class="p">:</span> <span class="n">privacy</span><span class="p">,</span>
+                 <span class="s1">&#39;wordlist&#39;</span><span class="p">:</span> <span class="n">wds</span>
+                 <span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_List</span><span class="p">(</span><span class="n">WdList</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ITMTTaskManagerCMD.EditWdList"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.EditWdList">[docs]</a>    <span class="k">def</span> <span class="nf">EditWdList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method allows the edition of an existing list of words, i.e.</span>
+<span class="sd">        adding new words or removing existing words</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">displaytext</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        Edition of an existing list</span>
+
+<span class="s2">            - Stopwords or keywords: Introduce the words separated by commas (stw1,stw2, ...)</span>
+<span class="s2">            - Equivalences: Introduce equivalences separated by commas in the format</span>
+<span class="s2">              orig:target (orig1:tgt1, orig2:tgt2, ...)</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">printgr</span><span class="p">(</span><span class="n">displaytext</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Modifying an existing list of words&#39;</span><span class="p">)</span>
+        <span class="c1"># First thing to do is to select a list</span>
+        <span class="n">allWdLists</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allWdLists</span><span class="p">)</span>
+        <span class="n">wdLsts</span> <span class="o">=</span> <span class="p">[</span><span class="n">wlst</span> <span class="k">for</span> <span class="n">wlst</span> <span class="ow">in</span> <span class="n">allWdLists</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="n">displaywdLsts</span> <span class="o">=</span> <span class="p">[</span><span class="n">allWdLists</span><span class="p">[</span><span class="n">wlst</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> 
+            <span class="n">allWdLists</span><span class="p">[</span><span class="n">wlst</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">wlst</span> <span class="ow">in</span> <span class="n">wdLsts</span><span class="p">]</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">query_options</span><span class="p">(</span><span class="n">displaywdLsts</span><span class="p">,</span> <span class="s2">&quot;Select the list you wish to modify&quot;</span><span class="p">)</span>
+        <span class="n">WdLst</span> <span class="o">=</span> <span class="n">allWdLists</span><span class="p">[</span><span class="n">wdLsts</span><span class="p">[</span><span class="n">selection</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Selected list is </span><span class="si">{</span><span class="n">WdLst</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">Y_or_N</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Do you wish to visualize existing words in list [Y/N]?: &quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Y_or_N</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">WdLst</span><span class="p">[</span><span class="s1">&#39;wordlist&#39;</span><span class="p">]))</span>
+
+        <span class="n">wds</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Introduce the elements you wish to remove (separated by commas): &#39;</span><span class="p">)</span>
+        <span class="n">wds</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">wds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">el</span><span class="p">)]</span>
+        <span class="n">WdLst</span><span class="p">[</span><span class="s1">&#39;wordlist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">wd</span> <span class="k">for</span> <span class="n">wd</span> <span class="ow">in</span> <span class="n">WdLst</span><span class="p">[</span><span class="s1">&#39;wordlist&#39;</span><span class="p">]</span> 
+                                                    <span class="k">if</span> <span class="n">wd</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">wds</span><span class="p">])))</span>
+
+        <span class="n">wds</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Introduce new elements for the list (separated by commas): &#39;</span><span class="p">)</span>
+        <span class="n">wds</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">wds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">el</span><span class="p">)]</span>
+        <span class="n">WdLst</span><span class="p">[</span><span class="s1">&#39;wordlist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">wds</span> <span class="o">+</span> <span class="n">WdLst</span><span class="p">[</span><span class="s1">&#39;wordlist&#39;</span><span class="p">])))</span>
+
+        <span class="c1">#The list will be saved replacing existing list</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_List</span><span class="p">(</span><span class="n">WdLst</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ITMTTaskManagerCMD.DelWdList"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.DelWdList">[docs]</a>    <span class="k">def</span> <span class="nf">DelWdList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete a wordlist from wordlist folder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Show available wordlists</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listAllWdLists</span><span class="p">()</span>
+
+        <span class="n">allWdLists</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allWdLists</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">WdLst</span> <span class="ow">in</span> <span class="n">allWdLists</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">Y_or_N</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Remove Word List </span><span class="si">{</span><span class="n">allWdLists</span><span class="p">[</span><span class="n">WdLst</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> [Y/N]?: &quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">Y_or_N</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">request_confirmation</span><span class="p">(</span>
+                        <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Word List &#39;</span> <span class="o">+</span> <span class="n">allWdLists</span><span class="p">[</span><span class="n">WdLst</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; will be deleted. Proceed?&#39;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">delete_WdLst</span><span class="p">(</span><span class="n">WdLst</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="ITMTTaskManagerCMD.trainTM"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.trainTM">[docs]</a>    <span class="k">def</span> <span class="nf">trainTM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Topic modeling trainer. Initial training of a topic model</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trainer : string</span>
+<span class="sd">            Optimizer to use for training the topic model</span>
+<span class="sd">            Possible values are mallet|sparkLDA|ctm</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">############################################################</span>
+        <span class="c1">## IMT Interface: Interactive Model Trainer Window</span>
+        <span class="c1">############################################################</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- Topic Model Training&#39;</span><span class="p">)</span>
+        
+        <span class="n">displaytext</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        We will retrieve all parameters needed for training the topic model</span>
+<span class="s2">        We start with common settings independent of the method used for the training</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">printgr</span><span class="p">(</span><span class="n">displaytext</span><span class="p">)</span>        
+        
+        <span class="c1"># First thing to do is to select a corpus</span>
+        <span class="c1"># Ask user which dataset should be used for model training</span>
+        <span class="n">allTrDtsets</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allTrDtsets</span><span class="p">)</span>
+        <span class="n">dtSets</span> <span class="o">=</span> <span class="p">[</span><span class="n">dts</span> <span class="k">for</span> <span class="n">dts</span> <span class="ow">in</span> <span class="n">allTrDtsets</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="n">displaydtSets</span> <span class="o">=</span> <span class="p">[</span><span class="n">allTrDtsets</span><span class="p">[</span><span class="n">dts</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> 
+            <span class="n">allTrDtsets</span><span class="p">[</span><span class="n">dts</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">dts</span> <span class="ow">in</span> <span class="n">dtSets</span><span class="p">]</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">query_options</span><span class="p">(</span><span class="n">displaydtSets</span><span class="p">,</span> <span class="s2">&quot;Select Training Dataset&quot;</span><span class="p">)</span>
+        <span class="n">TrDtSet</span> <span class="o">=</span> <span class="n">dtSets</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Selected corpus is </span><span class="si">{</span><span class="n">allTrDtsets</span><span class="p">[</span><span class="n">TrDtSet</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        
+        <span class="n">displaytext</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        We will retrieve all parameters needed for the preprocessing of the lemmas</span>
+<span class="s2">        This is also needed for all available topic models</span>
+
+<span class="s2">        Many of these settings may be for advanced users. We will need to check with the</span>
+<span class="s2">        users which parameters are basic and which ones should only appear for the advanced</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">printgr</span><span class="p">(</span><span class="n">displaytext</span><span class="p">)</span>
+        
+        <span class="c1"># Default values are read from config file</span>
+        <span class="n">min_lemas</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Preproc&#39;</span><span class="p">,</span> <span class="s1">&#39;min_lemas&#39;</span><span class="p">))</span>
+        <span class="n">no_below</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Preproc&#39;</span><span class="p">,</span> <span class="s1">&#39;no_below&#39;</span><span class="p">))</span>
+        <span class="n">no_above</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Preproc&#39;</span><span class="p">,</span> <span class="s1">&#39;no_above&#39;</span><span class="p">))</span>
+        <span class="n">keep_n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Preproc&#39;</span><span class="p">,</span> <span class="s1">&#39;keep_n&#39;</span><span class="p">))</span>
+        <span class="n">token_regexp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Preproc&#39;</span><span class="p">,</span> <span class="s1">&#39;token_regexp&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># The following settings will only be accessed in the &quot;advanced settings panel&quot;</span>
+        <span class="n">Y_or_N</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Do you wish to access the advance settings panel [Y/N]?:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Y_or_N</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span>
+            <span class="c1"># Some of them can be confirmed/modified by the user</span>
+            <span class="n">min_lemas</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">min_lemas</span><span class="p">,</span>
+                                         <span class="s1">&#39;Enter minimum number of lemas for the documents in the training set&#39;</span><span class="p">)</span>
+            <span class="n">no_below</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">no_below</span><span class="p">,</span>
+                                        <span class="s1">&#39;Minimum number occurrences to keep words in vocabulary&#39;</span><span class="p">)</span>
+            <span class="n">no_above</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="n">no_above</span><span class="p">,</span>
+                                        <span class="s1">&#39;Maximum proportion of documents to keep a word in vocabulary&#39;</span><span class="p">)</span>
+            <span class="n">keep_n</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">keep_n</span><span class="p">,</span>
+                                      <span class="s1">&#39;Maximum vocabulary size&#39;</span><span class="p">)</span>
+            <span class="n">tk</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Regular expresion for tokenizer [</span><span class="si">{</span><span class="n">token_regexp</span><span class="si">}</span><span class="s1">]: &#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tk</span><span class="p">):</span>
+                <span class="n">token_regexp</span> <span class="o">=</span> <span class="n">tk</span>
+
+        <span class="c1">#Stopword selection        </span>
+        <span class="n">allWdLists</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allWdLists</span><span class="p">)</span>
+        <span class="n">StwLists</span> <span class="o">=</span> <span class="p">[</span><span class="n">swl</span> <span class="k">for</span> <span class="n">swl</span> <span class="ow">in</span> <span class="n">allWdLists</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> 
+                        <span class="k">if</span> <span class="n">allWdLists</span><span class="p">[</span><span class="n">swl</span><span class="p">][</span><span class="s1">&#39;valid_for&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;stopwords&#39;</span><span class="p">]</span>
+        <span class="n">displayStwLists</span> <span class="o">=</span> <span class="p">[</span><span class="n">allWdLists</span><span class="p">[</span><span class="n">swl</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> 
+            <span class="n">allWdLists</span><span class="p">[</span><span class="n">swl</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">swl</span> <span class="ow">in</span> <span class="n">StwLists</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Available lists of stopwords:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;. &#39;</span> <span class="o">+</span> <span class="n">el</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">displayStwLists</span><span class="p">)]))</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Select all lists of stopwords that should be used (separated by commas): &quot;</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
+            <span class="n">StwLists</span> <span class="o">=</span> <span class="p">[</span><span class="n">StwLists</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">el</span><span class="p">)]</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">selection</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">StwLists</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1">#Lists of equivalences</span>
+        <span class="n">EqLists</span> <span class="o">=</span> <span class="p">[</span><span class="n">eql</span> <span class="k">for</span> <span class="n">eql</span> <span class="ow">in</span> <span class="n">allWdLists</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> 
+                        <span class="k">if</span> <span class="n">allWdLists</span><span class="p">[</span><span class="n">eql</span><span class="p">][</span><span class="s1">&#39;valid_for&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;equivalences&#39;</span><span class="p">]</span>
+        <span class="n">displayEqLists</span> <span class="o">=</span> <span class="p">[</span><span class="n">allWdLists</span><span class="p">[</span><span class="n">eql</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> 
+            <span class="n">allWdLists</span><span class="p">[</span><span class="n">eql</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">eql</span> <span class="ow">in</span> <span class="n">EqLists</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Available lists of equivalent terms:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;. &#39;</span> <span class="o">+</span> <span class="n">el</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">displayEqLists</span><span class="p">)]))</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Select all lists of equivalent terms that should be used (separated by commas): &quot;</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
+            <span class="n">EqLists</span> <span class="o">=</span> <span class="p">[</span><span class="n">EqLists</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">el</span><span class="p">)]</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">selection</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">EqLists</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">Preproc</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;min_lemas&quot;</span> <span class="p">:</span>   <span class="n">min_lemas</span><span class="p">,</span>
+                <span class="s2">&quot;no_below&quot;</span> <span class="p">:</span>    <span class="n">no_below</span><span class="p">,</span>
+                <span class="s2">&quot;no_above&quot;</span> <span class="p">:</span>    <span class="n">no_above</span><span class="p">,</span>
+                <span class="s2">&quot;keep_n&quot;</span> <span class="p">:</span>      <span class="n">keep_n</span><span class="p">,</span>
+                <span class="s2">&quot;token_regexp&quot;</span><span class="p">:</span> <span class="n">token_regexp</span><span class="p">,</span>
+                <span class="s2">&quot;stopwords&quot;</span> <span class="p">:</span>   <span class="n">StwLists</span><span class="p">,</span>
+                <span class="s2">&quot;equivalences&quot;</span><span class="p">:</span> <span class="n">EqLists</span>
+            <span class="p">}</span>
+            
+        <span class="n">displaytext</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        We will retrieve all parameters needed for the topic modeling itself</span>
+
+<span class="s2">        Most of these settings may be for advanced users. We will need to check with the</span>
+<span class="s2">        users which parameters are basic and which ones should only appear for the advanced</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">printgr</span><span class="p">(</span><span class="n">displaytext</span><span class="p">)</span>
+
+        <span class="c1"># We also need the user to select/confirm number of topics</span>
+        <span class="n">ntopics</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TM&#39;</span><span class="p">,</span> <span class="s1">&#39;ntopics&#39;</span><span class="p">))</span>
+        <span class="n">ntopics</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">ntopics</span><span class="p">,</span>
+                                   <span class="s1">&#39;Please, select the number of topics&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Retrieve parameters for training. These are dependent on the training algorithm</span>
+        <span class="k">if</span> <span class="n">trainer</span> <span class="o">==</span> <span class="s2">&quot;mallet&quot;</span><span class="p">:</span>
+            <span class="c1"># Default values are read from config file</span>
+            <span class="n">mallet_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;mallet_path&#39;</span><span class="p">)</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">))</span>
+            <span class="n">optimize_interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;optimize_interval&#39;</span><span class="p">))</span>
+            <span class="n">num_threads</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;num_threads&#39;</span><span class="p">))</span>
+            <span class="n">num_iterations</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;num_iterations&#39;</span><span class="p">))</span>
+            <span class="n">doc_topic_thr</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;doc_topic_thr&#39;</span><span class="p">))</span>
+            <span class="n">thetas_thr</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;thetas_thr&#39;</span><span class="p">))</span>
+
+            <span class="c1"># The following settings will only be accessed in the &quot;advanced settings panel&quot;</span>
+            <span class="n">Y_or_N</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Do you wish to access the advanced settings panel [Y/N]?:&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">Y_or_N</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span>
+
+                <span class="n">alpha</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span>
+                                         <span class="s1">&#39;Prior parameter for the Dirichlet for doc generation&#39;</span><span class="p">)</span>
+                <span class="n">optimize_interval</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">optimize_interval</span><span class="p">,</span>
+                                                     <span class="s1">&#39;Iterations between Dirichlet priors optimization&#39;</span><span class="p">)</span>
+                <span class="n">num_threads</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">,</span>
+                                               <span class="s1">&#39;Number of threads for mallet parallelization&#39;</span><span class="p">)</span>
+                <span class="n">num_iterations</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">num_iterations</span><span class="p">,</span>
+                                                  <span class="s1">&#39;Number of Gibbs Sampling iterations&#39;</span><span class="p">)</span>
+                <span class="n">doc_topic_thr</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="n">doc_topic_thr</span><span class="p">,</span>
+                                                 <span class="s1">&#39;Threshold for topic activation in a doc (mallet training)&#39;</span><span class="p">)</span>
+                <span class="n">thetas_thr</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="n">thetas_thr</span><span class="p">,</span>
+                                              <span class="s1">&#39;Threshold for topic activation in a doc (sparsification)&#39;</span><span class="p">)</span>
+            <span class="n">LDAparam</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;ntopics&quot;</span> <span class="p">:</span>             <span class="n">ntopics</span><span class="p">,</span>
+                <span class="s2">&quot;alpha&quot;</span> <span class="p">:</span>               <span class="n">alpha</span><span class="p">,</span>
+                <span class="s2">&quot;optimize_interval&quot;</span> <span class="p">:</span>   <span class="n">optimize_interval</span><span class="p">,</span>
+                <span class="s2">&quot;num_threads&quot;</span> <span class="p">:</span>         <span class="n">num_threads</span><span class="p">,</span>
+                <span class="s2">&quot;num_iterations&quot;</span> <span class="p">:</span>      <span class="n">num_iterations</span><span class="p">,</span>
+                <span class="s2">&quot;doc_topic_thr&quot;</span> <span class="p">:</span>       <span class="n">doc_topic_thr</span><span class="p">,</span>
+                <span class="s2">&quot;thetas_thr&quot;</span> <span class="p">:</span>          <span class="n">thetas_thr</span>
+            <span class="p">}</span>
+
+        <span class="k">elif</span> <span class="n">trainer</span> <span class="o">==</span> <span class="s2">&quot;sparKLDA&quot;</span><span class="p">:</span>
+            <span class="n">LDAparam</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">elif</span> <span class="n">trainer</span> <span class="o">==</span> <span class="s2">&quot;ctm&quot;</span><span class="p">:</span>
+            <span class="n">LDAparam</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">displaytext</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        We will finally request other general information, modelname, description, etc</span>
+<span class="s2">        *************************************************************************************</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">printgr</span><span class="p">(</span><span class="n">displaytext</span><span class="p">)</span>
+        <span class="n">modelname</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelname</span><span class="p">):</span>
+            <span class="n">modelname</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Enter a name to save the new model: &#39;</span><span class="p">)</span>
+        <span class="n">modeldir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_struct</span><span class="p">[</span><span class="s1">&#39;LDAmodels&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">modelname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">modeldir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+
+            <span class="c1"># Remove current backup folder, if it exists</span>
+            <span class="n">old_model_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">modeldir</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_old/&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">old_model_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">old_model_dir</span><span class="p">)</span>
+
+            <span class="c1"># Copy current project folder to the backup folder.</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">modeldir</span><span class="p">,</span> <span class="n">old_model_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Creating backup of existing model in </span><span class="si">{</span><span class="n">old_model_dir</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Introduce a description for the model</span>
+        <span class="n">ModelDesc</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">ModelDesc</span><span class="p">):</span>
+            <span class="n">ModelDesc</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Introduce a description for the model: &#39;</span><span class="p">)</span>
+
+        <span class="c1"># Define privacy level of dataset</span>
+        <span class="n">privacy</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Public&#39;</span><span class="p">,</span> <span class="s1">&#39;Private&#39;</span><span class="p">]</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">query_options</span><span class="p">(</span><span class="n">privacy</span><span class="p">,</span> <span class="s1">&#39;Define visibility for the model&#39;</span><span class="p">)</span>
+        <span class="n">privacy</span> <span class="o">=</span> <span class="n">privacy</span><span class="p">[</span><span class="n">opt</span><span class="p">]</span>
+
+        <span class="c1"># Create corpus_folder and save model training configuration</span>
+        <span class="n">modeldir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+        <span class="n">configFile</span> <span class="o">=</span> <span class="n">modeldir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;trainconfig.json&#39;</span><span class="p">)</span>
+
+        <span class="n">train_config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span>         <span class="n">modelname</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span>  <span class="n">ModelDesc</span><span class="p">,</span>
+            <span class="s2">&quot;visibility&quot;</span><span class="p">:</span>   <span class="n">privacy</span><span class="p">,</span>
+            <span class="s2">&quot;trainer&quot;</span><span class="p">:</span>      <span class="n">trainer</span><span class="p">,</span>
+            <span class="s2">&quot;TrDtSet&quot;</span><span class="p">:</span>      <span class="n">TrDtSet</span><span class="p">,</span>
+            <span class="s2">&quot;Preproc&quot;</span> <span class="p">:</span>     <span class="n">Preproc</span><span class="p">,</span>
+            <span class="s2">&quot;LDAparam&quot;</span> <span class="p">:</span>    <span class="n">LDAparam</span>
+        <span class="p">}</span>
+
+        <span class="k">with</span> <span class="n">configFile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">train_config</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+        <span class="c1">#############################################################</span>
+        <span class="c1">## END IMT Interface: Next, the actual training should happen</span>
+        <span class="c1">#############################################################</span>
+
+        <span class="k">return</span>
+
+
+
+
+        <span class="c1"># Run command for training model</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;python topicmodeling.py --train --config </span><span class="si">{</span><span class="n">configFile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Running command </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">check_output</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;-- -- Command execution failed&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+
+
+
+
+
+
 <div class="viewcode-block" id="ITMTTaskManagerCMD.corpus2JSON"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.corpus2JSON">[docs]</a>    <span class="k">def</span> <span class="nf">corpus2JSON</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove a training corpus from the Interactive Topic Model Trainer</span>
@@ -624,151 +1109,6 @@
 
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="ITMTTaskManagerCMD.trainTM"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.trainTM">[docs]</a>    <span class="k">def</span> <span class="nf">trainTM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Topic modeling trainer. Initial training of a topic model</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        trainer:</span>
-<span class="sd">            TM optimizer [mallet/ctm]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1">############################################################</span>
-        <span class="c1">## IMT Interface: Topic Model Trainer Window</span>
-        <span class="c1">############################################################</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- Topic Model Training&#39;</span><span class="p">)</span>
-
-        <span class="c1"># First thing to do is to select a corpus</span>
-        <span class="c1"># Ask user which dataset should be used for model training</span>
-        <span class="n">dtSets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_struct</span><span class="p">[</span><span class="s1">&#39;datasets&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
-        <span class="n">dtSets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dtSets</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()])</span>
-        <span class="n">display_dtSets</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dtSets</span><span class="p">]</span>
-        <span class="n">selection</span> <span class="o">=</span> <span class="n">query_options</span><span class="p">(</span><span class="n">display_dtSets</span><span class="p">,</span> <span class="s2">&quot;Select Training Dataset&quot;</span><span class="p">)</span>
-        <span class="n">path_dtSet</span> <span class="o">=</span> <span class="n">dtSets</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span>
-        <span class="c1"># Retrieve all CSV files that form the selected dataset</span>
-        <span class="n">dtSetCSV</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">path_dtSet</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;CSV&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
-                           <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">)])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Selected corpus is </span><span class="si">{</span><span class="n">path_dtSet</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-        <span class="c1"># We also need the user to select/confirm number of topics</span>
-        <span class="n">ntopics</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TM&#39;</span><span class="p">,</span> <span class="s1">&#39;ntopics&#39;</span><span class="p">))</span>
-        <span class="n">ntopics</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">ntopics</span><span class="p">,</span>
-                                   <span class="s1">&#39;Please, select the number of topics&#39;</span><span class="p">)</span>
-
-        <span class="c1"># Retrieve parameters for training</span>
-        <span class="k">if</span> <span class="n">trainer</span> <span class="o">==</span> <span class="s2">&quot;mallet&quot;</span><span class="p">:</span>
-            <span class="c1"># Default values are read from config file</span>
-            <span class="n">min_lemas</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;min_lemas&#39;</span><span class="p">))</span>
-            <span class="n">no_below</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;no_below&#39;</span><span class="p">))</span>
-            <span class="n">no_above</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;no_above&#39;</span><span class="p">))</span>
-            <span class="n">keep_n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;keep_n&#39;</span><span class="p">))</span>
-            <span class="n">token_regexp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;token_regexp&#39;</span><span class="p">)</span>
-            <span class="n">mallet_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;mallet_path&#39;</span><span class="p">)</span>
-            <span class="n">stw_file</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;default_stw_file&#39;</span><span class="p">)]</span>
-            <span class="n">eq_file</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;default_eq_file&#39;</span><span class="p">)]</span>
-            <span class="n">alpha</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">))</span>
-            <span class="n">optimize_interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;optimize_interval&#39;</span><span class="p">))</span>
-            <span class="n">num_threads</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;num_threads&#39;</span><span class="p">))</span>
-            <span class="n">num_iterations</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;num_iterations&#39;</span><span class="p">))</span>
-            <span class="n">doc_topic_thr</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;doc_topic_thr&#39;</span><span class="p">))</span>
-            <span class="n">thetas_thr</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MalletTM&#39;</span><span class="p">,</span> <span class="s1">&#39;thetas_thr&#39;</span><span class="p">))</span>
-
-            <span class="c1"># The following settings will only be accessed in the &quot;advance settings panel&quot;</span>
-            <span class="n">Y_or_N</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Do you wish to access the advance settings panel [Y/N]?:&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">Y_or_N</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span>
-                <span class="c1"># Some of them can be confirmed/modified by the user</span>
-                <span class="n">min_lemas</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">min_lemas</span><span class="p">,</span>
-                                             <span class="s1">&#39;Enter minimum number of lemas for the documents in the training set&#39;</span><span class="p">)</span>
-                <span class="n">no_below</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">no_below</span><span class="p">,</span>
-                                            <span class="s1">&#39;Minimum number occurrences to keep words in vocabulary&#39;</span><span class="p">)</span>
-                <span class="n">no_above</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="n">no_above</span><span class="p">,</span>
-                                            <span class="s1">&#39;Maximum proportion of documents to keep a word in vocabulary&#39;</span><span class="p">)</span>
-                <span class="n">keep_n</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">keep_n</span><span class="p">,</span>
-                                          <span class="s1">&#39;Maximum vocabulary size&#39;</span><span class="p">)</span>
-                <span class="n">tk</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Regular expresion for tokenizer [</span><span class="si">{</span><span class="n">token_regexp</span><span class="si">}</span><span class="s1">]: &#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tk</span><span class="p">):</span>
-                    <span class="n">token_regexp</span> <span class="o">=</span> <span class="n">tk</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Stopwords will be read from file </span><span class="si">{</span><span class="n">stw_file</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">swf</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Enter the path of additional files of stopwords (separated by commas): &#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">swf</span><span class="p">):</span>
-                    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">swf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-                            <span class="n">stw_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Word equivalences will be read from file </span><span class="si">{</span><span class="n">eq_file</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">eq</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Enter the path of an alternative file with equivalent terms: &#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eq</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-                        <span class="n">eq_file</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="n">alpha</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span>
-                                         <span class="s1">&#39;Prior parameter for the Dirichlet for doc generation&#39;</span><span class="p">)</span>
-                <span class="n">optimize_interval</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">optimize_interval</span><span class="p">,</span>
-                                                     <span class="s1">&#39;Iterations between Dirichlet priors optimization&#39;</span><span class="p">)</span>
-                <span class="n">num_threads</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">,</span>
-                                               <span class="s1">&#39;Number of threads for mallet parallelization&#39;</span><span class="p">)</span>
-                <span class="n">num_iterations</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">num_iterations</span><span class="p">,</span>
-                                                  <span class="s1">&#39;Number of Gibbs Sampling iterations&#39;</span><span class="p">)</span>
-                <span class="n">doc_topic_thr</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="n">doc_topic_thr</span><span class="p">,</span>
-                                                 <span class="s1">&#39;Threshold for topic activation in a doc (mallet training)&#39;</span><span class="p">)</span>
-                <span class="n">thetas_thr</span> <span class="o">=</span> <span class="n">var_num_keyboard</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="n">thetas_thr</span><span class="p">,</span>
-                                              <span class="s1">&#39;Threshold for topic activation in a doc (sparsification)&#39;</span><span class="p">)</span>
-
-            <span class="c1"># Create folder for corpus, backup existing folder if necessary</span>
-            <span class="n">modelname</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Enter a name to save the new model: &#39;</span><span class="p">)</span>
-            <span class="n">modeldir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2p</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_struct</span><span class="p">[</span><span class="s1">&#39;LDAmodels&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">modelname</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">modeldir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-
-                <span class="c1"># Remove current backup folder, if it exists</span>
-                <span class="n">old_model_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">modeldir</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_old/&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">old_model_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">old_model_dir</span><span class="p">)</span>
-
-                <span class="c1"># Copy current project folder to the backup folder.</span>
-                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">modeldir</span><span class="p">,</span> <span class="n">old_model_dir</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Creating backup of existing model in </span><span class="si">{</span><span class="n">old_model_dir</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-            <span class="c1"># Create corpus_folder and save model training configuration</span>
-            <span class="n">modeldir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
-            <span class="n">configFile</span> <span class="o">=</span> <span class="n">modeldir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;train.config&#39;</span><span class="p">)</span>
-            <span class="k">with</span> <span class="n">configFile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[Preproc]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;min_lemas = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">min_lemas</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;no_below = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">no_below</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;no_above = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">no_above</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;keep_n = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">keep_n</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;stw_file = &#39;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stw_file</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;eq_file = &#39;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">eq_file</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">[Training]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;trainer = mallet</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;token_regexp = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">token_regexp</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;mallet_path = &#39;</span> <span class="o">+</span> <span class="n">mallet_path</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ntopics = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ntopics</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;alpha = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;optimize_interval = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">optimize_interval</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;num_threads = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;num_iterations = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;doc_topic_thr = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">doc_topic_thr</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;thetas_thr = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">thetas_thr</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;training_files = &#39;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">el</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">dtSetCSV</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-
-            <span class="c1">#############################################################</span>
-            <span class="c1">## END IMT Interface: Next, the actual training should happen</span>
-            <span class="c1">#############################################################</span>
-
-            <span class="c1"># Run command for training model</span>
-            <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;python topicmodeling.py --train --config </span><span class="si">{</span><span class="n">configFile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- -- Running command </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">check_output</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;-- -- Command execution failed&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">trainer</span> <span class="o">==</span> <span class="s2">&quot;ctm&quot;</span><span class="p">:</span>
-            <span class="c1"># Other trainers will be available</span>
-            <span class="k">pass</span>
-
-        <span class="k">return</span></div>
 
 <div class="viewcode-block" id="ITMTTaskManagerCMD.extractPipe"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerCMD.extractPipe">[docs]</a>    <span class="k">def</span> <span class="nf">extractPipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corpus</span><span class="p">):</span>
 
@@ -1483,22 +1823,64 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allDtsets</span><span class="p">:</span>
             <span class="n">allDtsets</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allDtsets</span><span class="p">)</span>
             <span class="n">table</span> <span class="o">=</span> <span class="n">gui</span><span class="o">.</span><span class="n">table_available_local_corpus</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">setRowCount</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">allDtsets</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
             <span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">Dts</span> <span class="ow">in</span> <span class="n">allDtsets</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
                 <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="p">][</span><span class="s1">&#39;source&#39;</span><span class="p">]))</span>
                 <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]))</span>
                 <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="p">][</span><span class="s1">&#39;schema&#39;</span><span class="p">]])))</span>
-                <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="p">][</span><span class="s1">&#39;records&#39;</span><span class="p">]))</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="p">][</span><span class="s1">&#39;records&#39;</span><span class="p">])))</span>
                 <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="p">][</span><span class="s1">&#39;download_date&#39;</span><span class="p">]))</span>
                 <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="p">][</span><span class="s1">&#39;visibility&#39;</span><span class="p">]))</span>
                 <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="ITMTTaskManagerGUI.createTMCorpus"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.createTMCorpus">[docs]</a>    <span class="k">def</span> <span class="nf">createTMCorpus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># @ TODO: To be implemented when UI ready</span>
-        <span class="k">return</span></div>
+<div class="viewcode-block" id="ITMTTaskManagerGUI.createTMCorpus"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.createTMCorpus">[docs]</a>    <span class="k">def</span> <span class="nf">createTMCorpus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dict_to_tm_corpus</span><span class="p">,</span> <span class="n">dtsName</span><span class="p">,</span> <span class="n">dtsDesc</span><span class="p">,</span> <span class="n">privacy</span><span class="p">):</span>
+
+        <span class="c1"># We need first to get all available (downloaded) datasets</span>
+        <span class="n">allDtsets</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allDtsets</span><span class="p">)</span>
+
+        <span class="n">TM_Dtset</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_ids_dts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">el</span><span class="p">)</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">dict_to_tm_corpus</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">corpus_id</span> <span class="ow">in</span> <span class="n">list_ids_dts</span><span class="p">:</span>
+            <span class="n">Dtsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">allDtsets</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+            <span class="n">Dtset_loc</span> <span class="o">=</span> <span class="n">Dtsets</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">corpus_id</span><span class="p">)</span>
+            <span class="n">Dtset_source</span> <span class="o">=</span> <span class="n">allDtsets</span><span class="p">[</span><span class="n">Dtset_loc</span><span class="p">][</span><span class="s1">&#39;source&#39;</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Processing dataset&#39;</span><span class="p">,</span> <span class="n">allDtsets</span><span class="p">[</span><span class="n">Dtset_loc</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+
+            <span class="c1"># id fld</span>
+            <span class="n">dict_tm_corpus_loc</span> <span class="o">=</span> <span class="n">list_ids_dts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">corpus_id</span><span class="p">)</span>
+            <span class="n">Dtset_idfld</span> <span class="o">=</span> <span class="n">dict_to_tm_corpus</span><span class="p">[</span><span class="n">dict_tm_corpus_loc</span><span class="p">][</span><span class="s1">&#39;identifier_field&#39;</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Field to use as identifier &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Dtset_idfld</span><span class="p">))</span>
+
+            <span class="c1"># lemmas fields</span>
+            <span class="n">Dtset_lemmas_fld</span> <span class="o">=</span> <span class="n">dict_to_tm_corpus</span><span class="p">[</span><span class="n">dict_tm_corpus_loc</span><span class="p">][</span><span class="s1">&#39;fields_for_lemmas&#39;</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Selected lemmas:&#39;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Dtset_lemmas_fld</span><span class="p">))</span>
+
+            <span class="c1"># rawtext fields</span>
+            <span class="n">Dtset_rawtext_fld</span> <span class="o">=</span> <span class="n">dict_to_tm_corpus</span><span class="p">[</span><span class="n">dict_tm_corpus_loc</span><span class="p">][</span><span class="s1">&#39;fields_for_raw&#39;</span><span class="p">]</span>
+
+            <span class="c1"># Spark clause for filtering (advanced users only)</span>
+            <span class="n">Dtset_filter</span> <span class="o">=</span> <span class="n">dict_to_tm_corpus</span><span class="p">[</span><span class="n">dict_tm_corpus_loc</span><span class="p">][</span><span class="s1">&#39;filtering_condition&#39;</span><span class="p">]</span>
+
+            <span class="n">TM_Dtset</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;parquet&#39;</span><span class="p">:</span> <span class="n">Dtset_loc</span><span class="p">,</span>
+                             <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="n">Dtset_source</span><span class="p">,</span>
+                             <span class="s1">&#39;idfld&#39;</span><span class="p">:</span> <span class="n">Dtset_idfld</span><span class="p">,</span>
+                             <span class="s1">&#39;lemmasfld&#39;</span><span class="p">:</span> <span class="n">Dtset_lemmas_fld</span><span class="p">,</span>
+                             <span class="s1">&#39;rawtxtfld&#39;</span><span class="p">:</span> <span class="n">Dtset_rawtext_fld</span><span class="p">,</span>
+                             <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="n">Dtset_filter</span>
+                             <span class="p">})</span>
+
+        <span class="n">Dtset</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">dtsName</span><span class="p">,</span>
+                 <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">dtsDesc</span><span class="p">,</span>
+                 <span class="s1">&#39;valid_for&#39;</span><span class="p">:</span> <span class="s2">&quot;TM&quot;</span><span class="p">,</span>
+                 <span class="s1">&#39;visibility&#39;</span><span class="p">:</span> <span class="n">privacy</span><span class="p">,</span>
+                 <span class="s1">&#39;Dtsets&#39;</span><span class="p">:</span> <span class="n">TM_Dtset</span>
+                 <span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_TrDtset</span><span class="p">(</span><span class="n">Dtset</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ITMTTaskManagerGUI.listTMCorpus"><a class="viewcode-back" href="../../../src.project_manager.itmt_task_manager.html#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.listTMCorpus">[docs]</a>    <span class="k">def</span> <span class="nf">listTMCorpus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gui</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1514,6 +1896,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allTrDtsets</span><span class="p">:</span>
             <span class="n">allTrDtsets</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allTrDtsets</span><span class="p">)</span>
             <span class="n">table</span> <span class="o">=</span> <span class="n">gui</span><span class="o">.</span><span class="n">table_available_training_datasets</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">setRowCount</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">allTrDtsets</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
             <span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">TrDts</span> <span class="ow">in</span> <span class="n">allTrDtsets</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="n">allTrDtsets</span><span class="p">[</span><span class="n">TrDts</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
@@ -1540,12 +1923,16 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allTrDtsets</span><span class="p">:</span>
             <span class="n">allTrDtsets</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allTrDtsets</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">TrDts</span> <span class="ow">in</span> <span class="n">allTrDtsets</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">corpus_to_delete</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">allTrDtsets</span><span class="p">[</span><span class="n">TrDts</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">allTrDtsets</span><span class="p">[</span><span class="n">TrDts</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">corpus_to_delete</span><span class="p">:</span>
                     <span class="n">reply</span> <span class="o">=</span> <span class="n">QMessageBox</span><span class="o">.</span><span class="n">question</span><span class="p">(</span><span class="n">gui</span><span class="p">,</span> <span class="n">Constants</span><span class="o">.</span><span class="n">SMOOTH_SPOON_MSG</span><span class="p">,</span> <span class="s1">&#39;Training Dataset &#39;</span> <span class="o">+</span>
                                                  <span class="n">allTrDtsets</span><span class="p">[</span><span class="n">TrDts</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; will be deleted. Proceed?&#39;</span><span class="p">,</span>
-                                                 <span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span> <span class="o">|</span> <span class="n">QMessageBox</span><span class="o">.</span><span class="n">No</span><span class="p">,</span> <span class="n">QMessageBox</span><span class="o">.</span><span class="n">No</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">reply</span> <span class="o">==</span> <span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span><span class="p">:</span>
+                                                 <span class="n">QMessageBox</span><span class="o">.</span><span class="n">StandardButton</span><span class="o">.</span><span class="n">Yes</span> <span class="o">|</span> <span class="n">QMessageBox</span><span class="o">.</span><span class="n">StandardButton</span><span class="o">.</span><span class="n">No</span><span class="p">,</span>
+                                                 <span class="n">QMessageBox</span><span class="o">.</span><span class="n">StandardButton</span><span class="o">.</span><span class="n">No</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">reply</span> <span class="o">==</span> <span class="n">QMessageBox</span><span class="o">.</span><span class="n">StandardButton</span><span class="o">.</span><span class="n">Yes</span><span class="p">:</span>
                         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delete_TrDtset</span><span class="p">(</span><span class="n">TrDts</span><span class="p">)</span>
+                        <span class="c1"># @TODO: Revise. Status is being returned as a byte object (b&#39;1&#39;)</span>
                         <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">QMessageBox</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">gui</span><span class="p">,</span> <span class="n">Constants</span><span class="o">.</span><span class="n">SMOOTH_SPOON_MSG</span><span class="p">,</span> <span class="s1">&#39;Training Dataset &#39;</span> <span class="o">+</span>
                                                 <span class="n">allTrDtsets</span><span class="p">[</span><span class="n">TrDts</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; could not be deleted.&#39;</span><span class="p">)</span>
