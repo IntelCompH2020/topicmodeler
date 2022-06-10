@@ -36,6 +36,8 @@ def main():
                         help="path to downloaded parquet datasets")
     parser.add_argument('--f', action='store_true', default=False,
                         help='Force creation of new project. Overwrite existing.')
+    parser.add_argument('--wdlist', type=str, default=None,
+                        help="path to folder with WordLists")
     args = parser.parse_args()
 
     # Read project_path

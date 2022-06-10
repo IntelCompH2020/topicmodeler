@@ -22,6 +22,7 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from functools import partial
 
 # Local imports
+from src.gui.create_sw_lst_window import CreateSwLstWindow
 from src.gui.generate_tm_corpus_window import GenerateTMCorpus
 from src.gui.train_model_window import TrainModelWindow
 from src.gui.utils import utils
@@ -32,7 +33,7 @@ from src.project_manager.itmt_task_manager import ITMTTaskManagerGUI
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, project_folder=None, parquet_folder=None):
+    def __init__(self, project_folder=None, parquet_folder=None, wordlists_folder=None):
 
         """
         Initializes the application's main window.
@@ -43,6 +44,8 @@ class MainWindow(QMainWindow):
            Path to the application project
         parquet_folder : pathlib.Path (default=None)
            Path to the folder containing the parquet files
+        wordlists_folder : pathlib.Path (default=None)
+           Path to the folder hosting the wordlists (stopwords, keywords, etc)
         """
 
         super(MainWindow, self).__init__()
@@ -62,8 +65,9 @@ class MainWindow(QMainWindow):
         # Attributes for creating TM object
         self.project_folder = project_folder
         self.parquet_folder = parquet_folder
+        self.wordlists_folder = wordlists_folder
         self.tm = None
-        if self.project_folder and self.parquet_folder:
+        if self.project_folder and self.parquet_folder and self.wordlists_folder:
             self.configure_tm()
 
         # Attributes for displaying PyLDAvis in home page
@@ -79,6 +83,7 @@ class MainWindow(QMainWindow):
         # Creation of subwindows
         self.train_model_subwindow = TrainModelWindow()
         self.create_tm_corpus_subwindow = None
+        self.create_stopwords_list_subwindow = None
 
         # Threads for executing in parallel
         self.thread_pool = QThreadPool()
@@ -111,6 +116,10 @@ class MainWindow(QMainWindow):
             home_recent_button_name = "pushButton_recent_parquet_folder_" + str(id_button + 1)
             home_recent_button_widget = self.findChild(QPushButton, home_recent_button_name)
             self.home_recent_buttons.append(home_recent_button_widget)
+        for id_button in np.arange(Constants.MAX_RECENT_WORDLISTS):
+            home_recent_button_name = "pushButton_recent_wordlists_folder_" + str(id_button + 1)
+            home_recent_button_widget = self.findChild(QPushButton, home_recent_button_name)
+            self.home_recent_buttons.append(home_recent_button_widget)
 
         for home_recent_button in self.home_recent_buttons:
             home_recent_button.clicked.connect(partial(self.get_folder_from_recent, home_recent_button))
@@ -134,14 +143,19 @@ class MainWindow(QMainWindow):
         self.corpus_button_2.clicked.connect(
             lambda: self.corpus_tabs.setCurrentWidget(self.page_training_datasets))
 
-        # PAGE 3: Models
-        #################
+        # PAGE 3: Wordlists
+        #####################
         self.menu_button_3.clicked.connect(
+            lambda: self.content_tabs.setCurrentWidget(self.page_wordlists))
+
+        # PAGE 4: Models
+        #################
+        self.menu_button_4.clicked.connect(
             lambda: self.content_tabs.setCurrentWidget(self.page_models))
 
-        # PAGE 4: Settings
+        # PAGE 5: Settings
         ###################
-        self.menu_button_4.clicked.connect(
+        self.menu_button_5.clicked.connect(
             lambda: self.content_tabs.setCurrentWidget(self.page_general_settings))
 
         #####################################################################################
@@ -163,10 +177,14 @@ class MainWindow(QMainWindow):
         utils.configure_table_header(Constants.CORPUS_TABLES, self)
         self.previous_corpus_button.setStyleSheet(Constants.TRAIN_BUTTONS_SELECTED_STYLESHEET)
 
-        # PAGE 3: Models
+        # PAGE 3: Wordlists
+        # Configure tables
+        utils.configure_table_header(Constants.WORDLISTS_TABLES, self)
+
+        # PAGE 4: Models
         # Configure tables
 
-        # PAGE 4: Settings
+        # PAGE 5: Settings
         utils.configure_table_header(Constants.MODELS_TABLES, self)
 
         #####################################################################################
@@ -174,10 +192,15 @@ class MainWindow(QMainWindow):
         #####################################################################################
         self.pushButton_open_project_folder.clicked.connect(self.get_project_folder)
         self.pushButton_open_parquet_folder.clicked.connect(self.get_parquet_folder)
+        self.pushButton_open_wordlists_folder.clicked.connect(self.get_wordlists_folder)
 
         self.pushButton_generate_training_dataset.clicked.connect(self.clicked_pushButton_generate_training_dataset)
         self.pushButton_train_trdtst.clicked.connect(self.clicked_train_dataset)
         self.pushButton_delete_trdtst.clicked.connect(self.clicked_delete_dataset)
+
+        self.pushButton_create_wordlist.clicked.connect(self.clicked_pushButton_create_wordlist)
+        self.pushButton_edit_wordlist.clicked.connect(self.clicked_pushButton_edit_wordlist)
+        self.pushButton_delete_wordlist.clicked.connect(self.clicked_pushButton_delete_wordlist)
 
     #####################################################################################
     # TASK MANAGER COMMUNICATION METHODS
@@ -190,22 +213,21 @@ class MainWindow(QMainWindow):
         and the menu buttons are unlocked so the user can proceed with the interaction with the GUI.
         """
 
-        if self.project_folder and self.parquet_folder:
+        if self.project_folder and self.parquet_folder and self.wordlists_folder:
             # A ITMTTaskManagerGUI is instantiated and configured according to whether the selected project is a new or
             # an already utilized one
-            self.tm = ITMTTaskManagerGUI(self.project_folder, self.parquet_folder)
+            self.tm = ITMTTaskManagerGUI(self.project_folder, self.parquet_folder, self.wordlists_folder)
             if len(os.listdir(self.project_folder)) == 0:
                 print("A new project folder was selected. Proceeding with "
                       "its configuration...")
                 self.tm.create()
-                self.tm.setup()
+                # self.tm.setup()
             else:
                 print("An existing project folder was selected. Proceeding with "
                       "its loading...")
-                self.tm.load()
-
+            self.tm.load()
             # Project and parquet folders are saved in the dict of recent folders to future user-gui interactions
-            utils.save_recent(self.project_folder,self.parquet_folder)
+            utils.save_recent(self.project_folder, self.parquet_folder, self.wordlists_folder)
             self.init_user_interaction()
 
             return
@@ -227,6 +249,9 @@ class MainWindow(QMainWindow):
 
         # Update the style of the tables in the corpus page
         utils.configure_table_header(Constants.CORPUS_TABLES, self)
+
+        # Load available wordlists (if any) into "table_available_wordlists"
+        self.tm.listAllWdLists(self)
 
         return
 
@@ -252,8 +277,8 @@ class MainWindow(QMainWindow):
         """
         Method to control the clicking of the button "pushButton_open_project_folder. When this button is clicked,
         the folder selector of the user's OS is open so the user can select the project folder. Once the project is
-        selected, if a proper parquet folder was also already selected, the GUI's associated Task Manager object is
-        configured.
+        selected, if a proper parquet and wordlists folders were also already selected, the GUI's associated Task
+        Manager object is configured.
         """
 
         self.project_folder = pathlib.Path(
@@ -270,14 +295,32 @@ class MainWindow(QMainWindow):
         """
         Method to control the clicking of the button "pushButton_open_parquet_folder. When this button is clicked,
         the folder selector of the user's OS is open so the user can select the parquet folder. Once the parquet
-        folder is selected, if a proper project folder was also already selected, the GUI's associated Task Manager
-        object is configured.
+        folder is selected, if a proper project and wordlists folders were also already selected, the GUI's associated
+        Task Manager object is configured.
         """
 
         self.parquet_folder = pathlib.Path(
             QFileDialog.getExistingDirectory(
                 self, 'Select the folder with the parquet files', self.home))
         self.lineEdit_current_parquet.setText(self.parquet_folder.as_posix())
+
+        # Create Task Manager object if possible
+        self.configure_tm()
+
+        return
+
+    def get_wordlists_folder(self):
+        """
+        Method to control the clicking of the button "pushButton_open_wordlists_folder. When this button is clicked,
+        the folder selector of the user's OS is open so the user can select the folder hosting the wordlists
+        (stopwords, keywords, etc). Once the wordlists folder is selected, if a proper project and parquet folders
+        were also already selected, the GUI's associated Task Manager object is configured.
+        """
+
+        self.wordlists_folder = pathlib.Path(
+            QFileDialog.getExistingDirectory(
+                self, 'Select the folder hosting the wordlists (stopwords, keywords, etc)', self.home))
+        self.lineEdit_current_wordlist.setText(self.wordlists_folder.as_posix())
 
         # Create Task Manager object if possible
         self.configure_tm()
@@ -295,12 +338,15 @@ class MainWindow(QMainWindow):
         if "project" in recent_button.objectName():
             self.project_folder = pathlib.Path(recent_button.text())
             self.lineEdit_current_project.setText(recent_button.text())
-        else:
+        elif "parquet" in recent_button.objectName():
             self.parquet_folder = pathlib.Path(recent_button.text())
             self.lineEdit_current_parquet.setText(recent_button.text())
+        elif "wordlists" in recent_button.objectName():
+            self.wordlists_folder = pathlib.Path(recent_button.text())
+            self.lineEdit_current_wordlist.setText(recent_button.text())
 
-            # Create Task Manager object if possible
-            self.configure_tm()
+        # Create Task Manager object if possible
+        self.configure_tm()
 
         return
 
@@ -367,8 +413,39 @@ class MainWindow(QMainWindow):
         corpus_to_delete = self.table_available_training_datasets.item(r, 0).text()
         self.tm.deleteTMCorpus(corpus_to_delete, self)
 
-        self.load_data()
+        self.tm.listTMCorpus(self)
 
+        return
+
+    def clicked_pushButton_create_wordlist(self):
+        QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.MSG_INSTRUCTIONS_NEW_WORDLIST)
+
+        # Invoke window
+        self.create_stopwords_list_subwindow = CreateSwLstWindow(self.tm)
+        self.create_stopwords_list_subwindow.exec()
+
+        # Update data in table
+        self.tm.listAllWdLists(self)
+
+        # Show information message about the TM corpus creation completion
+        # @ TODO: Add this to TM
+        if self.create_stopwords_list_subwindow.status == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_0)
+        elif self.create_stopwords_list_subwindow.status == 1:
+            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_1)
+        elif self.create_stopwords_list_subwindow.status == 2:
+            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_2)
+        return
+
+    def clicked_pushButton_edit_wordlist(self):
+        return
+
+    def clicked_pushButton_delete_wordlist(self):
+        r = self.table_available_wordlists.currentRow()
+        wlst_to_delete = self.table_available_wordlists.item(r, 0).text()
+        self.tm.DelWdList(wlst_to_delete, self)
+
+        self.tm.listAllWdLists(self)
         return
 
     def clicked_train_dataset(self):

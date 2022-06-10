@@ -4,6 +4,7 @@ class Constants:
     MAX_CORPUS_BUTTONS = 2
     MAX_RECENT_PROJECTS = 2
     MAX_RECENT_PARQUETS = 2
+    MAX_RECENT_WORDLISTS = 2
 
     LONG_TIME_SHOW_SB = 10000
 
@@ -16,6 +17,11 @@ class Constants:
     DOWNLOAD_CORPUS_TABLES = ["table_available_fields", "table_fields_to_include", "table_filters"]
     CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw", "tableWidget_fields_to_include_raw",
                                "tableWidget_available_fields_lemmas", "tableWidget_fields_to_include_lemmas"]
+
+    WORDLISTS_TABLES = ["table_available_wordlists"]
+    MSG_INSTRUCTIONS_NEW_WORDLIST = "To generate a new wordlists:\n - Stopwords or keywords: Introduce the words " \
+                                    "separated by commas (stw1,stw2, ...)\n - Equivalences: Introduce equivalences " \
+                                    "separated by commas in the format orig:target (orig1:tgt1, orig2:tgt2, ...) "
 
     MODELS_TABLES = ["table_available_models", "table_topics_edit_model"]
     TRAIN_MODEL_TABLES = ["table_training_resultsLDA", "table_training_results_AVITM", "table_training_results_CTM"]

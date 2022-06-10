@@ -138,7 +138,7 @@ def add_checkboxes_to_table(table):
     return
 
 
-def save_recent(current_project, current_parquet):
+def save_recent(current_project, current_parquet, current_wordlist):
     """
     Saves in a pickle file a dictionary structure with a list of the last used projects and parquet folders. If the
     file exists, the current project and parquet folders are added to the corresponding lists in the dictionary with
@@ -163,10 +163,14 @@ def save_recent(current_project, current_parquet):
                 dict_recent["recent_projects"].append(current_project)
             if current_parquet != dict_recent["recent_parquets"][-1]:
                 dict_recent["recent_parquets"].append(current_parquet)
+            if current_wordlist != dict_recent["recent_wordlists"][-1]:
+                dict_recent["recent_wordlists"].append(current_wordlist)
         with open(dtSets[0], 'wb') as f:
             pickle.dump(dict_recent, f)
     else:
-        dict_recent = {"recent_projects": [current_project], "recent_parquets": [current_parquet]}
+        dict_recent = {"recent_projects": [current_project],
+                       "recent_parquets": [current_parquet],
+                       "recent_wordlists": [current_wordlist]}
         with open(pathlib.Path("src/gui/utils/recent.pickle"), 'wb') as f:
             pickle.dump(dict_recent, f)
 
@@ -194,8 +198,7 @@ def set_recent_buttons(window):
         with open(dtSets[0], "rb") as f:
             dict_recent = pickle.load(f)
     if len(dict_recent) != 0:
-        # hide the recent frame and its contents
-        window.frame_recent.show()
+        # Fill buttons
         for rp in reversed(range(len(dict_recent['recent_projects']))):
             if os.path.exists(dict_recent['recent_projects'][rp]):
                 button_name = "pushButton_recent_project_folder_" + str(rp + 1)
@@ -210,8 +213,11 @@ def set_recent_buttons(window):
                 button_widget.setText(dict_recent['recent_parquets'][rpa].as_posix())
             else:
                 continue
-    else:
-        # hide the recent frame and its contents
-        window.frame_recent.hide()
-
+        for rwl in reversed(range(len(dict_recent['recent_wordlists']))):
+            if os.path.exists(dict_recent['recent_wordlists'][rpa]):
+                button_name = "pushButton_recent_wordlists_folder_" + str(rpa + 1)
+                button_widget = window.findChild(QPushButton, button_name)
+                button_widget.setText(dict_recent['recent_wordlists'][rwl].as_posix())
+            else:
+                continue
     return

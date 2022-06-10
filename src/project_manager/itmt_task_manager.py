@@ -685,11 +685,11 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             wds = input('Introduce the keywords: ')
         elif listType == 'stopwords':
             wds = input('Introduce the stopwords: ')
-        else: #equivalences
+        else:  # equivalences
             wds = input('Introduce the equivalences: ')
         wds = [el.strip() for el in wds.split(',') if len(el)]
         wds = sorted(list(set(wds)))
-        
+
         # We need a name for the list
         ListName = ""
         while not len(ListName):
@@ -706,11 +706,11 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         privacy = privacy[opt]
 
         WdList = {'name': ListName,
-                 'description': ListDesc,
-                 'valid_for': listType,
-                 'visibility': privacy,
-                 'wordlist': wds
-                 }
+                  'description': ListDesc,
+                  'valid_for': listType,
+                  'visibility': privacy,
+                  'wordlist': wds
+                  }
 
         return self.create_List(WdList)
 
@@ -735,8 +735,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # First thing to do is to select a list
         allWdLists = json.loads(self.allWdLists)
         wdLsts = [wlst for wlst in allWdLists.keys()]
-        displaywdLsts = [allWdLists[wlst]['name'] + ': ' + 
-            allWdLists[wlst]['description'] for wlst in wdLsts]
+        displaywdLsts = [allWdLists[wlst]['name'] + ': ' +
+                         allWdLists[wlst]['description'] for wlst in wdLsts]
         selection = query_options(displaywdLsts, "Select the list you wish to modify")
         WdLst = allWdLists[wdLsts[selection]]
         self.logger.info(f'-- -- Selected list is {WdLst["name"]}')
@@ -747,14 +747,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         wds = input('Introduce the elements you wish to remove (separated by commas): ')
         wds = [el.strip() for el in wds.split(',') if len(el)]
-        WdLst['wordlist'] = sorted(list(set([wd for wd in WdLst['wordlist'] 
-                                                    if wd not in wds])))
+        WdLst['wordlist'] = sorted(list(set([wd for wd in WdLst['wordlist']
+                                             if wd not in wds])))
 
         wds = input('Introduce new elements for the list (separated by commas): ')
         wds = [el.strip() for el in wds.split(',') if len(el)]
         WdLst['wordlist'] = sorted(list(set(wds + WdLst['wordlist'])))
 
-        #The list will be saved replacing existing list
+        # The list will be saved replacing existing list
         return self.create_List(WdLst)
 
     def DelWdList(self):
@@ -791,25 +791,25 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         ############################################################
 
         self.logger.info(f'-- Topic Model Training')
-        
+
         displaytext = """
         *************************************************************************************
         We will retrieve all parameters needed for training the topic model
         We start with common settings independent of the method used for the training
         *************************************************************************************
         """
-        printgr(displaytext)        
-        
+        printgr(displaytext)
+
         # First thing to do is to select a corpus
         # Ask user which dataset should be used for model training
         allTrDtsets = json.loads(self.allTrDtsets)
         dtSets = [dts for dts in allTrDtsets.keys()]
-        displaydtSets = [allTrDtsets[dts]['name'] + ': ' + 
-            allTrDtsets[dts]['description'] for dts in dtSets]
+        displaydtSets = [allTrDtsets[dts]['name'] + ': ' +
+                         allTrDtsets[dts]['description'] for dts in dtSets]
         selection = query_options(displaydtSets, "Select Training Dataset")
         TrDtSet = dtSets[selection]
         self.logger.info(f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
-        
+
         displaytext = """
         *************************************************************************************
         We will retrieve all parameters needed for the preprocessing of the lemmas
@@ -820,14 +820,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         *************************************************************************************
         """
         printgr(displaytext)
-        
+
         # Default values are read from config file
         min_lemas = int(self.cf.get('Preproc', 'min_lemas'))
         no_below = int(self.cf.get('Preproc', 'no_below'))
         no_above = float(self.cf.get('Preproc', 'no_above'))
         keep_n = int(self.cf.get('Preproc', 'keep_n'))
         token_regexp = self.cf.get('Preproc', 'token_regexp')
-        
+
         # The following settings will only be accessed in the "advanced settings panel"
         Y_or_N = input(f"Do you wish to access the advance settings panel [Y/N]?:")
         if Y_or_N.upper() == "Y":
@@ -844,12 +844,12 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             if len(tk):
                 token_regexp = tk
 
-        #Stopword selection        
+        # Stopword selection
         allWdLists = json.loads(self.allWdLists)
-        StwLists = [swl for swl in allWdLists.keys() 
-                        if allWdLists[swl]['valid_for']=='stopwords']
-        displayStwLists = [allWdLists[swl]['name'] + ': ' + 
-            allWdLists[swl]['description'] for swl in StwLists]
+        StwLists = [swl for swl in allWdLists.keys()
+                    if allWdLists[swl]['valid_for'] == 'stopwords']
+        displayStwLists = [allWdLists[swl]['name'] + ': ' +
+                           allWdLists[swl]['description'] for swl in StwLists]
         print('\nAvailable lists of stopwords:')
         print('\n'.join([str(el[0]) + '. ' + el[1] for el in enumerate(displayStwLists)]))
         msg = "Select all lists of stopwords that should be used (separated by commas): "
@@ -859,11 +859,11 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         else:
             StwLists = []
 
-        #Lists of equivalences
-        EqLists = [eql for eql in allWdLists.keys() 
-                        if allWdLists[eql]['valid_for']=='equivalences']
-        displayEqLists = [allWdLists[eql]['name'] + ': ' + 
-            allWdLists[eql]['description'] for eql in EqLists]
+        # Lists of equivalences
+        EqLists = [eql for eql in allWdLists.keys()
+                   if allWdLists[eql]['valid_for'] == 'equivalences']
+        displayEqLists = [allWdLists[eql]['name'] + ': ' +
+                          allWdLists[eql]['description'] for eql in EqLists]
         print('\nAvailable lists of equivalent terms:')
         print('\n'.join([str(el[0]) + '. ' + el[1] for el in enumerate(displayEqLists)]))
         msg = "Select all lists of equivalent terms that should be used (separated by commas): "
@@ -874,15 +874,15 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             EqLists = []
 
         Preproc = {
-                "min_lemas" :   min_lemas,
-                "no_below" :    no_below,
-                "no_above" :    no_above,
-                "keep_n" :      keep_n,
-                "token_regexp": token_regexp,
-                "stopwords" :   StwLists,
-                "equivalences": EqLists
-            }
-            
+            "min_lemas": min_lemas,
+            "no_below": no_below,
+            "no_above": no_above,
+            "keep_n": keep_n,
+            "token_regexp": token_regexp,
+            "stopwords": StwLists,
+            "equivalences": EqLists
+        }
+
         displaytext = """
         *************************************************************************************
         We will retrieve all parameters needed for the topic modeling itself
@@ -912,7 +912,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             # The following settings will only be accessed in the "advanced settings panel"
             Y_or_N = input(f"Do you wish to access the advanced settings panel [Y/N]?:")
             if Y_or_N.upper() == "Y":
-
                 alpha = var_num_keyboard('float', alpha,
                                          'Prior parameter for the Dirichlet for doc generation')
                 optimize_interval = var_num_keyboard('int', optimize_interval,
@@ -926,13 +925,13 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 thetas_thr = var_num_keyboard('float', thetas_thr,
                                               'Threshold for topic activation in a doc (sparsification)')
             LDAparam = {
-                "ntopics" :             ntopics,
-                "alpha" :               alpha,
-                "optimize_interval" :   optimize_interval,
-                "num_threads" :         num_threads,
-                "num_iterations" :      num_iterations,
-                "doc_topic_thr" :       doc_topic_thr,
-                "thetas_thr" :          thetas_thr
+                "ntopics": ntopics,
+                "alpha": alpha,
+                "optimize_interval": optimize_interval,
+                "num_threads": num_threads,
+                "num_iterations": num_iterations,
+                "doc_topic_thr": doc_topic_thr,
+                "thetas_thr": thetas_thr
             }
 
         elif trainer == "sparKLDA":
@@ -976,13 +975,13 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         configFile = modeldir.joinpath('trainconfig.json')
 
         train_config = {
-            "name":         modelname,
-            "description":  ModelDesc,
-            "visibility":   privacy,
-            "trainer":      trainer,
-            "TrDtSet":      TrDtSet,
-            "Preproc" :     Preproc,
-            "LDAparam" :    LDAparam
+            "name": modelname,
+            "description": ModelDesc,
+            "visibility": privacy,
+            "trainer": trainer,
+            "TrDtSet": TrDtSet,
+            "Preproc": Preproc,
+            "LDAparam": LDAparam
         }
 
         with configFile.open('w', encoding='utf-8') as outfile:
@@ -994,9 +993,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         return
 
-
-
-
         # Run command for training model
         cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
         try:
@@ -1006,12 +1002,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             self.logger.error('-- -- Command execution failed')
 
         return
-
-
-
-
-
-
 
     def corpus2JSON(self):
         """
@@ -1036,7 +1026,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             self.logger.error('-- -- Execution of script failed')
 
         return
-
 
     def extractPipe(self, corpus):
 
@@ -1716,7 +1705,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
     Graphical User Interface (GUI)
     """
 
-    def __init__(self, p2p, p2parquet, config_fname='config.cf',
+    def __init__(self, p2p, p2parquet, p2wdlist, config_fname='config.cf',
                  metadata_fname='metadata.yaml'):
         """
         Initializes an ITMTTaskManagerGUI object.
@@ -1727,6 +1716,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             Path to the application project
         p2parquet : pathlib.Path
             Path to the folder hosting the parquet datasets
+        p2wdlist : pathlib.Path
+            Path to the folder hosting the wordlists (stopwords, keywords, etc)
         config_fname : str, optional (default='config.cf')
             Name of the configuration file
         metadata_fname : str or None, optional (default=metadata.yaml)
@@ -1735,7 +1726,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         """
 
         super().__init__(
-            p2p, p2parquet, config_fname=config_fname, metadata_fname=metadata_fname)
+            p2p, p2parquet, p2wdlist, config_fname=config_fname, metadata_fname=metadata_fname)
 
     def listDownloaded(self, gui):
         """
@@ -1867,5 +1858,120 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                         elif status == 1:
                             QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
                                                     allTrDtsets[TrDts]['name'] + ' was deleted successfully.')
+
+        return
+
+    def listAllWdLists(self, gui):
+        """
+        This method shows all wordlists available for the project in the corresponding table
+        within the GUI.
+
+        Parameters
+        ----------
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+        """
+
+        if self.allWdLists:
+            allWdLists = json.loads(self.allWdLists)
+            table = gui.table_available_wordlists
+            table.setRowCount(len(allWdLists.keys()))
+            row = 0
+            for TrDts in allWdLists.keys():
+                table.setItem(row, 0, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['name']))
+                table.setItem(row, 1, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['description']))
+                table.setItem(row, 2, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['valid_for']))
+                table.setItem(row, 3, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['creation_date']))
+                table.setItem(row, 4, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['visibility']))
+                table.setItem(row, 5, QtWidgets.QTableWidgetItem(', '.join([el for el in allWdLists[TrDts]['wordlist']])))
+                row += 1
+
+        return
+
+    def NewWdList(self, listType, wds, lst_name, lst_privacy, lst_desc):
+        """
+        This method creates a New List of words that can be later used for
+        corpus preprocessing
+
+        Parameters
+        ----------
+        listType : string
+            type of list that will be created [keywords|stopwords|equivalences]
+        """
+
+        WdList = {'name': lst_name,
+                  'description': lst_desc,
+                  'valid_for': listType,
+                  'visibility': lst_privacy,
+                  'wordlist': wds
+                  }
+
+        return self.create_List(WdList)
+
+    def EditWdList(self):
+        """
+        This method allows the edition of an existing list of words, i.e.
+        adding new words or removing existing words
+        """
+
+        displaytext = """
+        *************************************************************************************
+        Edition of an existing list
+    
+            - Stopwords or keywords: Introduce the words separated by commas (stw1,stw2, ...)
+            - Equivalences: Introduce equivalences separated by commas in the format
+              orig:target (orig1:tgt1, orig2:tgt2, ...)
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        self.logger.info(f'-- -- Modifying an existing list of words')
+        # First thing to do is to select a list
+        allWdLists = json.loads(self.allWdLists)
+        wdLsts = [wlst for wlst in allWdLists.keys()]
+        displaywdLsts = [allWdLists[wlst]['name'] + ': ' +
+                         allWdLists[wlst]['description'] for wlst in wdLsts]
+        selection = query_options(displaywdLsts, "Select the list you wish to modify")
+        WdLst = allWdLists[wdLsts[selection]]
+        self.logger.info(f'-- -- Selected list is {WdLst["name"]}')
+
+        Y_or_N = input(f"\nDo you wish to visualize existing words in list [Y/N]?: ")
+        if Y_or_N.upper() == "Y":
+            print('\n'.join(WdLst['wordlist']))
+
+        wds = input('Introduce the elements you wish to remove (separated by commas): ')
+        wds = [el.strip() for el in wds.split(',') if len(el)]
+        WdLst['wordlist'] = sorted(list(set([wd for wd in WdLst['wordlist']
+                                             if wd not in wds])))
+
+        wds = input('Introduce new elements for the list (separated by commas): ')
+        wds = [el.strip() for el in wds.split(',') if len(el)]
+        WdLst['wordlist'] = sorted(list(set(wds + WdLst['wordlist'])))
+
+        # The list will be saved replacing existing list
+        return self.create_List(WdLst)
+
+    def DelWdList(self, wdlst_to_delete, gui):
+        """
+        Delete a wordlist from wordlist folder
+        """
+
+        if self.allWdLists:
+            allWdLists = json.loads(self.allWdLists)
+            for WdLst in allWdLists.keys():
+                if allWdLists[WdLst]['name'] == wdlst_to_delete:
+                    reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'Wordlist ' +
+                                                 allWdLists[WdLst]['name'] + ' will be deleted. Proceed?',
+                                                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                                 QMessageBox.StandardButton.No)
+                    if reply == QMessageBox.StandardButton.Yes:
+                        status = self.delete_WdLst(WdLst)
+                        # @TODO: Revise. Status is being returned as a byte object (b'1')
+                        if status == 0:
+                            QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Wordlist ' +
+                                                allWdLists[WdLst]['name'] + ' could not be deleted.')
+                        elif status == 1:
+                            QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Wordlist ' +
+                                                    allWdLists[WdLst]['name'] + ' was deleted successfully.')
 
         return

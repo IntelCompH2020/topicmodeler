@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1060</width>
-    <height>772</height>
+    <width>1038</width>
+    <height>774</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -607,6 +607,71 @@ QPushButton:pressed {
 }</string>
                </property>
                <property name="text">
+                <string>Wordlists</string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>../resources/images/settings.png</normaloff>../resources/images/settings.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>30</width>
+                 <height>30</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="menu_button_4">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>45</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>45</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton {	
+	background-image: ICON_REPLACE;
+	background-position: left center;
+    background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	font: 87 13pt &quot;Avenir&quot;;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+
+QPushButton[Active=true] {
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	border-right: 4px solid #4D6F8C;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+}
+
+QPushButton:pressed {
+	border-right: 4px solid #4D6F8C;
+	background-color: transparent;
+}</string>
+               </property>
+               <property name="text">
                 <string>Models</string>
                </property>
                <property name="icon">
@@ -622,7 +687,7 @@ QPushButton:pressed {
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="menu_button_4">
+              <widget class="QPushButton" name="menu_button_5">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1069,21 +1134,29 @@ padding-left: 10px;</string>
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QPushButton" name="pushButton_open_project_folder">
-                                  <property name="minimumSize">
-                                   <size>
-                                    <width>0</width>
-                                    <height>45</height>
-                                   </size>
-                                  </property>
-                                  <property name="maximumSize">
-                                   <size>
-                                    <width>16777215</width>
-                                    <height>45</height>
-                                   </size>
-                                  </property>
-                                  <property name="styleSheet">
-                                   <string notr="true">QPushButton {	
+                                 <layout class="QHBoxLayout" name="horizontalLayout_15">
+                                  <item>
+                                   <widget class="QPushButton" name="pushButton_open_project_folder">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="minimumSize">
+                                     <size>
+                                      <width>0</width>
+                                      <height>45</height>
+                                     </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>140</width>
+                                      <height>45</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">QPushButton {	
 	font: 87 13pt &quot;Avenir&quot;;
 	background-image: ICON_REPLACE;
 	background-position: left center;
@@ -1102,56 +1175,19 @@ QPushButton[Active=true] {
 QPushButton:pressed {
 	color:#4D6F8C;
 }</string>
-                                  </property>
-                                  <property name="text">
-                                   <string>Open project folder</string>
-                                  </property>
-                                  <property name="icon">
-                                   <iconset>
-                                    <normaloff>../resources/images/create_folder.png</normaloff>../resources/images/create_folder.png</iconset>
-                                  </property>
-                                  <property name="iconSize">
-                                   <size>
-                                    <width>30</width>
-                                    <height>30</height>
-                                   </size>
-                                  </property>
-                                 </widget>
-                                </item>
-                                <item>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_15">
-                                  <item>
-                                   <widget class="QLabel" name="label_5">
-                                    <property name="sizePolicy">
-                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                      <horstretch>0</horstretch>
-                                      <verstretch>0</verstretch>
-                                     </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                     <size>
-                                      <width>0</width>
-                                      <height>45</height>
-                                     </size>
-                                    </property>
-                                    <property name="font">
-                                     <font>
-                                      <family>Avenir</family>
-                                      <pointsize>13</pointsize>
-                                      <weight>75</weight>
-                                      <italic>false</italic>
-                                      <bold>true</bold>
-                                     </font>
-                                    </property>
-                                    <property name="styleSheet">
-                                     <string notr="true">padding-left: 10px;
-font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-</string>
                                     </property>
                                     <property name="text">
-                                     <string>Selected project   </string>
+                                     <string>Project folder</string>
+                                    </property>
+                                    <property name="icon">
+                                     <iconset>
+                                      <normaloff>../resources/images/create_folder.png</normaloff>../resources/images/create_folder.png</iconset>
+                                    </property>
+                                    <property name="iconSize">
+                                     <size>
+                                      <width>30</width>
+                                      <height>30</height>
+                                     </size>
                                     </property>
                                    </widget>
                                   </item>
@@ -1196,21 +1232,23 @@ font-weight: bold;
                                  </layout>
                                 </item>
                                 <item>
-                                 <widget class="QPushButton" name="pushButton_open_parquet_folder">
-                                  <property name="minimumSize">
-                                   <size>
-                                    <width>0</width>
-                                    <height>45</height>
-                                   </size>
-                                  </property>
-                                  <property name="maximumSize">
-                                   <size>
-                                    <width>16777215</width>
-                                    <height>45</height>
-                                   </size>
-                                  </property>
-                                  <property name="styleSheet">
-                                   <string notr="true">QPushButton {	
+                                 <layout class="QHBoxLayout" name="horizontalLayout_16">
+                                  <item>
+                                   <widget class="QPushButton" name="pushButton_open_parquet_folder">
+                                    <property name="minimumSize">
+                                     <size>
+                                      <width>0</width>
+                                      <height>45</height>
+                                     </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>140</width>
+                                      <height>45</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">QPushButton {	
 	font: 87 13pt &quot;Avenir&quot;;
 	background-image: ICON_REPLACE;
 	background-position: left center;
@@ -1229,56 +1267,19 @@ QPushButton[Active=true] {
 QPushButton:pressed {
 	color:#4D6F8C;
 }</string>
-                                  </property>
-                                  <property name="text">
-                                   <string>Open parquet folder</string>
-                                  </property>
-                                  <property name="icon">
-                                   <iconset>
-                                    <normaloff>../resources/images/open_folder.png</normaloff>../resources/images/open_folder.png</iconset>
-                                  </property>
-                                  <property name="iconSize">
-                                   <size>
-                                    <width>30</width>
-                                    <height>30</height>
-                                   </size>
-                                  </property>
-                                 </widget>
-                                </item>
-                                <item>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_16">
-                                  <item>
-                                   <widget class="QLabel" name="label_current_parquet_folder">
-                                    <property name="sizePolicy">
-                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                      <horstretch>0</horstretch>
-                                      <verstretch>0</verstretch>
-                                     </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                     <size>
-                                      <width>0</width>
-                                      <height>45</height>
-                                     </size>
-                                    </property>
-                                    <property name="font">
-                                     <font>
-                                      <family>Avenir</family>
-                                      <pointsize>13</pointsize>
-                                      <weight>75</weight>
-                                      <italic>false</italic>
-                                      <bold>true</bold>
-                                     </font>
-                                    </property>
-                                    <property name="styleSheet">
-                                     <string notr="true">padding-left: 10px;
-font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-</string>
                                     </property>
                                     <property name="text">
-                                     <string>Selected parquet folder   </string>
+                                     <string>Parquet folder</string>
+                                    </property>
+                                    <property name="icon">
+                                     <iconset>
+                                      <normaloff>../resources/images/open_folder.png</normaloff>../resources/images/open_folder.png</iconset>
+                                    </property>
+                                    <property name="iconSize">
+                                     <size>
+                                      <width>30</width>
+                                      <height>30</height>
+                                     </size>
                                     </property>
                                    </widget>
                                   </item>
@@ -1306,6 +1307,98 @@ font-weight: bold;
                                   </item>
                                   <item>
                                    <spacer name="horizontalSpacer_4">
+                                    <property name="orientation">
+                                     <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                     <enum>QSizePolicy::Fixed</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                     <size>
+                                      <width>15</width>
+                                      <height>20</height>
+                                     </size>
+                                    </property>
+                                   </spacer>
+                                  </item>
+                                 </layout>
+                                </item>
+                                <item>
+                                 <layout class="QHBoxLayout" name="horizontalLayout_17">
+                                  <item>
+                                   <widget class="QPushButton" name="pushButton_open_wordlists_folder">
+                                    <property name="minimumSize">
+                                     <size>
+                                      <width>0</width>
+                                      <height>45</height>
+                                     </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>140</width>
+                                      <height>45</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">QPushButton {	
+	font: 87 13pt &quot;Avenir&quot;;
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	color:#1A2E40;
+}
+
+QPushButton[Active=true] {
+	color:#4D6F8C;
+}
+
+QPushButton:pressed {
+	color:#4D6F8C;
+}</string>
+                                    </property>
+                                    <property name="text">
+                                     <string>Wordlists folder</string>
+                                    </property>
+                                    <property name="icon">
+                                     <iconset>
+                                      <normaloff>../resources/images/create_folder.png</normaloff>../resources/images/create_folder.png</iconset>
+                                    </property>
+                                    <property name="iconSize">
+                                     <size>
+                                      <width>30</width>
+                                      <height>30</height>
+                                     </size>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLineEdit" name="lineEdit_current_wordlist">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                    </property>
+                                    <property name="readOnly">
+                                     <bool>true</bool>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <spacer name="horizontalSpacer_10">
                                     <property name="orientation">
                                      <enum>Qt::Horizontal</enum>
                                     </property>
@@ -1435,13 +1528,13 @@ padding-left: 10px;</string>
                                   <property name="minimumSize">
                                    <size>
                                     <width>0</width>
-                                    <height>45</height>
+                                    <height>30</height>
                                    </size>
                                   </property>
                                   <property name="maximumSize">
                                    <size>
                                     <width>16777215</width>
-                                    <height>45</height>
+                                    <height>30</height>
                                    </size>
                                   </property>
                                   <property name="styleSheet">
@@ -1481,13 +1574,13 @@ QPushButton:pressed {
                                   <property name="minimumSize">
                                    <size>
                                     <width>0</width>
-                                    <height>45</height>
+                                    <height>30</height>
                                    </size>
                                   </property>
                                   <property name="maximumSize">
                                    <size>
                                     <width>16777215</width>
-                                    <height>45</height>
+                                    <height>30</height>
                                    </size>
                                   </property>
                                   <property name="styleSheet">
@@ -1566,13 +1659,13 @@ padding-left: 10px;</string>
                                   <property name="minimumSize">
                                    <size>
                                     <width>0</width>
-                                    <height>45</height>
+                                    <height>30</height>
                                    </size>
                                   </property>
                                   <property name="maximumSize">
                                    <size>
                                     <width>16777215</width>
-                                    <height>45</height>
+                                    <height>30</height>
                                    </size>
                                   </property>
                                   <property name="styleSheet">
@@ -1612,6 +1705,58 @@ QPushButton:pressed {
                                   <property name="minimumSize">
                                    <size>
                                     <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QPushButton {	
+	font: 87 13pt &quot;Avenir&quot;;
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	color:#1A2E40;
+}
+
+QPushButton[Active=true] {
+	color:#4D6F8C;
+}
+
+QPushButton:pressed {
+	color:#4D6F8C;
+}</string>
+                                  </property>
+                                  <property name="text">
+                                   <string/>
+                                  </property>
+                                  <property name="iconSize">
+                                   <size>
+                                    <width>30</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLabel" name="label_home_start_5">
+                                  <property name="sizePolicy">
+                                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                   </sizepolicy>
+                                  </property>
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
                                     <height>45</height>
                                    </size>
                                   </property>
@@ -1619,6 +1764,85 @@ QPushButton:pressed {
                                    <size>
                                     <width>16777215</width>
                                     <height>45</height>
+                                   </size>
+                                  </property>
+                                  <property name="font">
+                                   <font>
+                                    <family>Avenir</family>
+                                    <pointsize>16</pointsize>
+                                    <weight>10</weight>
+                                    <italic>false</italic>
+                                    <bold>false</bold>
+                                   </font>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">color:#1A2E40;
+font: 87 16pt &quot;Avenir&quot;;
+padding-left: 10px;</string>
+                                  </property>
+                                  <property name="text">
+                                   <string>&gt; &gt; wordlists folders</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="pushButton_recent_wordlists_folder_1">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <property name="styleSheet">
+                                   <string notr="true">QPushButton {	
+	font: 87 13pt &quot;Avenir&quot;;
+	background-image: ICON_REPLACE;
+	background-position: left center;
+	background-repeat: no-repeat;
+	border: none;
+	background-color: transparent;
+	text-align: left;
+	padding-left: 10px;
+	color:#1A2E40;
+}
+
+QPushButton[Active=true] {
+	color:#4D6F8C;
+}
+
+QPushButton:pressed {
+	color:#4D6F8C;
+}</string>
+                                  </property>
+                                  <property name="text">
+                                   <string/>
+                                  </property>
+                                  <property name="iconSize">
+                                   <size>
+                                    <width>30</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="pushButton_recent_wordlists_folder_2">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>30</height>
                                    </size>
                                   </property>
                                   <property name="styleSheet">
@@ -2755,12 +2979,6 @@ padding-left: 10px;</string>
                              </item>
                              <item>
                               <widget class="QTableWidget" name="table_available_models">
-                               <property name="sizePolicy">
-                                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                                 <horstretch>0</horstretch>
-                                 <verstretch>0</verstretch>
-                                </sizepolicy>
-                               </property>
                                <property name="styleSheet">
                                 <string notr="true">QTableWidget {	
 	background-color: #F2F2F2;
@@ -2792,80 +3010,29 @@ QScrollBar:horizontal {
     margin: 2px 0 2px 0;
 	border-radius: 0px;
  }
-QHeaderView::section{
-	background-color: #1A2E40;
-	max-width: 30px;
-	gridline-color: #FFFFFF;
-	font: 87 13pt &quot;Avenir&quot;;
-	color:white;
-	font-weight: bold;
-}
 
-QHeaderView::section:vertical
+QHeaderView::section:horizontal
 {
-    border: 1px solid #FFFFFF;
-}
-
-QTableWidget::horizontalHeader {	
 	background-color: #1A2E40;
+	padding: 3px;
+    border-bottom: 1px solid #FFFFFF;
+    border-right: 1px solid #FFFFFF;
+    border-top: 1px solid #FFFFFF;
+    border-left: 1px solid #FFFFFF;
 	color:white;
-	gridline-color: #FFFFFF;
-}
-
-QTableWidget::verticalHeader {	
-	background-color: #1A2E40;
-	color:white;
-	gridline-color: #FFFFFF;
 }
 
 </string>
                                </property>
                                <property name="sizeAdjustPolicy">
-                                <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                                <enum>QAbstractScrollArea::AdjustToContents</enum>
                                </property>
-                               <property name="editTriggers">
-                                <set>QAbstractItemView::NoEditTriggers</set>
-                               </property>
-                               <attribute name="horizontalHeaderVisible">
-                                <bool>false</bool>
-                               </attribute>
-                               <attribute name="horizontalHeaderCascadingSectionResizes">
-                                <bool>false</bool>
-                               </attribute>
                                <attribute name="horizontalHeaderStretchLastSection">
                                 <bool>true</bool>
                                </attribute>
-                               <attribute name="verticalHeaderVisible">
+                               <attribute name="verticalHeaderStretchLastSection">
                                 <bool>false</bool>
                                </attribute>
-                               <attribute name="verticalHeaderStretchLastSection">
-                                <bool>true</bool>
-                               </attribute>
-                               <row>
-                                <property name="text">
-                                 <string/>
-                                </property>
-                               </row>
-                               <row>
-                                <property name="text">
-                                 <string>New Row</string>
-                                </property>
-                               </row>
-                               <row>
-                                <property name="text">
-                                 <string>New Row</string>
-                                </property>
-                               </row>
-                               <row>
-                                <property name="text">
-                                 <string>New Row</string>
-                                </property>
-                               </row>
-                               <row>
-                                <property name="text">
-                                 <string>New Row</string>
-                                </property>
-                               </row>
                                <column>
                                 <property name="text">
                                  <string>MODEL NAME</string>
@@ -2899,81 +3066,6 @@ QTableWidget::verticalHeader {
                                  </font>
                                 </property>
                                </column>
-                               <item row="0" column="0">
-                                <property name="text">
-                                 <string>dqwdq</string>
-                                </property>
-                               </item>
-                               <item row="0" column="1">
-                                <property name="text">
-                                 <string>dqwdwqdq</string>
-                                </property>
-                               </item>
-                               <item row="0" column="2">
-                                <property name="text">
-                                 <string>doewinfewofn</string>
-                                </property>
-                               </item>
-                               <item row="1" column="0">
-                                <property name="text">
-                                 <string>dwe</string>
-                                </property>
-                               </item>
-                               <item row="1" column="1">
-                                <property name="text">
-                                 <string>dw</string>
-                                </property>
-                               </item>
-                               <item row="1" column="2">
-                                <property name="text">
-                                 <string>fonwefienow</string>
-                                </property>
-                               </item>
-                               <item row="2" column="0">
-                                <property name="text">
-                                 <string>dwe</string>
-                                </property>
-                               </item>
-                               <item row="2" column="1">
-                                <property name="text">
-                                 <string>dwe</string>
-                                </property>
-                               </item>
-                               <item row="2" column="2">
-                                <property name="text">
-                                 <string>fowenfewn</string>
-                                </property>
-                               </item>
-                               <item row="3" column="0">
-                                <property name="text">
-                                 <string>dwe</string>
-                                </property>
-                               </item>
-                               <item row="3" column="1">
-                                <property name="text">
-                                 <string>dw</string>
-                                </property>
-                               </item>
-                               <item row="3" column="2">
-                                <property name="text">
-                                 <string>foewnfwne</string>
-                                </property>
-                               </item>
-                               <item row="4" column="0">
-                                <property name="text">
-                                 <string>wde</string>
-                                </property>
-                               </item>
-                               <item row="4" column="1">
-                                <property name="text">
-                                 <string>dw</string>
-                                </property>
-                               </item>
-                               <item row="4" column="2">
-                                <property name="text">
-                                 <string>fwienfnwe</string>
-                                </property>
-                               </item>
                               </widget>
                              </item>
                              <item>
@@ -3118,12 +3210,6 @@ padding-left: 10px;</string>
                              </item>
                              <item>
                               <widget class="QTableWidget" name="table_topics_edit_model">
-                               <property name="sizePolicy">
-                                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                                 <horstretch>0</horstretch>
-                                 <verstretch>0</verstretch>
-                                </sizepolicy>
-                               </property>
                                <property name="styleSheet">
                                 <string notr="true">QTableWidget {	
 	background-color: #F2F2F2;
@@ -3155,80 +3241,26 @@ QScrollBar:horizontal {
     margin: 2px 0 2px 0;
 	border-radius: 0px;
  }
-QHeaderView::section{
-	background-color: #1A2E40;
-	max-width: 30px;
-	gridline-color: #FFFFFF;
-	font: 87 13pt &quot;Avenir&quot;;
-	color:white;
-	font-weight: bold;
-}
 
-QHeaderView::section:vertical
+QHeaderView::section:horizontal
 {
-    border: 1px solid #FFFFFF;
-}
-
-QTableWidget::horizontalHeader {	
 	background-color: #1A2E40;
+	padding: 3px;
+    border-bottom: 1px solid #FFFFFF;
+    border-right: 1px solid #FFFFFF;
+    border-top: 1px solid #FFFFFF;
+    border-left: 1px solid #FFFFFF;
 	color:white;
-	gridline-color: #FFFFFF;
-}
-
-QTableWidget::verticalHeader {	
-	background-color: #1A2E40;
-	color:white;
-	gridline-color: #FFFFFF;
 }
 
 </string>
                                </property>
                                <property name="sizeAdjustPolicy">
-                                <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                                <enum>QAbstractScrollArea::AdjustToContents</enum>
                                </property>
-                               <property name="editTriggers">
-                                <set>QAbstractItemView::NoEditTriggers</set>
-                               </property>
-                               <attribute name="horizontalHeaderVisible">
-                                <bool>false</bool>
-                               </attribute>
-                               <attribute name="horizontalHeaderCascadingSectionResizes">
-                                <bool>false</bool>
-                               </attribute>
                                <attribute name="horizontalHeaderStretchLastSection">
                                 <bool>true</bool>
                                </attribute>
-                               <attribute name="verticalHeaderVisible">
-                                <bool>false</bool>
-                               </attribute>
-                               <attribute name="verticalHeaderStretchLastSection">
-                                <bool>true</bool>
-                               </attribute>
-                               <row>
-                                <property name="text">
-                                 <string/>
-                                </property>
-                               </row>
-                               <row>
-                                <property name="text">
-                                 <string>New Row</string>
-                                </property>
-                               </row>
-                               <row>
-                                <property name="text">
-                                 <string>New Row</string>
-                                </property>
-                               </row>
-                               <row>
-                                <property name="text">
-                                 <string>New Row</string>
-                                </property>
-                               </row>
-                               <row>
-                                <property name="text">
-                                 <string>New Row</string>
-                                </property>
-                               </row>
                                <column>
                                 <property name="text">
                                  <string>TOPIC ID</string>
@@ -3251,56 +3283,6 @@ QTableWidget::verticalHeader {
                                  </font>
                                 </property>
                                </column>
-                               <item row="0" column="0">
-                                <property name="text">
-                                 <string>dqwdq</string>
-                                </property>
-                               </item>
-                               <item row="0" column="1">
-                                <property name="text">
-                                 <string>dqwdwqdq</string>
-                                </property>
-                               </item>
-                               <item row="1" column="0">
-                                <property name="text">
-                                 <string>dwe</string>
-                                </property>
-                               </item>
-                               <item row="1" column="1">
-                                <property name="text">
-                                 <string>dw</string>
-                                </property>
-                               </item>
-                               <item row="2" column="0">
-                                <property name="text">
-                                 <string>dwe</string>
-                                </property>
-                               </item>
-                               <item row="2" column="1">
-                                <property name="text">
-                                 <string>dwe</string>
-                                </property>
-                               </item>
-                               <item row="3" column="0">
-                                <property name="text">
-                                 <string>dwe</string>
-                                </property>
-                               </item>
-                               <item row="3" column="1">
-                                <property name="text">
-                                 <string>dw</string>
-                                </property>
-                               </item>
-                               <item row="4" column="0">
-                                <property name="text">
-                                 <string>wde</string>
-                                </property>
-                               </item>
-                               <item row="4" column="1">
-                                <property name="text">
-                                 <string>dw</string>
-                                </property>
-                               </item>
                               </widget>
                              </item>
                             </layout>
@@ -3375,6 +3357,390 @@ QTableWidget::verticalHeader {
                  </item>
                 </layout>
                </widget>
+               <widget class="QWidget" name="page_wordlists">
+                <layout class="QVBoxLayout" name="verticalLayout_17">
+                 <item>
+                  <widget class="QFrame" name="frame_training_datasets_2">
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_15">
+                    <property name="spacing">
+                     <number>-1</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>12</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>12</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>12</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>12</number>
+                    </property>
+                    <item>
+                     <widget class="QFrame" name="frame_available_training_datasets_2">
+                      <property name="styleSheet">
+                       <string notr="true">background-color: #F2F2F2;</string>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Raised</enum>
+                      </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_58">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="leftMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QLabel" name="label_available_training_datasets_2">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>45</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>45</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>Avenir</family>
+                           <pointsize>18</pointsize>
+                           <weight>10</weight>
+                           <italic>false</italic>
+                           <bold>false</bold>
+                          </font>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;</string>
+                         </property>
+                         <property name="text">
+                          <string>Available wordlists</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QTableWidget" name="table_available_wordlists">
+                         <property name="styleSheet">
+                          <string notr="true">QTableWidget {	
+	background-color: #F2F2F2;
+	padding: 0px;
+	border-radius: 5px;
+	font: 87 12pt &quot;Avenir&quot;;
+	gridline-color:#FFFFFF;
+}
+QTableWidget::item{
+	padding-left: 5px;
+	padding-right: 5px;
+	background-color: #F2F2F2;
+	color:black;
+	gridline-color:#FFFFFF;
+}
+QTableWidget::item:selected{
+	background-color: #4D6F8C;
+}
+QScrollBar:horizontal {
+	background: #4D6F8C;
+    border: none;
+    height: 2px;
+	margin: 0px 2px 0 2px;
+}
+ QScrollBar:vertical {
+    background: #4D6F8C;
+    border: none;
+    width: 2px;
+    margin: 2px 0 2px 0;
+	border-radius: 0px;
+ }
+
+QHeaderView::section:horizontal
+{
+	background-color: #1A2E40;
+	padding: 3px;
+    border-bottom: 1px solid #FFFFFF;
+    border-right: 1px solid #FFFFFF;
+    border-top: 1px solid #FFFFFF;
+    border-left: 1px solid #FFFFFF;
+	color:white;
+}
+
+</string>
+                         </property>
+                         <property name="sizeAdjustPolicy">
+                          <enum>QAbstractScrollArea::AdjustToContents</enum>
+                         </property>
+                         <attribute name="horizontalHeaderStretchLastSection">
+                          <bool>true</bool>
+                         </attribute>
+                         <attribute name="verticalHeaderVisible">
+                          <bool>false</bool>
+                         </attribute>
+                         <attribute name="verticalHeaderStretchLastSection">
+                          <bool>true</bool>
+                         </attribute>
+                         <column>
+                          <property name="text">
+                           <string>NAME</string>
+                          </property>
+                          <property name="font">
+                           <font>
+                            <weight>75</weight>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>DESCRIPTION</string>
+                          </property>
+                          <property name="font">
+                           <font>
+                            <weight>75</weight>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>VALID FOR</string>
+                          </property>
+                          <property name="font">
+                           <font>
+                            <weight>75</weight>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>CREATION DATE</string>
+                          </property>
+                          <property name="font">
+                           <font>
+                            <weight>75</weight>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>VISIBILITY</string>
+                          </property>
+                          <property name="font">
+                           <font>
+                            <weight>75</weight>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>WORDLIST</string>
+                          </property>
+                          <property name="font">
+                           <font>
+                            <weight>75</weight>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                         </column>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QFrame" name="frame_pushButton_training_datasets_2">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::StyledPanel</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Raised</enum>
+                      </property>
+                      <layout class="QHBoxLayout" name="horizontalLayout_21">
+                       <item>
+                        <spacer name="horizontalSpacer_11">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_create_wordlist">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true">QPushButton {
+	background-color: #1A2E40;
+	font: 87 13pt &quot;Avenir&quot;;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+QPushButton:hover {
+	background-color: #4D6F8C;
+ }
+QPushButton:pressed {	
+	background-color: #4D6F8C;
+}
+
+</string>
+                         </property>
+                         <property name="text">
+                          <string>Create new wordlist</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <spacer name="horizontalSpacer_14">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_edit_wordlist">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true">QPushButton {
+	background-color: #1A2E40;
+	font: 87 13pt &quot;Avenir&quot;;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+QPushButton:hover {
+	background-color: #4D6F8C;
+ }
+QPushButton:pressed {	
+	background-color: #4D6F8C;
+}
+
+</string>
+                         </property>
+                         <property name="text">
+                          <string>Edit wordlist</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <spacer name="horizontalSpacer_12">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_delete_wordlist">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true">QPushButton {
+	background-color: #1A2E40;
+	font: 87 13pt &quot;Avenir&quot;;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+QPushButton:hover {
+	background-color: #4D6F8C;
+ }
+QPushButton:pressed {	
+	background-color: #4D6F8C;
+}
+
+</string>
+                         </property>
+                         <property name="text">
+                          <string>Delete wordlist</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <spacer name="horizontalSpacer_13">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
                <widget class="QWidget" name="page_general_settings"/>
               </widget>
              </item>
@@ -3391,8 +3757,6 @@ QTableWidget::verticalHeader {
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources>
-  <include location="../resources/resources_widget_tm_corpus.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
