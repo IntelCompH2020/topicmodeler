@@ -37,12 +37,11 @@ class CorpusManager(object):
             key is the absolute path to the dataset
             value is a dictionary with metadata
         """
-        allDtsets = {}
-        for Dts in path_parquet.iterdir():
-            metafile = Dts.joinpath('datasetMeta.json')
-            if metafile.exists():
-                with open(metafile, 'r', encoding='utf8') as fin:
-                    allDtsets[Dts.resolve().as_posix()] = json.load(fin)
+        metafile = path_parquet.joinpath('datasetMeta.json')
+        with open(metafile, 'r', encoding='utf8') as fin:
+            allDtsets = json.load(fin)
+        allDtsets = {path_parquet.joinpath(Dts).resolve().as_posix() : allDtsets[Dts]
+                        for Dts in allDtsets.keys()}
 
         return allDtsets
 

@@ -27,7 +27,6 @@ from pathlib import Path
 import subprocess
 from subprocess import check_output
 # from sklearn.preprocessing import normalize
-# from topicmodeler.topicmodeling import MalletTrainer, TMmodel
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QMessageBox
 
@@ -475,8 +474,17 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                                       if el.name.endswith('.parquet')][0]).names
         }
 
-        with path_dataset.joinpath('datasetMeta.json').open('w', encoding='utf-8') as outfile:
-            json.dump(datasetMeta, outfile, ensure_ascii=False, indent=2, default=str)
+        path_datasetMeta = self.p2parquet.joinpath('datasetMeta.json')
+        if path_datasetMeta.is_file():
+            with path_datasetMeta.open('r', encoding='utf-8') as infile:
+                allMeta = json.load(infile)
+            allMeta[dtsName] = datasetMeta
+            with path_datasetMeta.open('w', encoding='utf-8') as outfile:
+                json.dump(allMeta, outfile, ensure_ascii=False, indent=2, default=str)
+        else:
+            datasetMeta = {dtsName: datasetMeta}
+            with path_datasetMeta.open('w', encoding='utf-8') as outfile:
+                json.dump(datasetMeta, outfile, ensure_ascii=False, indent=2, default=str)
 
         self.load_listDownloaded()
 
@@ -826,7 +834,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         no_below = int(self.cf.get('Preproc', 'no_below'))
         no_above = float(self.cf.get('Preproc', 'no_above'))
         keep_n = int(self.cf.get('Preproc', 'keep_n'))
-        token_regexp = self.cf.get('Preproc', 'token_regexp')
         
         # The following settings will only be accessed in the "advanced settings panel"
         Y_or_N = input(f"Do you wish to access the advance settings panel [Y/N]?:")
@@ -840,9 +847,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                                         'Maximum proportion of documents to keep a word in vocabulary')
             keep_n = var_num_keyboard('int', keep_n,
                                       'Maximum vocabulary size')
-            tk = input(f'Regular expresion for tokenizer [{token_regexp}]: ')
-            if len(tk):
-                token_regexp = tk
 
         #Stopword selection        
         allWdLists = json.loads(self.allWdLists)
@@ -878,7 +882,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "no_below" :    no_below,
                 "no_above" :    no_above,
                 "keep_n" :      keep_n,
-                "token_regexp": token_regexp,
                 "stopwords" :   StwLists,
                 "equivalences": EqLists
             }
@@ -908,6 +911,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             num_iterations = int(self.cf.get('MalletTM', 'num_iterations'))
             doc_topic_thr = float(self.cf.get('MalletTM', 'doc_topic_thr'))
             thetas_thr = float(self.cf.get('MalletTM', 'thetas_thr'))
+            token_regexp = self.cf.get('MalletTM', 'token_regexp')
 
             # The following settings will only be accessed in the "advanced settings panel"
             Y_or_N = input(f"Do you wish to access the advanced settings panel [Y/N]?:")
@@ -932,7 +936,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "num_threads" :         num_threads,
                 "num_iterations" :      num_iterations,
                 "doc_topic_thr" :       doc_topic_thr,
-                "thetas_thr" :          thetas_thr
+                "thetas_thr" :          thetas_thr,
+                "token_regexp" :        token_regexp
             }
 
         elif trainer == "sparKLDA":
@@ -992,18 +997,38 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         ## END IMT Interface: Next, the actual training should happen
         #############################################################
 
-        return
+        # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+        # This fragment of code creates a spark cluster and submits the task
+        # This function is dependent on UC3M local deployment infrastructure
+        # and will not work in BSC production environment
+        # 
+        # Needs to be modified with the BSC Spark Cluster and/or CITE SparkSubmit
+        # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+        
+        if self.cf.get('Spark', 'spark_available') == 'True':
+            script_spark = self.cf.get('Spark', 'script_spark')
+            token_spark = self.cf.get('Spark', 'token_spark')
+            script_path = './src/topicmodeling/topicmodeling.py'
+            options = '"--train --config ' + configFile.resolve().as_posix() + '"'
+            cmd = script_spark + ' -C ' + token_spark + \
+                  ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+            printred(cmd)
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Execution of script failed')
 
+        else:
 
-
-
-        # Run command for training model
-        cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
-        try:
-            self.logger.info(f'-- -- Running command {cmd}')
-            check_output(args=cmd, shell=True)
-        except:
-            self.logger.error('-- -- Command execution failed')
+            # Run command for training model without using Spark
+            cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
+            printred(cmd)
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Command execution failed')
 
         return
 

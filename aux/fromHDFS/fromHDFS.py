@@ -65,4 +65,11 @@ if __name__ == "__main__":
         mode="overwrite",
     )
     
-    
+    """
+    For testing purposes only
+    df2 = spark.read.parquet(f"file://{path_dataset}")
+    df2 = spark.sample(fraction=0.1)
+    df2.write.parquet(f"file://{path_dataset}",
+        mode="overwrite",
+    )
+    """

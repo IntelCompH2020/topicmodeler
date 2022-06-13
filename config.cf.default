@@ -8,6 +8,7 @@ cons_level = DEBUG
 cons_format = %%(levelname)-8s | %%(message)s
 
 [Spark]
+spark_available = True
 script_spark = /export/usuarios_ml4ds/jarenas/script-spark/script-spark
 token_spark = /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json
 
@@ -26,8 +27,6 @@ no_below=10
 no_above=0.6
 #Maximum number of words in vocabulary
 keep_n=500000
-#Regular expression for token identification
-token_regexp=[\p{L}\p{N}][\p{L}\p{N}\p{P}]*\p{L}
 
 [TM]
 #Default setting for number of topics
@@ -36,7 +35,8 @@ ntopics=25
 [MalletTM]
 #Path to mallet binary
 mallet_path=./mallet-2.0.8/bin/mallet
-
+#Regular expression for token identification
+token_regexp=[\p{L}\p{N}][\p{L}\p{N}\p{P}]*\p{L}
 #Settings for mallet training and doctopics postprocessing
 alpha=5
 optimize_interval=10
