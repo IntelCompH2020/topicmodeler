@@ -711,7 +711,6 @@ QComboBox::drop-down {
 }
 
 QComboBox::down-arrow {
-    image: url(:/icons/images/aufklappen.png);
 	width: 16px;
     height: 16px;
 }
