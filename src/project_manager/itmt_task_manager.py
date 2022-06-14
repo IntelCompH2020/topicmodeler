@@ -878,14 +878,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             EqLists = []
 
         Preproc = {
-                "min_lemas" :   min_lemas,
-                "no_below" :    no_below,
-                "no_above" :    no_above,
-                "keep_n" :      keep_n,
-                "stopwords" :   StwLists,
-                "equivalences": EqLists
-            }
-            
+            "min_lemas": min_lemas,
+            "no_below": no_below,
+            "no_above": no_above,
+            "keep_n": keep_n,
+            "stopwords": StwLists,
+            "equivalences": EqLists
+        }
+
         displaytext = """
         *************************************************************************************
         We will retrieve all parameters needed for the topic modeling itself
@@ -929,14 +929,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 thetas_thr = var_num_keyboard('float', thetas_thr,
                                               'Threshold for topic activation in a doc (sparsification)')
             LDAparam = {
-                "ntopics" :             ntopics,
-                "alpha" :               alpha,
-                "optimize_interval" :   optimize_interval,
-                "num_threads" :         num_threads,
-                "num_iterations" :      num_iterations,
-                "doc_topic_thr" :       doc_topic_thr,
-                "thetas_thr" :          thetas_thr,
-                "token_regexp" :        token_regexp
+                "ntopics": ntopics,
+                "alpha": alpha,
+                "optimize_interval": optimize_interval,
+                "num_threads": num_threads,
+                "num_iterations": num_iterations,
+                "doc_topic_thr": doc_topic_thr,
+                "thetas_thr": thetas_thr,
+                "token_regexp": token_regexp
             }
 
         elif trainer == "sparKLDA":
@@ -1003,7 +1003,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # 
         # Needs to be modified with the BSC Spark Cluster and/or CITE SparkSubmit
         # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-        
+
         if self.cf.get('Spark', 'spark_available') == 'True':
             script_spark = self.cf.get('Spark', 'script_spark')
             token_spark = self.cf.get('Spark', 'token_spark')
@@ -1911,7 +1911,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                 table.setItem(row, 2, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['valid_for']))
                 table.setItem(row, 3, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['creation_date']))
                 table.setItem(row, 4, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['visibility']))
-                table.setItem(row, 5, QtWidgets.QTableWidgetItem(', '.join([el for el in allWdLists[TrDts]['wordlist']])))
+                table.setItem(row, 5,
+                              QtWidgets.QTableWidgetItem(', '.join([el for el in allWdLists[TrDts]['wordlist']])))
                 row += 1
 
         return
@@ -1936,48 +1937,14 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         return self.create_List(WdList)
 
-    def EditWdList(self):
+    def EditWdList(self, wdlist):
         """
         This method allows the edition of an existing list of words, i.e.
         adding new words or removing existing words
         """
 
-        displaytext = """
-        *************************************************************************************
-        Edition of an existing list
-    
-            - Stopwords or keywords: Introduce the words separated by commas (stw1,stw2, ...)
-            - Equivalences: Introduce equivalences separated by commas in the format
-              orig:target (orig1:tgt1, orig2:tgt2, ...)
-        *************************************************************************************
-        """
-        printgr(displaytext)
-
-        self.logger.info(f'-- -- Modifying an existing list of words')
-        # First thing to do is to select a list
-        allWdLists = json.loads(self.allWdLists)
-        wdLsts = [wlst for wlst in allWdLists.keys()]
-        displaywdLsts = [allWdLists[wlst]['name'] + ': ' +
-                         allWdLists[wlst]['description'] for wlst in wdLsts]
-        selection = query_options(displaywdLsts, "Select the list you wish to modify")
-        WdLst = allWdLists[wdLsts[selection]]
-        self.logger.info(f'-- -- Selected list is {WdLst["name"]}')
-
-        Y_or_N = input(f"\nDo you wish to visualize existing words in list [Y/N]?: ")
-        if Y_or_N.upper() == "Y":
-            print('\n'.join(WdLst['wordlist']))
-
-        wds = input('Introduce the elements you wish to remove (separated by commas): ')
-        wds = [el.strip() for el in wds.split(',') if len(el)]
-        WdLst['wordlist'] = sorted(list(set([wd for wd in WdLst['wordlist']
-                                             if wd not in wds])))
-
-        wds = input('Introduce new elements for the list (separated by commas): ')
-        wds = [el.strip() for el in wds.split(',') if len(el)]
-        WdLst['wordlist'] = sorted(list(set(wds + WdLst['wordlist'])))
-
         # The list will be saved replacing existing list
-        return self.create_List(WdLst)
+        return self.create_List(wdlist)
 
     def DelWdList(self, wdlst_to_delete, gui):
         """
@@ -2003,3 +1970,17 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                                                     allWdLists[WdLst]['name'] + ' was deleted successfully.')
 
         return
+
+    def get_wdlist_info(self, wlst_to_edit):
+        wdList_info = {}
+        if self.allWdLists:
+            allWdLists = json.loads(self.allWdLists)
+            for WdLst in allWdLists.keys():
+                if allWdLists[WdLst]['name'] == wlst_to_edit:
+                    wdList_info = {'name': wlst_to_edit,
+                                   'description': allWdLists[WdLst]['description'],
+                                   'valid_for': allWdLists[WdLst]['valid_for'],
+                                   'visibility': allWdLists[WdLst]['visibility'],
+                                   'wordlist': allWdLists[WdLst]['wordlist']
+                                   }
+        return wdList_info

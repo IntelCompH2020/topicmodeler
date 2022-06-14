@@ -23,6 +23,7 @@ from functools import partial
 
 # Local imports
 from src.gui.create_sw_lst_window import CreateSwLstWindow
+from src.gui.edit_sw_lst_window import EditSwLstWindow
 from src.gui.generate_tm_corpus_window import GenerateTMCorpus
 from src.gui.train_model_window import TrainModelWindow
 from src.gui.utils import utils
@@ -84,6 +85,7 @@ class MainWindow(QMainWindow):
         self.train_model_subwindow = TrainModelWindow()
         self.create_tm_corpus_subwindow = None
         self.create_stopwords_list_subwindow = None
+        self.edit_stopwords_list_subwindow = None
 
         # Threads for executing in parallel
         self.thread_pool = QThreadPool()
@@ -438,6 +440,27 @@ class MainWindow(QMainWindow):
         return
 
     def clicked_pushButton_edit_wordlist(self):
+
+        # Get wordlist selected for edition
+        r = self.table_available_wordlists.currentRow()
+        wlst_to_edit = self.table_available_wordlists.item(r, 0).text()
+
+        wdList_info = self.tm.get_wdlist_info(wlst_to_edit)
+        self.edit_stopwords_list_subwindow = EditSwLstWindow(self.tm,wdList_info)
+        self.edit_stopwords_list_subwindow.exec()
+
+        # Update data in table
+        self.tm.listAllWdLists(self)
+
+        # Show information message about the TM corpus edition completion
+        # @ TODO: Add this to TM
+        if self.edit_stopwords_list_subwindow.status == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_0)
+        elif self.edit_stopwords_list_subwindow.status == 1:
+            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_1)
+        elif self.edit_stopwords_list_subwindow.status == 2:
+            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_2)
+
         return
 
     def clicked_pushButton_delete_wordlist(self):
