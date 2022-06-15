@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>SmoothSpoon</class>
+ <widget class="QMainWindow" name="SmoothSpoon">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>971</width>
-    <height>729</height>
+    <height>769</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>SmoothSpoon</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../resources/images/fuzzy_training4.png</normaloff>../resources/images/fuzzy_training4.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -43,8 +47,8 @@ QToolTip {
 }
 
 #top_bar {
-	background-color: #1A2E40;
-	border-color: #1A2E40;
+	background-color:white; /*#1A2E40;*/
+	border-color: white;
 }
 
 #left_frame_top_bar {
@@ -391,7 +395,7 @@ QToolTip {
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>../resources/images/fuzzy_training2.png</pixmap>
+                <pixmap>../resources/images/fuzzy_training3.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -808,74 +812,6 @@ QPushButton:pressed {
            <number>0</number>
           </property>
           <item>
-           <widget class="QFrame" name="top_bar">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>50</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>50</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <item>
-              <widget class="QFrame" name="left_frame_top_bar">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QFrame" name="right_frame_top_bar">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
            <widget class="QFrame" name="content">
             <property name="styleSheet">
              <string notr="true"/>
@@ -940,28 +876,6 @@ QPushButton:pressed {
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QFrame" name="frame_home_sep_content_title">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>10</height>
-                       </size>
-                      </property>
-                      <property name="frameShape">
-                       <enum>QFrame::StyledPanel</enum>
-                      </property>
-                      <property name="frameShadow">
-                       <enum>QFrame::Raised</enum>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
                      <widget class="QFrame" name="frame_home_center">
                       <property name="frameShape">
                        <enum>QFrame::StyledPanel</enum>
@@ -970,6 +884,21 @@ QPushButton:pressed {
                        <enum>QFrame::Raised</enum>
                       </property>
                       <layout class="QHBoxLayout" name="horizontalLayout_4">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="leftMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
                        <item>
                         <widget class="QFrame" name="frame_start_recent_pyldavis">
                          <property name="styleSheet">
@@ -1097,7 +1026,7 @@ QPushButton:pressed {
                                  </property>
                                  <property name="icon">
                                   <iconset>
-                                   <normaloff>../resources/images/create_folder.png</normaloff>../resources/images/create_folder.png</iconset>
+                                   <normaloff>../resources/images/fileA.png</normaloff>../resources/images/fileA.png</iconset>
                                  </property>
                                  <property name="iconSize">
                                   <size>
@@ -1189,7 +1118,7 @@ QPushButton:pressed {
                                  </property>
                                  <property name="icon">
                                   <iconset>
-                                   <normaloff>../resources/images/open_folder.png</normaloff>../resources/images/open_folder.png</iconset>
+                                   <normaloff>../resources/images/fileB.png</normaloff>../resources/images/fileB.png</iconset>
                                  </property>
                                  <property name="iconSize">
                                   <size>
@@ -1281,7 +1210,7 @@ QPushButton:pressed {
                                  </property>
                                  <property name="icon">
                                   <iconset>
-                                   <normaloff>../resources/images/create_folder.png</normaloff>../resources/images/create_folder.png</iconset>
+                                   <normaloff>../resources/images/fileC.png</normaloff>../resources/images/fileC.png</iconset>
                                  </property>
                                  <property name="iconSize">
                                   <size>
@@ -1813,14 +1742,14 @@ QPushButton:pressed {
                             <property name="maximumSize">
                              <size>
                               <width>300</width>
-                              <height>300</height>
+                              <height>600</height>
                              </size>
                             </property>
                             <property name="text">
                              <string/>
                             </property>
                             <property name="pixmap">
-                             <pixmap>../resources/images/spoon_model.png</pixmap>
+                             <pixmap>../resources/images/spoon_model2.png</pixmap>
                             </property>
                             <property name="scaledContents">
                              <bool>true</bool>

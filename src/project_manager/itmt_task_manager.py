@@ -1959,10 +1959,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                 print(allTrDtsets[TrDts]['name'])
                 if allTrDtsets[TrDts]['name'] == corpus_to_delete:
                     reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
-                                                 allTrDtsets[TrDts]['name'] +
-                                                 ' will be deleted. Proceed?',
-                                                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                                                 QMessageBox.StandardButton.No)
+                                                 allTrDtsets[TrDts]['name'] + ' will be deleted. Proceed?',  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
                     if reply == QMessageBox.StandardButton.Yes:
                         status = self.delete_TrDtset(TrDts)
                         # @TODO: Revise. Status is being returned as a byte object (b'1')
@@ -1970,8 +1967,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                             QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
                                                 allTrDtsets[TrDts]['name'] + ' could not be deleted.')
                         elif status == 1:
-                            QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
-                                                    allTrDtsets[TrDts]['name'] + ' was deleted successfully.')
+                            QMessageBox.information(
+                                gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' + allTrDtsets[TrDts]['name'] + ' was deleted successfully.')
 
         return
 

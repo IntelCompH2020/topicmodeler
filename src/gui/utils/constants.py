@@ -13,10 +13,21 @@ class Constants:
     TM_CORPUS_MSG_STATUS_0 = "The dataset could not be created."
     TM_CORPUS_MSG_STATUS_1 = "The dataset was created successfully."
     TM_CORPUS_MSG_STATUS_2 = "The dataset replaced an existing dataset"
+    TM_DELETE_NO_CORPUS_MSG = "A corpus to be deleted must be selected first."
+    WORDLIST_CREATION_MSG_STATUS_0 = "The wordlist could not be created."
+    WORDLIST_CREATION_MSG_STATUS_1 = "The wordlist was created successfully."
+    WORDLIST_CREATION_MSG_STATUS_2 = "The wordlist replaced an existing dataset"
+    WORDLIST_EDITION_MSG_STATUS_0 = "The wordlist could not be created."
+    WORDLIST_EDITION_MSG_STATUS_1 = "The wordlist was created successfully."
+    WORDLIST_EDITION_MSG_STATUS_2 = "The wordlist replaced an existing dataset"
+    EDIT_WORDLIST_NOT_SELECTED_MSG = "A wordlist to be edited must be selected first."
+    DELETE_WORDLIST_NOT_SELECTED_MSG = "A wordlist to be deleted must be selected first."
 
-    CORPUS_TABLES = ["table_available_local_corpus", "table_available_training_datasets"]
-    DOWNLOAD_CORPUS_TABLES = ["table_available_fields", "table_fields_to_include", "table_filters"]
-    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw", "tableWidget_fields_to_include_raw",
+    CORPUS_TABLES = ["table_available_local_corpus",
+                     "table_available_training_datasets"]
+    DOWNLOAD_CORPUS_TABLES = ["table_available_fields",
+                              "table_fields_to_include", "table_filters"]
+    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",      "tableWidget_fields_to_include_raw",
                                "tableWidget_available_fields_lemmas", "tableWidget_fields_to_include_lemmas"]
 
     WORDLISTS_TABLES = ["table_available_wordlists"]
@@ -25,8 +36,10 @@ class Constants:
                                     "separated by commas in the format orig:target (orig1:tgt1, orig2:tgt2, ...) "
 
     MODELS_TABLES = ["table_available_models", "table_topics_edit_model"]
-    TRAIN_MODEL_TABLES = ["table_training_resultsLDA", "table_training_results_AVITM", "table_training_results_CTM"]
-    TRAIN_LOADING_BARS = ["progress_bar_LDA", "progress_bar_AVITM", "progress_bar_CTM"]
+    TRAIN_MODEL_TABLES = ["table_training_resultsLDA",
+                          "table_training_results_AVITM", "table_training_results_CTM"]
+    TRAIN_LOADING_BARS = ["progress_bar_LDA",
+                          "progress_bar_AVITM", "progress_bar_CTM"]
 
     HOME_BUTTON_SELECTED_STYLESHEET = \
         """ QPushButton {	

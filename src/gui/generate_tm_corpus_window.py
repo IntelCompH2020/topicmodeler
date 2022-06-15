@@ -22,7 +22,7 @@ class GenerateTMCorpus(QtWidgets.QDialog):
         Parameters
         ----------
         dts_ids_list: list
-            Dictionary with all the information (name, word list, privacy level and description) that defines the wordlist selected by the user in the GUI's main page to be edited
+            List of ids describing the datasets that are going to be used for the generation of the new topic modeling training corpus
         tm : TaskManager
             TaskManager object associated with the project
         """
@@ -71,6 +71,8 @@ class GenerateTMCorpus(QtWidgets.QDialog):
         self.center()
 
     def initialize_stackedWidget_trdts(self):
+        """It creates as many widgets as datasets selected for the training corpus creation. At each of the widgets, a QLabel is added to specify the name of the dataset to which the widget refers to.
+        """        
         for dts_id in self.dts_ids_list:
             Dtsets = [el for el in self.allDtsets.keys()]
             Dtset_loc = Dtsets.pop(dts_id)
@@ -99,6 +101,9 @@ class GenerateTMCorpus(QtWidgets.QDialog):
                 self.update_stacks()
 
     def clicked_pushButton_trdts_back(self):
+        """Method for going back to the widget referring to the previous dataset when the button 'pushButton_trdts_back' is clicked.
+        """      
+         
         if self.current_dts + 1 > 0:
             self.current_dts -= 1
             self.current_stack = self.stackedWidget_trdts_widgets[self.current_dts]
@@ -108,6 +113,8 @@ class GenerateTMCorpus(QtWidgets.QDialog):
         return
 
     def clicked_pushButton_trdts_next(self):
+        """Method for moving to the widget referring to the next dataset when the button 'pushButton_trdts_next' is clicked.
+        """ 
 
         if self.current_dts + 1 < len(self.dts_ids_list):
             self.current_dts += 1
@@ -118,10 +125,18 @@ class GenerateTMCorpus(QtWidgets.QDialog):
         return
 
     def update_stacks(self):
+        """Method for updating the content of the widget that refers to the dataset selected with the buttons 'pushButton_trdts_next' and 'pushButton_trdts_back'.
+        """    
+
         self.stackedWidget_trdts.setCurrentWidget(self.current_stack)
         self.stackedWidget_dts_name.setCurrentWidget(self.current_stack_name)
 
+        return
+
     def clicked_pushButton_create_tm_corpus(self):
+        """Method for controlling the clicking of the button 'pushButton_create_tm_corpus'. It takes the information from each of the widgets referring to the datasets selected for the creation of the training corpus, and once all the data is available, it invokes the task manager function in charge of creating the TM corpus. Once it is completed, the window is closed and the widgets created for describing each of the datasets are removed.
+        """  
+
         dict_to_tm_corpus = {}
         for i in range(len(self.dts_ids_list)):
             i_dts_id = self.dts_ids_list[i]
@@ -167,3 +182,5 @@ class GenerateTMCorpus(QtWidgets.QDialog):
             i_widget = self.stackedWidget_dts_name.widget(0)
             self.stackedWidget_dts_name.removeWidget(i_widget)
             i_widget.deleteLater()
+        
+        return
