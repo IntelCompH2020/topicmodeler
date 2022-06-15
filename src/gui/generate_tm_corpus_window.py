@@ -1,28 +1,28 @@
+"""
+* *IntelComp H2020 project*
+
+Class that defines the subwindow for the Interactive Topic Model Trainer App for the creation of a new topic modeling corpus from one or several of the available local dataset selected by the user in the GUI's main window.
+
+"""
 import json
 
-import numpy as np
-from PyQt6 import QtWidgets, QtGui
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget
+from PyQt6 import QtGui, QtWidgets
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 from PyQt6.uic import loadUi
-from functools import partial
-
-from src.gui.utils import utils
 from src.gui.utils.constants import Constants
 from src.gui.widget_create_tm_corpus import WidgetCreateTMCorpus
 
 
 class GenerateTMCorpus(QtWidgets.QDialog):
-    """
-    @ TODO: Describe
-    """
 
     def __init__(self, dts_ids_list, tm):
         """
-        @ TODO: Describe
+        Initializes the application's subwindow from which the user can access the functionalities for creating a new topic modeling corpus.
 
         Parameters
         ----------
+        dts_ids_list: list
+            Dictionary with all the information (name, word list, privacy level and description) that defines the wordlist selected by the user in the GUI's main page to be edited
         tm : TaskManager
             TaskManager object associated with the project
         """
@@ -54,17 +54,20 @@ class GenerateTMCorpus(QtWidgets.QDialog):
         #####################################################################################
         # Connect buttons
         #####################################################################################
-        self.pushButton_trdts_back.clicked.connect(self.clicked_pushButton_trdts_back)
-        self.pushButton_trdts_next.clicked.connect(self.clicked_pushButton_trdts_next)
-        self.pushButton_create_tm_corpus.clicked.connect(self.clicked_pushButton_create_tm_corpus)
+        self.pushButton_trdts_back.clicked.connect(
+            self.clicked_pushButton_trdts_back)
+        self.pushButton_trdts_next.clicked.connect(
+            self.clicked_pushButton_trdts_next)
+        self.pushButton_create_tm_corpus.clicked.connect(
+            self.clicked_pushButton_create_tm_corpus)
 
     def init_ui(self):
-        """Configures the elements of the GUI window that are not configured in the UI, i.e. icon of the application,
-        the application's title, and the position of the window at its opening.
+        """Configures the elements of the GUI window that are not configured in the UI, i.e., icon of the application, the application's title, and the position of the window at its opening.
         """
-        # @ TODO: When icons ready
-        # self.setWindowIcon(QIcon('UIs/Images/dc_logo.png'))
-        # self.setWindowTitle(Messages.WINDOW_TITLE)
+
+        self.setWindowIcon(QtGui.QIcon(
+            'src/gui/resources/images/fuzzy_training.png'))
+        self.setWindowTitle(Constants.SMOOTH_SPOON_TITLE)
         self.center()
 
     def initialize_stackedWidget_trdts(self):
@@ -127,11 +130,13 @@ class GenerateTMCorpus(QtWidgets.QDialog):
             fields_for_lemmas = []
             for row in range(i_widget.tableWidget_fields_to_include_lemmas.rowCount()):
                 if i_widget.tableWidget_fields_to_include_lemmas.item(row, 0):
-                    fields_for_lemmas.append(i_widget.tableWidget_fields_to_include_lemmas.item(row, 0).text())
+                    fields_for_lemmas.append(
+                        i_widget.tableWidget_fields_to_include_lemmas.item(row, 0).text())
             fields_for_raw = []
             for row in range(i_widget.tableWidget_fields_to_include_raw.rowCount()):
                 if i_widget.tableWidget_fields_to_include_raw.item(row, 0):
-                    fields_for_raw.append(i_widget.tableWidget_fields_to_include_raw.item(row, 0).text())
+                    fields_for_raw.append(
+                        i_widget.tableWidget_fields_to_include_raw.item(row, 0).text())
             filtering_condition = ""  # TODO
 
             i_dict = {'identifier_field': identifier_field,
@@ -146,7 +151,8 @@ class GenerateTMCorpus(QtWidgets.QDialog):
         privacy = self.comboBox_privacy_level.currentText()
 
         # Create TMCorpus
-        self.status = self.tm.createTMCorpus(dict_to_tm_corpus, dtsName, dtsDesc, privacy)
+        self.status = self.tm.createTMCorpus(
+            dict_to_tm_corpus, dtsName, dtsDesc, privacy)
 
         # Hide window
         self.hide()
@@ -161,10 +167,3 @@ class GenerateTMCorpus(QtWidgets.QDialog):
             i_widget = self.stackedWidget_dts_name.widget(0)
             self.stackedWidget_dts_name.removeWidget(i_widget)
             i_widget.deleteLater()
-
-
-
-
-
-
-

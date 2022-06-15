@@ -1,7 +1,7 @@
 """
 * *IntelComp H2020 project*
 
-Class that defines the Graphical user interface's main window  for the Interactive Topic Model Trainer App
+Class that defines the Graphical user interface's main window for the Interactive Topic Model Trainer App
 It implements the functions needed to
 
     - Configure the GUI widgets defined in the corresponding UI file (main_window.ui)

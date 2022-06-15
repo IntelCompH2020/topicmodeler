@@ -8,6 +8,7 @@ class Constants:
 
     LONG_TIME_SHOW_SB = 10000
 
+    SMOOTH_SPOON_TITLE = 'Smooth Spoon'
     SMOOTH_SPOON_MSG = 'Smooth Spoon message'
     TM_CORPUS_MSG_STATUS_0 = "The dataset could not be created."
     TM_CORPUS_MSG_STATUS_1 = "The dataset was created successfully."

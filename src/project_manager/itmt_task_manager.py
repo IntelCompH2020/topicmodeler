@@ -10,31 +10,31 @@ It implements the functions needed to
     - Do inference with topic models
 """
 
-import shutil
 import configparser
-import logging
 import datetime as DT
 import json
-import pandas as pd
-import pyarrow.parquet as pt
+import logging
+import shutil
+# from gensim import corpora
+import subprocess
 # import numpy as np
 # import time
 # import re
 # import regex as javare
 import sys
 from pathlib import Path
-# from gensim import corpora
-import subprocess
 from subprocess import check_output
+
+import pandas as pd
+import pyarrow.parquet as pt
 # from sklearn.preprocessing import normalize
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QMessageBox
+from src.utils.misc import (printgr, printmag, printred, query_options,
+                            request_confirmation, var_num_keyboard)
 
-# Local imports
-from .base_task_manager import BaseTaskManager
-from src.utils.misc import query_options, var_num_keyboard, request_confirmation
-from src.utils.misc import printgr, printred, printmag
 from ..gui.utils.constants import Constants
+from .base_task_manager import BaseTaskManager
 
 
 class ITMTTaskManager(BaseTaskManager):
@@ -51,7 +51,6 @@ class ITMTTaskManager(BaseTaskManager):
 
     def __init__(self, p2p, p2parquet, p2wdlist, config_fname='config.cf',
                  metadata_fname='metadata.yaml'):
-
         """
         Initializes an ITMTTaskManager object.
 
@@ -146,7 +145,9 @@ class ITMTTaskManager(BaseTaskManager):
         """
 
         cmd = 'python src/manageCorpus/manageCorpus.py --listTrDtsets --path_datasets '
-        cmd = cmd + self.p2p.joinpath(self._dir_struct['datasets']).resolve().as_posix()
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['datasets']).resolve().as_posix()
         printred(cmd)
         try:
             self.logger.info(f'-- -- Running command {cmd}')
@@ -203,7 +204,9 @@ class ITMTTaskManager(BaseTaskManager):
 
         cmd = 'echo "' + json.dumps(dt_set).replace('"', '\\"') + '"'
         cmd = cmd + '| python src/manageCorpus/manageCorpus.py --saveTrDtset --path_datasets '
-        cmd = cmd + self.p2p.joinpath(self._dir_struct['datasets']).resolve().as_posix()
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['datasets']).resolve().as_posix()
 
         try:
             self.logger.info(f'-- -- Running command {cmd}')
@@ -366,7 +369,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
     def fromHDFS(self):
         """
         This method simulates the download of a corpus from the IntelComp data space
-        
+
         In the version that will be taken to production, this method will not be necessary
         and data will be directly retrieved from the data datalogue using IntelComp mediators
 
@@ -391,7 +394,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         for key in self.cf['HDFS']:
             tables[key] = self.cf['HDFS'][key]
         tables_list = [el for el in tables.keys()]
-        table_opt = query_options(tables_list, 'Select the dataset you wish to download')
+        table_opt = query_options(
+            tables_list, 'Select the dataset you wish to download')
         parquet_table = tables[tables_list[table_opt]]
 
         # Select fields to include
@@ -408,7 +412,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         filterCondition = input(f"Filter to apply [{filterCondition}]: ")
         # This is not very smart. Used for being able to send arguments with
         # "'" or " " to the spark job
-        filterCondition = filterCondition.replace(' ', 'SsS').replace("'", "XxX")
+        filterCondition = filterCondition.replace(
+            ' ', 'SsS').replace("'", "XxX")
 
         # We need a name for the dataset
         dtsName = ""
@@ -451,7 +456,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         token_spark = self.cf.get('Spark', 'token_spark')
         script_path = '/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/aux/fromHDFS/fromHDFS.py'
         cmd = script_spark + ' -C ' + token_spark + \
-              ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+            ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
         printred(cmd)
         try:
             self.logger.info(f'-- -- Running command {cmd}')
@@ -480,11 +485,13 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 allMeta = json.load(infile)
             allMeta[dtsName] = datasetMeta
             with path_datasetMeta.open('w', encoding='utf-8') as outfile:
-                json.dump(allMeta, outfile, ensure_ascii=False, indent=2, default=str)
+                json.dump(allMeta, outfile, ensure_ascii=False,
+                          indent=2, default=str)
         else:
             datasetMeta = {dtsName: datasetMeta}
             with path_datasetMeta.open('w', encoding='utf-8') as outfile:
-                json.dump(datasetMeta, outfile, ensure_ascii=False, indent=2, default=str)
+                json.dump(datasetMeta, outfile, ensure_ascii=False,
+                          indent=2, default=str)
 
         self.load_listDownloaded()
 
@@ -504,7 +511,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             printmag('\nDataset ' + allDtsets[Dts]['name'])
             print('\tSource:', allDtsets[Dts]['source'])
             print('\tDescription:', allDtsets[Dts]['description'])
-            print('\tFields:', ', '.join([el for el in allDtsets[Dts]['schema']]))
+            print('\tFields:', ', '.join(
+                [el for el in allDtsets[Dts]['schema']]))
             print('\tNumber of docs:', allDtsets[Dts]['records'])
             print('\tDownload date:', allDtsets[Dts]['download_date'])
             print('\tVisibility:', allDtsets[Dts]['visibility'])
@@ -539,11 +547,13 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         printgr(displaytext)
 
         Dtsets = [el for el in allDtsets.keys()]
-        options = [allDtsets[el]['name'] for el in Dtsets] + ['Finish selection']
+        options = [allDtsets[el]['name']
+                   for el in Dtsets] + ['Finish selection']
         TM_Dtset = []
         exit = False
         while not exit:
-            opt = query_options(options, '\nSelect a corpus for the training dataset')
+            opt = query_options(
+                options, '\nSelect a corpus for the training dataset')
             if opt == len(options) - 1:
                 exit = True
             else:
@@ -556,24 +566,30 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 # id fld
                 Dtset_idfld = ''
                 while Dtset_idfld not in allDtsets[Dtset_loc]['schema']:
-                    Dtset_idfld = input('Select the field to use as identifier: ')
+                    Dtset_idfld = input(
+                        'Select the field to use as identifier: ')
 
                 # lemmas fields
-                Dtset_lemmas_fld = input('Select fields for lemmas (separated by commas): ')
-                Dtset_lemmas_fld = [el.strip() for el in Dtset_lemmas_fld.split(',')]
+                Dtset_lemmas_fld = input(
+                    'Select fields for lemmas (separated by commas): ')
+                Dtset_lemmas_fld = [el.strip()
+                                    for el in Dtset_lemmas_fld.split(',')]
                 Dtset_lemmas_fld = [el for el in Dtset_lemmas_fld
                                     if el in allDtsets[Dtset_loc]['schema']]
                 print('Selected:', ', '.join(Dtset_lemmas_fld))
 
                 # rawtext fields
-                Dtset_rawtext_fld = input('Select fields for rawtext (separated by commas): ')
-                Dtset_rawtext_fld = [el.strip() for el in Dtset_rawtext_fld.split(',')]
+                Dtset_rawtext_fld = input(
+                    'Select fields for rawtext (separated by commas): ')
+                Dtset_rawtext_fld = [el.strip()
+                                     for el in Dtset_rawtext_fld.split(',')]
                 Dtset_rawtext_fld = [el for el in Dtset_rawtext_fld
                                      if el in allDtsets[Dtset_loc]['schema']]
                 print('Selected:', ', '.join(Dtset_rawtext_fld))
 
                 # Spark clause for filtering (advanced users only)
-                Dtset_filter = input('Introduce a filtering condition for Spark clause (advanced users): ')
+                Dtset_filter = input(
+                    'Introduce a filtering condition for Spark clause (advanced users): ')
 
                 TM_Dtset.append({'parquet': Dtset_loc,
                                  'source': Dtset_source,
@@ -638,7 +654,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         allTrDtsets = json.loads(self.allTrDtsets)
         for TrDts in allTrDtsets.keys():
-            Y_or_N = input(f"\nRemove Training Set {allTrDtsets[TrDts]['name']} [Y/N]?: ")
+            Y_or_N = input(
+                f"\nRemove Training Set {allTrDtsets[TrDts]['name']} [Y/N]?: ")
             if Y_or_N.upper() == "Y":
                 if request_confirmation(
                         msg='Training Dataset ' + allTrDtsets[TrDts]['name'] + ' will be deleted. Proceed?'):
@@ -745,20 +762,24 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         wdLsts = [wlst for wlst in allWdLists.keys()]
         displaywdLsts = [allWdLists[wlst]['name'] + ': ' +
                          allWdLists[wlst]['description'] for wlst in wdLsts]
-        selection = query_options(displaywdLsts, "Select the list you wish to modify")
+        selection = query_options(
+            displaywdLsts, "Select the list you wish to modify")
         WdLst = allWdLists[wdLsts[selection]]
         self.logger.info(f'-- -- Selected list is {WdLst["name"]}')
 
-        Y_or_N = input(f"\nDo you wish to visualize existing words in list [Y/N]?: ")
+        Y_or_N = input(
+            f"\nDo you wish to visualize existing words in list [Y/N]?: ")
         if Y_or_N.upper() == "Y":
             print('\n'.join(WdLst['wordlist']))
 
-        wds = input('Introduce the elements you wish to remove (separated by commas): ')
+        wds = input(
+            'Introduce the elements you wish to remove (separated by commas): ')
         wds = [el.strip() for el in wds.split(',') if len(el)]
         WdLst['wordlist'] = sorted(list(set([wd for wd in WdLst['wordlist']
                                              if wd not in wds])))
 
-        wds = input('Introduce new elements for the list (separated by commas): ')
+        wds = input(
+            'Introduce new elements for the list (separated by commas): ')
         wds = [el.strip() for el in wds.split(',') if len(el)]
         WdLst['wordlist'] = sorted(list(set(wds + WdLst['wordlist'])))
 
@@ -775,7 +796,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         allWdLists = json.loads(self.allWdLists)
         for WdLst in allWdLists.keys():
-            Y_or_N = input(f"\nRemove Word List {allWdLists[WdLst]['name']} [Y/N]?: ")
+            Y_or_N = input(
+                f"\nRemove Word List {allWdLists[WdLst]['name']} [Y/N]?: ")
             if Y_or_N.upper() == "Y":
                 if request_confirmation(
                         msg='Word List ' + allWdLists[WdLst]['name'] + ' will be deleted. Proceed?'):
@@ -795,7 +817,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         """
 
         ############################################################
-        ## IMT Interface: Interactive Model Trainer Window
+        # IMT Interface: Interactive Model Trainer Window
         ############################################################
 
         self.logger.info(f'-- Topic Model Training')
@@ -816,7 +838,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                          allTrDtsets[dts]['description'] for dts in dtSets]
         selection = query_options(displaydtSets, "Select Training Dataset")
         TrDtSet = dtSets[selection]
-        self.logger.info(f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
+        self.logger.info(
+            f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
 
         displaytext = """
         *************************************************************************************
@@ -836,7 +859,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         keep_n = int(self.cf.get('Preproc', 'keep_n'))
 
         # The following settings will only be accessed in the "advanced settings panel"
-        Y_or_N = input(f"Do you wish to access the advance settings panel [Y/N]?:")
+        Y_or_N = input(
+            f"Do you wish to access the advance settings panel [Y/N]?:")
         if Y_or_N.upper() == "Y":
             # Some of them can be confirmed/modified by the user
             min_lemas = var_num_keyboard('int', min_lemas,
@@ -855,7 +879,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         displayStwLists = [allWdLists[swl]['name'] + ': ' +
                            allWdLists[swl]['description'] for swl in StwLists]
         print('\nAvailable lists of stopwords:')
-        print('\n'.join([str(el[0]) + '. ' + el[1] for el in enumerate(displayStwLists)]))
+        print('\n'.join([str(el[0]) + '. ' + el[1]
+              for el in enumerate(displayStwLists)]))
         msg = "Select all lists of stopwords that should be used (separated by commas): "
         selection = input(msg)
         if len(selection):
@@ -869,7 +894,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         displayEqLists = [allWdLists[eql]['name'] + ': ' +
                           allWdLists[eql]['description'] for eql in EqLists]
         print('\nAvailable lists of equivalent terms:')
-        print('\n'.join([str(el[0]) + '. ' + el[1] for el in enumerate(displayEqLists)]))
+        print('\n'.join([str(el[0]) + '. ' + el[1]
+              for el in enumerate(displayEqLists)]))
         msg = "Select all lists of equivalent terms that should be used (separated by commas): "
         selection = input(msg)
         if len(selection):
@@ -906,7 +932,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             # Default values are read from config file
             mallet_path = self.cf.get('MalletTM', 'mallet_path')
             alpha = float(self.cf.get('MalletTM', 'alpha'))
-            optimize_interval = int(self.cf.get('MalletTM', 'optimize_interval'))
+            optimize_interval = int(self.cf.get(
+                'MalletTM', 'optimize_interval'))
             num_threads = int(self.cf.get('MalletTM', 'num_threads'))
             num_iterations = int(self.cf.get('MalletTM', 'num_iterations'))
             doc_topic_thr = float(self.cf.get('MalletTM', 'doc_topic_thr'))
@@ -914,7 +941,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             token_regexp = self.cf.get('MalletTM', 'token_regexp')
 
             # The following settings will only be accessed in the "advanced settings panel"
-            Y_or_N = input(f"Do you wish to access the advanced settings panel [Y/N]?:")
+            Y_or_N = input(
+                f"Do you wish to access the advanced settings panel [Y/N]?:")
             if Y_or_N.upper() == "Y":
                 alpha = var_num_keyboard('float', alpha,
                                          'Prior parameter for the Dirichlet for doc generation')
@@ -953,7 +981,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         modelname = ''
         while not len(modelname):
             modelname = input('Enter a name to save the new model: ')
-        modeldir = self.p2p.joinpath(self._dir_struct['LDAmodels']).joinpath(modelname)
+        modeldir = self.p2p.joinpath(
+            self._dir_struct['LDAmodels']).joinpath(modelname)
         if modeldir.exists():
 
             # Remove current backup folder, if it exists
@@ -963,7 +992,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
             # Copy current project folder to the backup folder.
             shutil.move(modeldir, old_model_dir)
-            self.logger.info(f'-- -- Creating backup of existing model in {old_model_dir}')
+            self.logger.info(
+                f'-- -- Creating backup of existing model in {old_model_dir}')
 
         # Introduce a description for the model
         ModelDesc = ""
@@ -990,17 +1020,18 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         }
 
         with configFile.open('w', encoding='utf-8') as outfile:
-            json.dump(train_config, outfile, ensure_ascii=False, indent=2, default=str)
+            json.dump(train_config, outfile,
+                      ensure_ascii=False, indent=2, default=str)
 
         #############################################################
-        ## END IMT Interface: Next, the actual training should happen
+        # END IMT Interface: Next, the actual training should happen
         #############################################################
 
         # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         # This fragment of code creates a spark cluster and submits the task
         # This function is dependent on UC3M local deployment infrastructure
         # and will not work in BSC production environment
-        # 
+        #
         # Needs to be modified with the BSC Spark Cluster and/or CITE SparkSubmit
         # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
@@ -1010,7 +1041,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             script_path = './src/topicmodeling/topicmodeling.py'
             options = '"--train --config ' + configFile.resolve().as_posix() + '"'
             cmd = script_spark + ' -C ' + token_spark + \
-                  ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+                ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
             printred(cmd)
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
@@ -1058,19 +1089,24 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
     def extractPipe(self, corpus):
 
         # A proper corpus with BoW, vocabulary, etc .. should exist
-        path_corpus = self.p2p.joinpath(corpus).joinpath(self._dir_struct['corpus'])
-        path_corpus = path_corpus.joinpath(corpus).joinpath(corpus + '_corpus.mallet')
+        path_corpus = self.p2p.joinpath(
+            corpus).joinpath(self._dir_struct['corpus'])
+        path_corpus = path_corpus.joinpath(
+            corpus).joinpath(corpus + '_corpus.mallet')
         if not path_corpus.is_file():
-            self.logger.error('-- Pipe extraction: Could not locate corpus file')
+            self.logger.error(
+                '-- Pipe extraction: Could not locate corpus file')
             return
 
         # Create auxiliary file with only first line from the original corpus file
-        path_txt = self.p2p.joinpath(corpus).joinpath(self._dir_struct['corpus'])
+        path_txt = self.p2p.joinpath(corpus).joinpath(
+            self._dir_struct['corpus'])
         path_txt = path_txt.joinpath(corpus).joinpath(corpus + '_corpus.txt')
         with path_txt.open('r', encoding='utf8') as f:
             first_line = f.readline()
 
-        path_aux = self.p2p.joinpath(corpus).joinpath(self._dir_struct['corpus'])
+        path_aux = self.p2p.joinpath(corpus).joinpath(
+            self._dir_struct['corpus'])
         path_aux = path_aux.joinpath(corpus).joinpath('corpus_aux.txt')
         with path_aux.open('w', encoding='utf8') as fout:
             fout.write(first_line + '\n')
@@ -1080,10 +1116,11 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # file containing the pipe
         self.logger.info('-- Extracting pipeline')
         mallet_path = Path(self.cf.get('TM', 'mallet_path'))
-        path_pipe = self.p2p.joinpath(corpus).joinpath(self._dir_struct['corpus'])
+        path_pipe = self.p2p.joinpath(corpus).joinpath(
+            self._dir_struct['corpus'])
         path_pipe = path_pipe.joinpath(corpus).joinpath('import.pipe')
         cmd = str(mallet_path) + \
-              ' import-file --use-pipe-from %s --input %s --output %s'
+            ' import-file --use-pipe-from %s --input %s --output %s'
         cmd = cmd % (path_corpus, path_aux, path_pipe)
 
         try:
@@ -1100,18 +1137,22 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
     def inference(self, corpus):
 
         # A proper corpus should exist with the corresponding ipmortation pipe
-        path_pipe = self.p2p.joinpath(corpus).joinpath(self._dir_struct['corpus'])
+        path_pipe = self.p2p.joinpath(corpus).joinpath(
+            self._dir_struct['corpus'])
         path_pipe = path_pipe.joinpath(corpus).joinpath('import.pipe')
         if not path_pipe.is_file():
-            self.logger.error('-- Inference error. Importation pipeline not found')
+            self.logger.error(
+                '-- Inference error. Importation pipeline not found')
             return
 
         # Ask user which model should be used for inference
         # Final models are enumerated as corpus_givenName
-        path_model = self.p2p.joinpath(corpus).joinpath(self._dir_struct['modtm'])
+        path_model = self.p2p.joinpath(
+            corpus).joinpath(self._dir_struct['modtm'])
         models = sorted([d for d in path_model.iterdir() if d.is_dir()])
         display_models = [' '.join(d.name.split('_')) for d in models]
-        selection = query_options(display_models, 'Select model for the inference')
+        selection = query_options(
+            display_models, 'Select model for the inference')
         path_model = models[selection]
         inferencer = path_model.joinpath('inferencer.mallet')
 
@@ -1120,7 +1161,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # Note all created files will be hosted in same directory, so a good idea
         # would be to put the file into an empty directory for this purpose
         while True:
-            txt_file = input('Introduce complete path to file with texts for the inference: ')
+            txt_file = input(
+                'Introduce complete path to file with texts for the inference: ')
             txt_file = Path(txt_file)
             if not txt_file.is_file():
                 print('Please provide a valid file name')
@@ -1130,8 +1172,10 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # The following files will be generated in the same folder
         corpus_file = Path(str(txt_file) + '_corpus.txt')  # lemmatized texts
-        corpus_mallet_inf = Path(str(txt_file) + '_corpus.mallet')  # mallet serialized
-        doc_topics_file = Path(str(txt_file) + '_doc-topics.txt')  # Topic proportions
+        corpus_mallet_inf = Path(
+            str(txt_file) + '_corpus.mallet')  # mallet serialized
+        doc_topics_file = Path(
+            str(txt_file) + '_doc-topics.txt')  # Topic proportions
         # Reorder topic proportions in numpy format
         doc_topics_file_npy = Path(str(txt_file) + '_doc-topics.npy')
 
@@ -1159,14 +1203,17 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         docs = [[el[0], clean_utf8(el[1])] for el in docs]
         lemasBatch = ENLM.lemmatizeBatch(docs, processes=concurrent_posts)
         # Remove entries that where not lemmatized correctly
-        lemasBatch = [[el[0], clean_utf8(el[1])] for el in lemasBatch if len(el[1])]
+        lemasBatch = [[el[0], clean_utf8(el[1])]
+                      for el in lemasBatch if len(el[1])]
 
         # ========================
         # 2. Tokenization and application of specific stopwords
         #    and equivalences for the corpus
         # ========================
-        self.logger.info('-- Inference: Applying corpus specific stopwords and equivalences')
-        token_regexp = javare.compile(self.cf.get('CorpusGeneration', 'token_regexp'))
+        self.logger.info(
+            '-- Inference: Applying corpus specific stopwords and equivalences')
+        token_regexp = javare.compile(
+            self.cf.get('CorpusGeneration', 'token_regexp'))
         corpus_stw = Path(self.cf.get(corpus, 'stw_file'))
         corpus_eqs = Path(self.cf.get(corpus, 'eq_file'))
 
@@ -1190,14 +1237,15 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         mallet_path = Path(self.cf.get('TM', 'mallet_path'))
 
         cmd = str(mallet_path) + \
-              ' import-file --use-pipe-from %s --input %s --output %s'
+            ' import-file --use-pipe-from %s --input %s --output %s'
         cmd = cmd % (path_pipe, corpus_file, corpus_mallet_inf)
 
         try:
             self.logger.info(f'-- Running command {cmd}')
             check_output(args=cmd, shell=True)
         except:
-            self.logger.error('-- Mallet failed to import data. Revise command')
+            self.logger.error(
+                '-- Mallet failed to import data. Revise command')
             return
 
         # ========================
@@ -1208,9 +1256,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         doc_topic_thr = float(self.cf.get('TM', 'doc_topic_thr'))
 
         cmd = str(mallet_path) + \
-              ' infer-topics --inferencer %s --input %s --output-doc-topics %s ' + \
-              ' --doc-topics-threshold ' + str(doc_topic_thr) + \
-              ' --num-iterations ' + str(num_iterations)
+            ' infer-topics --inferencer %s --input %s --output-doc-topics %s ' + \
+            ' --doc-topics-threshold ' + str(doc_topic_thr) + \
+            ' --num-iterations ' + str(num_iterations)
         cmd = cmd % (inferencer, corpus_mallet_inf, doc_topics_file)
 
         try:
@@ -1223,15 +1271,18 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # ========================
         # 5. Apply model editions
         # ========================
-        self.logger.info('-- Inference: Applying model edition transformations')
+        self.logger.info(
+            '-- Inference: Applying model edition transformations')
         # Load thetas file, apply model edition actions, and save as a numpy array
         # We need to read the number of topics, e.g. from train_config file
         train_config = path_model.joinpath('train.config')
         with train_config.open('r', encoding='utf8') as fin:
-            num_topics = [el for el in fin.readlines() if el.startswith('num-topics')][0]
+            num_topics = [el for el in fin.readlines(
+            ) if el.startswith('num-topics')][0]
             num_topics = int(num_topics.strip().split(' = ')[1])
         cols = [k for k in np.arange(2, num_topics + 2)]
-        thetas32 = np.loadtxt(doc_topics_file, delimiter='\t', dtype=np.float32, usecols=cols)
+        thetas32 = np.loadtxt(doc_topics_file, delimiter='\t',
+                              dtype=np.float32, usecols=cols)
         model_edits = path_model.joinpath('model_edits.txt')
         if model_edits.is_file():
             with model_edits.open('r', encoding='utf8') as fin:
@@ -1261,13 +1312,15 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # Select model for edition
         # Final models are enumerated as corpus_givenName
-        path_model = self.p2p.joinpath(corpus).joinpath(self._dir_struct['modtm'])
+        path_model = self.p2p.joinpath(
+            corpus).joinpath(self._dir_struct['modtm'])
         models = sorted([d for d in path_model.iterdir() if d.is_dir()])
         display_models = [' '.join(d.name.split('_')) for d in models]
         selection = query_options(
             display_models, 'Select the topic model that you want to edit:')
         path_model = models[selection]
-        tm = TMmodel(from_file=path_model.joinpath('modelo.npz'), logger=self.logger)
+        tm = TMmodel(from_file=path_model.joinpath(
+            'modelo.npz'), logger=self.logger)
 
         corpus_size = tm.get_thetas().shape[0]
         var_exit2 = False
@@ -1331,29 +1384,40 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 # Y por último seleccionamos las palabras y hacemos la intersección
                 wordsOth = []
                 for tpc in tpcsOth:
-                    wordstpc = tm.most_significant_words_per_topic(n_palabras=10000, tfidf=True, tpc=[tpc])
+                    wordstpc = tm.most_significant_words_per_topic(
+                        n_palabras=10000, tfidf=True, tpc=[tpc])
                     if wordstpc[0][-1][1] / wordstpc[0][0][1] > weighWordsOth:
-                        printred('Se supera el límite preestablecido de palabras para el tópico ' + str(tpc))
+                        printred(
+                            'Se supera el límite preestablecido de palabras para el tópico ' + str(tpc))
                     else:
-                        wordstpc = [el[0] for el in wordstpc[0] if el[1] / wordstpc[0][0][1] > weighWordsOth]
+                        wordstpc = [el[0] for el in wordstpc[0]
+                                    if el[1] / wordstpc[0][0][1] > weighWordsOth]
                         wordsOth += wordstpc
                 wordsOth = set(wordsOth)
 
                 for tpc in tpcsGbg:
-                    wordstpc = tm.most_significant_words_per_topic(n_palabras=10000, tfidf=True, tpc=[tpc])
+                    wordstpc = tm.most_significant_words_per_topic(
+                        n_palabras=10000, tfidf=True, tpc=[tpc])
                     if wordstpc[0][-1][1] / wordstpc[0][0][1] > weighWordsGbg:
-                        printred('Se supera el límite preestablecido de palabras para el tópico ' + str(tpc))
+                        printred(
+                            'Se supera el límite preestablecido de palabras para el tópico ' + str(tpc))
                     else:
-                        wordstpc = [el[0] for el in wordstpc[0] if el[1] / wordstpc[0][0][1] > weighWordsGbg]
+                        wordstpc = [el[0] for el in wordstpc[0]
+                                    if el[1] / wordstpc[0][0][1] > weighWordsGbg]
                         printgr(40 * '=')
                         printgr('Tópico ' + str(tpc))
-                        printgr('Seleccionadas ' + str(len(wordstpc)) + ' palabras')
+                        printgr('Seleccionadas ' +
+                                str(len(wordstpc)) + ' palabras')
                         printgr(40 * '=')
-                        stwCandidates = [el for el in wordstpc if el not in wordsOth]
-                        printmag('Candidatas a StopWord (' + str(len(stwCandidates)) + '):')
+                        stwCandidates = [
+                            el for el in wordstpc if el not in wordsOth]
+                        printmag('Candidatas a StopWord (' +
+                                 str(len(stwCandidates)) + '):')
                         print(stwCandidates)
-                        nonStwCandidates = [el for el in wordstpc if el in wordsOth]
-                        printmag('Coincidentes con otros tópicos (' + str(len(nonStwCandidates)) + '):')
+                        nonStwCandidates = [
+                            el for el in wordstpc if el in wordsOth]
+                        printmag('Coincidentes con otros tópicos (' +
+                                 str(len(nonStwCandidates)) + '):')
                         print(nonStwCandidates)
 
             elif selection == 'Exportar Visualización pyLDAvis':
@@ -1406,7 +1470,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                     print('Topic ID:', tpc)
                     print('Current description:', desc)
                     print('Word description:', worddesc)
-                    r = input('\nIntroduce the description for the topic, write "wd" use Word Description,\n' + \
+                    r = input('\nIntroduce the description for the topic, write "wd" use Word Description,\n' +
                               'or press enter to keep current:\n')
                     if r == 'wd':
                         tm.set_description(worddesc, tpc)
@@ -1415,12 +1479,15 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 modified = True
 
             elif selection == 'Eliminar un tópico del modelo':
-                lista = [(ndoc, desc) for ndoc, desc in zip(tm.ndocs_active_topic(), tm.get_topic_word_descriptions())]
+                lista = [(ndoc, desc) for ndoc, desc in zip(
+                    tm.ndocs_active_topic(), tm.get_topic_word_descriptions())]
                 for k in sorted(lista, key=lambda x: -x[0]):
                     print('=' * 5)
-                    perc = '(' + str(round(100 * float(k[0]) / corpus_size)) + ' %)'
+                    perc = '(' + \
+                        str(round(100 * float(k[0]) / corpus_size)) + ' %)'
                     print('ID del tópico:', k[1][0])
-                    print('Número de documentos en los que está activo:', k[0], perc)
+                    print('Número de documentos en los que está activo:',
+                          k[0], perc)
                     print('Palabras más significativas:', k[1][1])
                 msg = '\nIntroduce el ID de los tópicos que deseas eliminar separados por comas'
                 msg += '\no presiona ENTER si no deseas eliminar ningún tópico\n'
@@ -1442,12 +1509,15 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 nwords = var_num_keyboard('int', 10, msg)
                 selected = tm.get_similar_corrcoef(npairs)
                 for pair in selected:
-                    msg = 'Correlación de los tópicos {0:d} y {1:d}: {2:.2f}%'.format(pair[0], pair[1], 100 * pair[2])
+                    msg = 'Correlación de los tópicos {0:d} y {1:d}: {2:.2f}%'.format(
+                        pair[0], pair[1], 100 * pair[2])
                     printmag(msg)
                     printmag(20 * '=')
-                    tm.muestra_perfiles(n_palabras=nwords, tpc=[pair[0], pair[1]])
+                    tm.muestra_perfiles(n_palabras=nwords,
+                                        tpc=[pair[0], pair[1]])
                 printred(20 * '=')
-                printred('Cuidado: los ids de los tópicos cambian tras la fusión o eliminación')
+                printred(
+                    'Cuidado: los ids de los tópicos cambian tras la fusión o eliminación')
                 printred(20 * '=')
 
             elif selection == 'Tópicos similares por palabras':
@@ -1459,12 +1529,15 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 nwords = var_num_keyboard('int', 10, msg)
                 selected = tm.get_similar_JSdist(npairs, thr)
                 for pair in selected:
-                    msg = 'Similitud de los tópicos {0:d} y {1:d}: {2:.2f}%'.format(pair[0], pair[1], 100 * pair[2])
+                    msg = 'Similitud de los tópicos {0:d} y {1:d}: {2:.2f}%'.format(
+                        pair[0], pair[1], 100 * pair[2])
                     printmag(msg)
                     printmag(20 * '=')
-                    tm.muestra_perfiles(n_palabras=nwords, tpc=[pair[0], pair[1]])
+                    tm.muestra_perfiles(n_palabras=nwords,
+                                        tpc=[pair[0], pair[1]])
                 printred(20 * '=')
-                printred('Cuidado: los ids de los tópicos cambian tras la fusión o eliminación')
+                printred(
+                    'Cuidado: los ids de los tópicos cambian tras la fusión o eliminación')
                 printred(20 * '=')
 
             elif selection == 'Fusionar dos tópicos del modelo':
@@ -1773,13 +1846,20 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             table.setRowCount(len(allDtsets.keys()))
             row = 0
             for Dts in allDtsets.keys():
-                table.setItem(row, 0, QtWidgets.QTableWidgetItem(allDtsets[Dts]['name']))
-                table.setItem(row, 1, QtWidgets.QTableWidgetItem(allDtsets[Dts]['source']))
-                table.setItem(row, 2, QtWidgets.QTableWidgetItem(allDtsets[Dts]['description']))
-                table.setItem(row, 3, QtWidgets.QTableWidgetItem(', '.join([el for el in allDtsets[Dts]['schema']])))
-                table.setItem(row, 4, QtWidgets.QTableWidgetItem(str(allDtsets[Dts]['records'])))
-                table.setItem(row, 5, QtWidgets.QTableWidgetItem(allDtsets[Dts]['download_date']))
-                table.setItem(row, 6, QtWidgets.QTableWidgetItem(allDtsets[Dts]['visibility']))
+                table.setItem(row, 0, QtWidgets.QTableWidgetItem(
+                    allDtsets[Dts]['name']))
+                table.setItem(row, 1, QtWidgets.QTableWidgetItem(
+                    allDtsets[Dts]['source']))
+                table.setItem(row, 2, QtWidgets.QTableWidgetItem(
+                    allDtsets[Dts]['description']))
+                table.setItem(row, 3, QtWidgets.QTableWidgetItem(
+                    ', '.join([el for el in allDtsets[Dts]['schema']])))
+                table.setItem(row, 4, QtWidgets.QTableWidgetItem(
+                    str(allDtsets[Dts]['records'])))
+                table.setItem(row, 5, QtWidgets.QTableWidgetItem(
+                    allDtsets[Dts]['download_date']))
+                table.setItem(row, 6, QtWidgets.QTableWidgetItem(
+                    allDtsets[Dts]['visibility']))
                 row += 1
 
         return
@@ -1846,11 +1926,16 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             table.setRowCount(len(allTrDtsets.keys()))
             row = 0
             for TrDts in allTrDtsets.keys():
-                table.setItem(row, 0, QtWidgets.QTableWidgetItem(allTrDtsets[TrDts]['name']))
-                table.setItem(row, 1, QtWidgets.QTableWidgetItem(allTrDtsets[TrDts]['description']))
-                table.setItem(row, 2, QtWidgets.QTableWidgetItem(allTrDtsets[TrDts]['valid_for']))
-                table.setItem(row, 3, QtWidgets.QTableWidgetItem(allTrDtsets[TrDts]['creation_date']))
-                table.setItem(row, 4, QtWidgets.QTableWidgetItem(allTrDtsets[TrDts]['visibility']))
+                table.setItem(row, 0, QtWidgets.QTableWidgetItem(
+                    allTrDtsets[TrDts]['name']))
+                table.setItem(row, 1, QtWidgets.QTableWidgetItem(
+                    allTrDtsets[TrDts]['description']))
+                table.setItem(row, 2, QtWidgets.QTableWidgetItem(
+                    allTrDtsets[TrDts]['valid_for']))
+                table.setItem(row, 3, QtWidgets.QTableWidgetItem(
+                    allTrDtsets[TrDts]['creation_date']))
+                table.setItem(row, 4, QtWidgets.QTableWidgetItem(
+                    allTrDtsets[TrDts]['visibility']))
                 row += 1
 
         return
@@ -1874,7 +1959,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                 print(allTrDtsets[TrDts]['name'])
                 if allTrDtsets[TrDts]['name'] == corpus_to_delete:
                     reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
-                                                 allTrDtsets[TrDts]['name'] + ' will be deleted. Proceed?',
+                                                 allTrDtsets[TrDts]['name'] +
+                                                 ' will be deleted. Proceed?',
                                                  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                                                  QMessageBox.StandardButton.No)
                     if reply == QMessageBox.StandardButton.Yes:
@@ -1906,11 +1992,16 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             table.setRowCount(len(allWdLists.keys()))
             row = 0
             for TrDts in allWdLists.keys():
-                table.setItem(row, 0, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['name']))
-                table.setItem(row, 1, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['description']))
-                table.setItem(row, 2, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['valid_for']))
-                table.setItem(row, 3, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['creation_date']))
-                table.setItem(row, 4, QtWidgets.QTableWidgetItem(allWdLists[TrDts]['visibility']))
+                table.setItem(row, 0, QtWidgets.QTableWidgetItem(
+                    allWdLists[TrDts]['name']))
+                table.setItem(row, 1, QtWidgets.QTableWidgetItem(
+                    allWdLists[TrDts]['description']))
+                table.setItem(row, 2, QtWidgets.QTableWidgetItem(
+                    allWdLists[TrDts]['valid_for']))
+                table.setItem(row, 3, QtWidgets.QTableWidgetItem(
+                    allWdLists[TrDts]['creation_date']))
+                table.setItem(row, 4, QtWidgets.QTableWidgetItem(
+                    allWdLists[TrDts]['visibility']))
                 table.setItem(row, 5,
                               QtWidgets.QTableWidgetItem(', '.join([el for el in allWdLists[TrDts]['wordlist']])))
                 row += 1
@@ -1919,13 +2010,19 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
     def NewWdList(self, listType, wds, lst_name, lst_privacy, lst_desc):
         """
-        This method creates a New List of words that can be later used for
-        corpus preprocessing
+        This method creates a new List of words that can be later used for
+        corpus preprocessing. 
 
         Parameters
         ----------
         listType : string
             type of list that will be created [keywords|stopwords|equivalences]
+        wds : string
+            List of words in the format required by the listType with which the new wordlist will be conformed
+        lst_privacy : string
+            String describing the new wordlist's privacy level [private|public]
+        lst_desc : string
+            String with the new wordlist's description
         """
 
         WdList = {'name': lst_name,
@@ -1941,6 +2038,11 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         """
         This method allows the edition of an existing list of words, i.e.
         adding new words or removing existing words
+
+        Parameters
+        ----------
+        wds : dict
+            Dictionary describing the edited wordlist
         """
 
         # The list will be saved replacing existing list
@@ -1948,7 +2050,14 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
     def DelWdList(self, wdlst_to_delete, gui):
         """
-        Delete a wordlist from wordlist folder
+        Deletes a wordlist from wordlist folder
+
+        Parameters
+        ----------
+        wdlst_to_delete : str
+            Name of the wordlist selected by the user in the GUI to be deleted
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
         """
 
         if self.allWdLists:
@@ -1956,7 +2065,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             for WdLst in allWdLists.keys():
                 if allWdLists[WdLst]['name'] == wdlst_to_delete:
                     reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'Wordlist ' +
-                                                 allWdLists[WdLst]['name'] + ' will be deleted. Proceed?',
+                                                 allWdLists[WdLst]['name'] +
+                                                 ' will be deleted. Proceed?',
                                                  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                                                  QMessageBox.StandardButton.No)
                     if reply == QMessageBox.StandardButton.Yes:
@@ -1972,6 +2082,20 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         return
 
     def get_wdlist_info(self, wlst_to_edit):
+        """
+        Deletes a wordlist from wordlist folder
+
+        Parameters
+        ----------
+        wlst_to_edit : str
+            Name of the wordlist selected by the user in the GUI to be edited
+
+        Returns
+        -------
+        wdList_info : dict
+            Dictionary with the wordlist information
+        """
+
         wdList_info = {}
         if self.allWdLists:
             allWdLists = json.loads(self.allWdLists)
