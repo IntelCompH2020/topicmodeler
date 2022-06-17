@@ -19,6 +19,7 @@ import argparse
 import pathlib
 
 from PyQt6.QtWidgets import QApplication
+from PyQt6 import QtGui
 import sys
 
 # Local imports
@@ -50,7 +51,8 @@ def main():
     # Create application
     # ####################
     app = QApplication(sys.argv)
-    # app.setWindowIcon(QIcon('images/dc_logo.png'))
+    app.setWindowIcon(QtGui.QIcon(
+            'src/gui/resources/images/fuzzy_training4.png'))
 
     gui = MainWindow(project_path, parquet_path)
     gui.show()

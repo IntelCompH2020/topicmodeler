@@ -385,7 +385,7 @@ border:none;</string>
               </property>
               <property name="maximumSize">
                <size>
-                <width>300</width>
+                <width>130</width>
                 <height>45</height>
                </size>
               </property>
@@ -404,46 +404,43 @@ font: 87 18pt &quot;Avenir&quot;;
 padding-left: 10px;</string>
               </property>
               <property name="text">
-               <string>Select wordlist type</string>
+               <string>Wordlist type:</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="comboBox_wordlst_type">
+             <widget class="QLabel" name="label_wordlist_type">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>45</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Avenir</family>
+                <pointsize>13</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="styleSheet">
-               <string notr="true">/*COMBO BOX*/
-QComboBox {
-    border: 1px solid black;
-    border-radius: 3px;
-    padding: 1px 18px 1px 3px;
-    min-width: 6em;
-    background-color:#F2F2F2;
-	color:black;
-}
-
-
-QComboBox:on { /* shift the text when the popup opens */
-    padding-top: 3px;
-    padding-left: 4px;
-}
-
+               <string notr="true">padding-left: 10px;
+font: 87 13pt &quot;Avenir&quot;;
+color:#1A2E40;
+font-weight: bold;
 </string>
               </property>
-              <item>
-               <property name="text">
-                <string>Stopwords</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Equivalences</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Keywords</string>
-               </property>
-              </item>
+              <property name="text">
+               <string>Stopwords</string>
+              </property>
              </widget>
             </item>
             <item>
@@ -626,29 +623,41 @@ font-weight: bold;
 </string>
                           </property>
                           <property name="text">
-                           <string>Name for the new wordlist: </string>
+                           <string>Wordlist name</string>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QLineEdit" name="lineEdit_wordlst_name">
+                         <widget class="QLabel" name="label_wordlist_name">
                           <property name="sizePolicy">
-                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                            </sizepolicy>
                           </property>
-                          <property name="styleSheet">
-                           <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>45</height>
+                           </size>
                           </property>
-                          <property name="readOnly">
-                           <bool>false</bool>
+                          <property name="font">
+                           <font>
+                            <family>Avenir</family>
+                            <pointsize>13</pointsize>
+                            <weight>10</weight>
+                            <italic>false</italic>
+                            <bold>false</bold>
+                           </font>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true">padding-left: 10px;
+font: 87 13pt &quot;Avenir&quot;;
+color:#1A2E40;
+</string>
+                          </property>
+                          <property name="text">
+                           <string>wordlistname</string>
                           </property>
                          </widget>
                         </item>
@@ -709,36 +718,37 @@ font-weight: bold;
                          </widget>
                         </item>
                         <item>
-                         <widget class="QComboBox" name="comboBox_privacy_level">
+                         <widget class="QLabel" name="label_wordlist_privacy_level">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>45</height>
+                           </size>
+                          </property>
+                          <property name="font">
+                           <font>
+                            <family>Avenir</family>
+                            <pointsize>13</pointsize>
+                            <weight>10</weight>
+                            <italic>false</italic>
+                            <bold>false</bold>
+                           </font>
+                          </property>
                           <property name="styleSheet">
-                           <string notr="true">/*COMBO BOX*/
-QComboBox {
-    border: 1px solid black;
-    border-radius: 3px;
-    padding: 1px 18px 1px 3px;
-    min-width: 6em;
-    background-color:#F2F2F2;
-	color:black;
-}
-
-
-QComboBox:on { /* shift the text when the popup opens */
-    padding-top: 3px;
-    padding-left: 4px;
-}
-
+                           <string notr="true">padding-left: 10px;
+font: 87 13pt &quot;Avenir&quot;;
+color:#1A2E40;
 </string>
                           </property>
-                          <item>
-                           <property name="text">
-                            <string>private</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>public</string>
-                           </property>
-                          </item>
+                          <property name="text">
+                           <string>private</string>
+                          </property>
                          </widget>
                         </item>
                         <item>
@@ -843,6 +853,9 @@ font-weight: bold;
 	color:black;
 }</string>
                        </property>
+                       <property name="readOnly">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -921,7 +934,7 @@ font-weight: bold;
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_create_wordlist">
+             <widget class="QPushButton" name="pushButton_edit_wordlist">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -945,7 +958,7 @@ QPushButton:pressed {
 </string>
               </property>
               <property name="text">
-               <string>  Create wordlist  </string>
+               <string>  Edit wordlist  </string>
               </property>
              </widget>
             </item>

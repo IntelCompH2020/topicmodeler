@@ -1,7 +1,7 @@
 """
 * *IntelComp H2020 project*
 
-Class that defines the Graphical user interface's main window  for the Interactive Topic Model Trainer App
+Class that defines the Graphical user interface's main window for the Interactive Topic Model Trainer App
 It implements the functions needed to
 
     - Configure the GUI widgets defined in the corresponding UI file (main_window.ui)
@@ -10,34 +10,34 @@ It implements the functions needed to
     - Control the opening of secondary windows for specific functionalities (training, curation, etc.)
 """
 
-import numpy as np
 import os
 import pathlib
-
-from PyQt6 import QtCore
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QPushButton, QMessageBox
-from PyQt6.uic import loadUi
-from PyQt6.QtCore import QUrl, QThreadPool
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from functools import partial
+
+import numpy as np
+from PyQt6 import QtCore, QtGui
+from PyQt6.QtCore import QThreadPool, QUrl
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QPushButton
+from PyQt6.uic import loadUi
 
 # Local imports
 from src.gui.create_sw_lst_window import CreateSwLstWindow
+from src.gui.edit_sw_lst_window import EditSwLstWindow
 from src.gui.generate_tm_corpus_window import GenerateTMCorpus
 from src.gui.train_model_window import TrainModelWindow
 from src.gui.utils import utils
-from src.gui.utils.output_wrapper import OutputWrapper
 from src.gui.utils.constants import Constants
+from src.gui.utils.output_wrapper import OutputWrapper
 from src.gui.utils.utils import execute_in_thread
 from src.project_manager.itmt_task_manager import ITMTTaskManagerGUI
 
 
 class MainWindow(QMainWindow):
     def __init__(self, project_folder=None, parquet_folder=None, wordlists_folder=None):
-
         """
         Initializes the application's main window.
-        
+
         Parameters
         ----------
         project_folder : pathlib.Path (default=None)
@@ -54,7 +54,9 @@ class MainWindow(QMainWindow):
         # Load UI
         #####################################################################################
         loadUi("src/gui/uis/main_window.ui", self)
-
+        self.setWindowIcon(QtGui.QIcon(
+            'src/gui/resources/images/fuzzy_training.png'))
+        self.setWindowTitle(Constants.SMOOTH_SPOON_TITLE)
         #####################################################################################
         # Attributes
         #####################################################################################
@@ -74,8 +76,10 @@ class MainWindow(QMainWindow):
         self.web = None
 
         # Other attributes
-        self.previous_page_button = self.findChild(QPushButton, "menu_button_1")
-        self.previous_corpus_button = self.findChild(QPushButton, "corpus_button_1")
+        self.previous_page_button = self.findChild(
+            QPushButton, "menu_button_1")
+        self.previous_corpus_button = self.findChild(
+            QPushButton, "corpus_button_1")
 
         # Get home in any operating system
         self.home = str(pathlib.Path.home())
@@ -84,6 +88,7 @@ class MainWindow(QMainWindow):
         self.train_model_subwindow = TrainModelWindow()
         self.create_tm_corpus_subwindow = None
         self.create_stopwords_list_subwindow = None
+        self.edit_stopwords_list_subwindow = None
 
         # Threads for executing in parallel
         self.thread_pool = QThreadPool()
@@ -100,7 +105,8 @@ class MainWindow(QMainWindow):
             self.menu_buttons.append(menu_button_widget)
 
         for menu_button in self.menu_buttons:
-            menu_button.clicked.connect(partial(self.clicked_change_menu_button, menu_button))
+            menu_button.clicked.connect(
+                partial(self.clicked_change_menu_button, menu_button))
 
         # PAGE 1: Home
         ###############
@@ -109,20 +115,27 @@ class MainWindow(QMainWindow):
 
         self.home_recent_buttons = []
         for id_button in np.arange(Constants.MAX_RECENT_PROJECTS):
-            home_recent_button_name = "pushButton_recent_project_folder_" + str(id_button + 1)
-            home_recent_button_widget = self.findChild(QPushButton, home_recent_button_name)
+            home_recent_button_name = "pushButton_recent_project_folder_" + \
+                str(id_button + 1)
+            home_recent_button_widget = self.findChild(
+                QPushButton, home_recent_button_name)
             self.home_recent_buttons.append(home_recent_button_widget)
         for id_button in np.arange(Constants.MAX_RECENT_PARQUETS):
-            home_recent_button_name = "pushButton_recent_parquet_folder_" + str(id_button + 1)
-            home_recent_button_widget = self.findChild(QPushButton, home_recent_button_name)
+            home_recent_button_name = "pushButton_recent_parquet_folder_" + \
+                str(id_button + 1)
+            home_recent_button_widget = self.findChild(
+                QPushButton, home_recent_button_name)
             self.home_recent_buttons.append(home_recent_button_widget)
         for id_button in np.arange(Constants.MAX_RECENT_WORDLISTS):
-            home_recent_button_name = "pushButton_recent_wordlists_folder_" + str(id_button + 1)
-            home_recent_button_widget = self.findChild(QPushButton, home_recent_button_name)
+            home_recent_button_name = "pushButton_recent_wordlists_folder_" + \
+                str(id_button + 1)
+            home_recent_button_widget = self.findChild(
+                QPushButton, home_recent_button_name)
             self.home_recent_buttons.append(home_recent_button_widget)
 
         for home_recent_button in self.home_recent_buttons:
-            home_recent_button.clicked.connect(partial(self.get_folder_from_recent, home_recent_button))
+            home_recent_button.clicked.connect(
+                partial(self.get_folder_from_recent, home_recent_button))
 
         # PAGE 2: Corpus
         #################
@@ -132,11 +145,13 @@ class MainWindow(QMainWindow):
         self.corpus_buttons = []
         for id_button in np.arange(Constants.MAX_CORPUS_BUTTONS):
             corpus_button_name = "corpus_button_" + str(id_button + 1)
-            corpus_button_widget = self.findChild(QPushButton, corpus_button_name)
+            corpus_button_widget = self.findChild(
+                QPushButton, corpus_button_name)
             self.corpus_buttons.append(corpus_button_widget)
 
         for corpus_button in self.corpus_buttons:
-            corpus_button.clicked.connect(partial(self.clicked_change_corpus_button, corpus_button))
+            corpus_button.clicked.connect(
+                partial(self.clicked_change_corpus_button, corpus_button))
 
         self.corpus_button_1.clicked.connect(
             lambda: self.corpus_tabs.setCurrentWidget(self.page_local_corpus))
@@ -170,12 +185,14 @@ class MainWindow(QMainWindow):
 
         # PAGE 1: Home
         utils.set_recent_buttons(self)
-        self.previous_page_button.setStyleSheet(Constants.HOME_BUTTON_SELECTED_STYLESHEET)
+        self.previous_page_button.setStyleSheet(
+            Constants.HOME_BUTTON_SELECTED_STYLESHEET)
 
         # PAGE 2: Corpus
         # Configure tables
         utils.configure_table_header(Constants.CORPUS_TABLES, self)
-        self.previous_corpus_button.setStyleSheet(Constants.TRAIN_BUTTONS_SELECTED_STYLESHEET)
+        self.previous_corpus_button.setStyleSheet(
+            Constants.TRAIN_BUTTONS_SELECTED_STYLESHEET)
 
         # PAGE 3: Wordlists
         # Configure tables
@@ -190,17 +207,26 @@ class MainWindow(QMainWindow):
         #####################################################################################
         # Connect buttons
         #####################################################################################
-        self.pushButton_open_project_folder.clicked.connect(self.get_project_folder)
-        self.pushButton_open_parquet_folder.clicked.connect(self.get_parquet_folder)
-        self.pushButton_open_wordlists_folder.clicked.connect(self.get_wordlists_folder)
+        self.pushButton_open_project_folder.clicked.connect(
+            self.get_project_folder)
+        self.pushButton_open_parquet_folder.clicked.connect(
+            self.get_parquet_folder)
+        self.pushButton_open_wordlists_folder.clicked.connect(
+            self.get_wordlists_folder)
 
-        self.pushButton_generate_training_dataset.clicked.connect(self.clicked_pushButton_generate_training_dataset)
-        self.pushButton_train_trdtst.clicked.connect(self.clicked_train_dataset)
-        self.pushButton_delete_trdtst.clicked.connect(self.clicked_delete_dataset)
+        self.pushButton_generate_training_dataset.clicked.connect(
+            self.clicked_pushButton_generate_training_dataset)
+        self.pushButton_train_trdtst.clicked.connect(
+            self.clicked_train_dataset)
+        self.pushButton_delete_trdtst.clicked.connect(
+            self.clicked_delete_dataset)
 
-        self.pushButton_create_wordlist.clicked.connect(self.clicked_pushButton_create_wordlist)
-        self.pushButton_edit_wordlist.clicked.connect(self.clicked_pushButton_edit_wordlist)
-        self.pushButton_delete_wordlist.clicked.connect(self.clicked_pushButton_delete_wordlist)
+        self.pushButton_create_wordlist.clicked.connect(
+            self.clicked_pushButton_create_wordlist)
+        self.pushButton_edit_wordlist.clicked.connect(
+            self.clicked_pushButton_edit_wordlist)
+        self.pushButton_delete_wordlist.clicked.connect(
+            self.clicked_pushButton_delete_wordlist)
 
     #####################################################################################
     # TASK MANAGER COMMUNICATION METHODS
@@ -216,7 +242,8 @@ class MainWindow(QMainWindow):
         if self.project_folder and self.parquet_folder and self.wordlists_folder:
             # A ITMTTaskManagerGUI is instantiated and configured according to whether the selected project is a new or
             # an already utilized one
-            self.tm = ITMTTaskManagerGUI(self.project_folder, self.parquet_folder, self.wordlists_folder)
+            self.tm = ITMTTaskManagerGUI(
+                self.project_folder, self.parquet_folder, self.wordlists_folder)
             if len(os.listdir(self.project_folder)) == 0:
                 print("A new project folder was selected. Proceeding with "
                       "its configuration...")
@@ -227,7 +254,8 @@ class MainWindow(QMainWindow):
                       "its loading...")
             self.tm.load()
             # Project and parquet folders are saved in the dict of recent folders to future user-gui interactions
-            utils.save_recent(self.project_folder, self.parquet_folder, self.wordlists_folder)
+            utils.save_recent(self.project_folder,
+                              self.parquet_folder, self.wordlists_folder)
             self.init_user_interaction()
 
             return
@@ -320,7 +348,8 @@ class MainWindow(QMainWindow):
         self.wordlists_folder = pathlib.Path(
             QFileDialog.getExistingDirectory(
                 self, 'Select the folder hosting the wordlists (stopwords, keywords, etc)', self.home))
-        self.lineEdit_current_wordlist.setText(self.wordlists_folder.as_posix())
+        self.lineEdit_current_wordlist.setText(
+            self.wordlists_folder.as_posix())
 
         # Create Task Manager object if possible
         self.configure_tm()
@@ -358,15 +387,19 @@ class MainWindow(QMainWindow):
         # Put unpressed color for the previous pressed menu button
         if self.previous_page_button:
             if self.previous_page_button.objectName() == "menu_button_1":
-                self.previous_page_button.setStyleSheet(Constants.HOME_BUTTON_UNSELECTED_STYLESHEET)
+                self.previous_page_button.setStyleSheet(
+                    Constants.HOME_BUTTON_UNSELECTED_STYLESHEET)
             else:
-                self.previous_page_button.setStyleSheet(Constants.OTHER_BUTTONS_UNSELECTED_STYLESHEET)
+                self.previous_page_button.setStyleSheet(
+                    Constants.OTHER_BUTTONS_UNSELECTED_STYLESHEET)
 
         self.previous_page_button = menu_button
         if self.previous_page_button.objectName() == "menu_button_1":
-            self.previous_page_button.setStyleSheet(Constants.HOME_BUTTON_SELECTED_STYLESHEET)
+            self.previous_page_button.setStyleSheet(
+                Constants.HOME_BUTTON_SELECTED_STYLESHEET)
         else:
-            self.previous_page_button.setStyleSheet(Constants.OTHER_BUTTONS_SELECTED_STYLESHEET)
+            self.previous_page_button.setStyleSheet(
+                Constants.OTHER_BUTTONS_SELECTED_STYLESHEET)
         return
 
     def clicked_change_corpus_button(self, corpus_button):
@@ -376,49 +409,79 @@ class MainWindow(QMainWindow):
 
         # Put unpressed color for the previous pressed train button
         if self.previous_corpus_button:
-            self.previous_corpus_button.setStyleSheet(Constants.TRAIN_BUTTONS_UNSELECTED_STYLESHEET)
+            self.previous_corpus_button.setStyleSheet(
+                Constants.TRAIN_BUTTONS_UNSELECTED_STYLESHEET)
 
         self.previous_corpus_button = corpus_button
-        self.previous_corpus_button.setStyleSheet(Constants.TRAIN_BUTTONS_SELECTED_STYLESHEET)
+        self.previous_corpus_button.setStyleSheet(
+            Constants.TRAIN_BUTTONS_SELECTED_STYLESHEET)
 
         return
 
     # CORPUS FUNCTIONS
     def clicked_pushButton_generate_training_dataset(self):
+        """Method for controlling the clicking of the 'pushButton_generate_training_dataset'. Once this button is clicked, the datasets to be used for the creation of a new topic modeling corpus are collected by checking which of the checkboxes at the last column of the available local datasets are selected, and a list is created with its corresponding ids. Such a list is utilized for creating a "GenerateTMCorpus" subwindow, from which the user can specify his desired characteristics for the training corpus to be created. Once the former subwindow is closed, the training corpus generation is completed and based on the status returned by the task manager function in charge of the creation, an informative or warning message is shown to the user.
+        """
+
+        # Get ids of the datasets that are going to be used for the training corpus generation
         checked_list = []
         for i in range(self.table_available_local_corpus.rowCount()):
-            item = self.table_available_local_corpus.item(i, self.table_available_local_corpus.columnCount() - 1)
+            item = self.table_available_local_corpus.item(
+                i, self.table_available_local_corpus.columnCount() - 1)
             if item.checkState() == QtCore.Qt.CheckState.Checked:
                 checked_list.append(i)
 
-        self.create_tm_corpus_subwindow = GenerateTMCorpus(checked_list, self.tm)
+        self.create_tm_corpus_subwindow = GenerateTMCorpus(
+            checked_list, self.tm)
         self.create_tm_corpus_subwindow.exec()
 
         # Update data in table
         self.load_data()
 
         # Show information message about the TM corpus creation completion
-        # @ TODO: Add this to TM
         if self.create_tm_corpus_subwindow.status == 0:
-            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_0)
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.TM_CORPUS_MSG_STATUS_0)
         elif self.create_tm_corpus_subwindow.status == 1:
-            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_1)
+            QMessageBox.information(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_1)
         elif self.create_tm_corpus_subwindow.status == 2:
-            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_2)
+            QMessageBox.information(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_2)
 
         return
 
     def clicked_delete_dataset(self):
+        """It controls the clicking of the 'pushButton_delete_trdtst' button. When such a button is selected, it is first checked whether the user has chosen a corpus to be deleted. In the affirmative case, the TM function in charge of the deletion of training corpus is invoked.
+        """
+
+        # Get selected dataset for deletion
         r = self.table_available_training_datasets.currentRow()
-        corpus_to_delete = self.table_available_training_datasets.item(r, 0).text()
+
+        # If no training corpus is selected for deletion before clicking the 'pushButton_delete_trdtst' button, a warning message is shown to the user
+        if not r:
+            QMessageBox.warning(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.TM_DELETE_NO_CORPUS_MSG)
+            return
+        # Get name of the corpus to be deleted
+        corpus_to_delete = self.table_available_training_datasets.item(
+            r, 0).text()
+
+        # Delete corpus by invoking the corresponding task manager function
         self.tm.deleteTMCorpus(corpus_to_delete, self)
 
+        # Reload the listing of the training corpora
         self.tm.listTMCorpus(self)
 
         return
 
     def clicked_pushButton_create_wordlist(self):
-        QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.MSG_INSTRUCTIONS_NEW_WORDLIST)
+        """It controls the clicking of the 'pushButton_create_wordlist' button. When such a button is clicked, a message informing about the format for each wordlist type is shown to the user. Immediately after, a new window appears from which the user can insert the wordlist characteristics. Once this window is closed and the wordlist creation is completed, an informative message is shown specifying whether the creation was successful or not.
+        """
+
+        # Show instruction for creation of wordlists
+        QMessageBox.information(
+            self, Constants.SMOOTH_SPOON_MSG, Constants.MSG_INSTRUCTIONS_NEW_WORDLIST)
 
         # Invoke window
         self.create_stopwords_list_subwindow = CreateSwLstWindow(self.tm)
@@ -428,24 +491,72 @@ class MainWindow(QMainWindow):
         self.tm.listAllWdLists(self)
 
         # Show information message about the TM corpus creation completion
-        # @ TODO: Add this to TM
         if self.create_stopwords_list_subwindow.status == 0:
-            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_0)
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.WORDLIST_CREATION_MSG_STATUS_0)
         elif self.create_stopwords_list_subwindow.status == 1:
-            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_1)
+            QMessageBox.information(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.WORDLIST_CREATION_MSG_STATUS_1)
         elif self.create_stopwords_list_subwindow.status == 2:
-            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, Constants.TM_CORPUS_MSG_STATUS_2)
+            QMessageBox.information(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.WORDLIST_CREATION_MSG_STATUS_2)
+
         return
 
     def clicked_pushButton_edit_wordlist(self):
+        """It controls the clicking of the 'pushButton_edit_wordlist' button. When such a button is clicked, a new window appears from which the user can edit the selected wordlist. Once this window is closed and the wordlist edition is completed, an informative message is shown specifying whether the edition was successful or not.
+        """
+
+        # Get wordlist selected for edition
+        r = self.table_available_wordlists.currentRow()
+
+        # If no wordlist for edition is selected  before clicking the 'pushButton_edit_wordlist' button, a warning message is shown to the user
+        if not r:
+            QMessageBox.warning(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.EDIT_WORDLIST_NOT_SELECTED_MSG)
+            return
+
+        wlst_to_edit = self.table_available_wordlists.item(r, 0).text()
+        wdList_info = self.tm.get_wdlist_info(wlst_to_edit)
+        self.edit_stopwords_list_subwindow = EditSwLstWindow(
+            self.tm, wdList_info)
+        self.edit_stopwords_list_subwindow.exec()
+
+        # Update data in table
+        self.tm.listAllWdLists(self)
+
+        # Show information message about the TM corpus edition completion
+        if self.edit_stopwords_list_subwindow.status == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.WORDLIST_EDITION_MSG_STATUS_0)
+        elif self.edit_stopwords_list_subwindow.status == 1:
+            QMessageBox.information(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.WORDLIST_EDITION_MSG_STATUS_1)
+        elif self.edit_stopwords_list_subwindow.status == 2:
+            QMessageBox.information(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.WORDLIST_EDITION_MSG_STATUS_2)
+
         return
 
     def clicked_pushButton_delete_wordlist(self):
+        """It controls the clicking of the 'pushButton_delete_wordlist' button. When such a button is selected, it is first checked whether the user has chosen a wordlist to be deleted. In the affirmative case, the TM function in charge of the deletion of a wordlist is invoked.
+        """
+
+        # Get wordlist selected for deletion
         r = self.table_available_wordlists.currentRow()
+
+        # If no training corpus is selected for deletion before clicking the 'pushButton_delete_wordlist' button, a warning message is shown to the user
+        if not r:
+            QMessageBox.warning(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.DELETE_WORDLIST_NOT_SELECTED_MSG)
+            return
+
         wlst_to_delete = self.table_available_wordlists.item(r, 0).text()
         self.tm.DelWdList(wlst_to_delete, self)
 
+        # Update data in wordlists table
         self.tm.listAllWdLists(self)
+
         return
 
     def clicked_train_dataset(self):
@@ -454,7 +565,6 @@ class MainWindow(QMainWindow):
         return
 
     # MODELS FUNCTIONS
-
     def get_pyldavis_home(self):
         self.web = QWebEngineView()
         cwd = os.getcwd()

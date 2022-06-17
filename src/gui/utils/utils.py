@@ -23,9 +23,7 @@ from src.gui.utils.worker import Worker
 def execute_in_thread(gui, function, function_output, progress_bar):
     """
     Method to execute a certain function in a secondary thread while keeping the GUI's execution in the main thread.
-    A progress bar is shown at the time the function is being executed if a progress bar object is provided. When
-    finished, it forces the execution of the method to be executed after the function executing in a thread is
-    completed. Based on the functions provided in the manual available at:
+    A progress bar is shown at the time the function is being executed if a progress bar object is provided. When finished, it forces the execution of the method to be executed after the function executing in a thread is completed. Based on the functions provided in the manual available at:
     https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/
 
     Parameters
@@ -79,8 +77,7 @@ def signal_accept(progress_bar):
 
 def configure_table_header(list_tables, window):
     """
-    Configures all the tables defined in the list given by "list_tables" in the sense that it makes their horizontal
-    headers visible disables the functionality of highlighting sections and resizes their rows to fit their content.
+    Configures all the tables defined in the list given by "list_tables" in the sense that it makes their horizontal headers visible disables the functionality of highlighting sections and resizes their rows to fit their content.
 
     Parameters
     ----------
@@ -101,8 +98,7 @@ def configure_table_header(list_tables, window):
 
 def initialize_progress_bar(list_progress_bars, window):
     """
-    Initializes all the progress bars defined in the list given by "list_progress_bars" in the sense that it makes
-    them invisible to the user and establishes their progress at 0.
+    Initializes all the progress bars defined in the list given by "list_progress_bars" in the sense that it makes them invisible to the user and establishes their progress at 0.
 
     Parameters
     ----------
@@ -131,7 +127,8 @@ def add_checkboxes_to_table(table):
     column = table.columnCount() - 1
     for row in range(table.rowCount()):
         chkBoxItem = QTableWidgetItem()
-        chkBoxItem.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+        chkBoxItem.setFlags(
+            QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
         chkBoxItem.setCheckState(QtCore.Qt.CheckState.Unchecked)
         table.setItem(row, column, chkBoxItem)
 
@@ -140,11 +137,7 @@ def add_checkboxes_to_table(table):
 
 def save_recent(current_project, current_parquet, current_wordlist):
     """
-    Saves in a pickle file a dictionary structure with a list of the last used projects and parquet folders. If the
-    file exists, the current project and parquet folders are added to the corresponding lists in the dictionary with
-    the condition that they are not equal to their corresponding pair in the previous execution. If the file does not
-    exist, a new dictionary is instantiated with each of its lists being conformed by just the current project and
-    parquet folder, respectively,
+    Saves in a pickle file a dictionary structure with a list of the last used projects and parquet folders. If the file exists, the current project and parquet folders are added to the corresponding lists in the dictionary with the condition that they are not equal to their corresponding pair in the previous execution. If the file does not exist, a new dictionary is instantiated with each of its lists being conformed by just the current project and parquet folder, respectively,
 
     Parameters
     ----------
@@ -179,11 +172,7 @@ def save_recent(current_project, current_parquet, current_wordlist):
 
 def set_recent_buttons(window):
     """
-    Loads the dictionary of recent projects and parquet folders into execution time. If the dictionary is not empty,
-    it looks for the last two project folders and parquet folders. After checking if the routes still exist in the
-    user's OS, it adds the route as text in the corresponding buttons. Otherwise, in case the dictionary is empty and
-    thus there are no recent projects, the frame that contains the buttons for the recent folders is hidden from the
-    window.
+    Loads the dictionary of recent projects and parquet folders into execution time. If the dictionary is not empty, it looks for the last two project folders and parquet folders. After checking if the routes still exist in the user's OS, it adds the route as text in the corresponding buttons. Otherwise, in case the dictionary is empty and thus there are no recent projects, the frame that contains the buttons for the recent folders is hidden from the window.
 
     Parameters
     ----------
@@ -203,21 +192,26 @@ def set_recent_buttons(window):
             if os.path.exists(dict_recent['recent_projects'][rp]):
                 button_name = "pushButton_recent_project_folder_" + str(rp + 1)
                 button_widget = window.findChild(QPushButton, button_name)
-                button_widget.setText(dict_recent['recent_projects'][rp].as_posix())
+                button_widget.setText(
+                    dict_recent['recent_projects'][rp].as_posix())
             else:
                 continue
         for rpa in reversed(range(len(dict_recent['recent_parquets']))):
             if os.path.exists(dict_recent['recent_parquets'][rpa]):
-                button_name = "pushButton_recent_parquet_folder_" + str(rpa + 1)
+                button_name = "pushButton_recent_parquet_folder_" + \
+                    str(rpa + 1)
                 button_widget = window.findChild(QPushButton, button_name)
-                button_widget.setText(dict_recent['recent_parquets'][rpa].as_posix())
+                button_widget.setText(
+                    dict_recent['recent_parquets'][rpa].as_posix())
             else:
                 continue
         for rwl in reversed(range(len(dict_recent['recent_wordlists']))):
             if os.path.exists(dict_recent['recent_wordlists'][rpa]):
-                button_name = "pushButton_recent_wordlists_folder_" + str(rpa + 1)
+                button_name = "pushButton_recent_wordlists_folder_" + \
+                    str(rpa + 1)
                 button_widget = window.findChild(QPushButton, button_name)
-                button_widget.setText(dict_recent['recent_wordlists'][rwl].as_posix())
+                button_widget.setText(
+                    dict_recent['recent_wordlists'][rwl].as_posix())
             else:
                 continue
     return

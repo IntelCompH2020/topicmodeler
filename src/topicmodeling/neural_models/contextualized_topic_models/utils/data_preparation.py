@@ -45,11 +45,10 @@ def bert_embeddings_from_list(texts, sbert_model_to_load, batch_size=200, max_se
     """
     model = SentenceTransformer(sbert_model_to_load)
 
-    #if max_seq_length is not None:
-    #   model.max_seq_length = max_seq_length
+    if max_seq_length is not None:
+       model.max_seq_length = max_seq_length
 
-    #print(texts)
-    #check_max_local_length(max_seq_length, texts)
+    check_max_local_length(max_seq_length, texts)
 
     return np.array(model.encode(texts, show_progress_bar=True, batch_size=batch_size))
 
@@ -63,7 +62,8 @@ def check_max_local_length(max_seq_length, texts):
 
 
 def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=None, 
-                        sbert_model_to_load='paraphrase-distilroberta-base-v1', val_size=0.25):
+                        sbert_model_to_load='paraphrase-distilroberta-base-v1',
+                        val_size=0.25, max_seq_length=512):
 
     """It prepares the training data in the format that is asked as input in a CTM model.
 
@@ -80,6 +80,7 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
         Model (e.g. paraphrase-distilroberta-base-v1) to be used for generating the embeddings
     val_size: float (default=0.25)
         Percentage of the documents to be used for validation
+    max_seq_length: int (default=512)
 
     Returns
     -------
@@ -103,7 +104,7 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
     #  documents) size
     if custom_embeddings is None:
         docs_conv = [" ".join(unpreprocessed_corpus[i]) for i in np.arange(len(unpreprocessed_corpus))]
-        custom_embeddings = bert_embeddings_from_list(docs_conv, sbert_model_to_load)
+        custom_embeddings = bert_embeddings_from_list(docs_conv, sbert_model_to_load, max_seq_length=max_seq_length)
 
     # Divide text data and embeddings into training and validation sets
     docs_train, docs_val, embeddings_train, embeddings_val = \
