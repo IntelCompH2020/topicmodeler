@@ -8,20 +8,25 @@ Provides several classes for Topic Modeling
     - MalletTrainer: To train a topic model from a given corpus
 """
 
+import sys
+import shutil
+import argparse
+import json
+from pathlib import Path
+import pandas as pd
+
+
+
+"""
 import numpy as np
 from sklearn.preprocessing import normalize
 from scipy import sparse
 # from scipy.spatial.distance import jensenshannon
 # import pyLDAvis
 import matplotlib.pyplot as plt
-import argparse
-import configparser
 import logging
-from pathlib import Path
 import regex as javare
 import re
-import sys
-import pandas as pd
 from tqdm import tqdm
 import ipdb
 from gensim import corpora
@@ -35,7 +40,7 @@ from src.neural_models.pytorchavitm.avitm_network.avitm import AVITM
 from src.neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
 
 logging.getLogger("gensim").setLevel(logging.WARNING)
-
+"""
 
 def file_lines(fname):
     # Count number of lines in file
@@ -43,6 +48,196 @@ def file_lines(fname):
         for i, l in enumerate(f):
             pass
     return i + 1
+
+
+class textPreproc(object):
+    """
+    A simple class to carry out some simple text preprocessing tasks
+    that are needed by topic modeling
+    - Stopword removal
+    - Replace equivalent terms
+    - Calculate BoW
+    - Generate the files that are needed for training of different
+      topic modeling technologies
+
+    It allows to use Gensim or Spark functions
+    """
+    def __init__(self, stw_files=[], eq_files=[],
+                    min_lemas=15, no_below=10, no_above=0.6,
+                    keep_n = 100000, cntVecModel=None, logger=None):
+        """
+        Initilization Method
+        Stopwords and the dictionary of equivalences will be loaded
+        during initialization
+
+        Parameters
+        ----------
+        stw_files: list of str
+            List of paths to stopwords files
+        eq_files: list of str
+            List of paths to equivalent terms files
+        min_lemas: int
+            Minimum number of lemas for document filtering
+        no_below: int
+            Minimum number of documents to keep a term in the vocabulary
+        no_above: float
+            Maximum proportion of documents to keep a term in the vocab
+        keep_n: int
+            Maximum vocabulary size
+        logger: Logger object
+            To log object activity
+        """
+        self._stopwords = self._loadSTW(stw_files)
+        self._equivalents = self._loadEQ(eq_files)
+        self._min_lemas = min_lemas
+        self._no_below = no_below
+        self._no_above = no_above
+        self._keep_n = keep_n
+        self._cntVecModel = cntVecModel
+
+        if logger:
+            self._logger = logger
+        else:
+            import logging
+            logging.basicConfig(level='INFO')
+            self._logger = logging.getLogger('stwEQcleaner')
+
+    def _loadSTW(self, stw_files):
+        """
+        Loads all stopwords from all files provided in the argument
+
+        Parameters
+        ----------
+        stw_files: list of str
+            List of paths to stopwords files
+
+        Returns
+        -------
+        stopWords: list of str
+            List of stopwords
+        """
+
+        stopWords = []
+        for stwFile in stw_files:
+            with Path(stwFile).open('r', encoding='utf8') as fin:
+                stopWords += json.load(fin)['wordlist']
+
+        return list(set(stopWords))
+
+    def _loadEQ(self, eq_files):
+        """
+        Loads all equivalent terms from all files provided in the argument
+
+        Parameters
+        ----------
+        eq_files: list of str
+            List of paths to equivalent terms files
+
+        Returns
+        -------
+        equivalents: dictionary
+            Dictionary of term_to_replace -> new_term
+        """
+
+        equivalent = {}
+
+        for eqFile in eq_files:
+            with Path(eqFile).open('r', encoding = 'utf8') as fin:
+                newEq = json.load(fin)['wordlist']
+            newEq = [x.split(':') for x in newEq]
+            newEq = [x for x in newEq if len(x) == 2]
+            newEq = dict(newEq)
+            equivalent = {**equivalent, **newEq}
+        
+        return equivalent
+
+    def preprocBOW(self, trDF):
+        """
+        Preprocesses the documents in the dataframe to carry
+        out the following tasks
+            - Filter out short documents (below min_lemas)
+            - Cleaning of stopwords
+            - Equivalent terms application
+            - BoW calculation
+
+        Parameters
+        ----------
+        trDF: Pandas or Spark dataframe
+            This routine works on the following column "all_lemmas"
+            Other columns are left untouched
+
+        Returns
+        -------
+        trDFnew: A new dataframe with a new colum bow containing the
+        bow representation of the documents
+        """
+        if isinstance(trDF, pd.DataFrame):
+            print('pandas')
+        else:
+            #tokenization
+            tk = Tokenizer(inputCol="all_lemmas", outputCol="tokens")
+            trDF = tk.transform(trDF)
+
+            #Removal of Stopwords
+            if len(self._stopwords):
+                swr = StopWordsRemover(inputCol="tokens", outputCol="clean_tokens",
+                                        stopWords=self._stopwords)
+                trDF = swr.transform(trDF)
+
+            #Filter according to number of lemmas in each document
+            trDF = trDF.where(F.size(F.col("clean_tokens")) >= self._min_lemas)
+
+            #Equivalences replacement
+            if len(self._equivalents):
+                df = trDF.select(trDF.id, F.explode(trDF.clean_tokens))
+                df = df.na.replace(self._equivalents, 1)
+                df = df.groupBy("id").agg(F.collect_list("col"))
+                trDF = (trDF.join(df, trDF.id == df.id, "left")
+                                      .drop(df.id)
+                                      .withColumnRenamed("collect_list(col)","final_tokens")
+                       )
+
+            if not self._cntVecModel:
+                cntVec = CountVectorizer(inputCol="final_tokens",
+                   outputCol="bow", minDF=self._no_below,
+                   maxDF=self._no_above, vocabSize = self._keep_n)
+                self._cntVecModel = cntVec.fit(trDF)
+
+            trDFnew = (self._cntVecModel.transform(trDF)
+                           .drop("tokens", "clean_tokens", "final_tokens")
+                      )
+
+        return trDFnew
+
+    def saveCntVecModel(self, dirpath):
+        """
+        Saves a Count Vectorizer Model to the specified path
+        Saves also a text document with the corresponding
+        vocabulary
+
+        Parameters
+        ----------
+        dirpath: pathlib.Path
+            The folder where the CountVectorizerModel and the
+            text file with the vocabulary will be saved
+
+        Returns
+        -------
+        status: int
+            - 1: If the files were generated sucessfully
+            - 0: Error (Count Vectorizer Model does not exist)
+        """
+        if self._cntVecModel:
+            cntVecModel = dirpath.joinpath('CntVecModel')
+            if cntVecModel.is_dir():
+                shutil.rmtree(cntVecModel)
+            self._cntVecModel.save(f"file://{cntVecModel.as_posix()}")
+            with dirpath.joinpath('vocabulary.txt').open('w', encoding='utf8') as fout:
+                fout.write('\n'.join([el for el in self._cntVecModel.vocabulary]))
+            return 1
+        else:
+            return 0
+
 
 
 class stwEQcleaner(object):
@@ -1126,9 +1321,6 @@ class MalletTrainer(object):
         return
 
 
-##############################################################################
-#                                PRODLDA                                     #
-##############################################################################
 class ProdLDATrainer(object):
 
     def __init__(self, cf, modelFolder):
@@ -1401,9 +1593,6 @@ class ProdLDATrainer(object):
         return
 
 
-##############################################################################
-#                                  CTM                                       #
-##############################################################################
 class CTMTrainer(object):
 
     def __init__(self, cf, modelFolder):
@@ -1701,21 +1890,87 @@ class CTMTrainer(object):
 ##############################################################################
 if __name__ == "__main__":
 
-    # settings
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Topic modeling utilities')
+    parser.add_argument('--spark', action='store_true', default=False,
+                         help='Indicate that spark cluster is available',
+                         required=False)
     parser.add_argument('--train', action='store_true', default=False,
                         help="Train a Topic Model according to config file")
     parser.add_argument('--config', type=str, default=None,
                         help="path to configuration file")
     args = parser.parse_args()
 
+    if args.spark:
+
+        #Spark imports and session generation
+        from pyspark.sql import SparkSession
+        from pyspark.ml.feature import Tokenizer, StopWordsRemover, CountVectorizer
+        import pyspark.sql.functions as F
+        
+        spark = SparkSession\
+            .builder\
+            .appName("Topicmodeling")\
+            .getOrCreate()
+
+    else:
+        spark = None
+
     # If the training flag is activated, we need to check availability of
     # configuration file, and run the training using class MalletTrainer
     if args.train:
         configFile = Path(args.config)
         if configFile.is_file():
-            cf = configparser.ConfigParser()
-            cf.read(configFile)
+            with configFile.open('r', encoding='utf8') as fin:
+                train_config = json.load(fin)
+
+            """
+            Data preprocessing This part of the code will preprocess all the
+            documents that are available in the training dataset and generate
+            also the necessary objects for preprocessing objects during inference
+            """
+
+            tPreproc = textPreproc(stw_files=train_config['Preproc']['stopwords'],
+                            eq_files=train_config['Preproc']['equivalences'],
+                            min_lemas=train_config['Preproc']['min_lemas'],
+                            no_below=train_config['Preproc']['no_below'],
+                            no_above=train_config['Preproc']['no_above'],
+                            keep_n=train_config['Preproc']['keep_n'])
+
+            #Create a Dataframe with all training data                
+            trDtFile = Path(train_config['TrDtSet'])
+            with trDtFile.open() as fin:
+                trDtSet = json.load(fin)
+
+            if args.spark:
+                #Read all training data and configure them as a spark dataframe
+                for idx, DtSet in enumerate(trDtSet['Dtsets']):
+                    df = spark.read.parquet(f"file://{DtSet['parquet']}")
+                    if len(DtSet['filter']):
+                        # To be implemented
+                        # Needs a spark command to carry out the filtering
+                        # df = df.filter ...
+                        pass
+                    df = (
+                        df.withColumn("all_lemmas", F.concat_ws(' ', *DtSet['lemmasfld']))
+                          .withColumn("all_rawtext", F.concat_ws(' ', *DtSet['rawtxtfld']))
+                          .withColumn("source", F.lit(DtSet["source"]))
+                          .select("id", "source", "all_lemmas", "all_rawtext")
+                    )
+                    if idx==0:
+                        trDF = df
+                    else:
+                        trDF = trDF.union(df).distinct()
+                
+                trDF = tPreproc.preprocBOW(trDF)
+                tPreproc.saveCntVecModel(configFile.parent.resolve())
+
+                with open('/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/outspark.txt', 'w') as fout:
+                    fout.write(str(trDF.count()))
+
+            else:
+                pass
+
+            """
             if cf['Training']['trainer'] == 'mallet':
                 MallTr = MalletTrainer(cf, modelFolder=configFile.parent)
                 MallTr.fit()
@@ -1725,6 +1980,7 @@ if __name__ == "__main__":
             elif cf['Training']['trainer'] == 'ctm':
                 CTMr = CTMTrainer(cf, modelFolder=configFile.parent)
                 CTMr.fit()
-
+            """
         else:
-            print('You need to provide a valid configuration file')
+            sys.exit('You need to provide a valid configuration file')
+

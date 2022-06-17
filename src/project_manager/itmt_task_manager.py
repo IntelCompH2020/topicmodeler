@@ -1008,13 +1008,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             script_spark = self.cf.get('Spark', 'script_spark')
             token_spark = self.cf.get('Spark', 'token_spark')
             script_path = './src/topicmodeling/topicmodeling.py'
-            options = '"--train --config ' + configFile.resolve().as_posix() + '"'
+            options = '"--spark --train --config ' + configFile.resolve().as_posix() + '"'
             cmd = script_spark + ' -C ' + token_spark + \
                   ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
             printred(cmd)
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
-                check_output(args=cmd, shell=True)
+                output = check_output(args=cmd, shell=True)
+                print(output)
             except:
                 self.logger.error('-- -- Execution of script failed')
 
@@ -1030,6 +1031,11 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 self.logger.error('-- -- Command execution failed')
 
         return
+
+
+
+
+
 
     def corpus2JSON(self):
         """
