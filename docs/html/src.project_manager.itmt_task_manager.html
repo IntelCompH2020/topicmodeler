@@ -18,7 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="src.utils" href="src.utils.html" />
+    <link rel="next" title="src.topicmodeling" href="src.topicmodeling.html" />
     <link rel="prev" title="src.project_manager.base_task_manager" href="src.project_manager.base_task_manager.html" /> 
 </head>
 
@@ -45,23 +45,24 @@
 <li class="toctree-l1"><a class="reference internal" href="TMinferencer.html">TMinferencer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus2JSON.html">corpus2JSON</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="src.html">src</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="src.html#packages">Packages</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="src.gui.html">src.gui</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageLists.html">src.manageLists</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="src.neural_models.html">src.neural_models</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="src.project_manager.html">src.project_manager</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="src.project_manager.html#modules">Modules</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.project_manager.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.project_manager.html#module-src.project_manager">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="src.topicmodeling.html">src.topicmodeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.utils.html">src.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="src.html#modules">Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="topicmodeling.html">topicmodeling</a></li>
 </ul>
 
         </div>
@@ -553,7 +554,7 @@ self.validate_subtrain_models()</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.itmt_task_manager.</span></span><span class="sig-name descname"><span class="pre">ITMTTaskManagerGUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.project_manager.itmt_task_manager.</span></span><span class="sig-name descname"><span class="pre">ITMTTaskManagerGUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2wdlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#src.project_manager.itmt_task_manager.ITMTTaskManager" title="src.project_manager.itmt_task_manager.ITMTTaskManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.project_manager.itmt_task_manager.ITMTTaskManager</span></code></a></p>
 <p>Provides extra functionality to the task manager, to be used by the
 Graphical User Interface (GUI)</p>
@@ -563,6 +564,7 @@ Graphical User Interface (GUI)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
 <li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>p2wdlist</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the wordlists (stopwords, keywords, etc)</p></li>
 <li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
 <li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
 If None, no metadata file is used.</p></li>
@@ -571,13 +573,14 @@ If None, no metadata file is used.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p2p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2wdlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.cf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'metadata.yaml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Initializes an ITMTTaskManagerGUI object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p2p</strong> (<em>pathlib.Path</em>) – Path to the application project</p></li>
 <li><p><strong>p2parquet</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the parquet datasets</p></li>
+<li><p><strong>p2wdlist</strong> (<em>pathlib.Path</em>) – Path to the folder hosting the wordlists (stopwords, keywords, etc)</p></li>
 <li><p><strong>config_fname</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='config.cf'</em><em>)</em>) – Name of the configuration file</p></li>
 <li><p><strong>metadata_fname</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em><em> (</em><em>default=metadata.yaml</em><em>)</em>) – Name of the project metadata file.
 If None, no metadata file is used.</p></li>
@@ -629,6 +632,78 @@ within the GUI.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.listAllWdLists">
+<span class="sig-name descname"><span class="pre">listAllWdLists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gui</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.listAllWdLists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.listAllWdLists" title="Permalink to this definition"></a></dt>
+<dd><p>This method shows all wordlists available for the project in the corresponding table
+within the GUI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gui</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>src.gui.main_window.MainWindow</em></a>) – QMainWindow object associated which the GUI</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.NewWdList">
+<span class="sig-name descname"><span class="pre">NewWdList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lst_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lst_privacy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lst_desc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.NewWdList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.NewWdList" title="Permalink to this definition"></a></dt>
+<dd><p>This method creates a new List of words that can be later used for
+corpus preprocessing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listType</strong> (<em>string</em>) – type of list that will be created [keywords|stopwords|equivalences]</p></li>
+<li><p><strong>wds</strong> (<em>string</em>) – List of words in the format required by the listType with which the new wordlist will be conformed</p></li>
+<li><p><strong>lst_privacy</strong> (<em>string</em>) – String describing the new wordlist’s privacy level [private|public]</p></li>
+<li><p><strong>lst_desc</strong> (<em>string</em>) – String with the new wordlist’s description</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.EditWdList">
+<span class="sig-name descname"><span class="pre">EditWdList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wdlist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.EditWdList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.EditWdList" title="Permalink to this definition"></a></dt>
+<dd><p>This method allows the edition of an existing list of words, i.e.
+adding new words or removing existing words</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>wds</strong> (<em>dict</em>) – Dictionary describing the edited wordlist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.DelWdList">
+<span class="sig-name descname"><span class="pre">DelWdList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wdlst_to_delete</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.DelWdList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.DelWdList" title="Permalink to this definition"></a></dt>
+<dd><p>Deletes a wordlist from wordlist folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wdlst_to_delete</strong> (<em>str</em>) – Name of the wordlist selected by the user in the GUI to be deleted</p></li>
+<li><p><strong>gui</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>src.gui.main_window.MainWindow</em></a>) – QMainWindow object associated which the GUI</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.get_wdlist_info">
+<span class="sig-name descname"><span class="pre">get_wdlist_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wlst_to_edit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/project_manager/itmt_task_manager.html#ITMTTaskManagerGUI.get_wdlist_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.project_manager.itmt_task_manager.ITMTTaskManagerGUI.get_wdlist_info" title="Permalink to this definition"></a></dt>
+<dd><p>Deletes a wordlist from wordlist folder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>wlst_to_edit</strong> (<em>str</em>) – Name of the wordlist selected by the user in the GUI to be edited</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>wdList_info</strong> – Dictionary with the wordlist information</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -638,7 +713,7 @@ within the GUI.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="src.project_manager.base_task_manager.html" class="btn btn-neutral float-left" title="src.project_manager.base_task_manager" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="src.utils.html" class="btn btn-neutral float-right" title="src.utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="src.topicmodeling.html" class="btn btn-neutral float-right" title="src.topicmodeling" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

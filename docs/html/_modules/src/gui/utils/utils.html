@@ -42,7 +42,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../TMinferencer.html">TMinferencer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../corpus2JSON.html">corpus2JSON</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../src.html">src</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../topicmodeling.html">topicmodeling</a></li>
 </ul>
 
         </div>
@@ -95,9 +94,7 @@
 <div class="viewcode-block" id="execute_in_thread"><a class="viewcode-back" href="../../../../src.gui.utils.utils.html#src.gui.utils.utils.execute_in_thread">[docs]</a><span class="k">def</span> <span class="nf">execute_in_thread</span><span class="p">(</span><span class="n">gui</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">function_output</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Method to execute a certain function in a secondary thread while keeping the GUI&#39;s execution in the main thread.</span>
-<span class="sd">    A progress bar is shown at the time the function is being executed if a progress bar object is provided. When</span>
-<span class="sd">    finished, it forces the execution of the method to be executed after the function executing in a thread is</span>
-<span class="sd">    completed. Based on the functions provided in the manual available at:</span>
+<span class="sd">    A progress bar is shown at the time the function is being executed if a progress bar object is provided. When finished, it forces the execution of the method to be executed after the function executing in a thread is completed. Based on the functions provided in the manual available at:</span>
 <span class="sd">    https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/</span>
 
 <span class="sd">    Parameters</span>
@@ -151,8 +148,7 @@
 
 <div class="viewcode-block" id="configure_table_header"><a class="viewcode-back" href="../../../../src.gui.utils.utils.html#src.gui.utils.utils.configure_table_header">[docs]</a><span class="k">def</span> <span class="nf">configure_table_header</span><span class="p">(</span><span class="n">list_tables</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Configures all the tables defined in the list given by &quot;list_tables&quot; in the sense that it makes their horizontal</span>
-<span class="sd">    headers visible disables the functionality of highlighting sections and resizes their rows to fit their content.</span>
+<span class="sd">    Configures all the tables defined in the list given by &quot;list_tables&quot; in the sense that it makes their horizontal headers visible disables the functionality of highlighting sections and resizes their rows to fit their content.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -173,8 +169,7 @@
 
 <div class="viewcode-block" id="initialize_progress_bar"><a class="viewcode-back" href="../../../../src.gui.utils.utils.html#src.gui.utils.utils.initialize_progress_bar">[docs]</a><span class="k">def</span> <span class="nf">initialize_progress_bar</span><span class="p">(</span><span class="n">list_progress_bars</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Initializes all the progress bars defined in the list given by &quot;list_progress_bars&quot; in the sense that it makes</span>
-<span class="sd">    them invisible to the user and establishes their progress at 0.</span>
+<span class="sd">    Initializes all the progress bars defined in the list given by &quot;list_progress_bars&quot; in the sense that it makes them invisible to the user and establishes their progress at 0.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -203,20 +198,17 @@
     <span class="n">column</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">columnCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()):</span>
         <span class="n">chkBoxItem</span> <span class="o">=</span> <span class="n">QTableWidgetItem</span><span class="p">()</span>
-        <span class="n">chkBoxItem</span><span class="o">.</span><span class="n">setFlags</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ItemFlag</span><span class="o">.</span><span class="n">ItemIsUserCheckable</span> <span class="o">|</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ItemFlag</span><span class="o">.</span><span class="n">ItemIsEnabled</span><span class="p">)</span>
+        <span class="n">chkBoxItem</span><span class="o">.</span><span class="n">setFlags</span><span class="p">(</span>
+            <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ItemFlag</span><span class="o">.</span><span class="n">ItemIsUserCheckable</span> <span class="o">|</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ItemFlag</span><span class="o">.</span><span class="n">ItemIsEnabled</span><span class="p">)</span>
         <span class="n">chkBoxItem</span><span class="o">.</span><span class="n">setCheckState</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CheckState</span><span class="o">.</span><span class="n">Unchecked</span><span class="p">)</span>
         <span class="n">table</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">chkBoxItem</span><span class="p">)</span>
 
     <span class="k">return</span></div>
 
 
-<div class="viewcode-block" id="save_recent"><a class="viewcode-back" href="../../../../src.gui.utils.utils.html#src.gui.utils.utils.save_recent">[docs]</a><span class="k">def</span> <span class="nf">save_recent</span><span class="p">(</span><span class="n">current_project</span><span class="p">,</span> <span class="n">current_parquet</span><span class="p">):</span>
+<div class="viewcode-block" id="save_recent"><a class="viewcode-back" href="../../../../src.gui.utils.utils.html#src.gui.utils.utils.save_recent">[docs]</a><span class="k">def</span> <span class="nf">save_recent</span><span class="p">(</span><span class="n">current_project</span><span class="p">,</span> <span class="n">current_parquet</span><span class="p">,</span> <span class="n">current_wordlist</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Saves in a pickle file a dictionary structure with a list of the last used projects and parquet folders. If the</span>
-<span class="sd">    file exists, the current project and parquet folders are added to the corresponding lists in the dictionary with</span>
-<span class="sd">    the condition that they are not equal to their corresponding pair in the previous execution. If the file does not</span>
-<span class="sd">    exist, a new dictionary is instantiated with each of its lists being conformed by just the current project and</span>
-<span class="sd">    parquet folder, respectively,</span>
+<span class="sd">    Saves in a pickle file a dictionary structure with a list of the last used projects and parquet folders. If the file exists, the current project and parquet folders are added to the corresponding lists in the dictionary with the condition that they are not equal to their corresponding pair in the previous execution. If the file does not exist, a new dictionary is instantiated with each of its lists being conformed by just the current project and parquet folder, respectively,</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -235,10 +227,14 @@
                 <span class="n">dict_recent</span><span class="p">[</span><span class="s2">&quot;recent_projects&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_project</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">current_parquet</span> <span class="o">!=</span> <span class="n">dict_recent</span><span class="p">[</span><span class="s2">&quot;recent_parquets&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
                 <span class="n">dict_recent</span><span class="p">[</span><span class="s2">&quot;recent_parquets&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_parquet</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">current_wordlist</span> <span class="o">!=</span> <span class="n">dict_recent</span><span class="p">[</span><span class="s2">&quot;recent_wordlists&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">dict_recent</span><span class="p">[</span><span class="s2">&quot;recent_wordlists&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_wordlist</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dtSets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">dict_recent</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;recent_projects&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">current_project</span><span class="p">],</span> <span class="s2">&quot;recent_parquets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">current_parquet</span><span class="p">]}</span>
+        <span class="n">dict_recent</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;recent_projects&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">current_project</span><span class="p">],</span>
+                       <span class="s2">&quot;recent_parquets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">current_parquet</span><span class="p">],</span>
+                       <span class="s2">&quot;recent_wordlists&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">current_wordlist</span><span class="p">]}</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;src/gui/utils/recent.pickle&quot;</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
@@ -247,11 +243,7 @@
 
 <div class="viewcode-block" id="set_recent_buttons"><a class="viewcode-back" href="../../../../src.gui.utils.utils.html#src.gui.utils.utils.set_recent_buttons">[docs]</a><span class="k">def</span> <span class="nf">set_recent_buttons</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Loads the dictionary of recent projects and parquet folders into execution time. If the dictionary is not empty,</span>
-<span class="sd">    it looks for the last two project folders and parquet folders. After checking if the routes still exist in the</span>
-<span class="sd">    user&#39;s OS, it adds the route as text in the corresponding buttons. Otherwise, in case the dictionary is empty and</span>
-<span class="sd">    thus there are no recent projects, the frame that contains the buttons for the recent folders is hidden from the</span>
-<span class="sd">    window.</span>
+<span class="sd">    Loads the dictionary of recent projects and parquet folders into execution time. If the dictionary is not empty, it looks for the last two project folders and parquet folders. After checking if the routes still exist in the user&#39;s OS, it adds the route as text in the corresponding buttons. Otherwise, in case the dictionary is empty and thus there are no recent projects, the frame that contains the buttons for the recent folders is hidden from the window.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -266,26 +258,33 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dtSets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">dict_recent</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># hide the recent frame and its contents</span>
-        <span class="n">window</span><span class="o">.</span><span class="n">frame_recent</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="c1"># Fill buttons</span>
         <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_projects&#39;</span><span class="p">]))):</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_projects&#39;</span><span class="p">][</span><span class="n">rp</span><span class="p">]):</span>
                 <span class="n">button_name</span> <span class="o">=</span> <span class="s2">&quot;pushButton_recent_project_folder_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">rp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">button_widget</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">button_name</span><span class="p">)</span>
-                <span class="n">button_widget</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_projects&#39;</span><span class="p">][</span><span class="n">rp</span><span class="p">]</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+                <span class="n">button_widget</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span>
+                    <span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_projects&#39;</span><span class="p">][</span><span class="n">rp</span><span class="p">]</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">continue</span>
         <span class="k">for</span> <span class="n">rpa</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_parquets&#39;</span><span class="p">]))):</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_parquets&#39;</span><span class="p">][</span><span class="n">rpa</span><span class="p">]):</span>
-                <span class="n">button_name</span> <span class="o">=</span> <span class="s2">&quot;pushButton_recent_parquet_folder_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">rpa</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">button_name</span> <span class="o">=</span> <span class="s2">&quot;pushButton_recent_parquet_folder_&quot;</span> <span class="o">+</span> \
+                    <span class="nb">str</span><span class="p">(</span><span class="n">rpa</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">button_widget</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">button_name</span><span class="p">)</span>
-                <span class="n">button_widget</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_parquets&#39;</span><span class="p">][</span><span class="n">rpa</span><span class="p">]</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+                <span class="n">button_widget</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span>
+                    <span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_parquets&#39;</span><span class="p">][</span><span class="n">rpa</span><span class="p">]</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">continue</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># hide the recent frame and its contents</span>
-        <span class="n">window</span><span class="o">.</span><span class="n">frame_recent</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
-
+        <span class="k">for</span> <span class="n">rwl</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_wordlists&#39;</span><span class="p">]))):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_wordlists&#39;</span><span class="p">][</span><span class="n">rpa</span><span class="p">]):</span>
+                <span class="n">button_name</span> <span class="o">=</span> <span class="s2">&quot;pushButton_recent_wordlists_folder_&quot;</span> <span class="o">+</span> \
+                    <span class="nb">str</span><span class="p">(</span><span class="n">rpa</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">button_widget</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">button_name</span><span class="p">)</span>
+                <span class="n">button_widget</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span>
+                    <span class="n">dict_recent</span><span class="p">[</span><span class="s1">&#39;recent_wordlists&#39;</span><span class="p">][</span><span class="n">rwl</span><span class="p">]</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
     <span class="k">return</span></div>
 </pre></div>
 

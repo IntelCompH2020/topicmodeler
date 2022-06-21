@@ -42,7 +42,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../TMinferencer.html">TMinferencer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../corpus2JSON.html">corpus2JSON</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../src.html">src</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../topicmodeling.html">topicmodeling</a></li>
 </ul>
 
         </div>
@@ -109,12 +108,11 @@
 <span class="sd">            key is the absolute path to the dataset</span>
 <span class="sd">            value is a dictionary with metadata</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">allDtsets</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">Dts</span> <span class="ow">in</span> <span class="n">path_parquet</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
-            <span class="n">metafile</span> <span class="o">=</span> <span class="n">Dts</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;datasetMeta.json&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">metafile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metafile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
-                    <span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fin</span><span class="p">)</span>
+        <span class="n">metafile</span> <span class="o">=</span> <span class="n">path_parquet</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;datasetMeta.json&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metafile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+            <span class="n">allDtsets</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fin</span><span class="p">)</span>
+        <span class="n">allDtsets</span> <span class="o">=</span> <span class="p">{</span><span class="n">path_parquet</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">Dts</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="p">:</span> <span class="n">allDtsets</span><span class="p">[</span><span class="n">Dts</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">Dts</span> <span class="ow">in</span> <span class="n">allDtsets</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
 
         <span class="k">return</span> <span class="n">allDtsets</span></div>
 

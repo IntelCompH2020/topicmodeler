@@ -1,5 +1,5 @@
 src.ITMTmanager
-======================
+===============
 
 .. automodule:: src.ITMTmanager
    :members:

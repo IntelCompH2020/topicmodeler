@@ -16,8 +16,6 @@ Topic Modeler documentation
    TMinferencer
    corpus2JSON
    src
-   topicmodeling
-   
 
 Indices and tables
 ==================

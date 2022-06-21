@@ -42,7 +42,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../TMinferencer.html">TMinferencer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../corpus2JSON.html">corpus2JSON</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../src.html">src</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../topicmodeling.html">topicmodeling</a></li>
 </ul>
 
         </div>
@@ -76,22 +75,42 @@
     <span class="n">MAX_CORPUS_BUTTONS</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">MAX_RECENT_PROJECTS</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">MAX_RECENT_PARQUETS</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">MAX_RECENT_WORDLISTS</span> <span class="o">=</span> <span class="mi">2</span>
 
     <span class="n">LONG_TIME_SHOW_SB</span> <span class="o">=</span> <span class="mi">10000</span>
 
+    <span class="n">SMOOTH_SPOON_TITLE</span> <span class="o">=</span> <span class="s1">&#39;Smooth Spoon&#39;</span>
     <span class="n">SMOOTH_SPOON_MSG</span> <span class="o">=</span> <span class="s1">&#39;Smooth Spoon message&#39;</span>
     <span class="n">TM_CORPUS_MSG_STATUS_0</span> <span class="o">=</span> <span class="s2">&quot;The dataset could not be created.&quot;</span>
     <span class="n">TM_CORPUS_MSG_STATUS_1</span> <span class="o">=</span> <span class="s2">&quot;The dataset was created successfully.&quot;</span>
     <span class="n">TM_CORPUS_MSG_STATUS_2</span> <span class="o">=</span> <span class="s2">&quot;The dataset replaced an existing dataset&quot;</span>
+    <span class="n">TM_DELETE_NO_CORPUS_MSG</span> <span class="o">=</span> <span class="s2">&quot;A corpus to be deleted must be selected first.&quot;</span>
+    <span class="n">WORDLIST_CREATION_MSG_STATUS_0</span> <span class="o">=</span> <span class="s2">&quot;The wordlist could not be created.&quot;</span>
+    <span class="n">WORDLIST_CREATION_MSG_STATUS_1</span> <span class="o">=</span> <span class="s2">&quot;The wordlist was created successfully.&quot;</span>
+    <span class="n">WORDLIST_CREATION_MSG_STATUS_2</span> <span class="o">=</span> <span class="s2">&quot;The wordlist replaced an existing dataset&quot;</span>
+    <span class="n">WORDLIST_EDITION_MSG_STATUS_0</span> <span class="o">=</span> <span class="s2">&quot;The wordlist could not be created.&quot;</span>
+    <span class="n">WORDLIST_EDITION_MSG_STATUS_1</span> <span class="o">=</span> <span class="s2">&quot;The wordlist was created successfully.&quot;</span>
+    <span class="n">WORDLIST_EDITION_MSG_STATUS_2</span> <span class="o">=</span> <span class="s2">&quot;The wordlist replaced an existing dataset&quot;</span>
+    <span class="n">EDIT_WORDLIST_NOT_SELECTED_MSG</span> <span class="o">=</span> <span class="s2">&quot;A wordlist to be edited must be selected first.&quot;</span>
+    <span class="n">DELETE_WORDLIST_NOT_SELECTED_MSG</span> <span class="o">=</span> <span class="s2">&quot;A wordlist to be deleted must be selected first.&quot;</span>
 
-    <span class="n">CORPUS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_available_local_corpus&quot;</span><span class="p">,</span> <span class="s2">&quot;table_available_training_datasets&quot;</span><span class="p">]</span>
-    <span class="n">DOWNLOAD_CORPUS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_available_fields&quot;</span><span class="p">,</span> <span class="s2">&quot;table_fields_to_include&quot;</span><span class="p">,</span> <span class="s2">&quot;table_filters&quot;</span><span class="p">]</span>
-    <span class="n">CREATE_TM_CORPUS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tableWidget_available_fields_raw&quot;</span><span class="p">,</span> <span class="s2">&quot;tableWidget_fields_to_include_raw&quot;</span><span class="p">,</span>
+    <span class="n">CORPUS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_available_local_corpus&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;table_available_training_datasets&quot;</span><span class="p">]</span>
+    <span class="n">DOWNLOAD_CORPUS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_available_fields&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;table_fields_to_include&quot;</span><span class="p">,</span> <span class="s2">&quot;table_filters&quot;</span><span class="p">]</span>
+    <span class="n">CREATE_TM_CORPUS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tableWidget_available_fields_raw&quot;</span><span class="p">,</span>      <span class="s2">&quot;tableWidget_fields_to_include_raw&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;tableWidget_available_fields_lemmas&quot;</span><span class="p">,</span> <span class="s2">&quot;tableWidget_fields_to_include_lemmas&quot;</span><span class="p">]</span>
 
+    <span class="n">WORDLISTS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_available_wordlists&quot;</span><span class="p">]</span>
+    <span class="n">MSG_INSTRUCTIONS_NEW_WORDLIST</span> <span class="o">=</span> <span class="s2">&quot;To generate a new wordlists:</span><span class="se">\n</span><span class="s2"> - Stopwords or keywords: Introduce the words &quot;</span> \
+                                    <span class="s2">&quot;separated by commas (stw1,stw2, ...)</span><span class="se">\n</span><span class="s2"> - Equivalences: Introduce equivalences &quot;</span> \
+                                    <span class="s2">&quot;separated by commas in the format orig:target (orig1:tgt1, orig2:tgt2, ...) &quot;</span>
+
     <span class="n">MODELS_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_available_models&quot;</span><span class="p">,</span> <span class="s2">&quot;table_topics_edit_model&quot;</span><span class="p">]</span>
-    <span class="n">TRAIN_MODEL_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_training_resultsLDA&quot;</span><span class="p">,</span> <span class="s2">&quot;table_training_results_AVITM&quot;</span><span class="p">,</span> <span class="s2">&quot;table_training_results_CTM&quot;</span><span class="p">]</span>
-    <span class="n">TRAIN_LOADING_BARS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;progress_bar_LDA&quot;</span><span class="p">,</span> <span class="s2">&quot;progress_bar_AVITM&quot;</span><span class="p">,</span> <span class="s2">&quot;progress_bar_CTM&quot;</span><span class="p">]</span>
+    <span class="n">TRAIN_MODEL_TABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;table_training_resultsLDA&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;table_training_results_AVITM&quot;</span><span class="p">,</span> <span class="s2">&quot;table_training_results_CTM&quot;</span><span class="p">]</span>
+    <span class="n">TRAIN_LOADING_BARS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;progress_bar_LDA&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;progress_bar_AVITM&quot;</span><span class="p">,</span> <span class="s2">&quot;progress_bar_CTM&quot;</span><span class="p">]</span>
 
     <span class="n">HOME_BUTTON_SELECTED_STYLESHEET</span> <span class="o">=</span> \
         <span class="sd">&quot;&quot;&quot; QPushButton {	</span>

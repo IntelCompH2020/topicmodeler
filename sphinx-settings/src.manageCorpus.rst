@@ -1,7 +1,7 @@
 src.manageCorpus
-========================
+================
 
-Modules
+Submodules
 ----------
 
 .. toctree::
@@ -9,10 +9,10 @@ Modules
 
    src.manageCorpus.manageCorpus
 
-.. Module contents
-.. ---------------
+Module contents
+---------------
 
-.. .. automodule:: src.manageCorpus
-..    :members:
-..    :undoc-members:
-..    :show-inheritance:
+.. automodule:: src.manageCorpus
+   :members:
+   :undoc-members:
+   :show-inheritance:

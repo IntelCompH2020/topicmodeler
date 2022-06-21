@@ -13,8 +13,8 @@ from tqdm import tqdm
 from scipy.special import softmax
 
 # Local imports
-from src.neural_models.utils.early_stopping.pytorchtools import EarlyStopping
-from src.neural_models.pytorchavitm.avitm_network.decoder_network import DecoderNetwork
+from ...utils.early_stopping.pytorchtools import EarlyStopping
+from .decoder_network import DecoderNetwork
 
 
 class AVITM(object):

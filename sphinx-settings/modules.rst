@@ -10,4 +10,3 @@ topicmodeler
    TMinferencer
    corpus2JSON
    src
-   topicmodeling

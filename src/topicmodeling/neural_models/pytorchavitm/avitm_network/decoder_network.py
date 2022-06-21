@@ -4,7 +4,7 @@ from torch import nn
 from torch.nn import functional as F
 
 # Local imports
-from src.neural_models.pytorchavitm.avitm_network.inference_network import InferenceNetwork
+from .inference_network import InferenceNetwork
 
 
 class DecoderNetwork(nn.Module):

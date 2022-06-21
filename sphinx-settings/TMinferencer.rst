@@ -1,5 +1,5 @@
 TMinferencer
-===================
+============
 
 .. automodule:: TMinferencer
    :members:

@@ -1,7 +1,7 @@
 src.menu\_navigator
-===========================
+===================
 
-Modules
+Submodules
 ----------
 
 .. toctree::
@@ -9,10 +9,10 @@ Modules
 
    src.menu_navigator.menu_navigator
 
-.. Module contents
-.. ---------------
+Module contents
+---------------
 
-.. .. automodule:: src.menu_navigator
-..    :members:
-..    :undoc-members:
-..    :show-inheritance:
+.. automodule:: src.menu_navigator
+   :members:
+   :undoc-members:
+   :show-inheritance:

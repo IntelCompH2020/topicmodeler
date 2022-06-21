@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset &mdash; Topic Modeler documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.topicmodeling.neural_models.pytorchavitm.utils" href="src.topicmodeling.neural_models.pytorchavitm.utils.html" />
+    <link rel="prev" title="src.topicmodeling.neural_models.pytorchavitm.datasets" href="src.topicmodeling.neural_models.pytorchavitm.datasets.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> IntelComp_Topic_Modeler
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ITMT_mainGUI.html">ITMT_mainGUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="JSONadapter.html">JSONadapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TMinferencer.html">TMinferencer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus2JSON.html">corpus2JSON</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="src.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.gui.html">src.gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.manageLists.html">src.manageLists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.project_manager.html">src.project_manager</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="src.topicmodeling.html">src.topicmodeling</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="src.topicmodeling.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.topicmodeling.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.topicmodeling.html#module-src.topicmodeling">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.utils.html">src.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IntelComp_Topic_Modeler</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="src.html">src</a> &raquo;</li>
+          <li><a href="src.topicmodeling.html">src.topicmodeling</a> &raquo;</li>
+          <li><a href="src.topicmodeling.neural_models.html">src.topicmodeling.neural_models</a> &raquo;</li>
+          <li><a href="src.topicmodeling.neural_models.pytorchavitm.html">src.topicmodeling.neural_models.pytorchavitm</a> &raquo;</li>
+          <li><a href="src.topicmodeling.neural_models.pytorchavitm.datasets.html">src.topicmodeling.neural_models.pytorchavitm.datasets</a> &raquo;</li>
+      <li>src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset">
+<span id="src-topicmodeling-neural-models-pytorchavitm-datasets-bow-dataset"></span><h1>src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset<a class="headerlink" href="#module-src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset.BOWDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset.</span></span><span class="sig-name descname"><span class="pre">BOWDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx2token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/topicmodeling/neural_models/pytorchavitm/datasets/bow_dataset.html#BOWDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset.BOWDataset" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.dataset.Dataset</span></code></p>
+<p>Class to load BOW dataset.</p>
+<p>Initializes BOWDataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>(</em><em>n_samples</em><em>, </em><em>n_features</em><em>)</em>) – Document-term matrix</p></li>
+<li><p><strong>idx2token</strong> (<em>list</em>) – A list of feature names</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset.BOWDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx2token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/topicmodeling/neural_models/pytorchavitm/datasets/bow_dataset.html#BOWDataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.topicmodeling.neural_models.pytorchavitm.datasets.bow_dataset.BOWDataset.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes BOWDataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>(</em><em>n_samples</em><em>, </em><em>n_features</em><em>)</em>) – Document-term matrix</p></li>
+<li><p><strong>idx2token</strong> (<em>list</em>) – A list of feature names</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.topicmodeling.neural_models.pytorchavitm.datasets.html" class="btn btn-neutral float-left" title="src.topicmodeling.neural_models.pytorchavitm.datasets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.topicmodeling.neural_models.pytorchavitm.utils.html" class="btn btn-neutral float-right" title="src.topicmodeling.neural_models.pytorchavitm.utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, J. Arenas-García, L. Calvo-Bartolomé, J. A. Espinosa-Melchor.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

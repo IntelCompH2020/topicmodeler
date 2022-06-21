@@ -1,5 +1,5 @@
 ITMT\_mainGUI
-====================
+=============
 
 .. automodule:: ITMT_mainGUI
    :members:

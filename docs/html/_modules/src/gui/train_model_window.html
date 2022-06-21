@@ -42,7 +42,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../TMinferencer.html">TMinferencer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../corpus2JSON.html">corpus2JSON</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../src.html">src</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../topicmodeling.html">topicmodeling</a></li>
 </ul>
 
         </div>
@@ -70,25 +69,28 @@
            <div itemprop="articleBody">
              
   <h1>Source code for src.gui.train_model_window</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">PyQt6</span> <span class="kn">import</span> <span class="n">QtWidgets</span>
-<span class="kn">from</span> <span class="nn">PyQt6.QtGui</span> <span class="kn">import</span> <span class="n">QIcon</span>
-<span class="kn">from</span> <span class="nn">PyQt6.QtWidgets</span> <span class="kn">import</span> <span class="n">QPushButton</span>
-<span class="kn">from</span> <span class="nn">PyQt6.uic</span> <span class="kn">import</span> <span class="n">loadUi</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">* *IntelComp H2020 project*</span>
+
+<span class="sd">Class that defines the subwindow for the Interactive Topic Model Trainer App for the training of a new topic model.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PyQt6</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtWidgets</span>
+<span class="kn">from</span> <span class="nn">PyQt6.QtWidgets</span> <span class="kn">import</span> <span class="n">QPushButton</span>
+<span class="kn">from</span> <span class="nn">PyQt6.uic</span> <span class="kn">import</span> <span class="n">loadUi</span>
 <span class="kn">from</span> <span class="nn">src.gui.utils</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">src.gui.utils.constants</span> <span class="kn">import</span> <span class="n">Constants</span>
 
 
 <div class="viewcode-block" id="TrainModelWindow"><a class="viewcode-back" href="../../../src.gui.train_model_window.html#src.gui.train_model_window.TrainModelWindow">[docs]</a><span class="k">class</span> <span class="nc">TrainModelWindow</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QDialog</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    @ TODO: Describe</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TrainModelWindow.__init__"><a class="viewcode-back" href="../../../src.gui.train_model_window.html#src.gui.train_model_window.TrainModelWindow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        @ TODO: Describe</span>
+<span class="sd">        Initializes the application&#39;s subwindow from which the user can train a new topic model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -122,11 +124,13 @@
         <span class="n">train_buttons</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">id_button</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">MAX_TRAIN_OPTIONS</span><span class="p">):</span>
             <span class="n">train_button_name</span> <span class="o">=</span> <span class="s2">&quot;train_button_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">id_button</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">train_button_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">train_button_name</span><span class="p">)</span>
+            <span class="n">train_button_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findChild</span><span class="p">(</span>
+                <span class="n">QPushButton</span><span class="p">,</span> <span class="n">train_button_name</span><span class="p">)</span>
             <span class="n">train_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">train_button_widget</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">train_button</span> <span class="ow">in</span> <span class="n">train_buttons</span><span class="p">:</span>
-            <span class="n">train_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_change_train_button</span><span class="p">,</span> <span class="n">train_button</span><span class="p">))</span>
+            <span class="n">train_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clicked_change_train_button</span><span class="p">,</span> <span class="n">train_button</span><span class="p">))</span>
 
         <span class="c1"># PAGE 1: LDA-Mallet</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_button_1</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
@@ -141,12 +145,12 @@
             <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_tabs</span><span class="o">.</span><span class="n">setCurrentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">page_trainCTM</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TrainModelWindow.init_ui"><a class="viewcode-back" href="../../../src.gui.train_model_window.html#src.gui.train_model_window.TrainModelWindow.init_ui">[docs]</a>    <span class="k">def</span> <span class="nf">init_ui</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Configures the elements of the GUI window that are not configured in the UI, i.e. icon of the application,</span>
-<span class="sd">        the application&#39;s title, and the position of the window at its opening.</span>
+        <span class="sd">&quot;&quot;&quot;Configures the elements of the GUI window that are not configured in the UI, i.e., icon of the application, the application&#39;s title, and the position of the window at its opening.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># @ TODO: When icons ready</span>
-        <span class="c1"># self.setWindowIcon(QIcon(&#39;UIs/Images/dc_logo.png&#39;))</span>
-        <span class="c1"># self.setWindowTitle(Messages.WINDOW_TITLE)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowIcon</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span>
+            <span class="s1">&#39;src/gui/resources/images/fuzzy_training.png&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">SMOOTH_SPOON_TITLE</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TrainModelWindow.clicked_change_train_button"><a class="viewcode-back" href="../../../src.gui.train_model_window.html#src.gui.train_model_window.TrainModelWindow.clicked_change_train_button">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_change_train_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_button</span><span class="p">):</span>
@@ -156,10 +160,12 @@
 
         <span class="c1"># Put unpressed color for the previous pressed train button</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_train_button</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">previous_train_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">TRAIN_BUTTONS_UNSELECTED_STYLESHEET</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_train_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span>
+                <span class="n">Constants</span><span class="o">.</span><span class="n">TRAIN_BUTTONS_UNSELECTED_STYLESHEET</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_train_button</span> <span class="o">=</span> <span class="n">train_button</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">previous_train_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">TRAIN_BUTTONS_SELECTED_STYLESHEET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_train_button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span>
+            <span class="n">Constants</span><span class="o">.</span><span class="n">TRAIN_BUTTONS_SELECTED_STYLESHEET</span><span class="p">)</span>
 
         <span class="k">return</span></div></div>
 </pre></div>

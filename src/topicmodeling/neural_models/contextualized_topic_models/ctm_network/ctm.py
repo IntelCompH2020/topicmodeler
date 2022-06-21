@@ -13,8 +13,8 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 # Local imports
-from src.neural_models.contextualized_topic_models.ctm_network.decoding_network import DecoderNetwork
-from src.neural_models.utils.early_stopping.pytorchtools import EarlyStopping
+from .decoding_network import DecoderNetwork
+from ...utils.early_stopping.pytorchtools import EarlyStopping
 
 
 class CTM(object):

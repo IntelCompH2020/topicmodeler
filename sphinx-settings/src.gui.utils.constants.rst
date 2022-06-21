@@ -1,5 +1,5 @@
 src.gui.utils.constants
-==============================
+=======================
 
 .. automodule:: src.gui.utils.constants
    :members:

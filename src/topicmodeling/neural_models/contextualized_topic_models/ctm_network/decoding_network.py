@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from src.neural_models.contextualized_topic_models.ctm_network.inference_network import CombinedInferenceNetwork, ContextualInferenceNetwork
+from .inference_network import CombinedInferenceNetwork, ContextualInferenceNetwork
 
 
 class DecoderNetwork(nn.Module):

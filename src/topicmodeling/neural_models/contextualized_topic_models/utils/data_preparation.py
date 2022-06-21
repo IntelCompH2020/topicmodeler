@@ -7,7 +7,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 
 # Local imports
-from src.neural_models.contextualized_topic_models.datasets.dataset import CTMDataset
+from ..datasets.dataset import CTMDataset
 
 
 def get_bag_of_words(data, min_length):
