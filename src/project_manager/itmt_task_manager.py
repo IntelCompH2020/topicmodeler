@@ -364,7 +364,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             p2p, p2parquet, p2wdlist, config_fname=config_fname,
             metadata_fname=metadata_fname)
 
-        super().load()
+        #super().load()
 
     def fromHDFS(self):
         """
