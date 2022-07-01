@@ -568,11 +568,3 @@ class MainWindow(QMainWindow):
         return
 
     # MODELS FUNCTIONS
-    def get_pyldavis_home(self):
-        self.web = QWebEngineView()
-        cwd = os.getcwd()
-        url = QUrl.fromLocalFile(cwd + "/src/gui/resources/pyLDAvis.html")
-        print(url)
-        self.web.load(url)
-        self.layout_plot_pyldavis.addWidget(self.web)
-        self.web.show()
