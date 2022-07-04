@@ -457,9 +457,12 @@ class MainWindow(QMainWindow):
 
         # Get selected dataset for deletion
         r = self.table_available_training_datasets.currentRow()
+        print(self.table_available_training_datasets.item(
+            r, 0).text())
 
-        # If no training corpus is selected for deletion before clicking the 'pushButton_delete_trdtst' button, a warning message is shown to the user
-        if not r:
+        # If no training corpus is selected for deletion before clicking the 'pushButton_delete_trdtst' button,
+        # a warning message is shown to the user
+        if r is None:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.TM_DELETE_NO_CORPUS_MSG)
             return
@@ -565,11 +568,3 @@ class MainWindow(QMainWindow):
         return
 
     # MODELS FUNCTIONS
-    def get_pyldavis_home(self):
-        self.web = QWebEngineView()
-        cwd = os.getcwd()
-        url = QUrl.fromLocalFile(cwd + "/src/gui/resources/pyLDAvis.html")
-        print(url)
-        self.web.load(url)
-        self.layout_plot_pyldavis.addWidget(self.web)
-        self.web.show()

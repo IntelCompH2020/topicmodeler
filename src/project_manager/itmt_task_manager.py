@@ -364,7 +364,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             p2p, p2parquet, p2wdlist, config_fname=config_fname,
             metadata_fname=metadata_fname)
 
-        super().load()
+        # super().load()
 
     def fromHDFS(self):
         """
@@ -1913,7 +1913,9 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                  'Dtsets': TM_Dtset
                  }
 
-        return self.save_TrDtset(Dtset)
+        status = self.save_TrDtset(Dtset)
+
+        return int(status.decode('utf8'))
 
     def listTMCorpus(self, gui):
         """
@@ -1969,10 +1971,10 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                     if reply == QMessageBox.StandardButton.Yes:
                         status = self.delete_TrDtset(TrDts)
                         # @TODO: Revise. Status is being returned as a byte object (b'1')
-                        if status == 0:
+                        if int(status.decode('utf8')) == 0:
                             QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
                                                 allTrDtsets[TrDts]['name'] + ' could not be deleted.')
-                        elif status == 1:
+                        elif int(status.decode('utf8')) == 1:
                             QMessageBox.information(
                                 gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' + allTrDtsets[TrDts]['name'] + ' was deleted successfully.')
 
@@ -2034,8 +2036,9 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                   'visibility': lst_privacy,
                   'wordlist': wds
                   }
+        status = self.create_List(WdList)
 
-        return self.create_List(WdList)
+        return int(status.decode('utf8'))
 
     def EditWdList(self, wdlist):
         """
@@ -2049,7 +2052,9 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         """
 
         # The list will be saved replacing existing list
-        return self.create_List(wdlist)
+        status = self.create_List(wdlist)
+
+        return int(status.decode('utf8'))
 
     def DelWdList(self, wdlst_to_delete, gui):
         """
@@ -2075,10 +2080,10 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                     if reply == QMessageBox.StandardButton.Yes:
                         status = self.delete_WdLst(WdLst)
                         # @TODO: Revise. Status is being returned as a byte object (b'1')
-                        if status == 0:
+                        if int(status.decode('utf8')) == 0:
                             QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Wordlist ' +
                                                 allWdLists[WdLst]['name'] + ' could not be deleted.')
-                        elif status == 1:
+                        elif int(status.decode('utf8')) == 1:
                             QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Wordlist ' +
                                                     allWdLists[WdLst]['name'] + ' was deleted successfully.')
 

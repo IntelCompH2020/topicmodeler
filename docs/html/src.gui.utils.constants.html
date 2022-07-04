@@ -45,24 +45,25 @@
 <li class="toctree-l1"><a class="reference internal" href="TMinferencer.html">TMinferencer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus2JSON.html">corpus2JSON</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="src.html">src</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="src.html#packages">Packages</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="src.gui.html">src.gui</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="src.gui.html#packages">Packages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="src.gui.html#modules">Modules</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.gui.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#module-src.gui">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageLists.html">src.manageLists</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="src.neural_models.html">src.neural_models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.project_manager.html">src.project_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.topicmodeling.html">src.topicmodeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.utils.html">src.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="src.html#modules">Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="topicmodeling.html">topicmodeling</a></li>
 </ul>
 
         </div>
@@ -124,8 +125,18 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.MAX_RECENT_WORDLISTS">
+<span class="sig-name descname"><span class="pre">MAX_RECENT_WORDLISTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.MAX_RECENT_WORDLISTS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="src.gui.utils.constants.Constants.LONG_TIME_SHOW_SB">
 <span class="sig-name descname"><span class="pre">LONG_TIME_SHOW_SB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10000</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.LONG_TIME_SHOW_SB" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.SMOOTH_SPOON_TITLE">
+<span class="sig-name descname"><span class="pre">SMOOTH_SPOON_TITLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Smooth</span> <span class="pre">Spoon'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.SMOOTH_SPOON_TITLE" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -149,6 +160,51 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.TM_DELETE_NO_CORPUS_MSG">
+<span class="sig-name descname"><span class="pre">TM_DELETE_NO_CORPUS_MSG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'A</span> <span class="pre">corpus</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">deleted</span> <span class="pre">must</span> <span class="pre">be</span> <span class="pre">selected</span> <span class="pre">first.'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.TM_DELETE_NO_CORPUS_MSG" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.WORDLIST_CREATION_MSG_STATUS_0">
+<span class="sig-name descname"><span class="pre">WORDLIST_CREATION_MSG_STATUS_0</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'The</span> <span class="pre">wordlist</span> <span class="pre">could</span> <span class="pre">not</span> <span class="pre">be</span> <span class="pre">created.'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.WORDLIST_CREATION_MSG_STATUS_0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.WORDLIST_CREATION_MSG_STATUS_1">
+<span class="sig-name descname"><span class="pre">WORDLIST_CREATION_MSG_STATUS_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'The</span> <span class="pre">wordlist</span> <span class="pre">was</span> <span class="pre">created</span> <span class="pre">successfully.'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.WORDLIST_CREATION_MSG_STATUS_1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.WORDLIST_CREATION_MSG_STATUS_2">
+<span class="sig-name descname"><span class="pre">WORDLIST_CREATION_MSG_STATUS_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'The</span> <span class="pre">wordlist</span> <span class="pre">replaced</span> <span class="pre">an</span> <span class="pre">existing</span> <span class="pre">dataset'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.WORDLIST_CREATION_MSG_STATUS_2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.WORDLIST_EDITION_MSG_STATUS_0">
+<span class="sig-name descname"><span class="pre">WORDLIST_EDITION_MSG_STATUS_0</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'The</span> <span class="pre">wordlist</span> <span class="pre">could</span> <span class="pre">not</span> <span class="pre">be</span> <span class="pre">created.'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.WORDLIST_EDITION_MSG_STATUS_0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.WORDLIST_EDITION_MSG_STATUS_1">
+<span class="sig-name descname"><span class="pre">WORDLIST_EDITION_MSG_STATUS_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'The</span> <span class="pre">wordlist</span> <span class="pre">was</span> <span class="pre">created</span> <span class="pre">successfully.'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.WORDLIST_EDITION_MSG_STATUS_1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.WORDLIST_EDITION_MSG_STATUS_2">
+<span class="sig-name descname"><span class="pre">WORDLIST_EDITION_MSG_STATUS_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'The</span> <span class="pre">wordlist</span> <span class="pre">replaced</span> <span class="pre">an</span> <span class="pre">existing</span> <span class="pre">dataset'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.WORDLIST_EDITION_MSG_STATUS_2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.EDIT_WORDLIST_NOT_SELECTED_MSG">
+<span class="sig-name descname"><span class="pre">EDIT_WORDLIST_NOT_SELECTED_MSG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'A</span> <span class="pre">wordlist</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">edited</span> <span class="pre">must</span> <span class="pre">be</span> <span class="pre">selected</span> <span class="pre">first.'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.EDIT_WORDLIST_NOT_SELECTED_MSG" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.DELETE_WORDLIST_NOT_SELECTED_MSG">
+<span class="sig-name descname"><span class="pre">DELETE_WORDLIST_NOT_SELECTED_MSG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'A</span> <span class="pre">wordlist</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">deleted</span> <span class="pre">must</span> <span class="pre">be</span> <span class="pre">selected</span> <span class="pre">first.'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.DELETE_WORDLIST_NOT_SELECTED_MSG" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="src.gui.utils.constants.Constants.CORPUS_TABLES">
 <span class="sig-name descname"><span class="pre">CORPUS_TABLES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['table_available_local_corpus',</span> <span class="pre">'table_available_training_datasets']</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.CORPUS_TABLES" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -161,6 +217,16 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.gui.utils.constants.Constants.CREATE_TM_CORPUS_TABLES">
 <span class="sig-name descname"><span class="pre">CREATE_TM_CORPUS_TABLES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['tableWidget_available_fields_raw',</span> <span class="pre">'tableWidget_fields_to_include_raw',</span> <span class="pre">'tableWidget_available_fields_lemmas',</span> <span class="pre">'tableWidget_fields_to_include_lemmas']</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.CREATE_TM_CORPUS_TABLES" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.WORDLISTS_TABLES">
+<span class="sig-name descname"><span class="pre">WORDLISTS_TABLES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['table_available_wordlists']</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.WORDLISTS_TABLES" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.gui.utils.constants.Constants.MSG_INSTRUCTIONS_NEW_WORDLIST">
+<span class="sig-name descname"><span class="pre">MSG_INSTRUCTIONS_NEW_WORDLIST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'To</span> <span class="pre">generate</span> <span class="pre">a</span> <span class="pre">new</span> <span class="pre">wordlists:\n</span> <span class="pre">-</span> <span class="pre">Stopwords</span> <span class="pre">or</span> <span class="pre">keywords:</span> <span class="pre">Introduce</span> <span class="pre">the</span> <span class="pre">words</span> <span class="pre">separated</span> <span class="pre">by</span> <span class="pre">commas</span> <span class="pre">(stw1,stw2,</span> <span class="pre">...)\n</span> <span class="pre">-</span> <span class="pre">Equivalences:</span> <span class="pre">Introduce</span> <span class="pre">equivalences</span> <span class="pre">separated</span> <span class="pre">by</span> <span class="pre">commas</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">format</span> <span class="pre">orig:target</span> <span class="pre">(orig1:tgt1,</span> <span class="pre">orig2:tgt2,</span> <span class="pre">...)</span> <span class="pre">'</span></em><a class="headerlink" href="#src.gui.utils.constants.Constants.MSG_INSTRUCTIONS_NEW_WORDLIST" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

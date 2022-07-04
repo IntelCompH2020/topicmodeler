@@ -1,7 +1,7 @@
 src
-===========
+===
 
-Packages
+Subpackages
 -----------
 
 .. toctree::
@@ -11,11 +11,11 @@ Packages
    src.manageCorpus
    src.manageLists
    src.menu_navigator
-   src.neural_models
    src.project_manager
+   src.topicmodeling
    src.utils
 
-Modules
+Submodules
 ----------
 
 .. toctree::
@@ -23,10 +23,10 @@ Modules
 
    src.ITMTmanager
 
-.. Module contents
-.. ---------------
+Module contents
+---------------
 
-.. .. automodule:: src
-..    :members:
-..    :undoc-members:
-..    :show-inheritance:
+.. automodule:: src
+   :members:
+   :undoc-members:
+   :show-inheritance:

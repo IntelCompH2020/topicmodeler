@@ -1,7 +1,7 @@
 src.manageLists
 ===============
 
-Modules
+Submodules
 ----------
 
 .. toctree::
@@ -9,10 +9,10 @@ Modules
 
    src.manageLists.manageLists
 
-.. Module contents
-.. ---------------
+Module contents
+---------------
 
-.. .. automodule:: src.manageLists
-..    :members:
-..    :undoc-members:
-..    :show-inheritance:
+.. automodule:: src.manageLists
+   :members:
+   :undoc-members:
+   :show-inheritance:

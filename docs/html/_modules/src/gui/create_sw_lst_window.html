@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.gui.create_sw_lst_window &mdash; Topic Modeler documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> IntelComp_Topic_Modeler
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ITMT_mainCMD.html">ITMT_mainCMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ITMT_mainGUI.html">ITMT_mainGUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../JSONadapter.html">JSONadapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../TMinferencer.html">TMinferencer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../corpus2JSON.html">corpus2JSON</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">IntelComp_Topic_Modeler</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>src.gui.create_sw_lst_window</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.gui.create_sw_lst_window</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">* *IntelComp H2020 project*</span>
+
+<span class="sd">Class that defines the subwindow for the Interactive Topic Model Trainer App for the creation of a new wordlist.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">PyQt6</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtWidgets</span>
+<span class="kn">from</span> <span class="nn">PyQt6.uic</span> <span class="kn">import</span> <span class="n">loadUi</span>
+<span class="kn">from</span> <span class="nn">src.gui.utils.constants</span> <span class="kn">import</span> <span class="n">Constants</span>
+
+
+<div class="viewcode-block" id="CreateSwLstWindow"><a class="viewcode-back" href="../../../src.gui.create_sw_lst_window.html#src.gui.create_sw_lst_window.CreateSwLstWindow">[docs]</a><span class="k">class</span> <span class="nc">CreateSwLstWindow</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QDialog</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CreateSwLstWindow.__init__"><a class="viewcode-back" href="../../../src.gui.create_sw_lst_window.html#src.gui.create_sw_lst_window.CreateSwLstWindow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tm</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the application&#39;s subwindow from which the user can access the functionalities for creating a new wordlist.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tm : TaskManager</span>
+<span class="sd">            TaskManager object associated with the project</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">CreateSwLstWindow</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Load UI and configure default geometry of the window</span>
+        <span class="c1"># #####################################################################</span>
+        <span class="n">loadUi</span><span class="p">(</span><span class="s2">&quot;src/gui/uis/create_wordlist.ui&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># ATTRIBUTES</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tm</span> <span class="o">=</span> <span class="n">tm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">list_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Widgets initial configuration</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textEdit_wordlst</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="s2">&quot;stw1,stw2, ...&quot;</span><span class="p">)</span>
+
+        <span class="c1">#####################################################################################</span>
+        <span class="c1"># Connect buttons</span>
+        <span class="c1">#####################################################################################</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushButton_create_wordlist</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clicked_pushButton_create_wordlist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comboBox_wordlst_type</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">changed_comboBox_wordlst_type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CreateSwLstWindow.init_ui"><a class="viewcode-back" href="../../../src.gui.create_sw_lst_window.html#src.gui.create_sw_lst_window.CreateSwLstWindow.init_ui">[docs]</a>    <span class="k">def</span> <span class="nf">init_ui</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configures the elements of the GUI window that are not configured in the UI, i.e., icon of the application, the application&#39;s title, and the position of the window at its opening.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowIcon</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span>
+            <span class="s1">&#39;src/gui/resources/images/fuzzy_training.png&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">Constants</span><span class="o">.</span><span class="n">SMOOTH_SPOON_TITLE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CreateSwLstWindow.changed_comboBox_wordlst_type"><a class="viewcode-back" href="../../../src.gui.create_sw_lst_window.html#src.gui.create_sw_lst_window.CreateSwLstWindow.changed_comboBox_wordlst_type">[docs]</a>    <span class="k">def</span> <span class="nf">changed_comboBox_wordlst_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;It adapts the format of the wordlist that needs to be introdued in the &#39;textEdit_wordlst&#39; for the wordlist type selected in the &#39;comboBox_wordlst_type&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">list_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comboBox_wordlst_type</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_type</span> <span class="o">==</span> <span class="s2">&quot;Stopwords&quot;</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;stw1,stw2, ...&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_type</span> <span class="o">==</span> <span class="s2">&quot;Keywords&quot;</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;key1,key2, ...&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_type</span> <span class="o">==</span> <span class="s2">&quot;Equivalences&quot;</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;orig1: tgt1, orig2: tgt2, ...&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textEdit_wordlst</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="CreateSwLstWindow.clicked_pushButton_create_wordlist"><a class="viewcode-back" href="../../../src.gui.create_sw_lst_window.html#src.gui.create_sw_lst_window.CreateSwLstWindow.clicked_pushButton_create_wordlist">[docs]</a>    <span class="k">def</span> <span class="nf">clicked_pushButton_create_wordlist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;It controls the clicking of the &#39;pushButton_create_wordlist&#39;. Once the button is clicked, the wordlist inserted by the user is taken from the &#39;textEdit_wordlst&#39;, as well as the wordlist characteristics (name, description, and privacy level). Once the wordlist characteristics are attained, the task manager function in charge of creating the new wordlist is invoked. After the wordlist creation completion, the window is closed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get wordlist characteristics</span>
+        <span class="n">wds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">textEdit_wordlst</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+        <span class="n">wds</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">wds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">el</span><span class="p">)]</span>
+        <span class="n">wds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">wds</span><span class="p">)))</span>
+        <span class="n">wlst_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit_wordlst_name</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="n">wlst_privacy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comboBox_privacy_level</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+        <span class="n">wlst_desc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">textEdit_wordlst_description</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+
+        <span class="c1"># Create TMCorpus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">NewWdList</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">list_type</span><span class="p">,</span> <span class="n">wds</span><span class="p">,</span> <span class="n">wlst_name</span><span class="p">,</span> <span class="n">wlst_privacy</span><span class="p">,</span> <span class="n">wlst_desc</span><span class="p">)</span>
+
+        <span class="c1"># Hide window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+        <span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, J. Arenas-García, L. Calvo-Bartolomé, J. A. Espinosa-Melchor.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -34,10 +34,10 @@ from gensim.utils import check_output, tokenize
 import pickle
 
 # Local imports
-from src.neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
-from src.neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
-from src.neural_models.pytorchavitm.avitm_network.avitm import AVITM
-from src.neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
+from .neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
+from .neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
+from .neural_models.pytorchavitm.avitm_network.avitm import AVITM
+from .neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
 
 logging.getLogger("gensim").setLevel(logging.WARNING)
 """

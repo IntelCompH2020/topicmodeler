@@ -1,7 +1,7 @@
 src.gui.utils
-=====================
+=============
 
-Modules
+Submodules
 ----------
 
 .. toctree::
@@ -13,10 +13,10 @@ Modules
    src.gui.utils.worker
    src.gui.utils.worker_signals
 
-.. Module contents
-.. ---------------
+Module contents
+---------------
 
-.. .. automodule:: src.gui.utils
-..    :members:
-..    :undoc-members:
-..    :show-inheritance:
+.. automodule:: src.gui.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

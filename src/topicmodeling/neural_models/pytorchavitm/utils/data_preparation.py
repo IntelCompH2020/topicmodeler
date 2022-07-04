@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 
 # Local imports
-from src.neural_models.pytorchavitm.datasets.bow_dataset import BOWDataset
+from ..datasets.bow_dataset import BOWDataset
 
 
 def prepare_dataset(corpus, val_size=0.25):

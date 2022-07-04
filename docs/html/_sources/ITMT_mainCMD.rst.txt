@@ -1,5 +1,5 @@
 ITMT\_mainCMD
-====================
+=============
 
 .. automodule:: ITMT_mainCMD
    :members:

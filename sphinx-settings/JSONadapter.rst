@@ -1,5 +1,5 @@
 JSONadapter
-==================
+===========
 
 .. automodule:: JSONadapter
    :members:

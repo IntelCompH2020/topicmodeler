@@ -45,24 +45,25 @@
 <li class="toctree-l1"><a class="reference internal" href="TMinferencer.html">TMinferencer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus2JSON.html">corpus2JSON</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="src.html">src</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="src.html#packages">Packages</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="src.gui.html">src.gui</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="src.gui.html#packages">Packages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="src.gui.html#modules">Modules</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.gui.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#module-src.gui">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageCorpus.html">src.manageCorpus</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.manageLists.html">src.manageLists</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.menu_navigator.html">src.menu_navigator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="src.neural_models.html">src.neural_models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.project_manager.html">src.project_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.topicmodeling.html">src.topicmodeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.utils.html">src.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="src.html#modules">Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="topicmodeling.html">topicmodeling</a></li>
 </ul>
 
         </div>
@@ -110,9 +111,7 @@ Among others, it implements the functions needed to</p>
 <dt class="sig sig-object py" id="src.gui.utils.utils.execute_in_thread">
 <span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">execute_in_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gui</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_bar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#execute_in_thread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.execute_in_thread" title="Permalink to this definition"></a></dt>
 <dd><p>Method to execute a certain function in a secondary thread while keeping the GUI’s execution in the main thread.
-A progress bar is shown at the time the function is being executed if a progress bar object is provided. When
-finished, it forces the execution of the method to be executed after the function executing in a thread is
-completed. Based on the functions provided in the manual available at:
+A progress bar is shown at the time the function is being executed if a progress bar object is provided. When finished, it forces the execution of the method to be executed after the function executing in a thread is completed. Based on the functions provided in the manual available at:
 <a class="reference external" href="https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/">https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -144,8 +143,7 @@ both to 0, thus the bar shows a busy indicator instead of a percentage of steps.
 <dl class="py function">
 <dt class="sig sig-object py" id="src.gui.utils.utils.configure_table_header">
 <span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">configure_table_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_tables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#configure_table_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.configure_table_header" title="Permalink to this definition"></a></dt>
-<dd><p>Configures all the tables defined in the list given by “list_tables” in the sense that it makes their horizontal
-headers visible disables the functionality of highlighting sections and resizes their rows to fit their content.</p>
+<dd><p>Configures all the tables defined in the list given by “list_tables” in the sense that it makes their horizontal headers visible disables the functionality of highlighting sections and resizes their rows to fit their content.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -159,8 +157,7 @@ headers visible disables the functionality of highlighting sections and resizes 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.gui.utils.utils.initialize_progress_bar">
 <span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">initialize_progress_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_progress_bars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#initialize_progress_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.initialize_progress_bar" title="Permalink to this definition"></a></dt>
-<dd><p>Initializes all the progress bars defined in the list given by “list_progress_bars” in the sense that it makes
-them invisible to the user and establishes their progress at 0.</p>
+<dd><p>Initializes all the progress bars defined in the list given by “list_progress_bars” in the sense that it makes them invisible to the user and establishes their progress at 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -184,12 +181,8 @@ them invisible to the user and establishes their progress at 0.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.gui.utils.utils.save_recent">
-<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">save_recent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_parquet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#save_recent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.save_recent" title="Permalink to this definition"></a></dt>
-<dd><p>Saves in a pickle file a dictionary structure with a list of the last used projects and parquet folders. If the
-file exists, the current project and parquet folders are added to the corresponding lists in the dictionary with
-the condition that they are not equal to their corresponding pair in the previous execution. If the file does not
-exist, a new dictionary is instantiated with each of its lists being conformed by just the current project and
-parquet folder, respectively,</p>
+<span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">save_recent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_parquet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_wordlist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#save_recent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.save_recent" title="Permalink to this definition"></a></dt>
+<dd><p>Saves in a pickle file a dictionary structure with a list of the last used projects and parquet folders. If the file exists, the current project and parquet folders are added to the corresponding lists in the dictionary with the condition that they are not equal to their corresponding pair in the previous execution. If the file does not exist, a new dictionary is instantiated with each of its lists being conformed by just the current project and parquet folder, respectively,</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -203,11 +196,7 @@ parquet folder, respectively,</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.gui.utils.utils.set_recent_buttons">
 <span class="sig-prename descclassname"><span class="pre">src.gui.utils.utils.</span></span><span class="sig-name descname"><span class="pre">set_recent_buttons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/gui/utils/utils.html#set_recent_buttons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.utils.utils.set_recent_buttons" title="Permalink to this definition"></a></dt>
-<dd><p>Loads the dictionary of recent projects and parquet folders into execution time. If the dictionary is not empty,
-it looks for the last two project folders and parquet folders. After checking if the routes still exist in the
-user’s OS, it adds the route as text in the corresponding buttons. Otherwise, in case the dictionary is empty and
-thus there are no recent projects, the frame that contains the buttons for the recent folders is hidden from the
-window.</p>
+<dd><p>Loads the dictionary of recent projects and parquet folders into execution time. If the dictionary is not empty, it looks for the last two project folders and parquet folders. After checking if the routes still exist in the user’s OS, it adds the route as text in the corresponding buttons. Otherwise, in case the dictionary is empty and thus there are no recent projects, the frame that contains the buttons for the recent folders is hidden from the window.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>window</strong> (<a class="reference internal" href="src.gui.main_window.html#src.gui.main_window.MainWindow" title="src.gui.main_window.MainWindow"><em>MainWindow</em></a>) – Window in which the buttons are going to be configured</p>

@@ -1,7 +1,7 @@
 src.utils
-================
+=========
 
-Modules
+Submodules
 ----------
 
 .. toctree::
@@ -9,7 +9,7 @@ Modules
 
    src.utils.misc
 
-.. .. automodule:: src.utils
-..    :members:
-..    :undoc-members:
-..    :show-inheritance:
+.. automodule:: src.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

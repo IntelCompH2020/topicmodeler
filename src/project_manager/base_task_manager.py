@@ -242,8 +242,8 @@ class BaseTaskManager(object):
         print("---- Project metadata saved in {0}".format(self.metadata_fname))
         print("---- A default config file has been located in the project "
               "folder.")
-        print("---- Open it and set your configuration variables properly.")
-        print("---- Once the config file is ready, activate it.")
+        # print("---- Open it and set your configuration variables properly.")
+        # print("---- Once the config file is ready, activate it.")
 
         self.setup()
 
@@ -277,7 +277,7 @@ class BaseTaskManager(object):
 
             # The following is used to automatically update any changes in the
             # keys of the self._dir_struct dictionary. This will be likely
-            # unnecesary once a stable version of the code is reached, but it
+            # unnecessary once a stable version of the code is reached, but it
             # is useful to update older application projects.
             self._update_folders(self._dir_struct)
 
