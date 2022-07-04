@@ -15,21 +15,20 @@ import pathlib
 from functools import partial
 
 import numpy as np
-from PyQt6 import QtCore, QtGui
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import QThreadPool, QUrl
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QPushButton
 from PyQt6.uic import loadUi
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 # Local imports
-from src.gui.create_sw_lst_window import CreateSwLstWindow
-from src.gui.edit_sw_lst_window import EditSwLstWindow
-from src.gui.generate_tm_corpus_window import GenerateTMCorpus
-from src.gui.train_model_window import TrainModelWindow
+from src.gui.manage_lists.create_sw_lst_window import CreateSwLstWindow
+from src.gui.manage_lists.edit_sw_lst_window import EditSwLstWindow
+from src.gui.manage_corpus.generate_tm_corpus_window import GenerateTMCorpus
+from src.gui.topic_modeling.train_model_window import TrainModelWindow
 from src.gui.utils import utils
 from src.gui.utils.constants import Constants
 from src.gui.utils.output_wrapper import OutputWrapper
-from src.gui.utils.utils import execute_in_thread
 from src.project_manager.itmt_task_manager import ITMTTaskManagerGUI
 
 
@@ -228,15 +227,23 @@ class MainWindow(QMainWindow):
         self.pushButton_delete_wordlist.clicked.connect(
             self.clicked_pushButton_delete_wordlist)
 
+        self.treeView_trained_models.clicked.connect(
+            self.clicked_treeView_trained_models)
+        self.pushButton_models_pyldavis.clicked.connect(
+            self.clicked_pushButton_models_pyldavis)
+        self.pushButton_return_pyldavis.clicked.connect(
+            self.clicked_pushButton_return_pyldavis)
+        self.pushButton_train_submodel.clicked.connect(
+            self.clicked_pushButton_train_submodel)
+        self.pushButton_delete_model.clicked.connect(
+            self.clicked_pushButton_delete_model)
+
     #####################################################################################
     # TASK MANAGER COMMUNICATION METHODS
     #####################################################################################
     def configure_tm(self):
         """
-        Once proper project and parquet folders have been selected by the user, it instantiates a task manager object
-        and its corresponding configuration functions are invoked according to whether the project selected already
-        existed or was just created. After this, the selected folders are saved in the dictionary of recent folders
-        and the menu buttons are unlocked so the user can proceed with the interaction with the GUI.
+        Once proper project and parquet folders have been selected by the user, it instantiates a task manager object and its corresponding configuration functions are invoked according to whether the project selected already existed or was just created.After this, the selected folders are saved in the dictionary of recent folders and the menu buttons are unlocked so the user can proceed with the interaction with the GUI.
         """
 
         if self.project_folder and self.parquet_folder and self.wordlists_folder:
@@ -262,8 +269,7 @@ class MainWindow(QMainWindow):
 
     def load_data(self):
         """
-        It loads the data and its associated metadata (local datasets available in the parquet folder, corpus for
-        training and trained models) into the corresponding GUI's tables.
+        It loads the data and its associated metadata (local datasets available in the parquet folder, corpus for training and trained models) into the corresponding GUI's tables.
         """
 
         # Load datasets available in the parquet folder into "table_available_local_corpus"
@@ -285,8 +291,7 @@ class MainWindow(QMainWindow):
 
     def init_user_interaction(self):
         """
-        Unlocks the clicking of the menu buttons so the user can proceed with the interaction with the GUI different
-        from the selection of the project and parquet folders.
+        Unlocks the clicking of the menu buttons so the user can proceed with the interaction with the GUI different from the selection of the project and parquet folders.
         """
 
         # Once project and parquet folders are properly selected, app's functionalities are enabled
@@ -303,10 +308,7 @@ class MainWindow(QMainWindow):
     #####################################################################################
     def get_project_folder(self):
         """
-        Method to control the clicking of the button "pushButton_open_project_folder. When this button is clicked,
-        the folder selector of the user's OS is open so the user can select the project folder. Once the project is
-        selected, if a proper parquet and wordlists folders were also already selected, the GUI's associated Task
-        Manager object is configured.
+        Method to control the clicking of the button "pushButton_open_project_folder. When this button is clicked, the folder selector of the user's OS is open so the user can select the project folder. Once the project is selected, if a proper parquet and wordlists folders were also already selected, the GUI's associated Task Manager object is configured.
         """
 
         self.project_folder = pathlib.Path(
@@ -321,10 +323,7 @@ class MainWindow(QMainWindow):
 
     def get_parquet_folder(self):
         """
-        Method to control the clicking of the button "pushButton_open_parquet_folder. When this button is clicked,
-        the folder selector of the user's OS is open so the user can select the parquet folder. Once the parquet
-        folder is selected, if a proper project and wordlists folders were also already selected, the GUI's associated
-        Task Manager object is configured.
+        Method to control the clicking of the button "pushButton_open_parquet_folder. When this button is clicked, the folder selector of the user's OS is open so the user can select the parquet folder. Once the parquet folder is selected, if a proper project and wordlists folders were also already selected, the GUI's associated Task Manager object is configured.
         """
 
         self.parquet_folder = pathlib.Path(
@@ -339,10 +338,7 @@ class MainWindow(QMainWindow):
 
     def get_wordlists_folder(self):
         """
-        Method to control the clicking of the button "pushButton_open_wordlists_folder. When this button is clicked,
-        the folder selector of the user's OS is open so the user can select the folder hosting the wordlists
-        (stopwords, keywords, etc). Once the wordlists folder is selected, if a proper project and parquet folders
-        were also already selected, the GUI's associated Task Manager object is configured.
+        Method to control the clicking of the button "pushButton_open_wordlists_folder. When this button is clicked, the folder selector of the user's OS is open so the user can select the folder hosting the wordlists (stopwords, keywords, etc). Once the wordlists folder is selected, if a proper project and parquet folders were also already selected, the GUI's associated Task Manager object is configured.
         """
 
         self.wordlists_folder = pathlib.Path(
@@ -358,10 +354,7 @@ class MainWindow(QMainWindow):
 
     def get_folder_from_recent(self, recent_button):
         """
-        Method to control the clicking of one of the recent buttons. If the recent button relates to a project
-        folder, such a project folder is loaded directly as the selected project folder and updated in the
-        corresponding line edit. Otherwise, the same applies but for the parquet folder. If both proper project and
-        parquet folders have been selected, the GUI's associated Task Manager object is configured.
+        Method to control the clicking of one of the recent buttons. If the recent button relates to a project folder, such a project folder is loaded directly as the selected project folder and updated in the corresponding line edit. Otherwise, the same applies but for the parquet folder. If both proper project and parquet folders have been selected, the GUI's associated Task Manager object is configured.
         """
 
         if "project" in recent_button.objectName():
@@ -420,7 +413,7 @@ class MainWindow(QMainWindow):
 
     # CORPUS FUNCTIONS
     def clicked_pushButton_generate_training_dataset(self):
-        """Method for controlling the clicking of the 'pushButton_generate_training_dataset'. Once this button is clicked, the datasets to be used for the creation of a new topic modeling corpus are collected by checking which of the checkboxes at the last column of the available local datasets are selected, and a list is created with its corresponding ids. Such a list is utilized for creating a "GenerateTMCorpus" subwindow, from which the user can specify his desired characteristics for the training corpus to be created. Once the former subwindow is closed, the training corpus generation is completed and based on the status returned by the task manager function in charge of the creation, an informative or warning message is shown to the user.
+        """Method for controlling the clicking of the 'pushButton_generate_training_dataset' Once this button is clicked, the datasets to be used for the creation of a new topic modeling corpus are collected by checking which of the checkboxes at the last column of the available local datasets are selected, and a list is created with its corresponding ids. Such a list is utilized for creating a "GenerateTMCorpus" subwindow, from which the user can specify his desired characteristics for the training corpus to be created. Once the former subwindow is closed, the training corpus generation is completed and based on the status returned by the task manager function in charge of the creation, an informative or warning message is shown to the user.
         """
 
         # Get ids of the datasets that are going to be used for the training corpus generation
@@ -568,3 +561,88 @@ class MainWindow(QMainWindow):
         return
 
     # MODELS FUNCTIONS
+    def clicked_treeView_trained_models(self):
+        """Method to control the clicking of an item within the QTreeWidget 'treeView_trained_models' in the 'Models' tab. At the time one of the items in the QTreeWidget is selected, the information of the model associated with the clicked item, as well as its topics' chemical description is shown in the tables 'table_available_trained_models_desc' and 'tableWidget_trained_models_topics', respectively.
+        """
+
+        if self.treeView_trained_models.currentItem() is None or \
+                self.treeView_available_models_topic_desc.currentItem().text(0).lower().startswith("models"):
+            return
+        else:
+            model_selected = self.treeView_trained_models.currentItem().text(0)
+
+            for model in self.tm.models.keys():
+                if self.tm.models[model]['name'] == model_selected:
+                    self.table_available_trained_models_desc.setRowCount(1)
+                    self.table_available_trained_models_desc.setItem(0, 0, QtWidgets.QTableWidgetItem(
+                        self.tm.models[model]['name']))
+                    self.table_available_trained_models_desc.setItem(0, 1, QtWidgets.QTableWidgetItem(
+                        self.tm.models[model]['model_type']))
+                    self.table_available_trained_models_desc.setItem(0, 2, QtWidgets.QTableWidgetItem(
+                        self.tm.models[model]['hierarchy_level']))
+                    self.table_available_trained_models_desc.setItem(0, 3, QtWidgets.QTableWidgetItem(
+                        self.tm.models[model]['hierarchical_type']))
+                    self.table_available_trained_models_desc.setItem(0, 4, QtWidgets.QTableWidgetItem(
+                        self.tm.models[model]['creation_date']))
+
+            # Show topics in table
+            self.tableWidget_trained_models_topics.clearContents()
+            self.tableWidget_trained_models_topics.setRowCount(
+                int(model.num_topics))
+            self.tableWidget_trained_models_topics.setColumnCount(2)
+
+            list_description = []
+            for i in np.arange(0, len(model.topics_models), 1):
+                if str(type(model.topics_models[i])) == "<class 'src.htms.topic.Topic'>":
+                    description = ' '.join(
+                        str(x) for x in model.topics_models[i].description)
+                    list_description.append(description)
+            for i in np.arange(0, len(list_description), 1):
+                item_topic_nr = QtWidgets.QTableWidgetItem(str(i))
+                self.tableWidget_trained_models_topics.setItem(
+                    i, 0, item_topic_nr)
+                item_topic_description = QtWidgets.QTableWidgetItem(
+                    str(list_description[i]))
+                self.tableWidget_trained_models_topics.setItem(
+                    i, 1, item_topic_description)
+
+            # Show PyLDAvis
+            if self.web:
+                self.web.setParent(None)
+            self.web = QWebEngineView()
+            # self.web.setZoomFactor(0.25)
+            url = QUrl.fromLocalFile(pathlib.Path(
+                model.model_path, "pyLDAvis.html").as_posix())
+            self.web.load(url)
+            self.layout_plot_pyldavis.addWidget(self.web)
+            self.web.show()
+
+        return
+
+    def clicked_pushButton_models_pyldavis(self):
+        """Method to control the change within the Models' page to the PyLDAvis view. 
+        """
+
+        self.models_tabs.setCurrentWidget(self.page_models_pyldavis)
+
+        return
+
+    def clicked_pushButton_return_pyldavis(self):
+        """Method to control the change from the PyLDAvis view back to the Models' page main view. 
+        """
+
+        self.models_tabs.setCurrentWidget(self.page_models_main)
+
+        return
+
+    def clicked_pushButton_train_submodel(self):
+        """Method to control the clicking of the button 'pushButton_train_submodel', which is in charge of starting the training of a submodel.
+        """
+
+        return
+
+    def clicked_pushButton_delete_model(self):
+        """Method to control the clicking of the button 'pushButton_train_submodel', which is in charge of starting the deletion of a model.
+        """
+
+        return

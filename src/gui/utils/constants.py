@@ -27,11 +27,13 @@ class Constants:
                      "table_available_training_datasets"]
     DOWNLOAD_CORPUS_TABLES = ["table_available_fields",
                               "table_fields_to_include", "table_filters"]
-    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",      "tableWidget_fields_to_include_raw",
+    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",  
+                               "tableWidget_fields_to_include_raw",
                                "tableWidget_available_fields_lemmas", "tableWidget_fields_to_include_lemmas"]
 
     WORDLISTS_TABLES = ["table_available_wordlists"]
-    MSG_INSTRUCTIONS_NEW_WORDLIST = "To generate a new wordlists:\n - Stopwords or keywords: Introduce the words " \
+    MSG_INSTRUCTIONS_NEW_WORDLIST = "To generate a new wordlists:\n - Stopwords or keywords: \
+                                    Introduce the words " \
                                     "separated by commas (stw1,stw2, ...)\n - Equivalences: Introduce equivalences " \
                                     "separated by commas in the format orig:target (orig1:tgt1, orig2:tgt2, ...) "
 
