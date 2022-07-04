@@ -10,6 +10,7 @@ It implements the functions needed to
     - Control the opening of secondary windows for specific functionalities (training, curation, etc.)
 """
 
+import configparser
 import os
 import pathlib
 from functools import partial
@@ -79,6 +80,10 @@ class MainWindow(QMainWindow):
             QPushButton, "menu_button_1")
         self.previous_corpus_button = self.findChild(
             QPushButton, "corpus_button_1")
+        self.previous_settings_button = self.findChild(
+            QPushButton, "settings_button_1")
+        self.previous_tm_settings_button = self.findChild(
+            QPushButton, "settings_button_5_1")
 
         # Get home in any operating system
         self.home = str(pathlib.Path.home())
@@ -172,13 +177,58 @@ class MainWindow(QMainWindow):
         self.menu_button_5.clicked.connect(
             lambda: self.content_tabs.setCurrentWidget(self.page_general_settings))
 
+        self.settings_buttons = []
+        for id_button in np.arange(Constants.MAX_SETTINGS_BUTTONS):
+            settings_button_name = "settings_button_" + str(id_button + 1)
+            settings_button_widget = self.findChild(
+                QPushButton, settings_button_name)
+            self.settings_buttons.append(settings_button_widget)
+
+        for settings_button in self.settings_buttons:
+            settings_button.clicked.connect(
+                partial(self.clicked_change_settings_button, settings_button))
+
+        self.tm_settings_buttons = []
+        for id_button in np.arange(Constants.MAX_TM_SETTINGS_SUBBUTTONS):
+            tm_settings_button_name = "settings_button_5_" + str(id_button + 1)
+            tm_settings_button_widget = self.findChild(
+                QPushButton, tm_settings_button_name)
+            self.tm_settings_buttons.append(tm_settings_button_widget)
+
+        for tm_settings_button in self.tm_settings_buttons:
+            tm_settings_button.clicked.connect(
+                partial(self.clicked_change_tm_settings_button, tm_settings_button))
+            tm_settings_button.hide()
+
+        self.settings_button_1.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_gui_settings))
+        self.settings_button_2.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_log_format))
+        self.settings_button_3.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_spark))
+        self.settings_button_4.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_preprocessing))
+        self.settings_button_5.clicked.connect(
+            self.select_tm_settings_suboption)
+        self.settings_button_5_1.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_tm_general))
+        self.settings_button_5_2.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_tm_mallet))
+        self.settings_button_5_3.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_tm_prod))
+        self.settings_button_5_4.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_tm_CTM))
+        self.settings_button_5_5.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_tm_spark_lda))
+        self.settings_button_5_6.clicked.connect(
+            lambda: self.settings_tabs.setCurrentWidget(self.page_tm_hierarchical))
+
         #####################################################################################
         # Widgets initial configuration
         #####################################################################################
 
         # MENU BUTTONS
-        # When the app is first opened, menu buttons are disabled until the user selects properly the project and
-        # parquet folders
+        # When the app is first opened, menu buttons are disabled until the user selects properly the project and parquet folders
         for menu_button in self.menu_buttons:
             menu_button.setEnabled(False)
 
@@ -199,9 +249,9 @@ class MainWindow(QMainWindow):
 
         # PAGE 4: Models
         # Configure tables
+        utils.configure_table_header(Constants.MODELS_TABLES, self)
 
         # PAGE 5: Settings
-        utils.configure_table_header(Constants.MODELS_TABLES, self)
 
         #####################################################################################
         # Connect buttons
@@ -237,6 +287,27 @@ class MainWindow(QMainWindow):
             self.clicked_pushButton_train_submodel)
         self.pushButton_delete_model.clicked.connect(
             self.clicked_pushButton_delete_model)
+
+        self.pushButton_apply_changes_gui_settings.clicked.connect(
+            self.clicked_pushButton_apply_changes_gui_settings)
+        self.pushButton_apply_changes_log_settings.clicked.connect(
+            self.clicked_pushButton_apply_changes_log_settings)
+        self.pushButton_apply_changes_mallet_settings.clicked.connect(
+            self.clicked_pushButton_apply_changes_mallet_settings)
+        self.pushButton_apply_changes_prodlda_settings.clicked.connect(
+            self.clicked_pushButton_apply_changes_prodlda_settings)
+        self.pushButton_apply_changes_sparklda_settings.clicked.connect(
+            self.clicked_pushButton_apply_changes_sparklda_settings)
+        self.pushButton_apply_changes_ctm_settings.clicked.connect(
+            self.clicked_pushButton_apply_changes_ctm_settings)
+        self.pushButton_apply_changes_hierarchical_settings.clicked.connect(
+            self.clicked_pushButton_apply_changes_hierarchical_settings)
+        self.pushButton_apply_changes_tm_general_settings.clicked.connect(
+            self.clicked_pushButton_apply_changes_tm_general_settings)
+        self.pushButton_apply_spark_settings.clicked.connect(
+            self.clicked_pushButton_apply_spark_settings)
+        self.pushButton_apply_preprocessing_settings.clicked.connect(
+            self.clicked_pushButton_apply_preprocessing_settings)
 
     #####################################################################################
     # TASK MANAGER COMMUNICATION METHODS
@@ -286,6 +357,9 @@ class MainWindow(QMainWindow):
 
         # Load available wordlists (if any) into "table_available_wordlists"
         self.tm.listAllWdLists(self)
+
+        # Fill settings table
+        self.set_default_settings()
 
         return
 
@@ -644,5 +718,441 @@ class MainWindow(QMainWindow):
     def clicked_pushButton_delete_model(self):
         """Method to control the clicking of the button 'pushButton_train_submodel', which is in charge of starting the deletion of a model.
         """
+
+        return
+
+    # SETTINGS FUNCTIONS
+    def clicked_change_settings_button(self, settings_button):
+        """
+        Method to control the selection of one of the topic modeling settings button.
+        """
+
+        # Put unpressed color for the previous pressed settings button
+        if self.previous_settings_button:
+            self.previous_settings_button.setStyleSheet(
+                Constants.SETTINGS_UNSELECTED_STYLESHEET)
+
+        if self.previous_settings_button.objectName() == "settings_button_5":
+            for tm_settings_button in self.tm_settings_buttons:
+                tm_settings_button.hide()
+                tm_settings_button.setStyleSheet(
+                    Constants.SETTINGS_SUBBUTTON_UNSELECTED_STYLESHEET)
+
+        self.previous_settings_button = settings_button
+        self.previous_settings_button.setStyleSheet(
+            Constants.SETTINGS_SELECTED_STYLESHEET)
+
+        return
+
+    def clicked_change_tm_settings_button(self, tm_settings_button):
+        """
+        Method to control the selection of one of the topic modeling settings button.
+        """
+
+        # Put unpressed color for the previous pressed settings button
+        if self.previous_tm_settings_button:
+            self.previous_tm_settings_button.setStyleSheet(
+                Constants.SETTINGS_SUBBUTTON_UNSELECTED_STYLESHEET)
+
+        self.previous_tm_settings_button = tm_settings_button
+        self.previous_tm_settings_button.setStyleSheet(
+            Constants.SETTINGS_SUBBUTTON_SELECTED_STYLESHEET)
+
+        self.settings_button_5.setStyleSheet(
+            Constants.SETTINGS_SELECTED_STYLESHEET)
+
+        return
+
+    def select_tm_settings_suboption(self):
+        """
+        Method for showing the Topic Modeling settings subbutons when the button 'settings_button_5' is clicked.
+        """
+
+        for tm_settings_button in self.tm_settings_buttons:
+            tm_settings_button.show()
+
+        return
+
+    def set_default_settings(self):
+        """
+        Method for reading settings from the TM's configuration file and writing them in the correspondng view within the Settings' page.
+        """
+
+        # GUI settings
+        self.lineEdit_font_size.setText(str(14))
+        self.fontComboBox.setCurrentText("Arial")
+
+        # Get config object
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+
+        # Read values and set them in the correponding widget
+        # LOG SETTINGS
+        self.lineEdit_file_name.setText(
+            str(cf.get('logformat', 'filename')))
+        self.lineEdit_date_format.setText(
+            str(cf.get('logformat', 'datefmt')))
+        self.lineEdit_file_format.setText(
+            str(cf.get('logformat', 'file_format')))
+        self.lineEdit_file_level.setText(
+            str(cf.get('logformat', 'file_level')))
+        self.lineEdit_cons_format.setText(
+            str(cf.get('logformat', 'cons_format')))
+        self.lineEdit_cons_level.setText(
+            str(cf.get('logformat', 'cons_level')))
+
+        # MALLET SETTINGS
+        self.lineEdit_settings_mallet_path.setText(
+            str(cf.get('MalletTM', 'mallet_path')))
+        self.lineEdit_settings_regexp.setText(
+            str(cf.get('MalletTM', 'token_regexp')))
+        self.lineEdit_settings_alpha.setText(
+            str(cf.get('MalletTM', 'alpha')))
+        self.lineEdit_settings_optimize_interval.setText(
+            str(cf.get('MalletTM', 'optimize_interval')))
+        self.lineEdit_settings_nr_threads.setText(
+            str(cf.get('MalletTM', 'num_threads')))
+        self.lineEdit_settings_nr_iter.setText(
+            str(cf.get('MalletTM', 'num_iterations')))
+        self.lineEdit_settings_doc_top_thr.setText(
+            str(cf.get('MalletTM', 'doc_topic_thr')))
+        self.lineEdit_settings_thetas_thr.setText(
+            str(cf.get('MalletTM', 'thetas_thr')))
+        self.lineEdit_settings_infer_iter.setText(
+            str(cf.get('MalletTM', 'num_iterations_inf')))
+
+        # PRODLDA
+        self.lineEdit_settings_nr_comp_prod.setText(
+            str(cf.get('ProdLDA', 'n_components')))
+        self.lineEdit_settings_model_type_prod.setText(
+            str(cf.get('ProdLDA', 'model_type')))
+        self.lineEdit_settings_hidden_prod.setText(
+            str(cf.get('ProdLDA', 'hidden_sizes')))
+        self.lineEdit_settings_activation_prod.setText(
+            str(cf.get('ProdLDA', 'activation')))
+        self.lineEdit_settings_dropout_prod.setText(
+            str(cf.get('ProdLDA', 'dropout')))
+        self.lineEdit_settings_learn_priors_prod.setText(
+            str(cf.get('ProdLDA', 'learn_priors')))
+        self.lineEdit_settings_lr_prod.setText(
+            str(cf.get('ProdLDA', 'lr')))
+        self.lineEdit_settings_momentum_prod.setText(
+            str(cf.get('ProdLDA', 'momentum')))
+        self.lineEdit_settings_solver_prod.setText(
+            str(cf.get('ProdLDA', 'solver')))
+        self.lineEdit_settings_nr_epochs_prod.setText(
+            str(cf.get('ProdLDA', 'num_epochs')))
+        self.lineEdit_settings_plateau_prod.setText(
+            str(cf.get('ProdLDA', 'reduce_on_plateau')))
+        self.lineEdit_settings_label_size_prod.setText(
+            str(cf.get('ProdLDA', 'label_size')))
+        self.lineEdit_settings_loss_weights_prod.setText(
+            str(cf.get('ProdLDA', 'loss_weights')))
+        self.lineEdit_settings_batch_size_prod.setText(
+            str(cf.get('ProdLDA', 'batch_size')))
+
+        # CTM
+        self.lineEdit_settings_nr_comp_prod.setText(
+            str(cf.get('CTM', 'num_topics')))
+        self.lineEdit_settings_under_ctm_type.setText(
+            str(cf.get('CTM', 'model_type')))
+        self.lineEdit_settings_model_type_ctm.setText(
+            str(cf.get('CTM', 'ctm_model_type')))
+        self.lineEdit_settings_hidden_ctm.setText(
+            str(cf.get('CTM', 'hidden_sizes')))
+        self.lineEdit_settings_activation_ctm.setText(
+            str(cf.get('CTM', 'activation')))
+        self.lineEdit_settings_dropout_ctm.setText(
+            str(cf.get('CTM', 'dropout')))
+        self.lineEdit_settings_priors_ctm.setText(
+            str(cf.get('CTM', 'learn_priors')))
+        self.lineEdit_settings_lr_ctm.setText(
+            str(cf.get('CTM', 'batch_size')))
+        self.lineEdit_settings_momentum_ctm.setText(
+            str(cf.get('CTM', 'lr')))
+        self.lineEdit_settings_solver_ctm.setText(
+            str(cf.get('CTM', 'momentum')))
+        self.lineEdit_settings_nr_epochs_ctm.setText(
+            str(cf.get('CTM', 'solver')))
+        self.lineEdit_settings_plateau_ctm.setText(
+            str(cf.get('CTM', 'num_epochs')))
+        self.lineEdit_settings_nr_samples_ctm.setText(
+            str(cf.get('CTM', 'num_samples')))
+        self.lineEdit_settings_plateau_ctm.setText(
+            str(cf.get('CTM', 'reduce_on_plateau')))
+        self.lineEdit_settings_topic_prior_mean_ctm.setText(
+            str(cf.get('CTM', 'topic_prior_mean')))
+        self.lineEdit_settings_topic_prior_std_ctm.setText(
+            str(cf.get('CTM', 'topic_prior_variance')))
+        self.lineEdit_settings_nr_workers_ctm.setText(
+            str(cf.get('CTM', 'num_data_loader_workers')))
+
+        # GENERAL TM SETTINGS
+        self.lineEdit_settings_nr_words.setText(
+            str(cf.get('TMedit', 'n_palabras')))
+        self.lineEdit_settings_round_size.setText(
+            str(cf.get('TMedit', 'round_size')))
+        self.lineEdit_settings_netl_workers.setText(
+            str(cf.get('TMedit', 'NETLworkers')))
+        self.lineEdit_settings_ldavis_nr_docs.setText(
+            str(cf.get('TMedit', 'LDAvis_ndocs')))
+        self.lineEdit_settings_ldavis_nr_jobs.setText(
+            str(cf.get('TMedit', 'LDAvis_njobs')))
+
+        # SPARK
+        self.lineEdit_settings_spark_available.setText(
+            str(cf.get('Spark', 'spark_available')))
+        self.lineEdit_settings_script_spark.setText(
+            str(cf.get('Spark', 'script_spark')))
+        self.lineEdit_settings_token_spark.setText(
+            str(cf.get('Spark', 'token_spark')))
+
+        # PREPROCESSING
+        self.lineEdit_settings_min_lemas.setText(
+            str(cf.get('Preproc', 'min_lemas')))
+        self.lineEdit_settings_nr_below.setText(
+            str(cf.get('Preproc', 'no_below')))
+        self.lineEdit_settings_nr_above.setText(
+            str(cf.get('Preproc', 'no_above')))
+        self.lineEdit_settings_keep_n.setText(
+            str(cf.get('Preproc', 'keep_n')))
+
+        return
+
+    def clicked_pushButton_apply_changes_gui_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_changes_gui_settings' that controls the actualization of the GUI' settings.
+        """
+
+        font_size = self.lineEdit_font_size.text()
+        font_type = self.fontComboBox.currentText()
+        font_size_type = font_size + ' "' + font_type + '" '
+        stylesheet = "QWidget { font: %s}" % font_size_type
+        self.centralwidget.setStyleSheet(stylesheet)
+
+        return
+
+    def clicked_pushButton_apply_changes_log_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_changes_log_settings' that controls the actualization of the Topic Modeler's log settings.
+        """
+
+        # Save user's configuration into config file
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+
+        cf.set('logformat', 'filename', str(self.lineEdit_file_name.text()))
+        cf.set('logformat', 'datefmt', str(self.lineEdit_date_format.text()))
+        cf.set('logformat', 'file_format', str(
+            self.lineEdit_file_format.text()))
+        cf.set('logformat', 'file_level', str(self.lineEdit_file_level.text()))
+        cf.set('logformat', 'cons_format', str(
+            self.lineEdit_cons_format.text()))
+        cf.set('logformat', 'cons_level', str(self.lineEdit_cons_level.text()))
+
+        with open(self.tm.p2config, 'w') as configfile:
+            cf.write(configfile)
+
+        return
+
+    def clicked_pushButton_apply_changes_mallet_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_changes_mallet_settings' that controls the actualization of the Topic Modeler's Mallet settings.
+        """
+
+        # Save user's configuration into config file
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+
+        cf.set('MalletTM', 'mallet_path', str(
+            self.lineEdit_settings_mallet_path.text()))
+        cf.set('MalletTM', 'token_regexp', str(
+            self.lineEdit_settings_regexp.text()))
+        cf.set('MalletTM', 'alpha', str(self.lineEdit_settings_alpha.text()))
+        cf.set('MalletTM', 'optimize_interval', str(
+            self.lineEdit_settings_optimize_interval.text()))
+        cf.set('MalletTM', 'num_threads', str(
+            self.lineEdit_settings_nr_threads.text()))
+        cf.set('MalletTM', 'num_iterations', str(
+            self.lineEdit_settings_nr_iter.text()))
+        cf.set('MalletTM', 'doc_topic_thr', str(
+            self.lineEdit_settings_doc_top_thr.text()))
+        cf.set('MalletTM', 'thetas_thr', str(
+            self.lineEdit_settings_thetas_thr.text()))
+        cf.set('MalletTM', 'num_iterations_inf', str(
+            self.lineEdit_settings_infer_iter.text()))
+
+        with open(self.tm.p2config, 'w') as configfile:
+            cf.write(configfile)
+
+        return
+
+    def clicked_pushButton_apply_changes_prodlda_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_changes_prodlda_settings' that controls the actualization of the Topic Modeler's ProdLDA settings.
+        """
+
+        # Save user's configuration into config file
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+
+        cf.set('ProdLDA', 'n_components', str(
+            self.lineEdit_settings_nr_comp_prod.text()))
+        cf.set('ProdLDA', 'model_type', str(
+            self.lineEdit_settings_model_type_prod.text()))
+        cf.set('ProdLDA', 'hidden_sizes', str(
+            self.lineEdit_settings_hidden_prod.text()))
+        cf.set('ProdLDA', 'activation', str(
+            self.lineEdit_settings_activation_prod.text()))
+        cf.set('ProdLDA', 'dropout', str(
+            self.lineEdit_settings_dropout_prod.text()))
+        cf.set('ProdLDA', 'learn_priors', str(
+            self.lineEdit_settings_learn_priors_prod.text()))
+        cf.set('ProdLDA', 'lr', str(self.lineEdit_settings_lr_prod.text()))
+        cf.set('ProdLDA', 'momentum', str(
+            self.lineEdit_settings_momentum_prod.text()))
+        cf.set('ProdLDA', 'n_components', str(
+            self.lineEdit_settings_lr_prod.text()))
+        cf.set('ProdLDA', 'solver', str(
+            self.lineEdit_settings_nr_epochs_prod.text()))
+        cf.set('ProdLDA', 'num_epochs', str(
+            self.lineEdit_settings_nr_comp_prod.text()))
+        cf.set('ProdLDA', 'reduce_on_plateau', str(
+            self.lineEdit_settings_plateau_prod.text()))
+        cf.set('ProdLDA', 'label_size', str(
+            self.lineEdit_settings_label_size_prod.text()))
+        cf.set('ProdLDA', 'loss_weights', str(
+            self.lineEdit_settings_loss_weights_prod.text()))
+        cf.set('ProdLDA', 'batch_size', str(
+            self.lineEdit_settings_batch_size_prod.text()))
+
+        with open(self.tm.p2config, 'w') as configfile:
+            cf.write(configfile)
+        return
+
+    def clicked_pushButton_apply_changes_sparklda_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_changes_sparklda_settings' that controls the actualization of the Topic Modeler's SparkLDA settings.
+        """
+
+        return
+
+    def clicked_pushButton_apply_changes_ctm_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_changes_ctm_settings' that controls the actualization of the Topic Modeler's CTM settings.
+        """
+
+        # Save user's configuration into config file
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+
+        cf.set('CTM', 'num_topics', str(
+            self.lineEdit_settings_nr_comp_prod.text()))
+        cf.set('CTM', 'model_type', str(
+            self.lineEdit_settings_under_ctm_type.text()))
+        cf.set('CTM', 'ctm_model_type', str(
+            self.lineEdit_settings_model_type_ctm.text()))
+        cf.set('CTM', 'hidden_sizes', str(
+            self.lineEdit_settings_hidden_ctm.text()))
+        cf.set('CTM', 'activation', str(
+            self.lineEdit_settings_activation_ctm.text()))
+        cf.set('CTM', 'dropout', str(self.lineEdit_settings_dropout_ctm.text()))
+        cf.set('CTM', 'learn_priors', str(
+            self.lineEdit_settings_priors_ctm.text()))
+        cf.set('CTM', 'batch_size', str(
+            self.lineEdit_settings_batch_size_ctm.text()))
+        cf.set('CTM', 'lr', str(self.lineEdit_settings_momentum_ctm.text()))
+        cf.set('CTM', 'momentum', str(
+            self.lineEdit_settings_momentum_ctm.text()))
+        cf.set('CTM', 'solver', str(self.lineEdit_settings_solver_ctm.text()))
+        cf.set('CTM', 'num_epochs', str(
+            self.lineEdit_settings_nr_epochs_ctm.text()))
+        cf.set('CTM', 'num_samples', str(
+            self.lineEdit_settings_nr_samples_ctm.text()))
+        cf.set('CTM', 'reduce_on_plateau', str(
+            self.lineEdit_settings_plateau_ctm.text()))
+        cf.set('CTM', 'topic_prior_mean', str(
+            self.lineEdit_settings_topic_prior_mean_ctm.text()))
+        cf.set('CTM', 'topic_prior_variance', str(
+            self.lineEdit_settings_topic_prior_std_ctm.text()))
+        cf.set('CTM', 'num_data_loader_workers', str(
+            self.lineEdit_settings_nr_workers_ctm.text()))
+
+        with open(self.tm.p2config, 'w') as configfile:
+            cf.write(configfile)
+        return
+
+    def clicked_pushButton_apply_changes_hierarchical_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_changes_hierarchical_settings' that controls the actualization of the Topic Modeler's hierarchical settings.
+        """
+
+        return
+
+    def clicked_pushButton_apply_changes_tm_general_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_changes_tm_general_settings' that controls the actualization of the Topic Modeler's general settings.
+        """
+
+        # Save user's configuration into config file
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+
+        cf.set('TMedit', 'n_palabras', str(
+            self.lineEdit_settings_nr_words.text()))
+        cf.set('TMedit', 'round_size', str(
+            self.lineEdit_settings_round_size.text()))
+        cf.set('TMedit', 'NETLworkers', str(
+            self.lineEdit_settings_netl_workers.text()))
+        cf.set('TMedit', 'LDAvis_ndocs', str(
+            self.lineEdit_settings_ldavis_nr_docs.text()))
+        cf.set('TMedit', 'LDAvis_njobs', str(
+            self.lineEdit_settings_ldavis_nr_jobs.text()))
+
+        with open(self.tm.p2config, 'w') as configfile:
+            cf.write(configfile)
+
+        return
+
+    def clicked_pushButton_apply_spark_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_spark_settings' that controls the actualization of the Topic Modeler's Spark settings.
+        """
+
+        # Save user's configuration into config file
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+
+        cf.set('Spark', 'mallet_path', str(
+            self.lineEdit_settings_spark_available.text()))
+        cf.set('Spark', 'token_regexp', str(
+            self.lineEdit_settings_script_spark.text()))
+        cf.set('Spark', 'alpha', str(self.lineEdit_settings_token_spark.text()))
+
+        with open(self.tm.p2config, 'w') as configfile:
+            cf.write(configfile)
+
+        return
+
+    def clicked_pushButton_apply_preprocessing_settings(self):
+        """
+        Method for controling the clicking of the button 'pushButton_apply_preprocessing_settings' that controls the actualization of the Topic Modeler's preprocessing settings.
+        """
+
+        # Save user's configuration into config file
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+
+        cf.set('Preproc', 'min_lemas', str(
+            self.lineEdit_settings_min_lemas.text()))
+        cf.set('Preproc', 'no_below', str(
+            self.lineEdit_settings_nr_below.text()))
+        cf.set('Preproc', 'no_above', str(
+            self.lineEdit_settings_nr_above.text()))
+        cf.set('Preproc', 'keep_n', str(
+            self.lineEdit_settings_keep_n.text()))
+
+        with open(self.tm.p2config, 'w') as configfile:
+            cf.write(configfile)
 
         return

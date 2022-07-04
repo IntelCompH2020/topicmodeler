@@ -5,6 +5,8 @@ class Constants:
     MAX_RECENT_PROJECTS = 2
     MAX_RECENT_PARQUETS = 2
     MAX_RECENT_WORDLISTS = 2
+    MAX_SETTINGS_BUTTONS = 5
+    MAX_TM_SETTINGS_SUBBUTTONS = 6
 
     LONG_TIME_SHOW_SB = 10000
 
@@ -37,7 +39,7 @@ class Constants:
                                     "separated by commas (stw1,stw2, ...)\n - Equivalences: Introduce equivalences " \
                                     "separated by commas in the format orig:target (orig1:tgt1, orig2:tgt2, ...) "
 
-    MODELS_TABLES = ["table_available_models", "table_topics_edit_model"]
+    MODELS_TABLES = ["table_available_trained_models_desc", "tableWidget_trained_models_topics"]
     TRAIN_MODEL_TABLES = ["table_training_resultsLDA",
                           "table_training_results_AVITM", "table_training_results_CTM"]
     TRAIN_LOADING_BARS = ["progress_bar_LDA",
@@ -181,3 +183,71 @@ class Constants:
             border: 1px solid #1A2E40;
             color:black;
         }"""
+    
+    SETTINGS_SUBBUTTON_SELECTED_STYLESHEET = \
+        """
+        QPushButton {
+	        background-color: #4D6F8C;
+	        font: 87 11pt "Avenir";
+	        font-weight: bold;
+	        color: #FFFFFF;
+        }
+        QPushButton:hover {
+	        background-color: #4D6F8C;
+        }
+        QPushButton:pressed {	
+	        background-color: #4D6F8C;
+        }
+        """
+    
+    SETTINGS_SUBBUTTON_UNSELECTED_STYLESHEET = \
+        """
+        QPushButton {
+	        background-color: #1A2E40;
+	        font: 87 11pt "Avenir";
+	        font-weight: bold;
+	        color: #FFFFFF;
+        }
+        QPushButton:hover {
+	        background-color: #4D6F8C;
+        }
+        QPushButton:pressed {	
+	        background-color: #4D6F8C;
+        }
+        """
+    
+    SETTINGS_SELECTED_STYLESHEET = \
+        """
+        QPushButton {
+	        background-color: #1A2E40;
+	        font: 87 11pt "Avenir";
+	        font-weight: bold;
+	        color: #FFFFFF;
+            border-right: 4px solid #4D6F8C;
+        }
+        QPushButton:hover {
+	        background-color: #4D6F8C;
+        }
+        QPushButton:pressed {	
+	        background-color: #4D6F8C;
+        }
+        """
+    
+    SETTINGS_UNSELECTED_STYLESHEET = \
+        """
+        QPushButton {
+	        background-color: #1A2E40;
+	        font: 87 11pt "Avenir";
+	        font-weight: bold;
+	        color: #FFFFFF;
+        }
+        QPushButton:hover {
+	        background-color: #4D6F8C;
+        }
+        QPushButton:pressed {	
+	        background-color: #4D6F8C;
+        }
+        """
+
+
+
