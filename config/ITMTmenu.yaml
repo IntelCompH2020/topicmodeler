@@ -55,7 +55,7 @@ deleteTMCorpus:
   title: Delete a Traning dataset for Topic Modeling
 
 
-# LEVEL 2 MENU manageCorpus 
+# LEVEL 2 MENU manageLists
 manageLists:
   title: WordLists Management Options
   options:
