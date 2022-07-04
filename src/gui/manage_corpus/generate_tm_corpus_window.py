@@ -10,7 +10,7 @@ from PyQt6 import QtGui, QtWidgets
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 from PyQt6.uic import loadUi
 from src.gui.utils.constants import Constants
-from src.gui.widget_create_tm_corpus import WidgetCreateTMCorpus
+from src.gui.manage_corpus.widget_create_tm_corpus import WidgetCreateTMCorpus
 
 
 class GenerateTMCorpus(QtWidgets.QDialog):
