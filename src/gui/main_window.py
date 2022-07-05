@@ -19,14 +19,12 @@ from functools import partial
 import numpy as np
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import QThreadPool, QUrl
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QPushButton
 from PyQt6.uic import loadUi
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-
-# Local imports
+from src.gui.manage_corpus.generate_tm_corpus_window import GenerateTMCorpus
 from src.gui.manage_lists.create_sw_lst_window import CreateSwLstWindow
 from src.gui.manage_lists.edit_sw_lst_window import EditSwLstWindow
-from src.gui.manage_corpus.generate_tm_corpus_window import GenerateTMCorpus
 from src.gui.topic_modeling.train_model_window import TrainModelWindow
 from src.gui.utils import utils
 from src.gui.utils.constants import Constants
@@ -90,10 +88,12 @@ class MainWindow(QMainWindow):
         self.home = str(pathlib.Path.home())
 
         # Creation of subwindows
-        self.train_model_subwindow = TrainModelWindow()
+        self.train_model_subwindow = None
         self.create_tm_corpus_subwindow = None
         self.create_stopwords_list_subwindow = None
         self.edit_stopwords_list_subwindow = None
+
+        self.training_corpus = None
 
         # Threads for executing in parallel
         self.thread_pool = QThreadPool()
@@ -309,7 +309,7 @@ class MainWindow(QMainWindow):
             self.clicked_pushButton_apply_spark_settings)
         self.pushButton_apply_preprocessing_settings.clicked.connect(
             self.clicked_pushButton_apply_preprocessing_settings)
-        
+
         self.pushButton_restore_gui_settings.clicked.connect(
             self.clicked_pushButton_restore_gui_settings)
         self.pushButton_restore_log_settings.clicked.connect(
@@ -379,6 +379,9 @@ class MainWindow(QMainWindow):
 
         # Load available wordlists (if any) into "table_available_wordlists"
         self.tm.listAllWdLists(self)
+
+        # Update the style of the tables in the wordlists page
+        utils.configure_table_header(Constants.WORDLISTS_TABLES, self)
 
         # Fill settings table
         self.set_default_settings("all", False, False)
@@ -652,7 +655,11 @@ class MainWindow(QMainWindow):
         return
 
     def clicked_train_dataset(self):
+        self.train_model_subwindow = TrainModelWindow(
+            self.tm, self.stdout, self.stderr, self.training_corpus)
         self.train_model_subwindow.exec()
+
+        # @TODO: Reload models
 
         return
 
@@ -872,10 +879,6 @@ class MainWindow(QMainWindow):
                 str(cf.get('ProdLDA', 'num_epochs')))
             self.lineEdit_settings_plateau_prod.setText(
                 str(cf.get('ProdLDA', 'reduce_on_plateau')))
-            self.lineEdit_settings_label_size_prod.setText(
-                str(cf.get('ProdLDA', 'label_size')))
-            self.lineEdit_settings_loss_weights_prod.setText(
-                str(cf.get('ProdLDA', 'loss_weights')))
             self.lineEdit_settings_batch_size_prod.setText(
                 str(cf.get('ProdLDA', 'batch_size')))
             if save:
@@ -959,11 +962,11 @@ class MainWindow(QMainWindow):
                 self.set_default_settings(op, False, False)
             if msg:
                 QMessageBox.information(
-                        self, Constants.SMOOTH_SPOON_MSG, Constants.RESTORE_DFT_ALL_SETTINGS)
+                    self, Constants.SMOOTH_SPOON_MSG, Constants.RESTORE_DFT_ALL_SETTINGS)
         if msg:
             id_msg = Constants.SETTINGS_OPTIONS.index(option)
             QMessageBox.information(
-                    self, Constants.SMOOTH_SPOON_MSG, Constants.RESTORE_DFT_MSGS[id_msg])
+                self, Constants.SMOOTH_SPOON_MSG, Constants.RESTORE_DFT_MSGS[id_msg])
 
         return
 
@@ -979,7 +982,7 @@ class MainWindow(QMainWindow):
         self.centralwidget.setStyleSheet(stylesheet)
 
         QMessageBox.information(
-                    self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_GUI_SETTINGS)
+            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_GUI_SETTINGS)
 
         return
 
@@ -1003,7 +1006,7 @@ class MainWindow(QMainWindow):
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
-        
+
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_LOG_SETTINGS)
 
@@ -1076,16 +1079,12 @@ class MainWindow(QMainWindow):
             self.lineEdit_settings_nr_comp_prod.text()))
         cf.set('ProdLDA', 'reduce_on_plateau', str(
             self.lineEdit_settings_plateau_prod.text()))
-        cf.set('ProdLDA', 'label_size', str(
-            self.lineEdit_settings_label_size_prod.text()))
-        cf.set('ProdLDA', 'loss_weights', str(
-            self.lineEdit_settings_loss_weights_prod.text()))
         cf.set('ProdLDA', 'batch_size', str(
             self.lineEdit_settings_batch_size_prod.text()))
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
-        
+
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_PRODLDA_SETTINGS)
 
@@ -1141,7 +1140,7 @@ class MainWindow(QMainWindow):
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
-        
+
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_CTM_SETTINGS)
 
@@ -1195,11 +1194,12 @@ class MainWindow(QMainWindow):
             self.lineEdit_settings_spark_available.text()))
         cf.set('Spark', 'script_spark', str(
             self.lineEdit_settings_script_spark.text()))
-        cf.set('Spark', 'token_spark', str(self.lineEdit_settings_token_spark.text()))
+        cf.set('Spark', 'token_spark', str(
+            self.lineEdit_settings_token_spark.text()))
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
-        
+
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_SPARK_SETTINGS)
 
@@ -1225,7 +1225,7 @@ class MainWindow(QMainWindow):
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
-        
+
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_PREPROC_SETTINGS)
 

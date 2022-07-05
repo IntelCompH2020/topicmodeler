@@ -1,6 +1,13 @@
 class Constants:
+
+    # GUI constants
+    SMOOTH_SPOON_TITLE = 'Smooth Spoon'
+    SMOOTH_SPOON_MSG = 'Smooth Spoon message'
+    LONG_TIME_SHOW_SB = 10000
+
+    # Buttons-related constants
     MAX_MENU_BUTTONS = 5
-    MAX_TRAIN_OPTIONS = 3
+    MAX_TRAIN_OPTIONS = 4
     MAX_CORPUS_BUTTONS = 2
     MAX_RECENT_PROJECTS = 2
     MAX_RECENT_PARQUETS = 2
@@ -8,14 +15,21 @@ class Constants:
     MAX_SETTINGS_BUTTONS = 5
     MAX_TM_SETTINGS_SUBBUTTONS = 6
 
-    LONG_TIME_SHOW_SB = 10000
-
-    SMOOTH_SPOON_TITLE = 'Smooth Spoon'
-    SMOOTH_SPOON_MSG = 'Smooth Spoon message'
+    # Corpus management-related constants
     TM_CORPUS_MSG_STATUS_0 = "The dataset could not be created."
     TM_CORPUS_MSG_STATUS_1 = "The dataset was created successfully."
     TM_CORPUS_MSG_STATUS_2 = "The dataset replaced an existing dataset"
     TM_DELETE_NO_CORPUS_MSG = "A corpus to be deleted must be selected first."
+
+    CORPUS_TABLES = ["table_available_local_corpus",
+                     "table_available_training_datasets"]
+    DOWNLOAD_CORPUS_TABLES = ["table_available_fields",
+                              "table_fields_to_include", "table_filters"]
+    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",
+                               "tableWidget_fields_to_include_raw",
+                               "tableWidget_available_fields_lemmas", "tableWidget_fields_to_include_lemmas"]
+
+    # Wordlists management-related constants
     WORDLIST_CREATION_MSG_STATUS_0 = "The wordlist could not be created."
     WORDLIST_CREATION_MSG_STATUS_1 = "The wordlist was created successfully."
     WORDLIST_CREATION_MSG_STATUS_2 = "The wordlist replaced an existing dataset"
@@ -24,6 +38,18 @@ class Constants:
     WORDLIST_EDITION_MSG_STATUS_2 = "The wordlist replaced an existing dataset"
     EDIT_WORDLIST_NOT_SELECTED_MSG = "A wordlist to be edited must be selected first."
     DELETE_WORDLIST_NOT_SELECTED_MSG = "A wordlist to be deleted must be selected first."
+
+    WORDLISTS_TABLES = ["table_available_wordlists"]
+    MSG_INSTRUCTIONS_NEW_WORDLIST = "To generate a new wordlists:\n - Stopwords or keywords: \
+                                    Introduce the words " \
+                                    "separated by commas (stw1,stw2, ...)\n - Equivalences: Introduce equivalences " \
+                                    "separated by commas in the format orig:target (orig1:tgt1, orig2:tgt2, ...) "
+
+    # Models management-related constants
+    MODELS_TABLES = ["table_available_trained_models_desc",
+                     "tableWidget_trained_models_topics"]
+
+    # Settings management-realated constants
     RESTORE_DFT_GUI_SETTINGS = "GUI settings were restored to its default value"
     UPDATE_GUI_SETTINGS = "GUI settings were to the selected values"
     RESTORE_DFT_LOG_SETTINGS = "Topic Modeling's logging settings were restored to its default value"
@@ -46,27 +72,42 @@ class Constants:
     SETTINGS_OPTIONS = ["gui", "log", "mallet", "prodlda",
                         "ctm", "tm_general", "spark", "preproc"]
 
-    CORPUS_TABLES = ["table_available_local_corpus",
-                     "table_available_training_datasets"]
-    DOWNLOAD_CORPUS_TABLES = ["table_available_fields",
-                              "table_fields_to_include", "table_filters"]
-    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",
-                               "tableWidget_fields_to_include_raw",
-                               "tableWidget_available_fields_lemmas", "tableWidget_fields_to_include_lemmas"]
+    # Training related constants
+    NR_PARAMS_TRAIN_LDA_MALLET = 7
+    NR_PARAMS_TRAIN_PRODLDA = 12
+    NR_PARAMS_TRAIN_CTM = 14
 
-    WORDLISTS_TABLES = ["table_available_wordlists"]
-    MSG_INSTRUCTIONS_NEW_WORDLIST = "To generate a new wordlists:\n - Stopwords or keywords: \
-                                    Introduce the words " \
-                                    "separated by commas (stw1,stw2, ...)\n - Equivalences: Introduce equivalences " \
-                                    "separated by commas in the format orig:target (orig1:tgt1, orig2:tgt2, ...) "
+    WRONG_NR_TOPICS_LDA_MSG = "The number of training topics must be larger than 0"
+    WRONG_ALPHA_LDA_MSG = "The sum over topics of smoothing over doc-topic distributions (alpha) must be larger than 0."
+    WRONG_OI_LDA_MSG = "The number of iterations between reestimating dirichlet hyperparameters (optimize interval) must be larger than 0. "
+    WRONG_NR_THREADS_LDA_MSG = "The number of threads for parallel training must be larger than 0"
+    WRONG_NR_ITER_LDA_MSG = "The number of iterations of Gibbs sampling must be larger than 0."
+    WRONG_DOC_TPC_THR_LDA_MSG = "The hreshold for topic activation in a document during training (doc-topic thr) cannot be larger than 1."
+    WRONG_THETAS_THR_LDA_MSG = "The threshold for topic activation in a doc during sparsification (thetas thr) cannot be larger than 1."
+    WRONG_UNDERLYING_MODEL_TYPE_MSG = "The AVITM model type must be either 'prodLDA' or 'lda'."
+    WRONG_MODEL_TYPE_MSG = "The CTM model type must be either 'CombinedTM or 'ZeroShotTM."
+    WRONG_NR_TOPIC_MSG = "The number of training topics must be larger than 0."
+    WRONG_NR_EPOCHS_MSG = "The number of epochs must be larger than 0."
+    WRONG_BATCH_SIZE_MSG = "The batch size must be bigger than 0."
+    WRONG_HIDDEN_SIZES_MSG = "Hidden_sizes must be type tuple."
+    WRONG_ACTIVATION_MSG = "Activation must be 'softplus', 'relu', 'sigmoid', 'swish', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'."
+    WRONG_DROPOUT_MSG = "Dropout must be larger or equal to 0."
+    WRONG_LEARN_PRIORS_MSG = "Learn_priors must be type bool."
+    WRONG_LR_MSG = "The learning rate must a value in the range (0,1]"
+    WRONG_MOMENTUM_MSG = "The learning momentum must a value in the range (0,1]"
+    WRONG_SOLVER_MSG = "The NN optimizer to be used (solver) must be chosen from 'adagrad', 'adam', 'sgd', 'adadelta' or 'rmsprop'"
+    WRONG_REDUCE_ON_PLATEAU_MSG = "Reduce_on_plateau must be type bool."
+    WRONG_TOPIC_PRIOR_MEAN_MSG = ""
+    WRONG_TOPIC_PRIOR_VAR_MSG = ""
+    WARNING_NO_TR_CORPUS = "An appropiate training dataset must be selected to proceed."
+    NO_NAME_FOR_MODEL = "A name for training the model must be specified"
 
-    MODELS_TABLES = ["table_available_trained_models_desc",
-                     "tableWidget_trained_models_topics"]
     TRAIN_MODEL_TABLES = ["table_training_resultsLDA",
-                          "table_training_results_AVITM", "table_training_results_CTM"]
+                          "table_training_results_AVITM", "table_training_results_CTM", "table_training_results_sparklda"]
     TRAIN_LOADING_BARS = ["progress_bar_LDA",
-                          "progress_bar_AVITM", "progress_bar_CTM"]
+                          "progress_bar_AVITM", "progress_bar_CTM", "progress_bar_sparklda"]
 
+    # Stylesheets
     HOME_BUTTON_SELECTED_STYLESHEET = \
         """ QPushButton {	
             background-image: ICON_REPLACE;
