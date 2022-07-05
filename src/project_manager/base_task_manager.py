@@ -53,6 +53,7 @@ class BaseTaskManager(object):
 
         # Configuration file
         self.p2config = self.p2p / config_fname
+        self.p2config_dft = self.p2p / "config.cf.default"
         self.cf = None  # Handler to the config file
 
         # Metadata file
@@ -223,6 +224,9 @@ class BaseTaskManager(object):
 
         # Place a copy of a default configuration file in the project folder.
         shutil.copyfile('config.cf.default', self.p2config)
+
+        # Place a copy for keeping changes from user
+        shutil.copyfile('config.cf.default', self.p2config_dft)
 
         # #####################
         # Update project status

@@ -14,9 +14,10 @@ import pathlib
 import pickle
 import shutil
 
+from PyQt6.QtGui import QTextCursor
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtWidgets import (QProgressBar, QPushButton, QTableWidget,
-                             QTableWidgetItem)
+                             QTableWidgetItem, QTextEdit)
 # Local imports
 from src.gui.utils.worker import Worker
 

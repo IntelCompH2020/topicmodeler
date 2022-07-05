@@ -58,8 +58,6 @@ momentum=0.99
 solver=adam
 num_epochs=100
 reduce_on_plateau=False
-label_size=0
-loss_weights=None
 batch_size=64
 
 [CTM]
