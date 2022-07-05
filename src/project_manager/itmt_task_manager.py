@@ -10,22 +10,21 @@ It implements the functions needed to
     - Do inference with topic models
 """
 
-import configparser
+# import configparser
 import datetime as DT
 import json
-import logging
+# import logging
 import shutil
 # from gensim import corpora
-import subprocess
 # import numpy as np
 # import time
 # import re
 # import regex as javare
-import sys
+# import sys
 from pathlib import Path
 from subprocess import check_output
 
-import pandas as pd
+# import pandas as pd
 import pyarrow.parquet as pt
 # from sklearn.preprocessing import normalize
 from PyQt6 import QtWidgets
@@ -74,6 +73,7 @@ class ITMTTaskManager(BaseTaskManager):
         self.path2metadata = None
         self.p2config = None
         self.p2parquet = None
+        self.p2wdlist = None
         self.metadata_fname = None
         self.cf = None
         self.state = None
@@ -337,7 +337,7 @@ class ITMTTaskManager(BaseTaskManager):
 class ITMTTaskManagerCMD(ITMTTaskManager):
     """
     Provides extra functionality to the task manager, requesting parameters
-    from users from a command window.
+    from users from a terminal.
     """
 
     def __init__(self, p2p, p2parquet, p2wdlist, config_fname='config.cf',
@@ -813,7 +813,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         ----------
         trainer : string
             Optimizer to use for training the topic model
-            Possible values are mallet|sparkLDA|ctm
+            Possible values are mallet|sparkLDA|prodLDA|ctm
         """
 
         ############################################################
@@ -860,7 +860,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # The following settings will only be accessed in the "advanced settings panel"
         Y_or_N = input(
-            f"Do you wish to access the advance settings panel [Y/N]?:")
+            f"Do you wish to access the advance settings panel [Y/N]?: ")
         if Y_or_N.upper() == "Y":
             # Some of them can be confirmed/modified by the user
             min_lemas = var_num_keyboard('int', min_lemas,
@@ -957,6 +957,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 thetas_thr = var_num_keyboard('float', thetas_thr,
                                               'Threshold for topic activation in a doc (sparsification)')
             LDAparam = {
+                "mallet_path": mallet_path,               
                 "ntopics": ntopics,
                 "alpha": alpha,
                 "optimize_interval": optimize_interval,
@@ -967,7 +968,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "token_regexp": token_regexp
             }
 
-        elif trainer == "sparKLDA":
+        elif trainer == "sparkLDA":
+            LDAparam = {}
+        elif trainer == "prodLDA":
             LDAparam = {}
         elif trainer == "ctm":
             LDAparam = {}
@@ -1035,32 +1038,58 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # Needs to be modified with the BSC Spark Cluster and/or CITE SparkSubmit
         # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+        # Step 1: Preprocessing of Training Data
         if self.cf.get('Spark', 'spark_available') == 'True':
             script_spark = self.cf.get('Spark', 'script_spark')
             token_spark = self.cf.get('Spark', 'token_spark')
             script_path = './src/topicmodeling/topicmodeling.py'
-            options = '"--spark --train --config ' + configFile.resolve().as_posix() + '"'
+            options = '"--spark --preproc --config ' + configFile.resolve().as_posix() + '"'
             cmd = script_spark + ' -C ' + token_spark + \
                 ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
             printred(cmd)
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
                 output = check_output(args=cmd, shell=True)
-                print(output)
             except:
                 self.logger.error('-- -- Execution of script failed')
 
         else:
+            # Run command for corpus preprocessing using gensim
+            cmd = f'python topicmodeling.py --preproc --config {configFile.as_posix()}'
+            printred(cmd)
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                output = check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Command execution failed')
 
-            # Run command for training model without using Spark
+        # Step 2: Training of Topic Model
+        if trainer=="sparkLDA":
+            if not self.cf.get('Spark', 'spark_available') == 'True':
+                self.logger.error("-- -- sparkLDA requires access to a Spark cluster")
+            else:
+                script_spark = self.cf.get('Spark', 'script_spark')
+                token_spark = self.cf.get('Spark', 'token_spark')
+                script_path = './src/topicmodeling/topicmodeling.py'
+                options = '"--spark --train --config ' + configFile.resolve().as_posix() + '"'
+                cmd = script_spark + ' -C ' + token_spark + \
+                    ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+                printred(cmd)
+                try:
+                    self.logger.info(f'-- -- Running command {cmd}')
+                    check_output(args=cmd, shell=True)
+                except:
+                    self.logger.error('-- -- Execution of script failed')
+
+        else:
+            # Other models do not require Spark
             cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
             printred(cmd)
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
-                check_output(args=cmd, shell=True)
+                output = check_output(args=cmd, shell=True)
             except:
                 self.logger.error('-- -- Command execution failed')
-
         return
 
 
@@ -1070,8 +1099,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
     def corpus2JSON(self):
         """
-        Remove a training corpus from the Interactive Topic Model Trainer
-
         This is linked to the ITMTrainer only tentatively, since it should
         be part of WP4 tools
 

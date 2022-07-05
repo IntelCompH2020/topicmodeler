@@ -3,7 +3,9 @@
 * *Topic Modeling Toolbox*
 
 Provides several classes for Topic Modeling
-    - stwEQcleaner: For string cleaning (stopword removal + equivalent terms)
+    - textPreproc: Preparation of datasets for training topic models, including
+                   - string cleaning (stopword removal + equivalent terms)
+                   - BoW calculation
     - TMmodel: To represent a trained topic model + edition functions
     - MalletTrainer: To train a topic model from a given corpus
 """
@@ -12,18 +14,19 @@ import sys
 import shutil
 import argparse
 import json
+from subprocess import check_output
 from pathlib import Path
 import pandas as pd
+import numpy as np
+from sklearn.preprocessing import normalize
+from scipy import sparse
+import matplotlib.pyplot as plt
 
 
 
 """
-import numpy as np
-from sklearn.preprocessing import normalize
-from scipy import sparse
 # from scipy.spatial.distance import jensenshannon
 # import pyLDAvis
-import matplotlib.pyplot as plt
 import logging
 import regex as javare
 import re
@@ -43,7 +46,18 @@ logging.getLogger("gensim").setLevel(logging.WARNING)
 """
 
 def file_lines(fname):
-    # Count number of lines in file
+    """
+    Count number of lines in file
+    
+    Parameters
+    ----------
+    fname: Path
+        the file whose number of lines is calculated
+
+    Returns
+    -------
+    number of lines
+    """ 
     with fname.open('r', encoding='utf8') as f:
         for i, l in enumerate(f):
             pass
@@ -84,6 +98,8 @@ class textPreproc(object):
             Maximum proportion of documents to keep a term in the vocab
         keep_n: int
             Maximum vocabulary size
+        cntVecModel : pyspark.ml.feature.CountVectorizerModel
+            CountVectorizer Model to be used for the BOW calculation
         logger: Logger object
             To log object activity
         """
@@ -100,7 +116,7 @@ class textPreproc(object):
         else:
             import logging
             logging.basicConfig(level='INFO')
-            self._logger = logging.getLogger('stwEQcleaner')
+            self._logger = logging.getLogger('textPreproc')
 
     def _loadSTW(self, stw_files):
         """
@@ -173,16 +189,109 @@ class textPreproc(object):
         """
         if isinstance(trDF, pd.DataFrame):
             print('pandas')
+
+            """
+                    Preprocessing of files
+            For the training we have access (in self._corpusFiles) to a number of lemmatized
+            documents. This function:
+                1) Carries out a first set of cleaning and homogeneization tasks
+                2) Allow to reduce the size of the vocabulary (removing very rare or common terms)
+                3) Import the training corpus into Mallet format
+
+            # Identification of words that are too rare or common that need to be
+            # removed from the dictionary.
+            self.logger.info('-- -- Mallet Corpus Generation: Vocabulary generation')
+            dictionary = corpora.Dictionary()
+
+            # We iterate over all CSV files
+            #### Very important
+            #### Corpus that can be used for Topic Modeling must contain
+            #### two fields: ["id", "lemmas"]
+            print('Processing files for vocabulary creation')
+            pbar = tqdm(self._corpusFiles)
+            for csvFile in pbar:
+                df = pd.read_csv(csvFile, escapechar="\\", on_bad_lines="skip")
+                if "id" not in df.columns or "lemmas" not in df.columns:
+                    self.logger.error('-- -- Traning corpus error: must contain "id" and "lemmas" - Exit')
+                    sys.exit()
+                # Keep only relevant fields
+                id_lemas = df[["id", "lemmas"]].values.tolist()
+                # Apply regular expression to identify tokens
+                id_lemas = [[el[0], ' '.join(self._token_regexp.findall(el[1].replace('\n', ' ').strip()))]
+                            for el in id_lemas]
+                # Apply stopwords and equivalence files
+                id_lemas = [[el[0], self._stwEQ.cleanstr(el[1])] for el in id_lemas]
+                # Apply gensim tokenizer
+                id_lemas = [[el[0], list(tokenize(el[1], lowercase=True, deacc=True))] for el in id_lemas]
+                # Retain only documents with minimum extension
+                id_lemas = [el for el in id_lemas if len(el[1]) >= self._min_lemas]
+                # Add to dictionary
+                all_lemas = [el[1] for el in id_lemas]
+                dictionary.add_documents(all_lemas)
+
+            # Remove words that appear in less than no_below documents, or in more than
+            # no_above, and keep at most keep_n most frequent terms, keep track of removed
+            # words for debugging purposes
+            all_words = [dictionary[idx] for idx in range(len(dictionary))]
+            dictionary.filter_extremes(no_below=self._no_below, no_above=self._no_above, keep_n=self._keep_n)
+            kept_words = set([dictionary[idx] for idx in range(len(dictionary))])
+            rmv_words = [el for el in all_words if el not in kept_words]
+            # Save extreme words that will be removed
+            self.logger.info(f'-- -- Saving {len(rmv_words)} extreme words to file')
+            rmv_file = self._modelFolder.joinpath('commonrare_words.txt')
+            with rmv_file.open('w', encoding='utf-8') as fout:
+                [fout.write(el + '\n') for el in sorted(rmv_words)]
+            # Save dictionary to file
+            self.logger.info(f'-- -- Saving dictionary to file. Number of words: {len(kept_words)}')
+            vocab_txt = self._modelFolder.joinpath('vocabulary.txt')
+            with vocab_txt.open('w', encoding='utf-8') as fout:
+                [fout.write(el + '\n') for el in sorted(kept_words)]
+            # Save also in gensim text format
+            vocab_gensim = self._modelFolder.joinpath('vocabulary.gensim')
+            dictionary.save_as_text(vocab_gensim)
+
+            ##################################################
+            # Create corpus txt files
+            self.logger.info('-- -- Mallet Corpus generation: TXT file')
+
+            corpus_file = self._modelFolder.joinpath('training_data.txt')
+
+            fcorpus = corpus_file.open('w', encoding='utf-8')
+
+            print('Processing files for training dataset creation')
+            pbar = tqdm(self._corpusFiles)
+            for csvFile in pbar:
+                # Document preprocessing is same as before, but now we apply an additional filter
+                # and keep only words in the vocabulary
+                df = pd.read_csv(csvFile, escapechar="\\", on_bad_lines="skip")
+                id_lemas = df[["id", "lemmas"]].values.tolist()
+                id_lemas = [[el[0], ' '.join(self._token_regexp.findall(el[1].replace('\n', ' ').strip()))]
+                            for el in id_lemas]
+                id_lemas = [[el[0], self._stwEQ.cleanstr(el[1])] for el in id_lemas]
+                id_lemas = [[el[0], list(tokenize(el[1], lowercase=True, deacc=True))] for el in id_lemas]
+                id_lemas = [[el[0], [tk for tk in el[1] if tk in kept_words]] for el in id_lemas]
+                id_lemas = [el for el in id_lemas if len(el[1]) >= self._min_lemas]
+                # Write to corpus file
+                [fcorpus.write(el[0] + ' 0 ' + ' '.join(el[1]) + '\n') for el in id_lemas]
+
+            fcorpus.close()
+
+            """
         else:
+            # Preprocess data using Spark
             #tokenization
             tk = Tokenizer(inputCol="all_lemmas", outputCol="tokens")
             trDF = tk.transform(trDF)
 
-            #Removal of Stopwords
+            #Removal of Stopwords - Skip if not stopwords are provided
+            #to save computation time
             if len(self._stopwords):
                 swr = StopWordsRemover(inputCol="tokens", outputCol="clean_tokens",
                                         stopWords=self._stopwords)
                 trDF = swr.transform(trDF)
+            else:
+                #We need to create a copy of the tokens with the new name
+                trDF = trDF.withColumn("clean_tokens", trDF["tokens"])
 
             #Filter according to number of lemmas in each document
             trDF = trDF.where(F.size(F.col("clean_tokens")) >= self._min_lemas)
@@ -238,6 +347,74 @@ class textPreproc(object):
         else:
             return 0
 
+    def exportTrData(self, trDF, dirpath, tmTrainer):
+        """
+        Exports the training data in the provided dataset to the
+        format required by the topic modeling trainer
+
+        Parameters
+        ----------
+        trDF: Pandas or Spark dataframe
+            The dataframe should contain a column "bow" that will
+            be used to calculate the training data
+        dirpath: pathlib.Path
+            The folder where the data will be saved
+        tmTrainer: string
+            The output format [mallet|sparkLDA|prodLDA|ctm]
+
+        Returns
+        -------
+        trDataPath: Path
+        A path containing the location of the training data in the
+        indicated format
+        """
+        if isinstance(trDF, pd.DataFrame):
+            print('pandas')
+        else:
+            if tmTrainer == "mallet":
+                #We need to convert the bow back to text, and save text file
+                #in mallet format
+                outFile = dirpath.joinpath('corpus.txt')
+                vocabulary = self._cntVecModel.vocabulary
+                spark.sparkContext.broadcast(vocabulary)
+
+                #User defined function to recover the text corresponding to BOW
+                def back2text(bow):
+                    text=""
+                    for idx, tf in zip(bow.indices, bow.values):
+                        text += int(tf) * (vocabulary[idx] + ' ')
+                    return text.strip()
+                back2textUDF = F.udf(lambda z: back2text(z)) 
+
+                malletDF = (trDF.withColumn("bow_text", back2textUDF(F.col("bow")))
+                            .withColumn("2mallet", F.concat_ws(" 0 ", "id", "bow_text"))
+                            .select("2mallet")
+                        )
+                #Save as text file
+                #Ideally everything should get written to one text file directly from Spark
+                #but this is failing repeatedly, so I avoid coalescing in Spark and
+                #instead concatenate all files after creation
+                tempFolder = dirpath.joinpath('tempFolder')
+                #malletDF.coalesce(1).write.format("text").option("header", "false").save(f"file://{tempFolder.as_posix()}")
+                malletDF.write.format("text").option("header", "false").save(f"file://{tempFolder.as_posix()}")
+                #Concatenate all text files
+                with outFile.open("w", encoding="utf8") as fout:
+                    for inFile in [f for f in tempFolder.iterdir() if f.name.endswith('.txt')]:
+                        fout.write(inFile.open("r").read())
+                shutil.rmtree(tempFolder)
+
+            elif tmTrainer == "sparkLDA":
+                #Save necessary columns for Spark LDA in parquet file
+                outFile = dirpath.joinpath('corpus.parquet')
+                trDF.select("id", "source", "bow").write.parquet(f"file://{outFile.as_posix()}",
+                    mode="overwrite")
+
+            elif tmTrainer == "prodLDA":
+                print('ctm')
+            elif tmTrainer == "ctm":
+                print('ctm')
+
+        return outFile
 
 
 class stwEQcleaner(object):
@@ -436,7 +613,7 @@ class TMmodel(object):
             return
 
         # Load vocabulary variables from file
-        self._vocab_w2id, self._vocab_id2w, self._vocabfreq = lee_vocabfreq(vocabfreq_file)
+        self._vocab_w2id, self._vocab_id2w, self._vocabfreq = self.lee_vocabfreq(vocabfreq_file)
         self._size_vocab = len(self._vocabfreq)
         self._vocabfreq_file = vocabfreq_file
 
@@ -586,7 +763,7 @@ class TMmodel(object):
             self._descriptions[tpc] = desc_tpc
         return
 
-    def lee_vocabfreq(vocabfreq_path):
+    def lee_vocabfreq(self, vocabfreq_path):
         """Lee el vocabulario del modelo que se encuentra en el fichero indicado
         Devuelve dos diccionarios, uno usando las palabras como llave, y el otro
         utilizando el id de la palabra como clave
@@ -1029,253 +1206,119 @@ class TMmodel(object):
 
 
 class MalletTrainer(object):
+    """
+    Wrapper for the Mallet Topic Model Training. Implements the
+    following functionalities
+    - Import of the corpus to the mallet internal training format
+    - Training of the model
+    - Creation and persistence of the TMmodel object for tm curation
+    - Execution of some other time consuming tasks (pyLDAvis, ..)
 
-    def __init__(self, cf, modelFolder):
-        """Object initializer
-        Initializes relevant variables from config file
+    """
+
+    def __init__(self, mallet_path, ntopics=25, alpha=5.0, optimize_interval=10,
+                    num_threads=4, num_iterations=1000, doc_topic_thr=0.0,
+                    thetas_thr=0.003, token_regexp=None, logger=None):
+        """
+        Initilization Method
+        
+        Parameters
+        ----------
+        mallet_path: str
+            Full path to mallet binary
+        ntopics: int
+            Number of topics for the model
+        alpha: float
+            Parameter for the Dirichlet prior on doc distribution
+        optimize_interval: int
+            Number of steps betweeen parameter reestimation
+        num_threads: int
+            Number of threads for the optimization
+        num_iterations: int
+            Number of iterations for the mallet training
+        doc_topic_thr: float
+            Min value for topic proportions during mallet training
+        thetas_thr: float
+            Min value for sparsification of topic proportions after training
+        token_regexp: str
+            Regular expression for mallet topic model trainer (java type)
+        logger: Logger object
+            To log object activity
         """
 
-        logging.basicConfig(level='INFO')
-        self.logger = logging.getLogger('MalletTrainer')
+        self._mallet_path = Path(mallet_path)
+        self._ntopics = ntopics
+        self._alpha = alpha
+        self._optimize_interval = optimize_interval
+        self._num_threads = num_threads
+        self._num_iterations = num_iterations
+        self._doc_topic_thr = doc_topic_thr
+        self._thetas_thr = thetas_thr
+        self._token_regexp = token_regexp
 
-        # Settings for text preprocessing
-        self._min_lemas = int(cf['Preproc']['min_lemas'])
-        self._no_below = int(cf['Preproc']['no_below'])
-        self._no_above = float(cf['Preproc']['no_above'])
-        self._keep_n = int(cf['Preproc']['keep_n'])
-        # Append stopwords and equivalences files only if they exist
-        # Several stopword files can be used, but only one with equivalent terms
-        self._stw_file = []
-        for f in cf['Preproc']['stw_file'].split(','):
-            if not Path(f).is_file():
-                self.logger.warning(f'-- -- Stopword file {f} does not exist -- Ignored')
-            else:
-                self._stw_file.append(Path(f))
-        f = cf['Preproc']['eq_file']
-        if not Path(f).is_file():
-            self.logger.warning(f'-- -- Equivalence file {f} does not exist -- Ignored')
+        if logger:
+            self._logger = logger
         else:
-            self._eq_file = Path(f)
-        # Initialize string cleaner
-        self._stwEQ = stwEQcleaner(stw_files=self._stw_file, dict_eq_file=self._eq_file,
-                                   logger=self.logger)
+            import logging
+            logging.basicConfig(level='INFO')
+            self._logger = logging.getLogger('textPreproc')
 
-        # Settings for Mallet training
-        self._token_regexp_str = cf['Training']['token_regexp']
-        self._token_regexp = javare.compile(cf['Training']['token_regexp'])
-        self._mallet_path = Path(cf['Training']['mallet_path'])
         if not self._mallet_path.is_file():
-            self.logger.error(f'-- -- Provided mallet path is not valid -- Stop')
+            self._logger.error(f'-- -- Provided mallet path is not valid -- Stop')
             sys.exit()
-        self._numTopics = int(cf['Training']['ntopics'])
-        self._alpha = float(cf['Training']['alpha'])
-        self._optimizeInterval = int(cf['Training']['optimize_interval'])
-        self._numThreads = int(cf['Training']['num_threads'])
-        self._numIterations = int(cf['Training']['num_iterations'])
-        self._docTopicsThreshold = float(cf['Training']['doc_topic_thr'])
-        self._sparse_thr = float(cf['Training']['thetas_thr'])
-
-        # Output model folder and training files for the corpus
-        self._modelFolder = modelFolder
-        if not self._modelFolder.is_dir():
-            self.logger.error(f'-- -- Provided model folder is not valid -- Stop')
-            sys.exit()
-        self._corpusFiles = []
-        for f in cf['Training']['training_files'].split(','):
-            if not Path(f).is_file():
-                self.logger.warn(f'-- -- Corpus file {f} does not exist -- Ignored')
-            else:
-                self._corpusFiles.append(Path(f))
-
-        self.logger.info(f'-- -- Initialization of MalletTrainer variables completed')
 
         return
 
-    def fit(self):
-        """To fit the model we need to preprocess training data, and then
-        carry out the training itself"""
-        self._preproc()
-        self._train()
-        return
-
-    def _SaveThrFig(self, thetas32):
+    def _SaveThrFig(self, thetas32, plotFile):
         """Creates a figure to illustrate the effect of thresholding
         The distribution of thetas is plotted, together with the value
         that the trainer is programmed to use for the thresholding
+
+        Parameters
+        ----------
+        thetas32: 2d numpy array
+            the doc-topics matrix for a topic model
+        plotFile: Path
+            The name of the file where the plot will be saved
         """
         allvalues = np.sort(thetas32.flatten())
         step = int(np.round(len(allvalues) / 1000))
         plt.semilogx(allvalues[::step], (100 / len(allvalues)) * np.arange(0, len(allvalues))[::step])
-        plt.semilogx([self._sparse_thr, self._sparse_thr], [0, 100], 'r')
-        plot_file = self._modelFolder.joinpath('thetas_dist.pdf')
-        plt.savefig(plot_file)
+        plt.semilogx([self._thetas_thr, self._thetas_thr], [0, 100], 'r')
+        plt.savefig(plotFile)
         plt.close()
-
-    def _preproc(self):
-        """Preprocessing of files
-        For the training we have access (in self._corpusFiles) to a number of lemmatized
-        documents. This function:
-            1) Carries out a first set of cleaning and homogeneization tasks
-            2) Allow to reduce the size of the vocabulary (removing very rare or common terms)
-            3) Import the training corpus into Mallet format
-        """
-
-        # Identification of words that are too rare or common that need to be
-        # removed from the dictionary.
-        self.logger.info('-- -- Mallet Corpus Generation: Vocabulary generation')
-        dictionary = corpora.Dictionary()
-
-        # We iterate over all CSV files
-        #### Very important
-        #### Corpus that can be used for Topic Modeling must contain
-        #### two fields: ["id", "lemmas"]
-        print('Processing files for vocabulary creation')
-        pbar = tqdm(self._corpusFiles)
-        for csvFile in pbar:
-            df = pd.read_csv(csvFile, escapechar="\\", on_bad_lines="skip")
-            if "id" not in df.columns or "lemmas" not in df.columns:
-                self.logger.error('-- -- Traning corpus error: must contain "id" and "lemmas" - Exit')
-                sys.exit()
-            # Keep only relevant fields
-            id_lemas = df[["id", "lemmas"]].values.tolist()
-            # Apply regular expression to identify tokens
-            id_lemas = [[el[0], ' '.join(self._token_regexp.findall(el[1].replace('\n', ' ').strip()))]
-                        for el in id_lemas]
-            # Apply stopwords and equivalence files
-            id_lemas = [[el[0], self._stwEQ.cleanstr(el[1])] for el in id_lemas]
-            # Apply gensim tokenizer
-            id_lemas = [[el[0], list(tokenize(el[1], lowercase=True, deacc=True))] for el in id_lemas]
-            # Retain only documents with minimum extension
-            id_lemas = [el for el in id_lemas if len(el[1]) >= self._min_lemas]
-            # Add to dictionary
-            all_lemas = [el[1] for el in id_lemas]
-            dictionary.add_documents(all_lemas)
-
-        # Remove words that appear in less than no_below documents, or in more than
-        # no_above, and keep at most keep_n most frequent terms, keep track of removed
-        # words for debugging purposes
-        all_words = [dictionary[idx] for idx in range(len(dictionary))]
-        dictionary.filter_extremes(no_below=self._no_below, no_above=self._no_above, keep_n=self._keep_n)
-        kept_words = set([dictionary[idx] for idx in range(len(dictionary))])
-        rmv_words = [el for el in all_words if el not in kept_words]
-        # Save extreme words that will be removed
-        self.logger.info(f'-- -- Saving {len(rmv_words)} extreme words to file')
-        rmv_file = self._modelFolder.joinpath('commonrare_words.txt')
-        with rmv_file.open('w', encoding='utf-8') as fout:
-            [fout.write(el + '\n') for el in sorted(rmv_words)]
-        # Save dictionary to file
-        self.logger.info(f'-- -- Saving dictionary to file. Number of words: {len(kept_words)}')
-        vocab_txt = self._modelFolder.joinpath('vocabulary.txt')
-        with vocab_txt.open('w', encoding='utf-8') as fout:
-            [fout.write(el + '\n') for el in sorted(kept_words)]
-        # Save also in gensim text format
-        vocab_gensim = self._modelFolder.joinpath('vocabulary.gensim')
-        dictionary.save_as_text(vocab_gensim)
-
-        ##################################################
-        # Create corpus txt files
-        self.logger.info('-- -- Mallet Corpus generation: TXT file')
-
-        corpus_file = self._modelFolder.joinpath('training_data.txt')
-
-        fcorpus = corpus_file.open('w', encoding='utf-8')
-
-        print('Processing files for training dataset creation')
-        pbar = tqdm(self._corpusFiles)
-        for csvFile in pbar:
-            # Document preprocessing is same as before, but now we apply an additional filter
-            # and keep only words in the vocabulary
-            df = pd.read_csv(csvFile, escapechar="\\", on_bad_lines="skip")
-            id_lemas = df[["id", "lemmas"]].values.tolist()
-            id_lemas = [[el[0], ' '.join(self._token_regexp.findall(el[1].replace('\n', ' ').strip()))]
-                        for el in id_lemas]
-            id_lemas = [[el[0], self._stwEQ.cleanstr(el[1])] for el in id_lemas]
-            id_lemas = [[el[0], list(tokenize(el[1], lowercase=True, deacc=True))] for el in id_lemas]
-            id_lemas = [[el[0], [tk for tk in el[1] if tk in kept_words]] for el in id_lemas]
-            id_lemas = [el for el in id_lemas if len(el[1]) >= self._min_lemas]
-            # Write to corpus file
-            [fcorpus.write(el[0] + ' 0 ' + ' '.join(el[1]) + '\n') for el in id_lemas]
-
-        fcorpus.close()
-
-        ##################################################
-        # Importing Data to mallet
-        self.logger.info('-- -- Mallet Corpus Generation: Mallet Data Import')
-
-        corpus_mallet = self._modelFolder.joinpath('training_data.mallet')
-
-        cmd = self._mallet_path.as_posix() + \
-              ' import-file --preserve-case --keep-sequence ' + \
-              '--remove-stopwords --token-regex "' + self._token_regexp_str + \
-              '" --input %s --output %s'
-        cmd = cmd % (corpus_file, corpus_mallet)
-
-        try:
-            self.logger.info(f'-- -- Running command {cmd}')
-            check_output(args=cmd, shell=True)
-        except:
-            self.logger.error('-- -- Mallet failed to import data. Revise command')
 
         return
 
-    def _train(self):
-        """Mallet training. It does the following:
-            1) Trains a Mallet model using the settings provided by the user
-            2) It sparsifies thetas matrix and save a figure to report the effect
-            3) It saves model matrices: alphas, betas, thetas (sparse)
+    def _createTMmodel(self, modelFolder):
+        """Creates an object of class TMmodel hosting the topic model
+        that has been trained using mallet topic modeling and whose
+        output is available at the provided folder
+
+        Parameters
+        ----------
+        modelFolder: Path
+            the folder with the mallet output files
+
+        Returns
+        -------
+        tm: TMmodel
+            The topic model as an object of class TMmodel
+
         """
-        config_file = self._modelFolder.joinpath('mallet.config')
-        corpus_mallet = self._modelFolder.joinpath('training_data.mallet')
-        # create folder for storing results for mallet training
-        self._modelFolder.joinpath('mallet_output').mkdir()
 
-        with config_file.open('w', encoding='utf8') as fout:
-            fout.write('input = ' + corpus_mallet.as_posix() + '\n')
-            fout.write('num-topics = ' + str(self._numTopics) + '\n')
-            fout.write('alpha = ' + str(self._alpha) + '\n')
-            fout.write('optimize-interval = ' + str(self._optimizeInterval) + '\n')
-            fout.write('num-threads = ' + str(self._numThreads) + '\n')
-            fout.write('num-iterations = ' + str(self._numIterations) + '\n')
-            fout.write('doc-topics-threshold = ' + str(self._docTopicsThreshold) + '\n')
-            # fout.write('output-state = ' + os.path.join(self._outputFolder, 'topic-state.gz') + '\n')
-            fout.write('output-doc-topics = ' + \
-                       self._modelFolder.joinpath('mallet_output').joinpath('doc-topics.txt').as_posix() + '\n')
-            fout.write('word-topic-counts-file = ' + \
-                       self._modelFolder.joinpath('mallet_output').joinpath('word-topic-counts.txt').as_posix() + '\n')
-            fout.write('diagnostics-file = ' + \
-                       self._modelFolder.joinpath('mallet_output').joinpath('diagnostics.xml ').as_posix() + '\n')
-            fout.write('xml-topic-report = ' + \
-                       self._modelFolder.joinpath('mallet_output').joinpath('topic-report.xml').as_posix() + '\n')
-            fout.write('output-topic-keys = ' + \
-                       self._modelFolder.joinpath('mallet_output').joinpath('topickeys.txt').as_posix() + '\n')
-            fout.write('inferencer-filename = ' + \
-                       self._modelFolder.joinpath('mallet_output').joinpath('inferencer.mallet').as_posix() + '\n')
-            # fout.write('output-model = ' + \
-            #    self._outputFolder.joinpath('mallet_output').joinpath('modelo.bin').as_posix() + '\n')
-            # fout.write('topic-word-weights-file = ' + \
-            #    self._outputFolder.joinpath('mallet_output').joinpath('topic-word-weights.txt').as_posix() + '\n')
+        thetas_file = modelFolder.joinpath('doc-topics.txt')
 
-        cmd = str(self._mallet_path) + ' train-topics --config ' + str(config_file)
-
-        try:
-            self.logger.info(f'-- -- Training mallet topic model. Command is {cmd}')
-            check_output(args=cmd, shell=True)
-        except:
-            self.logger.error('-- -- Model training failed. Revise command')
-            return
-
-        thetas_file = self._modelFolder.joinpath('mallet_output').joinpath('doc-topics.txt')
-
-        cols = [k for k in np.arange(2, self._numTopics + 2)]
+        cols = [k for k in np.arange(2, self._ntopics + 2)]
 
         # Sparsification of thetas matrix
-        self.logger.debug('-- -- Sparsifying doc-topics matrix')
+        self._logger.debug('-- -- Sparsifying doc-topics matrix')
         thetas32 = np.loadtxt(thetas_file, delimiter='\t', dtype=np.float32, usecols=cols)
         # thetas32 = np.loadtxt(thetas_file, delimiter='\t', dtype=np.float32)[:,2:]
         # Create figure to check thresholding is correct
-        self._SaveThrFig(thetas32)
+        self._SaveThrFig(thetas32, modelFolder.joinpath('thetasDist.pdf'))
         # Set to zeros all thetas below threshold, and renormalize
-        thetas32[thetas32 < self._sparse_thr] = 0
+        thetas32[thetas32 < self._thetas_thr] = 0
         thetas32 = normalize(thetas32, axis=1, norm='l1')
         thetas32 = sparse.csr_matrix(thetas32, copy=True)
 
@@ -1283,11 +1326,11 @@ class MalletTrainer(object):
         alphas = np.asarray(np.mean(thetas32, axis=0)).ravel()
 
         # Create vocabulary files and calculate beta matrix
-        # A vocabulary is available with words in alphabetic order,
-        # but the new files will use the order used by mallet
-        wtcFile = self._modelFolder.joinpath('mallet_output').joinpath('word-topic-counts.txt')
+        # A vocabulary is available with words provided by the Count Vectorizer object,
+        # but the new files need the order used by mallet
+        wtcFile = modelFolder.joinpath('word-topic-counts.txt')
         vocab_size = file_lines(wtcFile)
-        betas = np.zeros((self._numTopics, vocab_size))
+        betas = np.zeros((self._ntopics, vocab_size))
         vocab = []
         term_freq = np.zeros((vocab_size,))
 
@@ -1302,21 +1345,100 @@ class MalletTrainer(object):
                     term_freq[i] += cnt
         betas = normalize(betas, axis=1, norm='l1')
         # save vocabulary and frequencies
-        with self._modelFolder.joinpath('vocab_freq_mallet.txt').open('w', encoding='utf8') as fout:
+        vocabfreq_file = modelFolder.joinpath('vocab_freq_mallet.txt')
+        with vocabfreq_file.open('w', encoding='utf8') as fout:
             [fout.write(el[0] + '\t' + str(int(el[1])) + '\n') for el in zip(vocab, term_freq)]
-        self.logger.debug('-- -- Mallet training: Vocabulary file generated')
+        self._logger.debug('-- -- Mallet training: Vocabulary file generated')
 
-        # We end by saving the model for future use
-        modelVarsDir = self._modelFolder.joinpath('model_vars')
-        modelVarsDir.mkdir()
-        np.save(modelVarsDir.joinpath('alpha_orig.npy'), alphas)
-        np.save(modelVarsDir.joinpath('beta_orig.npy'), betas)
-        np.savez(modelVarsDir.joinpath('thetas_orig.npz'),
-                 thetas_data=thetas32.data, thetas_indices=thetas32.indices,
-                 thetas_indptr=thetas32.indptr, thetas_shape=thetas32.shape)
+        tm = TMmodel(betas=betas, thetas=thetas32, alphas=alphas,
+                 vocabfreq_file=vocabfreq_file)
 
         # Remove doc-topics file. It is no longer needed and takes a lot of space
         thetas_file.unlink()
+
+        return tm
+
+    def fit(self, corpusFile):
+        """
+        Training of Mallet Topic Model
+
+        Parameters
+        ----------
+        corpusFile: Path
+            Path to txt file in mallet format
+            id 0 token1 token2 token3 ...
+        """
+
+        # Output model folder and training file for the corpus
+        if not corpusFile.is_file():
+            self._logger.error(f'-- -- Provided corpus Path does not exist -- Stop')
+            sys.exit()
+
+        modelFolder = corpusFile.parent.joinpath('malletModel')
+        modelFolder.mkdir()
+
+        ##################################################
+        # Importing Data to mallet
+        self._logger.info('-- -- Mallet Corpus Generation: Mallet Data Import')
+
+        corpusMallet = modelFolder.joinpath('corpus.mallet')
+
+        cmd = self._mallet_path.as_posix() + \
+              ' import-file --preserve-case --keep-sequence ' + \
+              '--remove-stopwords --token-regex "' + self._token_regexp + \
+              '" --input %s --output %s'
+        cmd = cmd % (corpusFile, corpusMallet)
+
+        try:
+            self._logger.info(f'-- -- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self._logger.error('-- -- Mallet failed to import data. Revise command')
+
+        ##################################################
+        # Mallet Topic model training
+        configMallet = modelFolder.joinpath('mallet.config')
+
+        with configMallet.open('w', encoding='utf8') as fout:
+            fout.write('input = ' + corpusMallet.resolve().as_posix() + '\n')
+            fout.write('num-topics = ' + str(self._ntopics) + '\n')
+            fout.write('alpha = ' + str(self._alpha) + '\n')
+            fout.write('optimize-interval = ' + str(self._optimize_interval) + '\n')
+            fout.write('num-threads = ' + str(self._num_threads) + '\n')
+            fout.write('num-iterations = ' + str(self._num_iterations) + '\n')
+            fout.write('doc-topics-threshold = ' + str(self._doc_topic_thr) + '\n')
+            # fout.write('output-state = ' + os.path.join(self._outputFolder, 'topic-state.gz') + '\n')
+            fout.write('output-doc-topics = ' + \
+                       modelFolder.joinpath('doc-topics.txt').resolve().as_posix() + '\n')
+            fout.write('word-topic-counts-file = ' + \
+                       modelFolder.joinpath('word-topic-counts.txt').resolve().as_posix() + '\n')
+            fout.write('diagnostics-file = ' + \
+                       modelFolder.joinpath('diagnostics.xml ').resolve().as_posix() + '\n')
+            fout.write('xml-topic-report = ' + \
+                       modelFolder.joinpath('topic-report.xml').resolve().as_posix() + '\n')
+            fout.write('output-topic-keys = ' + \
+                       modelFolder.joinpath('topickeys.txt').resolve().as_posix() + '\n')
+            fout.write('inferencer-filename = ' + \
+                       modelFolder.joinpath('inferencer.mallet').resolve().as_posix() + '\n')
+            # fout.write('output-model = ' + \
+            #    self._outputFolder.joinpath('mallet_output').joinpath('modelo.bin').as_posix() + '\n')
+            # fout.write('topic-word-weights-file = ' + \
+            #    self._outputFolder.joinpath('mallet_output').joinpath('topic-word-weights.txt').as_posix() + '\n')
+
+        cmd = str(self._mallet_path) + ' train-topics --config ' + str(configMallet)
+
+        try:
+            self._logger.info(f'-- -- Training mallet topic model. Command is {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self._logger.error('-- -- Model training failed. Revise command')
+            return
+
+        ##################################################
+        # Create TMmodel object
+
+        tm = self._createTMmodel(modelFolder)
+        tm.save_npz(corpusFile.parent.joinpath('model.npz'))
 
         return
 
@@ -1894,8 +2016,10 @@ if __name__ == "__main__":
     parser.add_argument('--spark', action='store_true', default=False,
                          help='Indicate that spark cluster is available',
                          required=False)
+    parser.add_argument('--preproc', action='store_true', default=False,
+                        help="Preprocess training data according to config file")
     parser.add_argument('--train', action='store_true', default=False,
-                        help="Train a Topic Model according to config file")
+                        help="Train Topic Model according to config file")
     parser.add_argument('--config', type=str, default=None,
                         help="path to configuration file")
     args = parser.parse_args()
@@ -1915,9 +2039,10 @@ if __name__ == "__main__":
     else:
         spark = None
 
-    # If the training flag is activated, we need to check availability of
-    # configuration file, and run the training using class MalletTrainer
-    if args.train:
+    # If the preprocessing flag is activated, we need to check availability of
+    # configuration file, and run the preprocessing of the training data using
+    # the textPreproc class
+    if args.preproc:
         configFile = Path(args.config)
         if configFile.is_file():
             with configFile.open('r', encoding='utf8') as fin:
@@ -1961,26 +2086,52 @@ if __name__ == "__main__":
                     else:
                         trDF = trDF.union(df).distinct()
                 
+                #We preprocess the data and save the CountVectorizer Model used to obtain the BoW
                 trDF = tPreproc.preprocBOW(trDF)
                 tPreproc.saveCntVecModel(configFile.parent.resolve())
-
-                with open('/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/outspark.txt', 'w') as fout:
-                    fout.write(str(trDF.count()))
+                trDataFile = tPreproc.exportTrData(trDF = trDF,
+                                dirpath = configFile.parent.resolve(),
+                                tmTrainer = train_config['trainer'])
+                sys.stdout.write(trDataFile.as_posix())
 
             else:
+                # TBD Preprocess training data with Gensim
                 pass
+        else:
+            sys.exit('You need to provide a valid configuration file')
 
-            """
-            if cf['Training']['trainer'] == 'mallet':
-                MallTr = MalletTrainer(cf, modelFolder=configFile.parent)
-                MallTr.fit()
-            elif cf['Training']['trainer'] == 'prodlda':
-                ProdLDATr = ProdLDATrainer(cf, modelFolder=configFile.parent)
-                ProdLDATr.fit()
-            elif cf['Training']['trainer'] == 'ctm':
-                CTMr = CTMTrainer(cf, modelFolder=configFile.parent)
-                CTMr.fit()
-            """
+    # If the training flag is activated, we need to check availability of
+    # configuration file, and run the topic model training
+    if args.train:
+        configFile = Path(args.config)
+        if configFile.is_file():
+            with configFile.open('r', encoding='utf8') as fin:
+                train_config = json.load(fin)
+
+                if train_config['trainer'] == 'mallet':
+                    MallTr = MalletTrainer(mallet_path=train_config['LDAparam']['mallet_path'],
+                                ntopics=train_config['LDAparam']['ntopics'],
+                                alpha=train_config['LDAparam']['alpha'],
+                                optimize_interval=train_config['LDAparam']['optimize_interval'],
+                                num_threads=train_config['LDAparam']['num_threads'],
+                                num_iterations=train_config['LDAparam']['num_iterations'],
+                                doc_topic_thr=train_config['LDAparam']['doc_topic_thr'],
+                                thetas_thr=train_config['LDAparam']['thetas_thr'],
+                                token_regexp=train_config['LDAparam']['token_regexp'])
+                    MallTr.fit(corpusFile=configFile.parent.joinpath('corpus.txt'))
+                elif train_config['trainer'] == 'sparkLDA':
+                    if not args.spark:
+                        sys.stodout.write("You need access to a spark cluster to run sparkLDA")
+                        sys.exit("You need access to a spark cluster to run sparkLDA")
+                    sparkLDATr = sparkLDATrainer()
+                    sparkLDATr.fit(configFile.parent.joinpath('corpus.parquet'))
+                elif train_config['trainer'] == 'prodLDA':
+                    ProdLDATr = ProdLDATrainer(cf, modelFolder=configFile.parent.resolve())
+                    ProdLDATr.fit()
+                elif train_config['trainer'] == 'ctm':
+                    CTMr = CTMTrainer(cf, modelFolder=configFile.parent.resolve())
+                    CTMr.fit()
+
         else:
             sys.exit('You need to provide a valid configuration file')
 

@@ -96,6 +96,7 @@ trainTM:
     - parameters:
         mallet: Mallet Topic Modeling
         sparkLDA: Spark MLLIB Topic Modeling
+        prodLDA: ProdLDA Topic Modeling (deep learning)
         ctm: Contextualized Topic Model (deep learning)
 
 
