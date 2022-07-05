@@ -24,12 +24,33 @@ class Constants:
     WORDLIST_EDITION_MSG_STATUS_2 = "The wordlist replaced an existing dataset"
     EDIT_WORDLIST_NOT_SELECTED_MSG = "A wordlist to be edited must be selected first."
     DELETE_WORDLIST_NOT_SELECTED_MSG = "A wordlist to be deleted must be selected first."
+    RESTORE_DFT_GUI_SETTINGS = "GUI settings were restored to its default value"
+    UPDATE_GUI_SETTINGS = "GUI settings were to the selected values"
+    RESTORE_DFT_LOG_SETTINGS = "Topic Modeling's logging settings were restored to its default value"
+    UPDATE_LOG_SETTINGS = "Topic Modeling's logging settings were to the selected values"
+    RESTORE_DFT_MALLET_SETTINGS = "Topic Modeling's Mallet settings were restored to its default value"
+    UPDATE_MALLET_SETTINGS = "Topic Modeling's Mallet settings were to the selected values"
+    RESTORE_DFT_PRODLDA_SETTINGS = "Topic Modeling's ProdLDA settings were restored to its default value"
+    UPDATE_PRODLDA_SETTINGS = "Topic Modeling's ProdLDA settings were to the selected values"
+    RESTORE_DFT_CTM_SETTINGS = "Topic Modeling's CTM settings were restored to its default value"
+    UPDATE_CTM_SETTINGS = "Topic Modeling's CTM settings were to the selected values"
+    RESTORE_DFT_TM_GENERAL_SETTINGS = "Topic Modeling's general settings were restored to its default value"
+    UPDATE_TM_GENERAL_SETTINGS = "Topic Modeling's general settings were to the selected values"
+    RESTORE_DFT_SPARK_SETTINGS = "Spark settings were restored to its default value"
+    UPDATE_SPARK_SETTINGS = "Spark settings were to the selected values"
+    RESTORE_DFT_PREPROC_SETTINGS = "Preprocessing settings were restored to its default value"
+    UPDATE_PREPROC_SETTINGS = "Preprocessing settings were to the selected values"
+    RESTORE_DFT_ALL_SETTINGS = "All settings were restored to its default value"
+    RESTORE_DFT_MSGS = [RESTORE_DFT_GUI_SETTINGS, RESTORE_DFT_LOG_SETTINGS, RESTORE_DFT_MALLET_SETTINGS, RESTORE_DFT_PRODLDA_SETTINGS,
+                        RESTORE_DFT_CTM_SETTINGS, RESTORE_DFT_TM_GENERAL_SETTINGS, RESTORE_DFT_SPARK_SETTINGS, RESTORE_DFT_PREPROC_SETTINGS]
+    SETTINGS_OPTIONS = ["gui", "log", "mallet", "prodlda",
+                        "ctm", "tm_general", "spark", "preproc"]
 
     CORPUS_TABLES = ["table_available_local_corpus",
                      "table_available_training_datasets"]
     DOWNLOAD_CORPUS_TABLES = ["table_available_fields",
                               "table_fields_to_include", "table_filters"]
-    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",  
+    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",
                                "tableWidget_fields_to_include_raw",
                                "tableWidget_available_fields_lemmas", "tableWidget_fields_to_include_lemmas"]
 
@@ -39,7 +60,8 @@ class Constants:
                                     "separated by commas (stw1,stw2, ...)\n - Equivalences: Introduce equivalences " \
                                     "separated by commas in the format orig:target (orig1:tgt1, orig2:tgt2, ...) "
 
-    MODELS_TABLES = ["table_available_trained_models_desc", "tableWidget_trained_models_topics"]
+    MODELS_TABLES = ["table_available_trained_models_desc",
+                     "tableWidget_trained_models_topics"]
     TRAIN_MODEL_TABLES = ["table_training_resultsLDA",
                           "table_training_results_AVITM", "table_training_results_CTM"]
     TRAIN_LOADING_BARS = ["progress_bar_LDA",
@@ -183,7 +205,7 @@ class Constants:
             border: 1px solid #1A2E40;
             color:black;
         }"""
-    
+
     SETTINGS_SUBBUTTON_SELECTED_STYLESHEET = \
         """
         QPushButton {
@@ -199,7 +221,7 @@ class Constants:
 	        background-color: #4D6F8C;
         }
         """
-    
+
     SETTINGS_SUBBUTTON_UNSELECTED_STYLESHEET = \
         """
         QPushButton {
@@ -215,7 +237,7 @@ class Constants:
 	        background-color: #4D6F8C;
         }
         """
-    
+
     SETTINGS_SELECTED_STYLESHEET = \
         """
         QPushButton {
@@ -232,7 +254,7 @@ class Constants:
 	        background-color: #4D6F8C;
         }
         """
-    
+
     SETTINGS_UNSELECTED_STYLESHEET = \
         """
         QPushButton {
@@ -248,6 +270,3 @@ class Constants:
 	        background-color: #4D6F8C;
         }
         """
-
-
-

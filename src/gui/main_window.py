@@ -6,7 +6,8 @@ It implements the functions needed to
 
     - Configure the GUI widgets defined in the corresponding UI file (main_window.ui)
     - Connect the GUI and the project manager (ITMTTaskManager)
-    - Implement handler functions to control the interaction between the user and the different widgets
+    - Implement handler functions to control the interaction between the user and the 
+      different widgets
     - Control the opening of secondary windows for specific functionalities (training, curation, etc.)
 """
 
@@ -308,6 +309,27 @@ class MainWindow(QMainWindow):
             self.clicked_pushButton_apply_spark_settings)
         self.pushButton_apply_preprocessing_settings.clicked.connect(
             self.clicked_pushButton_apply_preprocessing_settings)
+        
+        self.pushButton_restore_gui_settings.clicked.connect(
+            self.clicked_pushButton_restore_gui_settings)
+        self.pushButton_restore_log_settings.clicked.connect(
+            self.clicked_pushButton_restore_log_settings)
+        self.pushButton_restore_mallet_settings.clicked.connect(
+            self.clicked_pushButton_restore_mallet_settings)
+        self.pushButton_restore_prodlda_settings.clicked.connect(
+            self.clicked_pushButton_restore_prodlda_settings)
+        self.pushButton_restore_sparklda_settings.clicked.connect(
+            self.clicked_pushButton_restore_sparklda_settings)
+        self.pushButton_restore_ctm_settings.clicked.connect(
+            self.clicked_pushButton_restore_ctm_settings)
+        self.pushButton_restore_hierarchical_settings.clicked.connect(
+            self.clicked_pushButton_restore_hierarchical_settings)
+        self.pushButton_restore_tm_general_settings.clicked.connect(
+            self.clicked_pushButton_restore_tm_general_settings)
+        self.pushButton_restore_spark_settings.clicked.connect(
+            self.clicked_pushButton_restore_spark_settings)
+        self.pushButton_restore_preprocessing_settings.clicked.connect(
+            self.clicked_pushButton_restore_preprocessing_settings)
 
     #####################################################################################
     # TASK MANAGER COMMUNICATION METHODS
@@ -359,7 +381,7 @@ class MainWindow(QMainWindow):
         self.tm.listAllWdLists(self)
 
         # Fill settings table
-        self.set_default_settings()
+        self.set_default_settings("all", False, False)
 
         return
 
@@ -773,149 +795,175 @@ class MainWindow(QMainWindow):
 
         return
 
-    def set_default_settings(self):
+    def set_default_settings(self, option, save, msg):
         """
         Method for reading settings from the TM's configuration file and writing them in the correspondng view within the Settings' page.
         """
 
-        # GUI settings
-        self.lineEdit_font_size.setText(str(14))
-        self.fontComboBox.setCurrentText("Arial")
-
         # Get config object
         cf = configparser.ConfigParser()
-        cf.read(self.tm.p2config)
+        cf.read(self.tm.p2config_dft)
 
-        # Read values and set them in the correponding widget
-        # LOG SETTINGS
-        self.lineEdit_file_name.setText(
-            str(cf.get('logformat', 'filename')))
-        self.lineEdit_date_format.setText(
-            str(cf.get('logformat', 'datefmt')))
-        self.lineEdit_file_format.setText(
-            str(cf.get('logformat', 'file_format')))
-        self.lineEdit_file_level.setText(
-            str(cf.get('logformat', 'file_level')))
-        self.lineEdit_cons_format.setText(
-            str(cf.get('logformat', 'cons_format')))
-        self.lineEdit_cons_level.setText(
-            str(cf.get('logformat', 'cons_level')))
-
-        # MALLET SETTINGS
-        self.lineEdit_settings_mallet_path.setText(
-            str(cf.get('MalletTM', 'mallet_path')))
-        self.lineEdit_settings_regexp.setText(
-            str(cf.get('MalletTM', 'token_regexp')))
-        self.lineEdit_settings_alpha.setText(
-            str(cf.get('MalletTM', 'alpha')))
-        self.lineEdit_settings_optimize_interval.setText(
-            str(cf.get('MalletTM', 'optimize_interval')))
-        self.lineEdit_settings_nr_threads.setText(
-            str(cf.get('MalletTM', 'num_threads')))
-        self.lineEdit_settings_nr_iter.setText(
-            str(cf.get('MalletTM', 'num_iterations')))
-        self.lineEdit_settings_doc_top_thr.setText(
-            str(cf.get('MalletTM', 'doc_topic_thr')))
-        self.lineEdit_settings_thetas_thr.setText(
-            str(cf.get('MalletTM', 'thetas_thr')))
-        self.lineEdit_settings_infer_iter.setText(
-            str(cf.get('MalletTM', 'num_iterations_inf')))
-
-        # PRODLDA
-        self.lineEdit_settings_nr_comp_prod.setText(
-            str(cf.get('ProdLDA', 'n_components')))
-        self.lineEdit_settings_model_type_prod.setText(
-            str(cf.get('ProdLDA', 'model_type')))
-        self.lineEdit_settings_hidden_prod.setText(
-            str(cf.get('ProdLDA', 'hidden_sizes')))
-        self.lineEdit_settings_activation_prod.setText(
-            str(cf.get('ProdLDA', 'activation')))
-        self.lineEdit_settings_dropout_prod.setText(
-            str(cf.get('ProdLDA', 'dropout')))
-        self.lineEdit_settings_learn_priors_prod.setText(
-            str(cf.get('ProdLDA', 'learn_priors')))
-        self.lineEdit_settings_lr_prod.setText(
-            str(cf.get('ProdLDA', 'lr')))
-        self.lineEdit_settings_momentum_prod.setText(
-            str(cf.get('ProdLDA', 'momentum')))
-        self.lineEdit_settings_solver_prod.setText(
-            str(cf.get('ProdLDA', 'solver')))
-        self.lineEdit_settings_nr_epochs_prod.setText(
-            str(cf.get('ProdLDA', 'num_epochs')))
-        self.lineEdit_settings_plateau_prod.setText(
-            str(cf.get('ProdLDA', 'reduce_on_plateau')))
-        self.lineEdit_settings_label_size_prod.setText(
-            str(cf.get('ProdLDA', 'label_size')))
-        self.lineEdit_settings_loss_weights_prod.setText(
-            str(cf.get('ProdLDA', 'loss_weights')))
-        self.lineEdit_settings_batch_size_prod.setText(
-            str(cf.get('ProdLDA', 'batch_size')))
-
-        # CTM
-        self.lineEdit_settings_nr_comp_prod.setText(
-            str(cf.get('CTM', 'num_topics')))
-        self.lineEdit_settings_under_ctm_type.setText(
-            str(cf.get('CTM', 'model_type')))
-        self.lineEdit_settings_model_type_ctm.setText(
-            str(cf.get('CTM', 'ctm_model_type')))
-        self.lineEdit_settings_hidden_ctm.setText(
-            str(cf.get('CTM', 'hidden_sizes')))
-        self.lineEdit_settings_activation_ctm.setText(
-            str(cf.get('CTM', 'activation')))
-        self.lineEdit_settings_dropout_ctm.setText(
-            str(cf.get('CTM', 'dropout')))
-        self.lineEdit_settings_priors_ctm.setText(
-            str(cf.get('CTM', 'learn_priors')))
-        self.lineEdit_settings_lr_ctm.setText(
-            str(cf.get('CTM', 'batch_size')))
-        self.lineEdit_settings_momentum_ctm.setText(
-            str(cf.get('CTM', 'lr')))
-        self.lineEdit_settings_solver_ctm.setText(
-            str(cf.get('CTM', 'momentum')))
-        self.lineEdit_settings_nr_epochs_ctm.setText(
-            str(cf.get('CTM', 'solver')))
-        self.lineEdit_settings_plateau_ctm.setText(
-            str(cf.get('CTM', 'num_epochs')))
-        self.lineEdit_settings_nr_samples_ctm.setText(
-            str(cf.get('CTM', 'num_samples')))
-        self.lineEdit_settings_plateau_ctm.setText(
-            str(cf.get('CTM', 'reduce_on_plateau')))
-        self.lineEdit_settings_topic_prior_mean_ctm.setText(
-            str(cf.get('CTM', 'topic_prior_mean')))
-        self.lineEdit_settings_topic_prior_std_ctm.setText(
-            str(cf.get('CTM', 'topic_prior_variance')))
-        self.lineEdit_settings_nr_workers_ctm.setText(
-            str(cf.get('CTM', 'num_data_loader_workers')))
-
-        # GENERAL TM SETTINGS
-        self.lineEdit_settings_nr_words.setText(
-            str(cf.get('TMedit', 'n_palabras')))
-        self.lineEdit_settings_round_size.setText(
-            str(cf.get('TMedit', 'round_size')))
-        self.lineEdit_settings_netl_workers.setText(
-            str(cf.get('TMedit', 'NETLworkers')))
-        self.lineEdit_settings_ldavis_nr_docs.setText(
-            str(cf.get('TMedit', 'LDAvis_ndocs')))
-        self.lineEdit_settings_ldavis_nr_jobs.setText(
-            str(cf.get('TMedit', 'LDAvis_njobs')))
-
-        # SPARK
-        self.lineEdit_settings_spark_available.setText(
-            str(cf.get('Spark', 'spark_available')))
-        self.lineEdit_settings_script_spark.setText(
-            str(cf.get('Spark', 'script_spark')))
-        self.lineEdit_settings_token_spark.setText(
-            str(cf.get('Spark', 'token_spark')))
-
-        # PREPROCESSING
-        self.lineEdit_settings_min_lemas.setText(
-            str(cf.get('Preproc', 'min_lemas')))
-        self.lineEdit_settings_nr_below.setText(
-            str(cf.get('Preproc', 'no_below')))
-        self.lineEdit_settings_nr_above.setText(
-            str(cf.get('Preproc', 'no_above')))
-        self.lineEdit_settings_keep_n.setText(
-            str(cf.get('Preproc', 'keep_n')))
+        if option == "gui":
+            # GUI settings
+            self.lineEdit_font_size.setText(str(14))
+            self.fontComboBox.setCurrentText("Arial")
+            if save:
+                self.clicked_pushButton_apply_changes_gui_settings()
+        elif option == "log":
+            # LOG SETTINGS
+            self.lineEdit_file_name.setText(
+                str(cf.get('logformat', 'filename')))
+            self.lineEdit_date_format.setText(
+                str(cf.get('logformat', 'datefmt')))
+            self.lineEdit_file_format.setText(
+                str(cf.get('logformat', 'file_format')))
+            self.lineEdit_file_level.setText(
+                str(cf.get('logformat', 'file_level')))
+            self.lineEdit_cons_format.setText(
+                str(cf.get('logformat', 'cons_format')))
+            self.lineEdit_cons_level.setText(
+                str(cf.get('logformat', 'cons_level')))
+            if save:
+                self.clicked_pushButton_apply_changes_log_settings()
+        elif option == "mallet":
+            # MALLET SETTINGS
+            self.lineEdit_settings_mallet_path.setText(
+                str(cf.get('MalletTM', 'mallet_path')))
+            self.lineEdit_settings_regexp.setText(
+                str(cf.get('MalletTM', 'token_regexp')))
+            self.lineEdit_settings_alpha.setText(
+                str(cf.get('MalletTM', 'alpha')))
+            self.lineEdit_settings_optimize_interval.setText(
+                str(cf.get('MalletTM', 'optimize_interval')))
+            self.lineEdit_settings_nr_threads.setText(
+                str(cf.get('MalletTM', 'num_threads')))
+            self.lineEdit_settings_nr_iter.setText(
+                str(cf.get('MalletTM', 'num_iterations')))
+            self.lineEdit_settings_doc_top_thr.setText(
+                str(cf.get('MalletTM', 'doc_topic_thr')))
+            self.lineEdit_settings_thetas_thr.setText(
+                str(cf.get('MalletTM', 'thetas_thr')))
+            self.lineEdit_settings_infer_iter.setText(
+                str(cf.get('MalletTM', 'num_iterations_inf')))
+            if save:
+                self.clicked_pushButton_apply_changes_mallet_settings()
+        elif option == "prodlda":
+            # PRODLDA
+            self.lineEdit_settings_nr_comp_prod.setText(
+                str(cf.get('ProdLDA', 'n_components')))
+            self.lineEdit_settings_model_type_prod.setText(
+                str(cf.get('ProdLDA', 'model_type')))
+            self.lineEdit_settings_hidden_prod.setText(
+                str(cf.get('ProdLDA', 'hidden_sizes')))
+            self.lineEdit_settings_activation_prod.setText(
+                str(cf.get('ProdLDA', 'activation')))
+            self.lineEdit_settings_dropout_prod.setText(
+                str(cf.get('ProdLDA', 'dropout')))
+            self.lineEdit_settings_learn_priors_prod.setText(
+                str(cf.get('ProdLDA', 'learn_priors')))
+            self.lineEdit_settings_lr_prod.setText(
+                str(cf.get('ProdLDA', 'lr')))
+            self.lineEdit_settings_momentum_prod.setText(
+                str(cf.get('ProdLDA', 'momentum')))
+            self.lineEdit_settings_solver_prod.setText(
+                str(cf.get('ProdLDA', 'solver')))
+            self.lineEdit_settings_nr_epochs_prod.setText(
+                str(cf.get('ProdLDA', 'num_epochs')))
+            self.lineEdit_settings_plateau_prod.setText(
+                str(cf.get('ProdLDA', 'reduce_on_plateau')))
+            self.lineEdit_settings_label_size_prod.setText(
+                str(cf.get('ProdLDA', 'label_size')))
+            self.lineEdit_settings_loss_weights_prod.setText(
+                str(cf.get('ProdLDA', 'loss_weights')))
+            self.lineEdit_settings_batch_size_prod.setText(
+                str(cf.get('ProdLDA', 'batch_size')))
+            if save:
+                self.clicked_pushButton_apply_changes_prodlda_settings()
+        elif option == "ctm":
+            # CTM
+            self.lineEdit_settings_nr_comp_prod.setText(
+                str(cf.get('CTM', 'num_topics')))
+            self.lineEdit_settings_under_ctm_type.setText(
+                str(cf.get('CTM', 'model_type')))
+            self.lineEdit_settings_model_type_ctm.setText(
+                str(cf.get('CTM', 'ctm_model_type')))
+            self.lineEdit_settings_hidden_ctm.setText(
+                str(cf.get('CTM', 'hidden_sizes')))
+            self.lineEdit_settings_activation_ctm.setText(
+                str(cf.get('CTM', 'activation')))
+            self.lineEdit_settings_dropout_ctm.setText(
+                str(cf.get('CTM', 'dropout')))
+            self.lineEdit_settings_priors_ctm.setText(
+                str(cf.get('CTM', 'learn_priors')))
+            self.lineEdit_settings_lr_ctm.setText(
+                str(cf.get('CTM', 'batch_size')))
+            self.lineEdit_settings_momentum_ctm.setText(
+                str(cf.get('CTM', 'lr')))
+            self.lineEdit_settings_solver_ctm.setText(
+                str(cf.get('CTM', 'momentum')))
+            self.lineEdit_settings_nr_epochs_ctm.setText(
+                str(cf.get('CTM', 'solver')))
+            self.lineEdit_settings_plateau_ctm.setText(
+                str(cf.get('CTM', 'num_epochs')))
+            self.lineEdit_settings_nr_samples_ctm.setText(
+                str(cf.get('CTM', 'num_samples')))
+            self.lineEdit_settings_plateau_ctm.setText(
+                str(cf.get('CTM', 'reduce_on_plateau')))
+            self.lineEdit_settings_topic_prior_mean_ctm.setText(
+                str(cf.get('CTM', 'topic_prior_mean')))
+            self.lineEdit_settings_topic_prior_std_ctm.setText(
+                str(cf.get('CTM', 'topic_prior_variance')))
+            self.lineEdit_settings_nr_workers_ctm.setText(
+                str(cf.get('CTM', 'num_data_loader_workers')))
+            if save:
+                self.clicked_pushButton_apply_changes_ctm_settings()
+        elif option == "tm_general":
+            # GENERAL TM SETTINGS
+            self.lineEdit_settings_nr_words.setText(
+                str(cf.get('TMedit', 'n_palabras')))
+            self.lineEdit_settings_round_size.setText(
+                str(cf.get('TMedit', 'round_size')))
+            self.lineEdit_settings_netl_workers.setText(
+                str(cf.get('TMedit', 'NETLworkers')))
+            self.lineEdit_settings_ldavis_nr_docs.setText(
+                str(cf.get('TMedit', 'LDAvis_ndocs')))
+            self.lineEdit_settings_ldavis_nr_jobs.setText(
+                str(cf.get('TMedit', 'LDAvis_njobs')))
+            if save:
+                self.clicked_pushButton_apply_changes_tm_general_settings()
+        elif option == "spark":
+            # SPARK
+            self.lineEdit_settings_spark_available.setText(
+                str(cf.get('Spark', 'spark_available')))
+            self.lineEdit_settings_script_spark.setText(
+                str(cf.get('Spark', 'script_spark')))
+            self.lineEdit_settings_token_spark.setText(
+                str(cf.get('Spark', 'token_spark')))
+            if save:
+                self.clicked_pushButton_apply_spark_settings()
+        elif option == "preproc":
+            # PREPROCESSING
+            self.lineEdit_settings_min_lemas.setText(
+                str(cf.get('Preproc', 'min_lemas')))
+            self.lineEdit_settings_nr_below.setText(
+                str(cf.get('Preproc', 'no_below')))
+            self.lineEdit_settings_nr_above.setText(
+                str(cf.get('Preproc', 'no_above')))
+            self.lineEdit_settings_keep_n.setText(
+                str(cf.get('Preproc', 'keep_n')))
+            if save:
+                self.clicked_pushButton_apply_preprocessing_settings()
+        elif option == "all":
+            for op in Constants.SETTINGS_OPTIONS:
+                self.set_default_settings(op, False, False)
+            if msg:
+                QMessageBox.information(
+                        self, Constants.SMOOTH_SPOON_MSG, Constants.RESTORE_DFT_ALL_SETTINGS)
+        if msg:
+            id_msg = Constants.SETTINGS_OPTIONS.index(option)
+            QMessageBox.information(
+                    self, Constants.SMOOTH_SPOON_MSG, Constants.RESTORE_DFT_MSGS[id_msg])
 
         return
 
@@ -929,6 +977,9 @@ class MainWindow(QMainWindow):
         font_size_type = font_size + ' "' + font_type + '" '
         stylesheet = "QWidget { font: %s}" % font_size_type
         self.centralwidget.setStyleSheet(stylesheet)
+
+        QMessageBox.information(
+                    self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_GUI_SETTINGS)
 
         return
 
@@ -952,6 +1003,9 @@ class MainWindow(QMainWindow):
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
+        
+        QMessageBox.information(
+            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_LOG_SETTINGS)
 
         return
 
@@ -984,6 +1038,9 @@ class MainWindow(QMainWindow):
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
+
+        QMessageBox.information(
+            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_MALLET_SETTINGS)
 
         return
 
@@ -1028,6 +1085,10 @@ class MainWindow(QMainWindow):
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
+        
+        QMessageBox.information(
+            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_PRODLDA_SETTINGS)
+
         return
 
     def clicked_pushButton_apply_changes_sparklda_settings(self):
@@ -1080,6 +1141,10 @@ class MainWindow(QMainWindow):
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
+        
+        QMessageBox.information(
+            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_CTM_SETTINGS)
+
         return
 
     def clicked_pushButton_apply_changes_hierarchical_settings(self):
@@ -1112,6 +1177,9 @@ class MainWindow(QMainWindow):
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
 
+        QMessageBox.information(
+            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_TM_GENERAL_SETTINGS)
+
         return
 
     def clicked_pushButton_apply_spark_settings(self):
@@ -1123,14 +1191,17 @@ class MainWindow(QMainWindow):
         cf = configparser.ConfigParser()
         cf.read(self.tm.p2config)
 
-        cf.set('Spark', 'mallet_path', str(
+        cf.set('Spark', 'spark_available', str(
             self.lineEdit_settings_spark_available.text()))
-        cf.set('Spark', 'token_regexp', str(
+        cf.set('Spark', 'script_spark', str(
             self.lineEdit_settings_script_spark.text()))
-        cf.set('Spark', 'alpha', str(self.lineEdit_settings_token_spark.text()))
+        cf.set('Spark', 'token_spark', str(self.lineEdit_settings_token_spark.text()))
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
+        
+        QMessageBox.information(
+            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_SPARK_SETTINGS)
 
         return
 
@@ -1154,5 +1225,94 @@ class MainWindow(QMainWindow):
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
+        
+        QMessageBox.information(
+            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_PREPROC_SETTINGS)
+
+        return
+
+    def clicked_pushButton_restore_gui_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_tm_gui_settings' that manages the setting of the GUI settings' default values.
+        """
+
+        self.set_default_settings("gui", True, True)
+
+        return
+
+    def clicked_pushButton_restore_log_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_log_settings' that manages the setting of the Topic Modeler's log settings' default values.
+        """
+
+        self.set_default_settings("log", True, True)
+
+        return
+
+    def clicked_pushButton_restore_mallet_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_mallet_settings' that manages the setting of the Topic Modeler's Mallet settings' default values.
+        """
+
+        self.set_default_settings("mallet", True, True)
+
+        return
+
+    def clicked_pushButton_restore_prodlda_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_tm_prodlda_settings' that manages the setting of the Topic Modeler's ProdLDA settings' default values.
+        """
+
+        self.set_default_settings("prodlda", True, True)
+
+        return
+
+    def clicked_pushButton_restore_sparklda_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_tm_sparklda_settings' that manages the setting of the Topic Modeler's SparkLDA settings' default values.
+        """
+
+        return
+
+    def clicked_pushButton_restore_ctm_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_ctm_settings' that manages the setting of the Topic Modeler's CTM settings' default values.
+        """
+
+        self.set_default_settings("ctm", True, True)
+
+        return
+
+    def clicked_pushButton_restore_hierarchical_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_hierarchical_settings' that manages the setting of the Topic Modeler's hierarchical settings' default values.
+        """
+
+        return
+
+    def clicked_pushButton_restore_tm_general_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_tm_general_settings' that manages the setting of the Topic Modeler's general settings' default values.
+        """
+
+        self.set_default_settings("tm_general", True, True)
+
+        return
+
+    def clicked_pushButton_restore_spark_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_spark_settings' that manages the setting of the Topic Modeler's Spark settings' default values.
+        """
+
+        self.set_default_settings("spark", True, True)
+
+        return
+
+    def clicked_pushButton_restore_preprocessing_settings(self):
+        """
+        Method for controlling the clicking of the button 'pushButton_restore_preprocessing_settings' that manages the setting of the Topic Modeler's preprocessing settings' default values.
+        """
+
+        self.set_default_settings("preproc", True, True)
 
         return
