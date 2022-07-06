@@ -6,6 +6,7 @@ Class that defines the subwindow for the Interactive Topic Model Trainer App for
 """
 
 import configparser
+import pathlib
 import re
 from functools import partial
 
@@ -13,7 +14,7 @@ import numpy as np
 from PyQt6 import QtGui, QtWidgets
 from PyQt6.QtCore import QThreadPool, QUrl, pyqtSlot
 from PyQt6.QtGui import QTextCursor
-from PyQt6.QtWidgets import QLabel, QMessageBox, QPushButton
+from PyQt6.QtWidgets import QLabel, QMessageBox, QPushButton, QWidget
 from PyQt6.uic import loadUi
 from src.gui.utils import utils
 from src.gui.utils.constants import Constants
@@ -49,10 +50,16 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.tm = tm
         self.stdout = stdout
         self.stderr = stderr
-        self.training_corpus = training_corpus
+        self.TrDts_name = training_corpus
         self.previous_train_button = self.findChild(
             QPushButton, "train_button_1")
-        self.model_name = None
+        self.trainer = None
+        self.TrDts_name = None
+        self.preproc_settings = None
+        self.training_params = None 
+        self.modelname = None
+        self.ModelDesc = None
+        self.privacy = None
 
         #####################################################################################
         # Widgets initial configuration
@@ -173,7 +180,7 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         # Get config object
         cf = configparser.ConfigParser()
-        cf.read(self.tm.p2config_dft)
+        cf.read(self.tm.p2config)
 
         # Read values and set them in the correponding widget
         self.lineEdit_nr_topics_lda.setText(
@@ -190,11 +197,11 @@ class TrainModelWindow(QtWidgets.QDialog):
             str(cf.get('MalletTM', 'doc_topic_thr')))
         self.lineEdit_thetas_thr_lda.setText(
             str(cf.get('MalletTM', 'thetas_thr')))
-
+       
         return
 
     def get_mallet_params_from_user(self):
-        """Method that gets the parameters from the 'tabWidget_settingsLDA' that have been modified by the user and checks whether the updated value is valid for the conditions that each parameter must meet. For each of the parameters that are not configured appropriately, the information that is going to be shown to the user in a warning message is updated accordingly. Moreover, for the parameters wrong configured, a red cross is shown on the right of each of them, while those properly configured are accompanied by a red tick. Once all the parameters are checked, a warning message is shown and the method is exited in case one or more of them are wrong configured; otherwise, the parameters are saved in the training configuration file. 
+        """Method that gets the parameters from the 'tabWidget_settingsLDA' that have been modified by the user and checks whether the updated value is valid for the conditions that each parameter must meet. For each of the parameters that are not configured appropriately, the information that is going to be shown to the user in a warning message is updated accordingly. Moreover, for the parameters wrong configured, a red cross is shown on the right of each of them, while those properly configured are accompanied by a red tick. Once all the parameters are checked, a warning message is shown and the method is exited in case one or more of them are wrong configured. 
 
         Returns
         -------
@@ -203,7 +210,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         """
 
         okay = True
-        dict_params = {}
+        self.training_params = {}
         messages = ""
 
         if int(self.lineEdit_nr_topics_lda.text()) < 0:
@@ -211,82 +218,64 @@ class TrainModelWindow(QtWidgets.QDialog):
             messages += Constants.WRONG_NR_TOPICS_LDA_MSG + "\n"
         else:
             self.checkBox_lda_1_good.show()
-            dict_params['num_topics'] = self.lineEdit_nr_topics_lda.text()
+            self.training_params['ntopics'] = self.lineEdit_nr_topics_lda.text()
 
         if int(self.lineEdit_alpha_lda.text()) < 0:
             self.checkBox_lda_2_bad.show()
             messages += Constants.WRONG_ALPHA_LDA_MSG + "\n"
         else:
             self.checkBox_lda_2_good.show()
-            dict_params['alpha'] = self.lineEdit_alpha_lda.text()
+            self.training_params['alpha'] = self.lineEdit_alpha_lda.text()
 
         if int(self.lineEdit_optimize_interval_lda.text()) < 0:
             self.checkBox_lda_3_bad.show()
             messages += Constants.WRONG_OI_LDA_MSG + "\n"
         else:
             self.checkBox_lda_3_good.show()
-            dict_params['optimize_interval'] = self.lineEdit_optimize_interval_lda.text()
+            self.training_params['optimize_interval'] = self.lineEdit_optimize_interval_lda.text()
 
         if int(self.lineEdit_nr_threads_lda.text()) < 0:
             self.checkBox_lda_4_bad.show()
             messages += Constants.WRONG_NR_THREADS_LDA_MSG + "\n"
         else:
             self.checkBox_lda_4_good.show()
-            dict_params['nr_threads'] = self.lineEdit_nr_threads_lda.text()
+            self.training_params['num_threads'] = self.lineEdit_nr_threads_lda.text()
 
         if int(self.lineEdit_nr_iterations_lda.text()) < 0:
             self.checkBox_lda_5_bad.show()
             messages += Constants.WRONG_NR_ITER_LDA_MSG + "\n"
         else:
             self.checkBox_lda_5_good.show()
-            dict_params['nr_iter'] = self.lineEdit_nr_iterations_lda.text()
+            self.training_params['num_iterations'] = self.lineEdit_nr_iterations_lda.text()
 
         if float(self.lineEdit_doc_top_thr_lda.text()) > 1:
             self.checkBox_lda_6_bad.show()
             messages += Constants.WRONG_DOC_TPC_THR_LDA_MSG + "\n"
         else:
             self.checkBox_lda_6_good.show()
-            dict_params['doc_top_thr'] = self.lineEdit_doc_top_thr_lda.text()
+            self.training_params['doc_topic_thr'] = self.lineEdit_doc_top_thr_lda.text()
 
         if float(self.lineEdit_thetas_thr_lda.text()) > 1:
             self.checkBox_lda_7_bad.show()
             messages += Constants.WRONG_THETAS_THR_LDA_MSG + "\n"
         else:
             self.checkBox_lda_7_good.show()
-            dict_params['thetas_thr'] = self.lineEdit_thetas_thr_lda.text()
+            self.training_params['thetas_thr'] = self.lineEdit_thetas_thr_lda.text()
 
-        if len(dict_params.keys()) != Constants.NR_PARAMS_TRAIN_LDA_MALLET:
+        if len(self.training_params.keys()) != Constants.NR_PARAMS_TRAIN_LDA_MALLET:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, messages)
             return False
+        
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+        self.training_params["mallet_path"] = cf.get('MalletTM', 'mallet_path')
+        self.training_params["token_regexp"] = cf.get('MalletTM', 'token_regexp')
 
         # Hide checkboxes
         for checkbox in self.lda_mallet_checkboxes_params:
             checkbox.hide()
-
-        # Save user's configuration into config file
-        cf = configparser.ConfigParser()
-        cf.read(self.tm.p2config)
-
-        cf.set('TM', 'ntopics', str(dict_params['num_topics']))
-        cf.set('MalletTM', 'alpha', str(dict_params['alpha']))
-        cf.set('MalletTM', 'optimize_interval',
-               str(dict_params['optimize_interval']))
-        cf.set('MalletTM', 'num_threads', str(dict_params['nr_threads']))
-        cf.set('MalletTM', 'num_iterations', str(dict_params['nr_iter']))
-        cf.set('MalletTM', 'doc_topic_thr', str(dict_params['doc_top_thr']))
-        cf.set('MalletTM', 'thetas_thr', str(dict_params['thetas_thr']))
-
-        with open(self.tm.p2config, 'w') as configfile:
-            cf.write(configfile)
-
-        if self.lineEdit_model_name_lda.text() is None or self.lineEdit_model_name_lda.text() == "":
-            QMessageBox.warning(
-                self, Constants.SMOOTH_SPOON_MSG, Constants.NO_NAME_FOR_MODEL)
-            return
-        else:
-            self.model_name = self.lineEdit_model_name_lda.text()
-
+        
         return okay
 
     # PRODLDA
@@ -296,7 +285,7 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         # Get config object
         cf = configparser.ConfigParser()
-        cf.read(self.tm.p2config_dft)
+        cf.read(self.tm.p2config)
 
         self.lineEdit_nr_topics_prod.setText(
             str(cf.get('ProdLDA', 'n_components')))
@@ -433,34 +422,6 @@ class TrainModelWindow(QtWidgets.QDialog):
         for checkbox in self.prodlda_checkboxes_params:
             checkbox.hide()
 
-        # Save user's configuration into config file
-        cf = configparser.ConfigParser()
-        cf.read(self.tm.p2config)
-        cf.set('ProdLDA', 'n_components', str(dict_params['num_topics']))
-        cf.set('ProdLDA', 'model_type', str(dict_params['model_type']))
-        cf.set('ProdLDA', 'hidden_sizes', str(dict_params['hidden_sizes']))
-        cf.set('ProdLDA', 'activation', str(dict_params['activation']))
-        cf.set('ProdLDA', 'dropout', str(dict_params['dropout']))
-        cf.set('ProdLDA', 'learn_priors', str(dict_params['learn_priors']))
-        cf.set('ProdLDA', 'lr', str(dict_params['lr']))
-        cf.set('ProdLDA', 'momentum', str(dict_params['momentum']))
-        cf.set('ProdLDA', 'n_components', str(dict_params['n_components']))
-        cf.set('ProdLDA', 'solver', str(dict_params['solver']))
-        cf.set('ProdLDA', 'num_epochs', str(dict_params['num_epochs']))
-        cf.set('ProdLDA', 'reduce_on_plateau', str(
-            dict_params['reduce_on_plateau']))
-        cf.set('ProdLDA', 'batch_size', str(dict_params['batch_size']))
-
-        with open(self.tm.p2config, 'w') as configfile:
-            cf.write(configfile)
-
-        if self.lineEdit_model_name_prodlda.text() is None or self.lineEdit_model_name_prodlda.text() == "":
-            QMessageBox.warning(
-                self, Constants.SMOOTH_SPOON_MSG, Constants.NO_NAME_FOR_MODEL)
-            return
-        else:
-            self.model_name = self.lineEdit_model_name_prodlda.text()
-
         return okay
 
     # CTM
@@ -470,7 +431,7 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         # Get config object
         cf = configparser.ConfigParser()
-        cf.read(self.tm.p2config_dft)
+        cf.read(self.tm.p2config)
 
         # Read values and set them in the correponding widget
         self.comboBox_ctm_model_type.setCurrentText(
@@ -622,32 +583,55 @@ class TrainModelWindow(QtWidgets.QDialog):
     def get_sparklda_params(self):
         return
 
-    def get_sparklda__params_from_user(self):
+    def get_sparklda_params_from_user(self):
         return
+    
+    def additional_training_params(self):
+
+        # Model name
+        if self.lineEdit_model_name.text() is None or self.lineEdit_model_name.text() == "":
+            QMessageBox.warning(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.NO_NAME_FOR_MODEL)
+            return
+        else:
+            self.modelname = self.lineEdit_model_name.text()
+
+        # Model description
+        if self.textEdit_model_description.toPlainText() is None or self.textEdit_model_description.toPlainText() == "":
+            QMessageBox.warning(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.NO_DESC_FOR_MODEL)
+            return
+        else:
+            self.ModelDesc = self.textEdit_model_description.toPlainText()
+
+        # Privacy level
+        self.privacy = self.comboBox_model_privacy_level.currentText()
+
+        return
+        
 
     @pyqtSlot(str)
-    def append_text_ctm_train(self, text):
+    def append_text_train(self, text):
         """
-        Method to redirect the stdout and stderr in the "text_logs_train_ctm"
-        while the training of a CTM model is being performed.
+        Method to redirect the stdout and stderr in the "text_logs_train"
+        while the training of a topic model is being performed.
         """
 
-        self.text_logs_train_ctm.moveCursor(QTextCursor.MoveOperation.End)
-        self.text_logs_train_ctm.insertPlainText(text)
+        self.text_logs_train.moveCursor(QTextCursor.MoveOperation.End)
+        self.text_logs_train.insertPlainText(text)
 
         return
 
     def execute_train_CTM(self):
-        """Method to control the execution of the training of a CTM model. To do so, it shows log information in the 'text_logs_train_ctm' QTextEdit and calls the corresponding TaskManager function that is in charge of training a CTM model.
+        """Method to control the execution of the training of a topic model. To do so, it shows log information in the 'text_logs_train' QTextEdit and calls the corresponding TaskManager function that is in charge of training a the correspinding topic model type.
         """
 
         # Connect pyslots for the stdout and stderr redirection during the time the training is being performed
-        self.stdout.outputWritten.connect(self.append_text_ctm_train)
-        self.stderr.outputWritten.connect(self.append_text_ctm_train)
+        self.stdout.outputWritten.connect(self.append_text_train)
+        self.stderr.outputWritten.connect(self.append_text_train)
 
-        # Train the CTM model by invoking the task manager method
-        # @TODO : Update
-        self.tm.train_ctm_model()
+        # Train the topic model by invoking the task manager method
+        self.tm.trainTM(self.trainer, self.TrDts_name, self.preproc_settings, self.training_params, self.modelname, self.ModelDesc, self.privacy)
 
         return
 
@@ -692,6 +676,20 @@ class TrainModelWindow(QtWidgets.QDialog):
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_TR_CORPUS)
             return
+
+        if self.train_tabs.currentWidget() == self.findChild(
+            QWidget, "page_trainLDA"):
+            self.trainer = "mallet"
+        elif self.train_tabs.currentWidget() == self.findChild(
+            QWidget, "page_trainSparkLDA"):
+            self.trainer = "sparkLDA"
+        elif self.train_tabs.currentWidget() == self.findChild(
+            QWidget, "page_trainAVITM"):
+            self.trainer = "prodLDA"
+        elif self.train_tabs.currentWidget() == self.findChild(
+            QWidget, "page_trainCTM"):
+            self.trainer = "ctm"
+
 
         okay = self.get_ctm_params_from_user()
 

@@ -102,6 +102,7 @@ class Constants:
     WRONG_TOPIC_PRIOR_VAR_MSG = ""
     WARNING_NO_TR_CORPUS = "An appropiate training dataset must be selected to proceed."
     NO_NAME_FOR_MODEL = "A name for training the model must be specified"
+    NO_DESC_FOR_MODEL = "A description for training the model must be specified"
 
     TRAIN_MODEL_TABLES = ["table_training_results"]
     TRAIN_LOADING_BARS = ["progress_bar_train"]
