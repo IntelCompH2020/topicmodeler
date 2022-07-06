@@ -10,21 +10,26 @@ Provides several classes for Topic Modeling
     - MalletTrainer: To train a topic model from a given corpus
 """
 
-import pickle
-import sys
-import shutil
 import argparse
 import json
-from subprocess import check_output
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import normalize
-from scipy import sparse
-import matplotlib.pyplot as plt
+import multiprocessing as mp
+import pickle
+import shutil
+import sys
 from abc import abstractmethod
-from .neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
-from .neural_models.pytorchavitm.avitm_network.avitm import AVITM
+from pathlib import Path
+from subprocess import check_output
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from scipy import sparse
+from sklearn.preprocessing import normalize
+
+from src.topicmodeling.neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM
+from src.topicmodeling.neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
+from src.topicmodeling.neural_models.pytorchavitm.avitm_network.avitm import AVITM
+from src.topicmodeling.neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
 
 """
 # from scipy.spatial.distance import jensenshannon
@@ -37,10 +42,6 @@ import ipdb
 from gensim import corpora
 from gensim.utils import check_output, tokenize
 import pickle
-
-# Local imports
-from .neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
-from .neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
 
 logging.getLogger("gensim").setLevel(logging.WARNING)
 """
@@ -369,11 +370,8 @@ class textPreproc(object):
         -------
         outFile: Path
             A path containing the location of the training data in the indicated format
-        outFile2: Path
-            A path containing the location of the raw training data in the indicated format. It is only used when the tmTrainer is 'ctm'
         """
 
-        outFile2 = None
         if isinstance(trDF, pd.DataFrame):
             print('pandas')
         else:
@@ -424,17 +422,13 @@ class textPreproc(object):
                     f"file://{outFile.as_posix()}", mode="overwrite")
             elif tmTrainer == "ctm":
                 outFile = dirpath.joinpath('lemas.parquet')
-                lemas_df = (trDF.withColumn("bow_text", back2textUDF(F.col("bow")))
-                            .select("id", "bow_text")
-                            )
-                lemas_df.write.parquet(
+                lemas_raw_df = (trDF.withColumn("bow_text", back2textUDF(F.col("bow")))
+                                .select("id", "bow_text", "all_raw_text")
+                               )
+                lemas_raw_df.write.parquet(
                     f"file://{outFile.as_posix()}", mode="overwrite")
 
-                outFile2 = dirpath.joinpath('raw.parquet')
-                trDF.select("id", "all_raw_text").write.parquet(
-                    f"file://{outFile2.as_posix()}", mode="overwrite")
-
-        return outFile, outFile2
+        return outFile
 
 
 class stwEQcleaner(object):
@@ -1556,8 +1550,7 @@ class MalletTrainer(Trainer):
         return
 
 
-class ProdLDATrainer(object):
-
+class ProdLDATrainer(Trainer):
     """
     Wrapper for the ProdLDA Topic Model Training. Implements the
     following functionalities
@@ -1568,14 +1561,16 @@ class ProdLDATrainer(object):
 
     """
 
-    def __init__(self, input_size, n_components=10, model_type='prodLDA', hidden_sizes=(100, 100), activation='softplus', dropout=0.2, learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, solver='adam', num_epochs=100, reduce_on_plateau=False, topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10, num_data_loader_workers=0, logger=None):
+    def __init__(self, n_components=10, model_type='prodLDA',
+                hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
+                learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99,
+                solver='adam', num_epochs=100, reduce_on_plateau=False,
+                topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10, num_data_loader_workers=mp.cpu_count(), thetas_thr=0.003, logger=None):
         """
         Initilization Method
 
         Parameters
         ----------
-        input_size : int
-            Dimension of the input
         n_components : int (default=10)
             Number of topic components
         model_type : string (default='prodLDA')
@@ -1611,13 +1606,14 @@ class ProdLDATrainer(object):
             Number of subprocesses to use for data loading
         verbose: bool
             If True, additional logs are displayed
+        thetas_thr: float
+            Min value for sparsification of topic proportions after training
         logger: Logger object
             To log object activity
         """
 
         super().__init__(logger)
 
-        self._input_size = input_size
         self._n_components = n_components
         self._model_type = model_type
         self._hidden_sizes = hidden_sizes
@@ -1634,6 +1630,7 @@ class ProdLDATrainer(object):
         self._topic_prior_variance = topic_prior_variance
         self._num_samples = num_samples
         self._num_data_loader_workers = num_data_loader_workers
+        self._thetas_thr = thetas_thr
 
         return
     
@@ -1655,44 +1652,44 @@ class ProdLDATrainer(object):
         """
 
         # Get thetas
-        thetas = np.asarray(
+        thetas32 = np.asarray(
             avitm.get_doc_topic_distribution(avitm.train_data))  # .T
 
         # Sparsification of thetas matrix
         self.logger.debug('-- -- Sparsifying doc-topics matrix')
         # Create figure to check thresholding is correct
-        self._SaveThrFig(thetas)
+        self._SaveThrFig(thetas32)
         # Set to zeros all thetas below threshold, and renormalize
-        thetas[thetas < self._sparse_thr] = 0
-        thetas = normalize(thetas, axis=1, norm='l1')
-        thetas = sparse.csr_matrix(thetas, copy=True)
+        thetas32[thetas32 < self._sparse_thr] = 0
+        thetas32 = normalize(thetas32, axis=1, norm='l1')
+        thetas32 = sparse.csr_matrix(thetas32, copy=True)
 
         # Recalculate topic weights to avoid errors due to sparsification
-        alphas = np.asarray(np.mean(thetas, axis=0)).ravel()
+        alphas = np.asarray(np.mean(thetas32, axis=0)).ravel()
 
         # Calculate beta matrix
         betas = avitm.get_topic_word_distribution()
 
         # Create vocabulary files and calculate beta matrix
         betas = avitm.get_topic_word_distribution()
-        a = sum(betas[0, :])
-        self.logger.info("SUM BETAS" + str(a))
         vocab_size = betas.shape[1]
         vocab = []
         term_freq = np.zeros((vocab_size,))
 
-        id2token = data[3]
         for top in np.arange(self._n_components):
-            for idx, word in id2token.items():
+            for idx, word in self._id2token.items():
                 vocab.append(word)
                 cnt = betas[top][idx]
-                term_freq[idx] += cnt  # Cuántas veces aparece una palabra
+                term_freq[idx] += cnt  # @TODO: This is not the freq
+        # Save vocabulary and frequencies
+        vocabfreq_file = modelFolder.joinpath('vocab_freq_prod.txt')
+        with vocabfreq_file.open('w', encoding='utf8') as fout:
+            [fout.write(el[0] + '\t' + str(int(el[1])) + '\n')
+             for el in zip(vocab, term_freq)]
+        self._logger.debug('-- -- ProdLDA training: Vocabulary file generated')
 
         tm = TMmodel(betas=betas, thetas=thetas32, alphas=alphas,
                      vocabfreq_file=vocabfreq_file)
-
-        # Remove doc-topics file. It is no longer needed and takes a lot of space
-        thetas_file.unlink()
 
         return tm
 
@@ -1731,408 +1728,254 @@ class ProdLDATrainer(object):
         with open(bowdataset_file, 'wb') as f:
             pickle.dump(data, f)
         
-        avitm = AVITM(logger=self.logger, input_size=self._bow_size,
+        avitm = AVITM(logger=self.logger,
+                      input_size=self._bow_size,
                       n_components=self._n_components,
-                      model_type=self._model_type, hidden_sizes=self._hidden_sizes, activation=self._activation,
+                      model_type=self._model_type,
+                      hidden_sizes=self._hidden_sizes,
+                      activation=self._activation,
                       dropout=self._dropout,
-                      learn_priors=self._learn_priors, batch_size=self._batch_size,
-                      lr=self._lr, momentum=self._momentum, solver=self._solver, num_epochs=self._num_epochs,
-                      reduce_on_plateau=self._reduce_on_plateau)
+                      learn_priors=self._learn_priors,
+                      batch_size=self._batch_size,
+                      lr=self._lr,
+                      momentum=self._momentum,
+                      solver=self._solver,
+                      num_epochs=self._num_epochs,
+                      reduce_on_plateau=self._reduce_on_plateau,
+                      topic_prior_mean=self._topic_prior_mean,
+                      topic_prior_variance=self._topic_prior_variance,
+                      num_samples=self._num_samples,
+                      num_data_loader_workers=self._num_data_loader_workers)
 
-        avitm_fit = avitm.fit(self._train_dataset, self._val_dataset)
+        avitm.fit(self._train_dataset, self._val_dataset)
+
+        # Create TMmodel object
+        tm = self._createTMmodel(modelFolder, avitm)
+        tm.save_npz(corpusFile.parent.joinpath('model.npz'))
 
         return
 
-    
+class CTMTrainer(Trainer):
+    """
+    Wrapper for the CTM Topic Model Training. Implements the
+    following functionalities
+    - Transformation of the corpus to the CTM internal training format
+    - Training of the model
+    - Creation and persistence of the TMmodel object for tm curation
+    - Execution of some other time consuming tasks (pyLDAvis, ..)
 
-    def _train(self):
-        """ProdLDA training. It does the following:
-        1) Trains a ProdLDA model using the settings provided by the user
-        2) It sparsifies thetas matrix and save a figure to report the effect
-        3) It saves model matrices: alphas, betas, thetas (sparse)
+    """
+
+    def __init__(self, inference_type="combined", n_components=10, model_type='prodLDA',
+                hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
+                learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, 
+                solver='adam', num_epochs=100, num_samples=10, reduce_on_plateau=False,
+                topic_prior_mean=0.0, topic_prior_variance=None,
+                num_data_loader_workers=mp.cpu_count(), label_size=0, loss_weights=None,
+                thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1',
+                logger=None, ):
+        """
+        Initilization Method
+
+        Parameters
+        ----------
+        inference_type: string (default='combined')
+            Type of inference network to be used. It can be either 'combined' or 'contextual'
+        n_components : int (default=10)
+            Number of topic components
+        model_type : string (default='prodLDA')
+            Type of the model that is going to be trained, 'prodLDA' or 'LDA'
+        hidden_sizes : tuple, length = n_layers (default=(100,100))
+            Size of the hidden layer
+        activation : string (default='softplus')
+            Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'
+        dropout : float (default=0.2)
+            Percent of neurons to drop out.
+        learn_priors : bool, (default=True)
+            If true, priors are made learnable parameters
+        batch_size : int (default=64)
+            Size of the batch to use for training
+        lr: float (defualt=2e-3)
+            Learning rate to be used for training
+        momentum: folat (default=0.99)
+            Momemtum to be used for training
+        solver: string (default='adam')
+            NN optimizer to be used, chosen from 'adagrad', 'adam', 'sgd', 'adadelta' or 'rmsprop' 
+        num_epochs: int (default=100)
+            Number of epochs to train for
+        num_samples: int (default=10)
+            Number of times the theta needs to be sampled
+        reduce_on_plateau: bool (default=False)
+            If true, reduce learning rate by 10x on plateau of 10 epochs 
+        topic_prior_mean: double (default=0.0)
+            Mean parameter of the prior
+        topic_prior_variance: double (default=None)
+            Variance parameter of the prior
+        num_data_loader_workers: int (default=0)
+            Number of subprocesses to use for data loading
+        label_size: int (default=0)
+            Number of total labels
+        loss_weights: dict (default=None)
+            It contains the name of the weight parameter (key) and the weight (value) for each loss.
+        thetas_thr: float
+            Min value for sparsification of topic proportions after training
+        logger: Logger object
+            To log object activity
+        sbert_model_to_load: str (default='paraphrase-distilroberta-base-v1')
+            Model to be used for calculating the embeddings
         """
 
-        # Get BOWDataset
-        bowdataset_file = self._modelFolder.joinpath('bowdataset.pickle')
-        with open(bowdataset_file, "rb") as f:
-            data = pickle.load(f)
+        super().__init__(logger)
 
-        # Create folder for storing results for mallet training
-        self._modelFolder.joinpath('prodlda_output').mkdir()
+        self._inference_type = inference_type
+        self._n_components = n_components
+        self._model_type = model_type
+        self._hidden_sizes = hidden_sizes
+        self._activation = activation
+        self._dropout = dropout
+        self._learn_priors = learn_priors
+        self._batch_size = batch_size
+        self._lr = lr
+        self._momentum = momentum
+        self._solver = solver
+        self._num_epochs = num_epochs
+        self._reduce_on_plateau = reduce_on_plateau
+        self._topic_prior_mean = topic_prior_mean
+        self._topic_prior_variance = topic_prior_variance
+        self._num_samples = num_samples
+        self._num_data_loader_workers = num_data_loader_workers
+        self._label_size = label_size
+        self._sbert_model_to_load = sbert_model_to_load
+        self._loss_weights = loss_weights
+        self._thetas_thr = thetas_thr
 
-        # Train model
-        avitm = AVITM(logger=self.logger, input_size=self._bow_size,
-                      n_components=self._n_components,
-                      model_type=self._model_type, hidden_sizes=self._hidden_sizes, activation=self._activation,
-                      dropout=self._dropout,
-                      learn_priors=self._learn_priors, batch_size=self._batch_size,
-                      lr=self._lr, momentum=self._momentum, solver=self._solver, num_epochs=self._num_epochs,
-                      reduce_on_plateau=self._reduce_on_plateau)
+        return
 
-        avitm_fit = avitm.fit(data[0], data[1])
+    def _createTMmodel(self, modelFolder, ctm):
+        """Creates an object of class TMmodel hosting the topic model
+        that has been trained using ProdLDA topic modeling and whose
+        output is available at the provided folder
+
+        Parameters
+        ----------
+        modelFolder: Path
+            the folder with the mallet output files
+
+        Returns
+        -------
+        tm: TMmodel
+            The topic model as an object of class TMmodel
+        """
 
         # Get thetas
-        thetas = np.asarray(
-            avitm.get_doc_topic_distribution(avitm.train_data))  # .T
+        thetas32 = np.asarray(ctm.get_doc_topic_distribution(ctm.train_data))
 
         # Sparsification of thetas matrix
         self.logger.debug('-- -- Sparsifying doc-topics matrix')
         # Create figure to check thresholding is correct
-        self._SaveThrFig(thetas)
+        self._SaveThrFig(thetas32)
         # Set to zeros all thetas below threshold, and renormalize
-        thetas[thetas < self._sparse_thr] = 0
-        thetas = normalize(thetas, axis=1, norm='l1')
-        thetas = sparse.csr_matrix(thetas, copy=True)
+        thetas32[thetas32 < self._sparse_thr] = 0
+        thetas32 = normalize(thetas32, axis=1, norm='l1')
+        thetas32 = sparse.csr_matrix(thetas32, copy=True)
 
         # Recalculate topic weights to avoid errors due to sparsification
-        alphas = np.asarray(np.mean(thetas, axis=0)).ravel()
-
-        # Calculate beta matrix
-        betas = avitm.get_topic_word_distribution()
-
-        # Create vocabulary files and calculate beta matrix
-        betas = avitm.get_topic_word_distribution()
-        a = sum(betas[0, :])
-        self.logger.info("SUM BETAS" + str(a))
-        vocab_size = betas.shape[1]
-        vocab = []
-        term_freq = np.zeros((vocab_size,))
-
-        id2token = data[3]
-        for top in np.arange(self._n_components):
-            for idx, word in id2token.items():
-                vocab.append(word)
-                cnt = betas[top][idx]
-                term_freq[idx] += cnt  # Cuántas veces aparece una palabra
-
-        # save vocabulary and frequencies
-        with self._modelFolder.joinpath('vocab_freq_prodlda.txt').open('w', encoding='utf8') as fout:
-            [fout.write(el[0] + '\t' + str(int(el[1])) + '\n')
-             for el in zip(vocab, term_freq)]
-        self.logger.debug('-- -- ProdLDA training: Vocabulary file generated')
-
-        # We end by saving the model for future use
-        modelVarsDir = self._modelFolder.joinpath('model_vars')
-        modelVarsDir.mkdir()
-        np.save(modelVarsDir.joinpath('alpha_orig.npy'), alphas)
-        np.save(modelVarsDir.joinpath('beta_orig.npy'), betas)
-        np.savez(modelVarsDir.joinpath('thetas_orig.npz'),
-                 thetas_data=thetas.data, thetas_indices=thetas.indices,
-                 thetas_indptr=thetas.indptr, thetas_shape=thetas.shape)
-
-        return
-
-
-class CTMTrainer(object):
-
-    def __init__(self, cf, modelFolder):
-        """Object initializer
-        Initializes relevant variables from config file
-        """
-
-        logging.basicConfig(level='INFO')
-        self.logger = logging.getLogger('CTMTrainer')
-
-        # Settings for text preprocessing
-        self._min_lemas = int(cf['Preproc']['min_lemas'])
-        self._no_below = int(cf['Preproc']['no_below'])
-        self._no_above = float(cf['Preproc']['no_above'])
-        self._keep_n = int(cf['Preproc']['keep_n'])
-        # Append stopwords and equivalences files only if they exist
-        # Several stopword files can be used, but only one with equivalent terms
-        self._stw_file = []
-        for f in cf['Preproc']['stw_file'].split(','):
-            if not Path(f).is_file():
-                self.logger.warning(
-                    f'-- -- Stopword file {f} does not exist -- Ignored')
-            else:
-                self._stw_file.append(Path(f))
-        f = cf['Preproc']['eq_file']
-        if not Path(f).is_file():
-            self.logger.warning(
-                f'-- -- Equivalence file {f} does not exist -- Ignored')
-        else:
-            self._eq_file = Path(f)
-        # Initialize string cleaner
-        self._stwEQ = stwEQcleaner(stw_files=self._stw_file, dict_eq_file=self._eq_file,
-                                   logger=self.logger)
-
-        # Settings for CTM training
-        self._token_regexp_str = cf['Training']['token_regexp']
-        self._token_regexp = javare.compile(cf['Training']['token_regexp'])
-
-        self._ntopics = int(cf['Training']['ntopics'])
-        self._model_type = str(cf['Training']['model_type'])
-        self._ctm_model_type = str(cf['Training']['ctm_model_type'])
-        self._hidden_sizes = \
-            tuple(map(int, cf['Training']['hidden_sizes'][1:-1].split(',')))
-        self._activation = str(cf['Training']['activation'])
-        self._dropout = float(cf['Training']['dropout'])
-        self._learn_priors = \
-            True if cf['Training']['learn_priors'] == "True" else False
-        self._batch_size = int(cf['Training']['batch_size'])
-        self._lr = float(cf['Training']['lr'])
-        self._momentum = float(cf['Training']['momentum'])
-        self._solver = str(cf['Training']['solver'])
-        self._num_epochs = int(cf['Training']['num_epochs'])
-        self._num_samples = int(cf['Training']['num_samples'])
-        self._reduce_on_plateau = \
-            True if cf['Training']['reduce_on_plateau'] == "True" else False
-        self._topic_prior_mean = float(cf['Training']['topic_prior_mean'])
-        self._topic_prior_variance = None if cf['Training']['topic_prior_variance'] == "None" else float(
-            cf['Training']['topic_prior_variance'])
-        self._num_data_loader_workers = int(
-            cf['Training']['num_data_loader_workers'])
-        self._docTopicsThreshold = float(cf['Training']['doc_topic_thr'])
-        self._sparse_thr = float(cf['Training']['thetas_thr'])
-
-        # Output model folder and training files for the corpus
-        self._modelFolder = modelFolder
-        if not self._modelFolder.is_dir():
-            self.logger.error(
-                f'-- -- Provided model folder is not valid -- Stop')
-            sys.exit()
-        self._corpusFiles = []
-        for f in cf['Training']['training_files'].split(','):
-            if not Path(f).is_file():
-                self.logger.warn(
-                    f'-- -- Corpus file {f} does not exist -- Ignored')
-            else:
-                self._corpusFiles.append(Path(f))
-
-        self.logger.info(
-            f'-- -- Initialization of CTMTrainer variables completed')
-
-        return
-
-    def _SaveThrFig(self, thetas32):
-        """
-        Creates a figure to illustrate the effect of thresholding
-        The distribution of thetas is plotted, together with the value
-        that the trainer is programmed to use for the thresholding
-        """
-        allvalues = np.sort(thetas32.flatten())
-        step = int(np.round(len(allvalues) / 1000))
-        plt.semilogx(allvalues[::step], (100 / len(allvalues))
-                     * np.arange(0, len(allvalues))[::step])
-        plt.semilogx([self._sparse_thr, self._sparse_thr], [0, 100], 'r')
-        plot_file = self._modelFolder.joinpath('thetas_dist.pdf')
-        plt.savefig(plot_file)
-        plt.close()
-
-    def fit(self):
-        """To fit the model we need to preprocess training data, and then
-        carry out the training itself"""
-        self._preproc()
-        self._train()
-        return
-
-    def _preproc(self):
-        """Preprocessing of files
-        For the training we have access (in self._corpusFiles) to a number of lemmatized
-        documents. This function:
-        1) Carries out a first set of cleaning and homogeneization tasks
-        2) Allow to reduce the size of the vocabulary (removing very rare or common terms)
-        3) Converts the training corpus into CTM format
-        """
-
-        # Identification of words that are too rare or common that need to be
-        # removed from the dictionary.
-        self.logger.info('-- -- CTM Corpus Generation: Vocabulary generation')
-        dictionary = corpora.Dictionary()
-
-        # We iterate over all CSV files
-        # Very important
-        # Corpus that can be used for Topic Modeling must contain
-        # two fields: ["id", "lemmas"]
-        print('Processing files for vocabulary creation')
-        pbar = tqdm(self._corpusFiles)
-        for csvFile in pbar:
-            df = pd.read_csv(csvFile, escapechar="\\", on_bad_lines="skip")
-            if "id" not in df.columns or "lemmas" not in df.columns:
-                self.logger.error(
-                    '-- -- Traning corpus error: must contain "id" and "lemmas" - Exit')
-                sys.exit()
-            # Keep only relevant fields
-            id_lemas = df[["id", "lemmas"]].values.tolist()
-            # Apply regular expression to identify tokens
-            id_lemas = [[el[0], ' '.join(self._token_regexp.findall(el[1].replace('\n', ' ').strip()))] for el in
-                        id_lemas]
-            # Apply stopwords and equivalence files
-            id_lemas = [
-                [el[0], self._stwEQ.cleanstr(el[1])] for el in id_lemas]
-            # Apply gensim tokenizer
-            id_lemas = [
-                [el[0], list(tokenize(el[1], lowercase=True, deacc=True))] for el in id_lemas]
-            # Retain only documents with minimum extension
-            id_lemas = [el for el in id_lemas if len(el[1]) >= self._min_lemas]
-            # Add to dictionary
-            all_lemas = [el[1] for el in id_lemas]
-            dictionary.add_documents(all_lemas)
-
-        # Remove words that appear in less than no_below documents, or in more than
-        # no_above, and keep at most keep_n most frequent terms, keep track of removed
-        # words for debugging purposes
-        all_words = [dictionary[idx] for idx in range(len(dictionary))]
-        dictionary.filter_extremes(
-            no_below=self._no_below, no_above=self._no_above, keep_n=self._keep_n)
-        kept_words = set([dictionary[idx] for idx in range(len(dictionary))])
-        rmv_words = [el for el in all_words if el not in kept_words]
-        # Save extreme words that will be removed
-        self.logger.info(
-            f'-- -- Saving {len(rmv_words)} extreme words to file')
-        rmv_file = self._modelFolder.joinpath('commonrare_words.txt')
-        with rmv_file.open('w', encoding='utf-8') as fout:
-            [fout.write(el + '\n') for el in sorted(rmv_words)]
-        # Save dictionary to file
-        self.logger.info(
-            f'-- -- Saving dictionary to file. Number of words: {len(kept_words)}')
-        vocab_txt = self._modelFolder.joinpath('vocabulary.txt')
-        with vocab_txt.open('w', encoding='utf-8') as fout:
-            [fout.write(el + '\n') for el in sorted(kept_words)]
-        # Save also in gensim text format
-        vocab_gensim = self._modelFolder.joinpath('vocabulary.gensim')
-        dictionary.save_as_text(vocab_gensim)
-
-        ##################################################
-        # Create corpus txt files
-        self.logger.info('-- -- CTM Corpus generation: TXT file')
-
-        corpus_file = self._modelFolder.joinpath('training_data.txt')
-
-        fcorpus = corpus_file.open('w', encoding='utf-8')
-
-        print('Processing files for training dataset creation')
-        pbar = tqdm(self._corpusFiles)
-        corpus = []
-        unpreprocessed_corpus = []
-        for csvFile in pbar:
-            # Document preprocessing is same as before, but now we apply an additional filter
-            # and keep only words in the vocabulary
-            df = pd.read_csv(csvFile, escapechar="\\", on_bad_lines="skip")
-            id_lemas = df[["id", "lemmas"]].values.tolist()
-            unpreprocessed_corpus = unpreprocessed_corpus + \
-                [el[1] for el in id_lemas]
-            id_lemas = [[el[0], ' '.join(self._token_regexp.findall(el[1].replace('\n', ' ').strip()))]
-                        for el in id_lemas]
-            id_lemas = [
-                [el[0], self._stwEQ.cleanstr(el[1])] for el in id_lemas]
-            id_lemas = [
-                [el[0], list(tokenize(el[1], lowercase=True, deacc=True))] for el in id_lemas]
-            id_lemas = [[el[0], [tk for tk in el[1] if tk in kept_words]]
-                        for el in id_lemas]
-            id_lemas = [el for el in id_lemas if len(el[1]) >= self._min_lemas]
-            # Write to corpus file
-            [fcorpus.write(el[0] + ' 0 ' + ' '.join(el[1]) + '\n')
-             for el in id_lemas]
-            corpus = corpus + [el[1] for el in id_lemas]
-
-        fcorpus.close()
-
-        ##################################################
-        # Generating the corpus in the input format required by CTM
-        self.logger.info('-- -- CTM Corpus Generation: CTM Dataset object')
-
-        train_dataset, val_dataset, input_size, id2token = \
-            prepare_ctm_dataset(corpus=corpus, unpreprocessed_corpus=unpreprocessed_corpus,
-                                sbert_model_to_load='paraphrase-distilroberta-base-v1')
-
-        self._input_size = input_size
-        self._train_dataset = train_dataset
-        self._val_dataset = val_dataset
-        self._id2token = id2token
-
-        data = [train_dataset, val_dataset, input_size, id2token]
-
-        ctm_dataset_file = self._modelFolder.joinpath('ctm_dataset.pickle')
-        with open(ctm_dataset_file, 'wb') as f:
-            pickle.dump(data, f)
-
-        return
-
-    def _train(self):
-        """ProdLDA training. It does the following:
-        1) Trains a ProdLDA model using the settings provided by the user
-        2) It sparsifies thetas matrix and save a figure to report the effect
-        3) It saves model matrices: alphas, betas, thetas (sparse)
-        """
-
-        # Get BOWDataset
-        ctm_dataset_file = self._modelFolder.joinpath('ctm_dataset.pickle')
-        with open(ctm_dataset_file, "rb") as f:
-            data = pickle.load(f)
-
-        # Create folder for storing results for mallet training
-        self._modelFolder.joinpath('ctm_output').mkdir()
-
-        # Train model
-        # module = __import__(module_name)
-        # class_ = getattr(module, self._ctm_model_type)
-
-        ctm = CombinedTM(logger=self.logger, input_size=self._input_size,
-                         contextual_size=768,
-                         n_components=self._ntopics, model_type='prodLDA',
-                         hidden_sizes=self._hidden_sizes, activation=self._activation,
-                         dropout=self._dropout, learn_priors=self._learn_priors,
-                         batch_size=self._batch_size, lr=self._lr, momentum=self._momentum,
-                         solver=self._solver, num_epochs=self._num_epochs,
-                         num_samples=self._num_samples, reduce_on_plateau=self._reduce_on_plateau,
-                         topic_prior_mean=self._topic_prior_mean,
-                         topic_prior_variance=self._topic_prior_variance,
-                         num_data_loader_workers=self._num_data_loader_workers,
-                         verbose=True)
-
-        ctm_fit = ctm.fit(data[0], data[1])
-
-        # Get thetas
-        thetas = np.asarray(ctm.get_doc_topic_distribution(ctm.train_data))
-
-        # Sparsification of thetas matrix
-        self.logger.debug('-- -- Sparsifying doc-topics matrix')
-        # Create figure to check thresholding is correct
-        self._SaveThrFig(thetas)
-        # Set to zeros all thetas below threshold, and renormalize
-        thetas[thetas < self._sparse_thr] = 0
-        thetas = normalize(thetas, axis=1, norm='l1')
-        thetas = sparse.csr_matrix(thetas, copy=True)
-
-        # Recalculate topic weights to avoid errors due to sparsification
-        alphas = np.asarray(np.mean(thetas, axis=0)).ravel()
+        alphas = np.asarray(np.mean(thetas32, axis=0)).ravel()
 
         # Calculate beta matrix
         betas = ctm.get_topic_word_distribution()
 
         # Create vocabulary files and calculate beta matrix
-        a = sum(betas[0, :])
-        self.logger.info("SUM BETAS" + str(a))
         vocab_size = betas.shape[1]
         vocab = []
         term_freq = np.zeros((vocab_size,))
 
-        id2token = data[3]
-        for top in np.arange(self._ntopics):
-            for idx, word in id2token.items():
+        for top in np.arange(self._n_components):
+            for idx, word in self._id2token.items():
                 vocab.append(word)
                 cnt = betas[top][idx]
                 term_freq[idx] += cnt  # Cuántas veces aparece una palabra
 
-        # save vocabulary and frequencies
-        with self._modelFolder.joinpath('vocab_freq_ctm.txt').open('w', encoding='utf8') as fout:
+        vocabfreq_file = modelFolder.joinpath('vocab_freq_ctm.txt')
+        with vocabfreq_file.open('w', encoding='utf8') as fout:
             [fout.write(el[0] + '\t' + str(int(el[1])) + '\n')
              for el in zip(vocab, term_freq)]
-        self.logger.debug('-- -- CTM training: Vocabulary file generated')
+        self._logger.debug('-- -- CTM training: Vocabulary file generated')
 
-        # We end by saving the model for future use
-        modelVarsDir = self._modelFolder.joinpath('model_vars')
-        modelVarsDir.mkdir()
-        np.save(modelVarsDir.joinpath('alpha_orig.npy'), alphas)
-        np.save(modelVarsDir.joinpath('beta_orig.npy'), betas)
-        np.savez(modelVarsDir.joinpath('thetas_orig.npz'),
-                 thetas_data=thetas.data, thetas_indices=thetas.indices,
-                 thetas_indptr=thetas.indptr, thetas_shape=thetas.shape)
+        tm = TMmodel(betas=betas, thetas=thetas32, alphas=alphas,
+                     vocabfreq_file=vocabfreq_file)
+
+        return tm
+
+    def fit(self, corpusFile):
+        """
+        Training of CTM Topic Model
+
+        Parameters
+        ----------
+        corpusFile: Path
+            Path to txt file in mallet format
+            id 0 token1 token2 token3 ...
+        """
+
+        # Output model folder and training file for the corpus
+        if not corpusFile.is_file():
+            self._logger.error(
+                f'-- -- Provided corpus Path does not exist -- Stop')
+            sys.exit()
+
+        modelFolder = corpusFile.parent.joinpath('ctmModel')
+        modelFolder.mkdir()
+
+        # Generating the corpus in the input format required by ProdLDA
+        self.logger.info('-- -- CTM Corpus Generation: BOW Dataset object')
+        df = pd.read_parquet(corpusFile)
+        df_lemas = df[["bow_text"]].values.tolist()
+        df_lemas = [doc[0].split() for doc in df_lemas]
+        df_raw = df[["all_rawtext"]].values.tolist()
+        df_raw = [doc[0].split() for doc in df_raw]
+        self._corpus = [el for el in df_lemas]
+        self._unpreprocessed_corpus = [el for el in df_raw]
+
+        # Generate the corpus in the input format required by CTM
+        self._train_dataset, self._val_dataset, self._input_size, self._id2token, self._qt, self.embeddings_train, custom_embeddings, self.docs_train = \
+            prepare_ctm_dataset(corpus=self._corpus,
+                                unpreprocessed_corpus=self._unpreprocessed_corpus,
+                                sbert_model_to_load=self._sbert_model_to_load)
+        
+        data = [self._train_dataset, self._val_dataset, self._input_size, self._id2token]
+        ctm_dataset_file = modelFolder.joinpath('ctm_dataset.pickle')
+        with open(ctm_dataset_file, 'wb') as f:
+            pickle.dump(data, f)
+        
+        ctm = CombinedTM(
+            logger=self.logger,
+            input_size=self._input_size,
+            contextual_size=768,
+            n_components=self._n_components,
+            model_type=self._model_type,
+            hidden_sizes=self._hidden_sizes,
+            activation=self._activation,
+            dropout=self._dropout,
+            learn_priors=self._learn_priors,
+            batch_size=self._batch_size,
+            lr=self._lr,
+            momentum=self._momentum,
+            solver=self._solver,
+            num_epochs=self._num_epochs,
+            num_samples=self._num_samples,
+            reduce_on_plateau=self._reduce_on_plateau,
+            topic_prior_mean=self._topic_prior_mean,
+            topic_prior_variance=self._topic_prior_variance,
+            num_data_loader_workers=self._num_data_loader_workers)
+
+        ctm.fit(self._train_dataset, self._val_dataset)
+
+        # Create TMmodel object
+        tm = self._createTMmodel(modelFolder, ctm)
+        tm.save_npz(corpusFile.parent.joinpath('model.npz'))
 
         return
-
 
 ##############################################################################
 #                                  MAIN                                      #
@@ -2154,9 +1997,10 @@ if __name__ == "__main__":
     if args.spark:
 
         # Spark imports and session generation
-        from pyspark.sql import SparkSession
-        from pyspark.ml.feature import Tokenizer, StopWordsRemover, CountVectorizer
         import pyspark.sql.functions as F
+        from pyspark.ml.feature import (CountVectorizer, StopWordsRemover,
+                                        Tokenizer)
+        from pyspark.sql import SparkSession
 
         spark = SparkSession\
             .builder\
@@ -2259,11 +2103,47 @@ if __name__ == "__main__":
                         configFile.parent.joinpath('corpus.parquet'))
                 elif train_config['trainer'] == 'prodLDA':
                     ProdLDATr = ProdLDATrainer(
-                        cf, modelFolder=configFile.parent.resolve())
+                                n_components=train_config['PRODparam']['n_components'],
+                                model_type=train_config['PRODparam']['model_type'],
+                                hidden_sizes=train_config['PRODparam']['hidden_sizes'],
+                                activation=train_config['PRODparam']['activation'],
+                                dropout=train_config['PRODparam']['dropout'],
+                                learn_priors=train_config['PRODparam']['learn_priors'],
+                                batch_size=train_config['PRODparam']['batch_size'],
+                                lr=train_config['PRODparam']['lr'],
+                                momentum=train_config['PRODparam']['momentum'],
+                                solver=train_config['PRODparam']['solver'],
+                                num_epochs=train_config['PRODparam']['num_epochs'],
+                                reduce_on_plateau=train_config['PRODparam']['reduce_on_plateau'],
+                                topic_prior_mean=train_config['PRODparam']['topic_prior_mean'],
+                                topic_prior_variance=train_config['PRODparam']['topic_prior_variance'],
+                                num_samples=train_config['PRODparam']['num_samples'],
+                                num_data_loader_workers=train_config['PRODparam']['num_data_loader_workers'],
+                                thetas_thr=train_config['PRODparam']['thetas_thr'])
                     ProdLDATr.fit()
                 elif train_config['trainer'] == 'ctm':
                     CTMr = CTMTrainer(
-                        cf, modelFolder=configFile.parent.resolve())
+                            inference_type=train_config['CTMparam']['inference_type'],
+                            n_components=train_config['CTMparam']['n_components'],
+                            model_type=train_config['CTMparam']['model_type'],
+                            hidden_sizes=train_config['CTMparam']['hidden_sizes'],
+                            activation=train_config['CTMparam']['activation'],
+                            dropout=train_config['CTMparam']['dropout'],
+                            learn_priors=train_config['CTMparam']['learn_priors'],
+                            batch_size=train_config['CTMparam']['batch_size'],
+                            lr=train_config['CTMparam']['lr'],
+                            momentum=train_config['CTMparam']['momentum'],
+                            solver=train_config['CTMparam']['solver'],
+                            num_epochs=train_config['CTMparam']['num_epochs'],
+                            num_samples=train_config['CTMparam']['num_samples'],
+                            reduce_on_plateau=train_config['CTMparam']['reduce_on_plateau'],
+                            topic_prior_mean=train_config['CTMparam']['topic_prior_mean'],
+                            topic_prior_variance=train_config['CTMparam']['topic_prior_variance'],
+                            num_data_loader_workers=train_config['CTMparam']['num_data_loader_workers'],
+                            label_size=train_config['CTMparam']['label_size'],
+                            loss_weights=train_config['CTMparam']['loss_weights'],
+                            thetas_thr=train_config['CTMparam']['thetas_thr'],
+                            sbert_model_to_load=train_config['CTMparam']['sbert_model_to_load'])
                     CTMr.fit()
 
         else:

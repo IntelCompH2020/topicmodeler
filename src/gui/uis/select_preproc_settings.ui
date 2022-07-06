@@ -342,7 +342,7 @@ QToolTip {
           <number>0</number>
          </property>
          <item>
-          <widget class="QFrame" name="frame_select_options_bottom_down">
+          <widget class="QFrame" name="frame_top_preproc">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -364,15 +364,9 @@ QToolTip {
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QTabWidget" name="tabWidget_preproc_settings">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QTabWidget" name="tabWidget">
               <property name="styleSheet">
                <string notr="true">QTabWidget::pane {
     background: transparent;
@@ -387,23 +381,8 @@ QTabBar::tab {
 	color: #FFFFFF;
 }</string>
               </property>
-              <property name="tabPosition">
-               <enum>QTabWidget::North</enum>
-              </property>
-              <property name="tabShape">
-               <enum>QTabWidget::Triangular</enum>
-              </property>
               <property name="currentIndex">
                <number>0</number>
-              </property>
-              <property name="elideMode">
-               <enum>Qt::ElideMiddle</enum>
-              </property>
-              <property name="movable">
-               <bool>true</bool>
-              </property>
-              <property name="tabBarAutoHide">
-               <bool>true</bool>
               </property>
               <widget class="QWidget" name="tab_preproc_settings">
                <property name="styleSheet">
@@ -413,7 +392,7 @@ QTabBar::tab {
                <attribute name="title">
                 <string>Preprocessing</string>
                </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_5">
+               <layout class="QVBoxLayout" name="verticalLayout_4">
                 <item>
                  <widget class="QFrame" name="frame_preproc_settings">
                   <property name="styleSheet">
@@ -1038,13 +1017,13 @@ border:none;</string>
               </widget>
               <widget class="QWidget" name="tab_stopwords_settings">
                <property name="styleSheet">
-                <string notr="true">background:transparent;
+                <string notr="true">background:white;
 </string>
                </property>
                <attribute name="title">
                 <string>Stopwords</string>
                </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_3">
+               <layout class="QVBoxLayout" name="verticalLayout_5">
                 <item>
                  <widget class="QTableWidget" name="table_available_stopwords">
                   <property name="styleSheet">
@@ -1252,7 +1231,7 @@ QHeaderView::section:horizontal
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="frame_bottom_download_corpus">
+          <widget class="QFrame" name="frame_bottom_preproc">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>

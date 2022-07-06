@@ -61,6 +61,7 @@ def check_max_local_length(max_seq_length, texts):
                       f"truncates to {max_seq_length} tokens.")
 
 
+
 def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=None, 
                         sbert_model_to_load='paraphrase-distilroberta-base-v1',
                         val_size=0.25, max_seq_length=512):
@@ -92,16 +93,20 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
         Size of the input dimensions of the AVITM model to be trained
     id2token: tuple
         Mappings with the content of each training dataset's document-term matrix.
-        
+    qt: TopicModelDataPreparation
+        Object with all the information for training the CTM model
+    embeddings_train: np.ndarray 
+        Train embeddings associated with the datasets
+    custom_embeddings:
+        All (train and validation) embeddings associated with the dataset
+    docs_train: list
+        Train documents
     """
     
     if custom_embeddings is None and unpreprocessed_corpus is None:
         raise TypeError("Custom embeddings or an unpreprocessed corpus to generate the embeddings from must be provided")
 
     # Create embeddings from text if no custom embeddings are provided
-    # For this step to work, the nr of documents after filtering needs to be equal to that
-    #  of the unprocessed documents, since the bow and the contextual embeddings needs to have the same row (nr of
-    #  documents) size
     if custom_embeddings is None:
         docs_conv = [" ".join(unpreprocessed_corpus[i]) for i in np.arange(len(unpreprocessed_corpus))]
         custom_embeddings = bert_embeddings_from_list(docs_conv, sbert_model_to_load, max_seq_length=max_seq_length)
@@ -119,7 +124,7 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
     docs_train_conv = [" ".join(docs_train[i]) for i in np.arange(len(docs_train))]
 
     # Learn the vocabulary dictionary, train_bow = document-term matrix.
-    train_bow = cv.fit_transform(docs_train_conv).toarray()
+    train_bow = cv.fit_transform(docs_train_conv)
 
     # Array mapping from feature integer indices to feature name.
     idx2token = cv.get_feature_names()
@@ -129,6 +134,7 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
     qt = TopicModelDataPreparation(contextualized_model=sbert_model_to_load)
     qt.vectorizer = cv
     qt.id2token = id2token
+    qt.vocab = idx2token
     training_dataset = qt.load(embeddings_train, train_bow, id2token)
 
     ############################################
@@ -137,7 +143,7 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
     docs_val_conv = [" ".join(docs_val[i]) for i in np.arange(len(docs_val))]
     validation_dataset = qt.transform(text_for_bow=docs_val_conv, text_for_contextual = docs_val_conv, custom_embeddings=embeddings_val)
 
-    return training_dataset, validation_dataset, input_size, id2token
+    return training_dataset, validation_dataset, input_size, id2token, qt, embeddings_train, custom_embeddings, docs_train
 
 
 class TopicModelDataPreparation:
