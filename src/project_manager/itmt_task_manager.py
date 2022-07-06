@@ -187,11 +187,7 @@ class ITMTTaskManager(BaseTaskManager):
 
     def load_listTMmodels(self):
         """
-        This method loads all the available Topic Models previously created by the user
-        ITMTTaskManager's 'allTMmodels' attribute as a dictionary object, which is characterized by one dictionary
-        entry per Topic Model, the key and the value being the absolute path to the model and a dictionary with the
-        corresponding metadata, respectively. To do so, it invokes the script from the folder 'src/topicmodeling' with
-        the option 'listTMmodels'.
+        This method loads all the available Topic Models previously created by the user ITMTTaskManager's 'allTMmodels' attribute as a dictionary object, which is characterized by one dictionary entry per Topic Model, the key and the value being the absolute path to the model and a dictionary with the corresponding metadata, respectively. To do so, it invokes the script from the folder 'src topicmodeling' with the option 'listTMmodels'.
         """
 
         cmd = 'python src/topicmodeling/topicmodeling.py --listTMmodels --path_models '
@@ -355,7 +351,7 @@ class ITMTTaskManager(BaseTaskManager):
         self.load_listWdLists()
 
         return status
-    
+
     def trainTM(self, modelname, ModelDesc, privacy, trainer, TrDtSet, Preproc, training_params):
         """
         Topic modeling trainer. Initial training of a topic model
@@ -367,7 +363,7 @@ class ITMTTaskManager(BaseTaskManager):
             Possible values are mallet|sparkLDA|prodLDA|ctm
         """
 
-        # 1. Create model directory 
+        # 1. Create model directory
         modeldir = self.p2p.joinpath(
             self._dir_struct['LDAmodels']).joinpath(modelname)
         if modeldir.exists():
@@ -401,7 +397,7 @@ class ITMTTaskManager(BaseTaskManager):
             json.dump(train_config, outfile,
                       ensure_ascii=False, indent=2, default=str)
 
-        # 3. Topic Modeling starts 
+        # 3. Topic Modeling starts
         # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         # This fragment of code creates a spark cluster and submits the task
         # This function is dependent on UC3M local deployment infrastructure
@@ -436,9 +432,10 @@ class ITMTTaskManager(BaseTaskManager):
                 self.logger.error('-- -- Command execution failed')
 
         # Step 2: Training of Topic Model
-        if trainer=="sparkLDA":
+        if trainer == "sparkLDA":
             if not self.cf.get('Spark', 'spark_available') == 'True':
-                self.logger.error("-- -- sparkLDA requires access to a Spark cluster")
+                self.logger.error(
+                    "-- -- sparkLDA requires access to a Spark cluster")
             else:
                 script_spark = self.cf.get('Spark', 'script_spark')
                 token_spark = self.cf.get('Spark', 'token_spark')
@@ -467,7 +464,6 @@ class ITMTTaskManager(BaseTaskManager):
         self.load_listTMmodels()
 
         return
-
 
 
 ##############################################################################
@@ -1116,7 +1112,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 thetas_thr = var_num_keyboard('float', thetas_thr,
                                               'Threshold for topic activation in a doc (sparsification)')
             LDAparam = {
-                "mallet_path": mallet_path,               
+                "mallet_path": mallet_path,
                 "ntopics": ntopics,
                 "alpha": alpha,
                 "optimize_interval": optimize_interval,
@@ -1223,9 +1219,10 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 self.logger.error('-- -- Command execution failed')
 
         # Step 2: Training of Topic Model
-        if trainer=="sparkLDA":
+        if trainer == "sparkLDA":
             if not self.cf.get('Spark', 'spark_available') == 'True':
-                self.logger.error("-- -- sparkLDA requires access to a Spark cluster")
+                self.logger.error(
+                    "-- -- sparkLDA requires access to a Spark cluster")
             else:
                 script_spark = self.cf.get('Spark', 'script_spark')
                 token_spark = self.cf.get('Spark', 'token_spark')
@@ -1250,11 +1247,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             except:
                 self.logger.error('-- -- Command execution failed')
         return
-
-
-
-
-
 
     def corpus2JSON(self):
         """
@@ -2196,7 +2188,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                 row += 1
 
         return
-    
+
     def listWdListsByType(self, table, type):
         """
         This method shows the wordlists of type "type" available for the project in the corresponding table within the GUI.
@@ -2211,7 +2203,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         if self.allWdLists:
             allWdLists = json.loads(self.allWdLists)
-            typeWdLists = [WdList for WdList in allWdLists.keys() if allWdLists[WdList]['valid_for'] == type]
+            typeWdLists = [WdList for WdList in allWdLists.keys(
+            ) if allWdLists[WdList]['valid_for'] == type]
             table.setRowCount(len(typeWdLists))
             row = 0
             for WdList in allWdLists.keys():
@@ -2347,6 +2340,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         self.logger.info(
             f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
 
-        super().trainTM(modelname, ModelDesc, privacy, trainer, TrDtSet, preproc_settings, training_params)
+        super().trainTM(modelname, ModelDesc, privacy, trainer,
+                        TrDtSet, preproc_settings, training_params)
 
         return

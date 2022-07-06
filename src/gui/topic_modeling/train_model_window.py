@@ -5,6 +5,7 @@ Class that defines the subwindow for the Interactive Topic Model Trainer App for
 
 """
 
+from concurrent.futures import thread
 import configparser
 import pathlib
 import re
@@ -22,7 +23,7 @@ from src.gui.utils.constants import Constants
 
 class TrainModelWindow(QtWidgets.QDialog):
 
-    def __init__(self, tm, stdout, stderr, training_corpus):
+    def __init__(self, tm, thread_pool, stdout, stderr, training_corpus, preproc_settings):
         """
         Initializes the application's subwindow from which the user can train a new topic model.
 
@@ -30,12 +31,16 @@ class TrainModelWindow(QtWidgets.QDialog):
         ----------
         tm : TaskManager
             TaskManager object associated with the project
+        thread_pool:
+
         stdout : OutputWrapper
             Attribute in which stdout is redirected
         stderr : OutputWrapper
             Attribute in which stderr is redirected
         training_corpus : str
             Name of the training dataset
+        preproc_settings: dict
+            Dictionary with the configuration for the preprocessing of the training corpus
         """
 
         super(TrainModelWindow, self).__init__()
@@ -48,27 +53,27 @@ class TrainModelWindow(QtWidgets.QDialog):
         # ATTRIBUTES
         #####################################################################################
         self.tm = tm
+        self.thread_pool = thread_pool
         self.stdout = stdout
         self.stderr = stderr
-        self.TrDts_name = training_corpus
         self.previous_train_button = self.findChild(
             QPushButton, "train_button_1")
         self.trainer = None
-        self.TrDts_name = None
-        self.preproc_settings = None
+        self.TrDts_name = training_corpus
+        self.preproc_settings = preproc_settings
         self.training_params = None 
         self.modelname = None
         self.ModelDesc = None
         self.privacy = None
 
+        # Reload config object in case changes were doing from the settings page
+        self.cf = configparser.ConfigParser()
+        self.cf.read(self.tm.p2config)
         #####################################################################################
         # Widgets initial configuration
         #####################################################################################
         # Initialize progress bars
         utils.initialize_progress_bar(Constants.TRAIN_LOADING_BARS, self)
-
-        # Configure tables
-        utils.configure_table_header(Constants.TRAIN_MODEL_TABLES, self)
 
         # Initialize checkboxes
         self.lda_mallet_checkboxes_params = []
@@ -178,25 +183,21 @@ class TrainModelWindow(QtWidgets.QDialog):
         """Method that reads from the config file the default parameters for training a LDA Mallet model, and sets the corresponding values in the 'tabWidget_settingsLDA'.
         """
 
-        # Get config object
-        cf = configparser.ConfigParser()
-        cf.read(self.tm.p2config)
-
         # Read values and set them in the correponding widget
         self.lineEdit_nr_topics_lda.setText(
-            str(cf.get('TM', 'ntopics')))
+            str(self.cf.get('TM', 'ntopics')))
         self.lineEdit_alpha_lda.setText(
-            str(cf.get('MalletTM', 'alpha')))
+            str(self.cf.get('MalletTM', 'alpha')))
         self.lineEdit_optimize_interval_lda.setText(
-            str(cf.get('MalletTM', 'optimize_interval')))
+            str(self.cf.get('MalletTM', 'optimize_interval')))
         self.lineEdit_nr_threads_lda.setText(
-            str(cf.get('MalletTM', 'num_threads')))
+            str(self.cf.get('MalletTM', 'num_threads')))
         self.lineEdit_nr_iterations_lda.setText(
-            str(cf.get('MalletTM', 'num_iterations')))
+            str(self.cf.get('MalletTM', 'num_iterations')))
         self.lineEdit_doc_top_thr_lda.setText(
-            str(cf.get('MalletTM', 'doc_topic_thr')))
+            str(self.cf.get('MalletTM', 'doc_topic_thr')))
         self.lineEdit_thetas_thr_lda.setText(
-            str(cf.get('MalletTM', 'thetas_thr')))
+            str(self.cf.get('MalletTM', 'thetas_thr')))
        
         return
 
@@ -213,7 +214,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.training_params = {}
         messages = ""
 
-        if int(self.lineEdit_nr_topics_lda.text()) < 0:
+        if int(self.lineEdit_nr_topics_lda.text()) < 0 or int(self.lineEdit_nr_topics_lda.text()) == 0:
             self.checkBox_lda_1_bad.show()
             messages += Constants.WRONG_NR_TOPICS_LDA_MSG + "\n"
         else:
@@ -283,34 +284,30 @@ class TrainModelWindow(QtWidgets.QDialog):
         """Method that reads from the config file the default parameters for training a AVITM  model, and sets the corresponding values in the 'tabWidget_settings_avitm'.
         """
 
-        # Get config object
-        cf = configparser.ConfigParser()
-        cf.read(self.tm.p2config)
-
         self.lineEdit_nr_topics_prod.setText(
-            str(cf.get('ProdLDA', 'n_components')))
+            str(self.cf.get('TM', 'ntopics')))
         self.comboBox_model_type_prod.setCurrentText(
-            str(cf.get('ProdLDA', 'model_type')))
+            str(self.cf.get('ProdLDA', 'model_type')))
         self.lineEdit_hidden_prod.setText(
-            str(cf.get('ProdLDA', 'hidden_sizes')))
+            str(self.cf.get('ProdLDA', 'hidden_sizes')))
         self.comboBox_prod_activation.setCurrentText(
-            str(cf.get('ProdLDA', 'activation')))
+            str(self.cf.get('ProdLDA', 'activation')))
         self.lineEdit_dropout_prod.setText(
-            str(cf.get('ProdLDA', 'dropout')))
+            str(self.cf.get('ProdLDA', 'dropout')))
         self.comboBox_prod_learn_priors.setCurrentText(
-            str(cf.get('ProdLDA', 'learn_priors')))
+            str(self.cf.get('ProdLDA', 'learn_priors')))
         self.lineEdit_lr_prod.setText(
-            str(cf.get('ProdLDA', 'lr')))
+            str(self.cf.get('ProdLDA', 'lr')))
         self.lineEdit_momentum_prod.setText(
-            str(cf.get('ProdLDA', 'momentum')))
+            str(self.cf.get('ProdLDA', 'momentum')))
         self.comboBox_prod_solver.setCurrentText(
-            str(cf.get('ProdLDA', 'solver')))
+            str(self.cf.get('ProdLDA', 'solver')))
         self.lineEdit_nr_epochs_prod.setText(
-            str(cf.get('ProdLDA', 'num_epochs')))
+            str(self.cf.get('ProdLDA', 'num_epochs')))
         self.comboBox_prod_reduce_on_plateau.setCurrentText(
-            str(cf.get('ProdLDA', 'reduce_on_plateau')))
+            str(self.cf.get('ProdLDA', 'reduce_on_plateau')))
         self.lineEdit_batch_size_prod.setText(
-            str(cf.get('ProdLDA', 'batch_size')))
+            str(self.cf.get('ProdLDA', 'batch_size')))
 
         return
 
@@ -429,31 +426,27 @@ class TrainModelWindow(QtWidgets.QDialog):
         """Method that reads from the config file the default parameters for training a CTM  model, and sets the corresponding values in the 'tabWidget_settings_ctm'.
         """
 
-        # Get config object
-        cf = configparser.ConfigParser()
-        cf.read(self.tm.p2config)
-
         # Read values and set them in the correponding widget
         self.comboBox_ctm_model_type.setCurrentText(
-            str(cf.get('CTM', 'ctm_model_type')))
-        self.lineEdit_nr_topics_ctm.setText(str(cf.get('CTM', 'num_topics')))
-        self.lineEdit_nr_epochs_ctm.setText(str(cf.get('CTM', 'num_epochs')))
-        self.lineEdit_batch_size_ctm.setText(str(cf.get('CTM', 'batch_size')))
-        self.lineEdit_ctm_hidden_sizes.setText(cf.get('CTM', 'hidden_sizes'))
+            str(self.cf.get('CTM', 'ctm_model_type')))
+        self.lineEdit_nr_topics_ctm.setText(str(self.cf.get('TM', 'ntopics')))
+        self.lineEdit_nr_epochs_ctm.setText(str(self.cf.get('CTM', 'num_epochs')))
+        self.lineEdit_batch_size_ctm.setText(str(self.cf.get('CTM', 'batch_size')))
+        self.lineEdit_ctm_hidden_sizes.setText(self.cf.get('CTM', 'hidden_sizes'))
         self.comboBox_ctm_activation.setCurrentText(
-            str(cf.get('CTM', 'activation')))
-        self.lineEdit_ctm_dropout.setText(str(cf.get('CTM', 'dropout')))
+            str(self.cf.get('CTM', 'activation')))
+        self.lineEdit_ctm_dropout.setText(str(self.cf.get('CTM', 'dropout')))
         self.comboBox_ctm_learn_priors.setCurrentText(
-            cf.get('CTM', 'learn_priors'))
-        self.lineEdit_ctm_learning_rate.setText(str(cf.get('CTM', 'lr')))
-        self.lineEdit_ctm_momentum.setText(str(cf.get('CTM', 'momentum')))
-        self.comboBox_ctm_solver.setCurrentText(str(cf.get('CTM', 'solver')))
+            self.cf.get('CTM', 'learn_priors'))
+        self.lineEdit_ctm_learning_rate.setText(str(self.cf.get('CTM', 'lr')))
+        self.lineEdit_ctm_momentum.setText(str(self.cf.get('CTM', 'momentum')))
+        self.comboBox_ctm_solver.setCurrentText(str(self.cf.get('CTM', 'solver')))
         self.comboBox_ctm_reduce_on_plateau.setCurrentText(
-            cf.get('CTM', 'reduce_on_plateau'))
+            self.cf.get('CTM', 'reduce_on_plateau'))
         self.lineEdit_ctm_topic_prior_mean.setText(
-            str(cf.get('CTM', 'topic_prior_mean')))
+            str(self.cf.get('CTM', 'topic_prior_mean')))
         self.lineEdit_ctm_topic_prior_variance.setText(
-            str(cf.get('CTM', 'topic_prior_variance')))
+            str(self.cf.get('CTM', 'topic_prior_variance')))
 
         return
 
@@ -587,12 +580,14 @@ class TrainModelWindow(QtWidgets.QDialog):
         return
     
     def additional_training_params(self):
+        """Method to get additional training parameters for the topic model, namely the name with which the model is going to be saved, its description and privacy level.
+        """        
 
         # Model name
         if self.lineEdit_model_name.text() is None or self.lineEdit_model_name.text() == "":
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.NO_NAME_FOR_MODEL)
-            return
+            return False
         else:
             self.modelname = self.lineEdit_model_name.text()
 
@@ -600,14 +595,14 @@ class TrainModelWindow(QtWidgets.QDialog):
         if self.textEdit_model_description.toPlainText() is None or self.textEdit_model_description.toPlainText() == "":
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.NO_DESC_FOR_MODEL)
-            return
+            return False
         else:
             self.ModelDesc = self.textEdit_model_description.toPlainText()
 
         # Privacy level
         self.privacy = self.comboBox_model_privacy_level.currentText()
 
-        return
+        return True
         
 
     @pyqtSlot(str)
@@ -622,7 +617,7 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         return
 
-    def execute_train_CTM(self):
+    def execute_train(self):
         """Method to control the execution of the training of a topic model. To do so, it shows log information in the 'text_logs_train' QTextEdit and calls the corresponding TaskManager function that is in charge of training a the correspinding topic model type.
         """
 
@@ -635,68 +630,49 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         return
 
-    def do_after_execute_train_CTM(self):
-        """Method after the completition of a CTM's model training. Among other things, it is in charge of:
+    def do_after_execute_train(self):
+        """Method after the completition of a model's training. Among other things, it is in charge of:
         - Making the training loading bar invisible for the user.
         - Showing messages about the completion of the training.
-        - Show the topics' chemical description of the just trained model.
         """
 
         # Hide progress bar
-        self.progress_bar_CTM.setVisible(False)
+        self.progress_bar_train.setVisible(False)
 
-        # Show messages in the status bar and pop up window
-        msg = "'The model " + self.model_name + "' was trained."
-        self.statusBar().showMessage(msg, Constants.LONG_TIME_SHOW_SB)
+        # Show messages in pop up window
         QtWidgets.QMessageBox.information(
-            self, Constants.SMOOTH_SPOON_MSG, msg)
-
-        # Show model's topics' chemical description
-        self.table_training_results_CTM.clearContents()
-        # self.table_training_results_CTM.setRowCount(int(num_topics))
-        # self.table_training_results_CTM.setColumnCount(2)
-
-        # for i in np.arange(0, len(list_description), 1):
-        #    item_topic_nr = QtWidgets.QTableWidgetItem(str(i))
-        #    self.table_training_results_CTM.setItem(i, 0, item_topic_nr)
-        #    item_topic_description = QtWidgets.QTableWidgetItem(
-        #        str(list_description[i]))
-        #    self.table_training_results_CTM.setItem(
-        #        i, 1, item_topic_description)
-
-        self.table_training_results_CTM.resizeRowsToContents()
+            self, Constants.SMOOTH_SPOON_MSG, "'The model " + self.modelname + "' was trained.")
 
         return
 
     def clicked_pushButton_train(self):
-        """Method to control the clicking of the 'pushButton_trainCTM' which is in charge of starting the training of a CTM model. Once the buttons have been clicked, it checks whether an appropriate corpus for training has been selected, and CTM training parameters have been configured appropriately. In case both former conditions are fulfilled, the training of a CTM model is carried out in a secondary thread, while the execution of the GUI is kept in the main one.
+        """Method to control the clicking of the 'pushButton_train' which is in charge of starting the training of a topic model. Once the button has been clicked, it checks whether an appropriate corpus for training has been selected, and training parameters have been configured appropriately. In case both former conditions are fulfilled, the training of the topic model is carried out in a secondary thread, while the execution of the GUI is kept in the main one.
         """
 
-        if self.training_corpus is None:
+        if self.TrDts_name is None:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_TR_CORPUS)
             return
-
-        if self.train_tabs.currentWidget() == self.findChild(
-            QWidget, "page_trainLDA"):
+        
+        if self.train_tabs.currentWidget().objectName() == "page_trainLDA":
             self.trainer = "mallet"
-        elif self.train_tabs.currentWidget() == self.findChild(
-            QWidget, "page_trainSparkLDA"):
+            okay = self.get_mallet_params_from_user()
+        elif self.train_tabs.currentWidget().objectName() == "page_trainSparkLDA":
             self.trainer = "sparkLDA"
-        elif self.train_tabs.currentWidget() == self.findChild(
-            QWidget, "page_trainAVITM"):
+            okay = self.get_sparklda_params_from_user()
+        elif self.train_tabs.currentWidget().objectName() == "page_trainAVITM":
             self.trainer = "prodLDA"
-        elif self.train_tabs.currentWidget() == self.findChild(
-            QWidget, "page_trainCTM"):
+            okay = self.get_prodlda_params_from_user()
+        elif self.train_tabs.currentWidget().objectName() == "page_trainCTM":
             self.trainer = "ctm"
+            okay = self.get_ctm_params_from_user()
+        
+        additional_okay = self.additional_training_params()
 
-
-        okay = self.get_ctm_params_from_user()
-
-        if okay:
+        if okay and additional_okay:
             utils.execute_in_thread(
-                self, self.execute_train_CTM,
-                self.do_after_execute_train_CTM,
-                self.progress_bar_CTM)
+                self, self.execute_train,
+                self.do_after_execute_train,
+                self.progress_bar_train)
         else:
             return

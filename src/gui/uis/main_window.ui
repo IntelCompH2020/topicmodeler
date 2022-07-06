@@ -4650,7 +4650,7 @@ QScrollBar:horizontal {
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>266</width>
+                                <width>609</width>
                                 <height>734</height>
                                </rect>
                               </property>
@@ -5413,7 +5413,7 @@ padding-left: 10px;</string>
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>412</width>
+                                   <width>585</width>
                                    <height>1097</height>
                                   </rect>
                                  </property>
@@ -6489,113 +6489,11 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>359</width>
-                                   <height>1460</height>
+                                   <width>585</width>
+                                   <height>1339</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_104">
-                                  <item>
-                                   <widget class="QFrame" name="frame_settings_nr_comp_prod">
-                                    <property name="styleSheet">
-                                     <string notr="true">background-color: #F2F2F2;
-border-right: 2px solid #8FA4BF;
-border-left: 2px solid #8FA4BF;
-border-top: 2px solid #8FA4BF;
-border-bottom: 2px solid #8FA4BF;
-
-</string>
-                                    </property>
-                                    <property name="frameShape">
-                                     <enum>QFrame::StyledPanel</enum>
-                                    </property>
-                                    <property name="frameShadow">
-                                     <enum>QFrame::Raised</enum>
-                                    </property>
-                                    <layout class="QHBoxLayout" name="horizontalLayout_37">
-                                     <item>
-                                      <widget class="QFrame" name="frame_24">
-                                       <property name="styleSheet">
-                                        <string notr="true">border:none;</string>
-                                       </property>
-                                       <property name="frameShape">
-                                        <enum>QFrame::StyledPanel</enum>
-                                       </property>
-                                       <property name="frameShadow">
-                                        <enum>QFrame::Raised</enum>
-                                       </property>
-                                       <layout class="QVBoxLayout" name="verticalLayout_105">
-                                        <item>
-                                         <widget class="QLabel" name="label_settings_nr_comp_prod">
-                                          <property name="styleSheet">
-                                           <string notr="true">color:#1A2E40;
-font: 87 18pt &quot;Avenir&quot;;
-padding-left: 10px;
-border:none;</string>
-                                          </property>
-                                          <property name="text">
-                                           <string>Number of components</string>
-                                          </property>
-                                         </widget>
-                                        </item>
-                                        <item>
-                                         <widget class="QLineEdit" name="lineEdit_settings_nr_comp_prod">
-                                          <property name="maximumSize">
-                                           <size>
-                                            <width>200</width>
-                                            <height>16777215</height>
-                                           </size>
-                                          </property>
-                                          <property name="styleSheet">
-                                           <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                                          </property>
-                                         </widget>
-                                        </item>
-                                       </layout>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QFrame" name="frame_45">
-                                       <property name="styleSheet">
-                                        <string notr="true">border:none;</string>
-                                       </property>
-                                       <property name="frameShape">
-                                        <enum>QFrame::StyledPanel</enum>
-                                       </property>
-                                       <property name="frameShadow">
-                                        <enum>QFrame::Raised</enum>
-                                       </property>
-                                       <layout class="QVBoxLayout" name="verticalLayout_106">
-                                        <item>
-                                         <widget class="QTextEdit" name="textEdit_21">
-                                          <property name="styleSheet">
-                                           <string notr="true">QTextEdit {	
-	background-color: #F2F2F2;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: none;
-}</string>
-                                          </property>
-                                          <property name="html">
-                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a name=&quot;docs-internal-guid-b9e93f8d-7fff-0a12-c83f-fc78b928877c&quot;&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of topic components&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                          </property>
-                                         </widget>
-                                        </item>
-                                       </layout>
-                                      </widget>
-                                     </item>
-                                    </layout>
-                                   </widget>
-                                  </item>
                                   <item>
                                    <widget class="QFrame" name="frame_settings_model_type_prod">
                                     <property name="styleSheet">
@@ -8025,113 +7923,11 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>359</width>
-                                   <height>2065</height>
+                                   <width>585</width>
+                                   <height>1944</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_135">
-                                  <item>
-                                   <widget class="QFrame" name="frame_settings_nr_comp_ctm">
-                                    <property name="styleSheet">
-                                     <string notr="true">background-color: #F2F2F2;
-border-right: 2px solid #8FA4BF;
-border-left: 2px solid #8FA4BF;
-border-top: 2px solid #8FA4BF;
-border-bottom: 2px solid #8FA4BF;
-
-</string>
-                                    </property>
-                                    <property name="frameShape">
-                                     <enum>QFrame::StyledPanel</enum>
-                                    </property>
-                                    <property name="frameShadow">
-                                     <enum>QFrame::Raised</enum>
-                                    </property>
-                                    <layout class="QHBoxLayout" name="horizontalLayout_53">
-                                     <item>
-                                      <widget class="QFrame" name="frame_74">
-                                       <property name="styleSheet">
-                                        <string notr="true">border:none;</string>
-                                       </property>
-                                       <property name="frameShape">
-                                        <enum>QFrame::StyledPanel</enum>
-                                       </property>
-                                       <property name="frameShadow">
-                                        <enum>QFrame::Raised</enum>
-                                       </property>
-                                       <layout class="QVBoxLayout" name="verticalLayout_136">
-                                        <item>
-                                         <widget class="QLabel" name="label_settings_nr_comp_ctm">
-                                          <property name="styleSheet">
-                                           <string notr="true">color:#1A2E40;
-font: 87 18pt &quot;Avenir&quot;;
-padding-left: 10px;
-border:none;</string>
-                                          </property>
-                                          <property name="text">
-                                           <string>Number of components</string>
-                                          </property>
-                                         </widget>
-                                        </item>
-                                        <item>
-                                         <widget class="QLineEdit" name="lineEdit_settings_nr_comp_ctm">
-                                          <property name="maximumSize">
-                                           <size>
-                                            <width>200</width>
-                                            <height>16777215</height>
-                                           </size>
-                                          </property>
-                                          <property name="styleSheet">
-                                           <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                                          </property>
-                                         </widget>
-                                        </item>
-                                       </layout>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QFrame" name="frame_75">
-                                       <property name="styleSheet">
-                                        <string notr="true">border:none;</string>
-                                       </property>
-                                       <property name="frameShape">
-                                        <enum>QFrame::StyledPanel</enum>
-                                       </property>
-                                       <property name="frameShadow">
-                                        <enum>QFrame::Raised</enum>
-                                       </property>
-                                       <layout class="QVBoxLayout" name="verticalLayout_137">
-                                        <item>
-                                         <widget class="QTextEdit" name="textEdit_36">
-                                          <property name="styleSheet">
-                                           <string notr="true">QTextEdit {	
-	background-color: #F2F2F2;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: none;
-}</string>
-                                          </property>
-                                          <property name="html">
-                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a name=&quot;docs-internal-guid-b9e93f8d-7fff-0a12-c83f-fc78b928877c&quot;&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of topic components&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                          </property>
-                                         </widget>
-                                        </item>
-                                       </layout>
-                                      </widget>
-                                     </item>
-                                    </layout>
-                                   </widget>
-                                  </item>
                                   <item>
                                    <widget class="QFrame" name="frame_settings_under_ctm_type">
                                     <property name="styleSheet">
@@ -10031,6 +9827,59 @@ padding-left: 10px;</string>
                             </widget>
                            </item>
                            <item>
+                            <widget class="QFrame" name="frame_settings_nr_words_2">
+                             <property name="styleSheet">
+                              <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                             </property>
+                             <property name="frameShape">
+                              <enum>QFrame::StyledPanel</enum>
+                             </property>
+                             <property name="frameShadow">
+                              <enum>QFrame::Raised</enum>
+                             </property>
+                             <layout class="QVBoxLayout" name="verticalLayout_64">
+                              <item>
+                               <widget class="QLabel" name="label_settings_nr_words_2">
+                                <property name="styleSheet">
+                                 <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                </property>
+                                <property name="text">
+                                 <string>Number of topics</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QLineEdit" name="lineEdit_settings_nr_words_2">
+                                <property name="maximumSize">
+                                 <size>
+                                  <width>200</width>
+                                  <height>16777215</height>
+                                 </size>
+                                </property>
+                                <property name="styleSheet">
+                                 <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </widget>
+                           </item>
+                           <item>
                             <widget class="QFrame" name="frame_settings_nr_words">
                              <property name="styleSheet">
                               <string notr="true">background-color: #F2F2F2;
@@ -10718,8 +10567,8 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>288</width>
-                                   <height>492</height>
+                                   <width>600</width>
+                                   <height>570</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_67">

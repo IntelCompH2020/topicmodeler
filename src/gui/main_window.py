@@ -95,8 +95,6 @@ class MainWindow(QMainWindow):
         self.edit_stopwords_list_subwindow = None
         self.preprocessing_subwindow = None
 
-        self.training_corpus = None
-
         # Threads for executing in parallel
         self.thread_pool = QThreadPool()
         print("Multithreading with maximum"
@@ -656,13 +654,24 @@ class MainWindow(QMainWindow):
         return
 
     def clicked_train_dataset(self):
+
+        # Get training dataset
+        r = self.table_available_training_datasets.currentRow()
+
+        # If no training dataset is selected for before clicking the 'train_dataset' button, a warning message is shown to the user
+        if not r:
+            QMessageBox.warning(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_TR_CORPUS)
+            return
+
+        training_corpus = self.table_available_training_datasets.item(r, 0).text()
         
         # Get preprocessing settings
-        self.preprocessing_subwindow = PreprocessingWindow(self.tm)
+        self.preprocessing_subwindow = PreprocessingWindow(tm=self.tm)
         self.preprocessing_subwindow.exec()
 
         self.train_model_subwindow = TrainModelWindow(
-            self.tm, self.stdout, self.stderr, self.training_corpus)
+             tm=self.tm, thread_pool=self.thread_pool, stdout=self.stdout, stderr=self.stderr, training_corpus=training_corpus, preproc_settings=self.preprocessing_subwindow.preproc_settings)
         self.train_model_subwindow.exec()
 
         # @TODO: Reload models
@@ -863,8 +872,6 @@ class MainWindow(QMainWindow):
                 self.clicked_pushButton_apply_changes_mallet_settings()
         elif option == "prodlda":
             # PRODLDA
-            self.lineEdit_settings_nr_comp_prod.setText(
-                str(cf.get('ProdLDA', 'n_components')))
             self.lineEdit_settings_model_type_prod.setText(
                 str(cf.get('ProdLDA', 'model_type')))
             self.lineEdit_settings_hidden_prod.setText(
@@ -891,8 +898,6 @@ class MainWindow(QMainWindow):
                 self.clicked_pushButton_apply_changes_prodlda_settings()
         elif option == "ctm":
             # CTM
-            self.lineEdit_settings_nr_comp_prod.setText(
-                str(cf.get('CTM', 'num_topics')))
             self.lineEdit_settings_under_ctm_type.setText(
                 str(cf.get('CTM', 'model_type')))
             self.lineEdit_settings_model_type_ctm.setText(
@@ -1062,8 +1067,6 @@ class MainWindow(QMainWindow):
         cf = configparser.ConfigParser()
         cf.read(self.tm.p2config)
 
-        cf.set('ProdLDA', 'n_components', str(
-            self.lineEdit_settings_nr_comp_prod.text()))
         cf.set('ProdLDA', 'model_type', str(
             self.lineEdit_settings_model_type_prod.text()))
         cf.set('ProdLDA', 'hidden_sizes', str(
@@ -1077,7 +1080,7 @@ class MainWindow(QMainWindow):
         cf.set('ProdLDA', 'lr', str(self.lineEdit_settings_lr_prod.text()))
         cf.set('ProdLDA', 'momentum', str(
             self.lineEdit_settings_momentum_prod.text()))
-        cf.set('ProdLDA', 'n_components', str(
+        cf.set('ProdLDA', 'lr', str(
             self.lineEdit_settings_lr_prod.text()))
         cf.set('ProdLDA', 'solver', str(
             self.lineEdit_settings_nr_epochs_prod.text()))
@@ -1112,8 +1115,6 @@ class MainWindow(QMainWindow):
         cf = configparser.ConfigParser()
         cf.read(self.tm.p2config)
 
-        cf.set('CTM', 'num_topics', str(
-            self.lineEdit_settings_nr_comp_prod.text()))
         cf.set('CTM', 'model_type', str(
             self.lineEdit_settings_under_ctm_type.text()))
         cf.set('CTM', 'ctm_model_type', str(

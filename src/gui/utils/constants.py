@@ -104,7 +104,6 @@ class Constants:
     NO_NAME_FOR_MODEL = "A name for training the model must be specified"
     NO_DESC_FOR_MODEL = "A description for training the model must be specified"
 
-    TRAIN_MODEL_TABLES = ["table_training_results"]
     TRAIN_LOADING_BARS = ["progress_bar_train"]
     PREPROC_TABLES = ["table_available_stopwords","table_available_equivalences"]
 
