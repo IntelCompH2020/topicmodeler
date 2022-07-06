@@ -1986,6 +1986,10 @@ if __name__ == "__main__":
     parser.add_argument('--spark', action='store_true', default=False,
                         help='Indicate that spark cluster is available',
                         required=False)
+    parser.add_argument('--listTMmodels', action='store_true', default=False,
+                        help='List available Topic Models')
+    parser.add_argument('--path_models', type=str, default=None,
+                        help="path to topic models folder")
     parser.add_argument('--preproc', action='store_true', default=False,
                         help="Preprocess training data according to config file")
     parser.add_argument('--train', action='store_true', default=False,
@@ -2009,6 +2013,29 @@ if __name__ == "__main__":
 
     else:
         spark = None
+
+    #Listing of topic models
+    if args.listTMmodels:
+        if not args.path_models:
+            sys.exit('You need to indicate the location of training datasets')
+
+        allTMmodels = {}
+        modelFolders = [el for el in Path(args.path_models).iterdir()]
+
+        for TMf in modelFolders:
+            modelConfig = TMf.joinpath('trainconfig.json')
+            if modelConfig.is_file():
+                with modelConfig.open('r', encoding='utf8') as fin:
+                    modelInfo = json.load(fin)
+                    allTMmodels[modelInfo['name']] = {
+                        "name": modelInfo['name'],
+                        "description": modelInfo['description'],
+                        "visibility": modelInfo['visibility'],
+                        "trainer": modelInfo['trainer'],
+                        "TrDtSet": modelInfo['TrDtSet'],
+                        "creation_date": modelInfo['creation_date']
+                    }
+        sys.stdout.write(json.dumps(allTMmodels))
 
     # If the preprocessing flag is activated, we need to check availability of
     # configuration file, and run the preprocessing of the training data using

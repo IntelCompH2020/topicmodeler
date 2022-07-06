@@ -81,10 +81,11 @@ class ITMTTaskManager(BaseTaskManager):
         self.ready2setup = None
         self.logger = None
 
-        # Attributes to load project's associated datasets and WordLists
+        # Attributes to load project's associated datasets and WordLists, etc
         self.allDtsets = None
         self.allTrDtsets = None
         self.allWdLists = None
+        self.allTMmodels = None
 
         super().__init__(p2p, p2parquet, p2wdlist, config_fname=config_fname,
                          metadata_fname=metadata_fname)
@@ -108,6 +109,7 @@ class ITMTTaskManager(BaseTaskManager):
         self.load_listDownloaded()
         self.load_listTrDtsets()
         self.load_listWdLists()
+        self.load_listTMmodels()
 
         return
 
@@ -181,6 +183,30 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("All available wordlists were loaded")
+        return
+
+    def load_listTMmodels(self):
+        """
+        This method loads all the available Topic Models previously created by the user
+        ITMTTaskManager's 'allTMmodels' attribute as a dictionary object, which is characterized by one dictionary
+        entry per Topic Model, the key and the value being the absolute path to the model and a dictionary with the
+        corresponding metadata, respectively. To do so, it invokes the script from the folder 'src/topicmodeling' with
+        the option 'listTMmodels'.
+        """
+
+        cmd = 'python src/topicmodeling/topicmodeling.py --listTMmodels --path_models '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['LDAmodels']).resolve().as_posix()
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            self.allTMmodels = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        self.logger.info("Logical datasets loaded")
         return
 
     def save_TrDtset(self, dt_set):
@@ -367,7 +393,8 @@ class ITMTTaskManager(BaseTaskManager):
             "trainer": trainer,
             "TrDtSet": TrDtSet,
             "Preproc": Preproc,
-            "LDAparam": training_params
+            "LDAparam": training_params,
+            "creation_date": DT.datetime.now()
         }
 
         with configFile.open('w', encoding='utf-8') as outfile:
@@ -435,6 +462,10 @@ class ITMTTaskManager(BaseTaskManager):
                 output = check_output(args=cmd, shell=True)
             except:
                 self.logger.error('-- -- Command execution failed')
+
+        # Reload the list of topic models to consider the one created in the current execution
+        self.load_listTMmodels()
+
         return
 
 
@@ -910,6 +941,26 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 if request_confirmation(
                         msg='Word List ' + allWdLists[WdLst]['name'] + ' will be deleted. Proceed?'):
                     self.delete_WdLst(WdLst)
+
+        return
+
+    def listTM(self):
+        """
+        This method shows all available topic models in the terminal
+
+        This is an extremely simple method for the taskmanager that does not
+        require any user interaction
+
+        """
+
+        allTMmodels = json.loads(self.allTMmodels)
+        for TMmodel in allTMmodels.keys():
+            printmag('\nTraining Dataset ' + allTMmodels[TMmodel]['name'])
+            print('\tDescription:', allTMmodels[TMmodel]['description'])
+            print('\tTraining Dataset:', allTMmodels[TMmodel]['TrDtSet'])
+            print('\tTrainer:', allTMmodels[TMmodel]['trainer'])
+            print('\tCreation date:', allTMmodels[TMmodel]['creation_date'])
+            print('\tVisibility:', allTMmodels[TMmodel]['visibility'])
 
         return
 

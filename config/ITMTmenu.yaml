@@ -86,9 +86,13 @@ DelWdList:
 TMoptions:
   title: Topic Modeling options
   options:
+    - listTM
     - trainTM
     - editTM
     - inference
+
+listTM:
+  title: List available topic models
 
 trainTM:
   title: Train a Topic Model
