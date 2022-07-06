@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1032</width>
-    <height>656</height>
+    <width>749</width>
+    <height>753</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -603,7 +603,7 @@ QPushButton:pressed {
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_32">
+           <layout class="QVBoxLayout" name="verticalLayout">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -620,38 +620,35 @@ QPushButton:pressed {
              <number>0</number>
             </property>
             <item>
-             <widget class="QStackedWidget" name="train_tabs">
-              <property name="currentIndex">
-               <number>0</number>
+             <widget class="QFrame" name="train_content_top">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
               </property>
-              <widget class="QWidget" name="page_trainLDA">
-               <property name="styleSheet">
-                <string notr="true">border:none;</string>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_56">
-                <item>
-                 <widget class="QFrame" name="frame_trainLDA">
-                  <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
+              <property name="styleSheet">
+               <string notr="true">border:none;</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <widget class="QStackedWidget" name="train_tabs">
+                 <property name="currentIndex">
+                  <number>0</number>
+                 </property>
+                 <widget class="QWidget" name="page_trainLDA">
+                  <property name="styleSheet">
+                   <string notr="true">border:none;</string>
                   </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_33">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_4">
                    <item>
-                    <widget class="QFrame" name="frame_top_train_LDA">
+                    <widget class="QFrame" name="frame_train_LDA">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -929,7 +926,7 @@ border:none;</string>
                          <attribute name="title">
                           <string>Advanced settings   |</string>
                          </attribute>
-                         <layout class="QVBoxLayout" name="verticalLayout">
+                         <layout class="QVBoxLayout" name="verticalLayout_5">
                           <property name="spacing">
                            <number>0</number>
                           </property>
@@ -977,6 +974,150 @@ border:none;</string>
                                <property name="spacing">
                                 <number>0</number>
                                </property>
+                               <item>
+                                <widget class="QFrame" name="frame_nr_topics_lda_3">
+                                 <property name="styleSheet">
+                                  <string notr="true">border-bottom: 0.5px solid #FFFFFF;
+border-right: 0.5px solid #FFFFFF;
+border-top: 0.5px solid #FFFFFF;
+</string>
+                                 </property>
+                                 <property name="frameShape">
+                                  <enum>QFrame::NoFrame</enum>
+                                 </property>
+                                 <property name="frameShadow">
+                                  <enum>QFrame::Plain</enum>
+                                 </property>
+                                 <layout class="QHBoxLayout" name="horizontalLayout_46">
+                                  <item>
+                                   <widget class="QLabel" name="label_nr_topics_lda_4">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>16777215</width>
+                                      <height>16777215</height>
+                                     </size>
+                                    </property>
+                                    <property name="font">
+                                     <font>
+                                      <family>Avenir</family>
+                                      <pointsize>13</pointsize>
+                                      <weight>75</weight>
+                                      <italic>false</italic>
+                                      <bold>true</bold>
+                                     </font>
+                                    </property>
+                                    <property name="toolTip">
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Number of topics to train the model with.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">font: 87 13pt &quot;Avenir&quot;;
+color:#1A2E40;
+font-weight: bold;
+border:None;</string>
+                                    </property>
+                                    <property name="text">
+                                     <string>Mallet path:</string>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLineEdit" name="lineEdit_mallet_path">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="minimumSize">
+                                     <size>
+                                      <width>0</width>
+                                      <height>0</height>
+                                     </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>60</width>
+                                      <height>16777215</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLabel" name="checkBox_lda_8_good">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>20</width>
+                                      <height>20</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color:transparent;
+border:none;</string>
+                                    </property>
+                                    <property name="text">
+                                     <string/>
+                                    </property>
+                                    <property name="pixmap">
+                                     <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                    </property>
+                                    <property name="scaledContents">
+                                     <bool>true</bool>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLabel" name="checkBox_lda_8_bad">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>20</width>
+                                      <height>20</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color:transparent;
+border:none;</string>
+                                    </property>
+                                    <property name="text">
+                                     <string/>
+                                    </property>
+                                    <property name="pixmap">
+                                     <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                    </property>
+                                    <property name="scaledContents">
+                                     <bool>true</bool>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                 </layout>
+                                </widget>
+                               </item>
                                <item>
                                 <widget class="QFrame" name="frame_alpha_lda">
                                  <property name="styleSheet">
@@ -1857,402 +1998,15 @@ border:none;</string>
                         </widget>
                        </widget>
                       </item>
-                      <item>
-                       <widget class="QTextEdit" name="text_logs_trainLDA">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>0</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>16777215</height>
-                         </size>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <family>Arial</family>
-                          <pointsize>12</pointsize>
-                          <weight>50</weight>
-                          <italic>false</italic>
-                          <bold>false</bold>
-                         </font>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QTextEdit {	
-	background-color: #F2F2F2;
-	border-radius: 0px;
-	gridline-color: #FFFFFF;
-	color:black;
-	}
-
- QScrollBar:vertical {
-	border: none;
-    background: #233821;
-    width: 2px;
-    margin: 2px 0 2px 0;
-	border-radius: 0px;
- }</string>
-                        </property>
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_select_options_name">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">background-color: #F2F2F2;
-border:none;
-</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::NoFrame</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_23">
-                      <item>
-                       <widget class="QLabel" name="label_10">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <family>Avenir</family>
-                          <pointsize>13</pointsize>
-                          <weight>75</weight>
-                          <italic>false</italic>
-                          <bold>true</bold>
-                         </font>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">padding-left: 10px;
-font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-</string>
-                        </property>
-                        <property name="text">
-                         <string>Name for the model:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="lineEdit_model_name_lda">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                        </property>
-                        <property name="readOnly">
-                         <bool>false</bool>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <spacer name="horizontalSpacer_10">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                         <enum>QSizePolicy::Fixed</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>15</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_middle_train_LDA">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">border:none;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::StyledPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_58">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_83">
-                        <item>
-                         <spacer name="horizontalSpacer_36">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="pushButton_train_LDA">
-                          <property name="styleSheet">
-                           <string notr="true">QPushButton {
-	background-color: #1A2E40;
-	font: 87 13pt &quot;Avenir&quot;;
-	font-weight: bold;
-	color: #FFFFFF;
-}
-QPushButton:hover {
-	background-color: #4D6F8C;
- }
-QPushButton:pressed {	
-	background-color: #4D6F8C;
-}
-
-</string>
-                          </property>
-                          <property name="text">
-                           <string>  TRAIN  </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer_37">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <widget class="QProgressBar" name="progress_bar_LDA">
-                        <property name="styleSheet">
-                         <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #4D6F8C;
-    width: 20px;
-}</string>
-                        </property>
-                        <property name="value">
-                         <number>24</number>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_bottom_trainLDA">
-                     <property name="styleSheet">
-                      <string notr="true">border:none;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::StyledPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_84">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <widget class="QTableWidget" name="table_training_resultsLDA">
-                        <property name="styleSheet">
-                         <string notr="true">QTableWidget {	
-	background-color: #F2F2F2;
-	padding: 0px;
-	border-radius: 5px;
-	font: 87 12pt &quot;Avenir&quot;;
-	gridline-color:#FFFFFF;
-}
-QTableWidget::item{
-	padding-left: 5px;
-	padding-right: 5px;
-	background-color: #F2F2F2;
-	color:black;
-	gridline-color:#FFFFFF;
-}
-QTableWidget::item:selected{
-	background-color: #4D6F8C;
-}
-QScrollBar:horizontal {
-	background: #4D6F8C;
-    border: none;
-    height: 2px;
-	margin: 0px 2px 0 2px;
-}
- QScrollBar:vertical {
-    background: #4D6F8C;
-    border: none;
-    width: 2px;
-    margin: 2px 0 2px 0;
-	border-radius: 0px;
- }
-
-QHeaderView::section:horizontal
-{
-	background-color: #1A2E40;
-	padding: 3px;
-    border-bottom: 1px solid #FFFFFF;
-    border-right: 1px solid #FFFFFF;
-    border-top: 1px solid #FFFFFF;
-    border-left: 1px solid #FFFFFF;
-	color:white;
-}
-
-</string>
-                        </property>
-                        <attribute name="horizontalHeaderStretchLastSection">
-                         <bool>true</bool>
-                        </attribute>
-                        <attribute name="verticalHeaderVisible">
-                         <bool>false</bool>
-                        </attribute>
-                        <attribute name="verticalHeaderStretchLastSection">
-                         <bool>true</bool>
-                        </attribute>
-                        <column>
-                         <property name="text">
-                          <string>TOPIC ID</string>
-                         </property>
-                         <property name="font">
-                          <font>
-                           <weight>75</weight>
-                           <bold>true</bold>
-                          </font>
-                         </property>
-                        </column>
-                        <column>
-                         <property name="text">
-                          <string>TOPIC DESCRIPTION</string>
-                         </property>
-                         <property name="font">
-                          <font>
-                           <weight>75</weight>
-                           <bold>true</bold>
-                          </font>
-                         </property>
-                        </column>
-                       </widget>
-                      </item>
                      </layout>
                     </widget>
                    </item>
                   </layout>
                  </widget>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="page_trainSparkLDA">
-               <layout class="QVBoxLayout" name="verticalLayout_3">
-                <item>
-                 <widget class="QFrame" name="frame_trainLDA_2">
-                  <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_34">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
+                 <widget class="QWidget" name="page_trainSparkLDA">
+                  <layout class="QVBoxLayout" name="verticalLayout_7">
                    <item>
-                    <widget class="QFrame" name="frame_top_train_LDA_2">
+                    <widget class="QFrame" name="frame_train_sparkLDA">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -2530,7 +2284,7 @@ border:none;</string>
                          <attribute name="title">
                           <string>Advanced settings   |</string>
                          </attribute>
-                         <layout class="QVBoxLayout" name="verticalLayout_2">
+                         <layout class="QVBoxLayout" name="verticalLayout_8">
                           <property name="spacing">
                            <number>0</number>
                           </property>
@@ -3458,405 +3212,18 @@ border:none;</string>
                         </widget>
                        </widget>
                       </item>
-                      <item>
-                       <widget class="QTextEdit" name="text_logs_trainLDA_2">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>0</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>16777215</height>
-                         </size>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <family>Arial</family>
-                          <pointsize>12</pointsize>
-                          <weight>50</weight>
-                          <italic>false</italic>
-                          <bold>false</bold>
-                         </font>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QTextEdit {	
-	background-color: #F2F2F2;
-	border-radius: 0px;
-	gridline-color: #FFFFFF;
-	color:black;
-	}
-
- QScrollBar:vertical {
-	border: none;
-    background: #233821;
-    width: 2px;
-    margin: 2px 0 2px 0;
-	border-radius: 0px;
- }</string>
-                        </property>
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_select_options_name_2">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">background-color: #F2F2F2;
-border:none;
-</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::NoFrame</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_24">
-                      <item>
-                       <widget class="QLabel" name="label_11">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <family>Avenir</family>
-                          <pointsize>13</pointsize>
-                          <weight>75</weight>
-                          <italic>false</italic>
-                          <bold>true</bold>
-                         </font>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">padding-left: 10px;
-font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-</string>
-                        </property>
-                        <property name="text">
-                         <string>Name for the model:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="lineEdit_model_name_sparklda">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                        </property>
-                        <property name="readOnly">
-                         <bool>false</bool>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <spacer name="horizontalSpacer_11">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                         <enum>QSizePolicy::Fixed</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>15</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_middle_train_LDA_2">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">border:none;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::StyledPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_65">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_129">
-                        <item>
-                         <spacer name="horizontalSpacer_42">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="pushButton_train_sparklda">
-                          <property name="styleSheet">
-                           <string notr="true">QPushButton {
-	background-color: #1A2E40;
-	font: 87 13pt &quot;Avenir&quot;;
-	font-weight: bold;
-	color: #FFFFFF;
-}
-QPushButton:hover {
-	background-color: #4D6F8C;
- }
-QPushButton:pressed {	
-	background-color: #4D6F8C;
-}
-
-</string>
-                          </property>
-                          <property name="text">
-                           <string>  TRAIN  </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer_43">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <widget class="QProgressBar" name="progress_bar_sparklda">
-                        <property name="styleSheet">
-                         <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #4D6F8C;
-    width: 20px;
-}</string>
-                        </property>
-                        <property name="value">
-                         <number>24</number>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_bottom_trainLDA_2">
-                     <property name="styleSheet">
-                      <string notr="true">border:none;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::StyledPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_130">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <widget class="QTableWidget" name="table_training_results_sparklda">
-                        <property name="styleSheet">
-                         <string notr="true">QTableWidget {	
-	background-color: #F2F2F2;
-	padding: 0px;
-	border-radius: 5px;
-	font: 87 12pt &quot;Avenir&quot;;
-	gridline-color:#FFFFFF;
-}
-QTableWidget::item{
-	padding-left: 5px;
-	padding-right: 5px;
-	background-color: #F2F2F2;
-	color:black;
-	gridline-color:#FFFFFF;
-}
-QTableWidget::item:selected{
-	background-color: #4D6F8C;
-}
-QScrollBar:horizontal {
-	background: #4D6F8C;
-    border: none;
-    height: 2px;
-	margin: 0px 2px 0 2px;
-}
- QScrollBar:vertical {
-    background: #4D6F8C;
-    border: none;
-    width: 2px;
-    margin: 2px 0 2px 0;
-	border-radius: 0px;
- }
-
-QHeaderView::section:horizontal
-{
-	background-color: #1A2E40;
-	padding: 3px;
-    border-bottom: 1px solid #FFFFFF;
-    border-right: 1px solid #FFFFFF;
-    border-top: 1px solid #FFFFFF;
-    border-left: 1px solid #FFFFFF;
-	color:white;
-}
-
-</string>
-                        </property>
-                        <attribute name="horizontalHeaderStretchLastSection">
-                         <bool>true</bool>
-                        </attribute>
-                        <attribute name="verticalHeaderVisible">
-                         <bool>false</bool>
-                        </attribute>
-                        <attribute name="verticalHeaderStretchLastSection">
-                         <bool>true</bool>
-                        </attribute>
-                        <column>
-                         <property name="text">
-                          <string>TOPIC ID</string>
-                         </property>
-                         <property name="font">
-                          <font>
-                           <weight>75</weight>
-                           <bold>true</bold>
-                          </font>
-                         </property>
-                        </column>
-                        <column>
-                         <property name="text">
-                          <string>TOPIC DESCRIPTION</string>
-                         </property>
-                         <property name="font">
-                          <font>
-                           <weight>75</weight>
-                           <bold>true</bold>
-                          </font>
-                         </property>
-                        </column>
-                       </widget>
-                      </item>
                      </layout>
                     </widget>
                    </item>
                   </layout>
                  </widget>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="page_trainAVITM">
-               <property name="styleSheet">
-                <string notr="true">border:none;</string>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_60">
-                <item>
-                 <widget class="QFrame" name="frame_trainAVITM">
-                  <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
+                 <widget class="QWidget" name="page_trainAVITM">
+                  <property name="styleSheet">
+                   <string notr="true">border:none;</string>
                   </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_61">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_9">
                    <item>
-                    <widget class="QFrame" name="frame_top_trainAVITM">
+                    <widget class="QFrame" name="frame_trainAVITM">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -3872,7 +3239,7 @@ QHeaderView::section:horizontal
                      <property name="frameShadow">
                       <enum>QFrame::Plain</enum>
                      </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_85">
+                     <layout class="QHBoxLayout" name="horizontalLayout_86">
                       <property name="leftMargin">
                        <number>0</number>
                       </property>
@@ -3954,7 +3321,7 @@ QTabBar::tab {
                             <property name="frameShadow">
                              <enum>QFrame::Plain</enum>
                             </property>
-                            <layout class="QHBoxLayout" name="horizontalLayout_86">
+                            <layout class="QHBoxLayout" name="horizontalLayout_87">
                              <property name="spacing">
                               <number>0</number>
                              </property>
@@ -4133,7 +3500,7 @@ border-top: 1px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_87">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_89">
                                   <item>
                                    <widget class="QLabel" name="label_alpha_7">
                                     <property name="sizePolicy">
@@ -4298,7 +3665,7 @@ border-top: 0.5px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_89">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_90">
                                   <item>
                                    <widget class="QLabel" name="label_optmize_interval_7">
                                     <property name="sizePolicy">
@@ -4442,7 +3809,7 @@ border-top: 0.5px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_90">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_91">
                                   <item>
                                    <widget class="QLabel" name="label_nr_threads_7">
                                     <property name="sizePolicy">
@@ -4614,7 +3981,7 @@ border:none;</string>
                             <property name="frameShadow">
                              <enum>QFrame::Plain</enum>
                             </property>
-                            <layout class="QHBoxLayout" name="horizontalLayout_91">
+                            <layout class="QHBoxLayout" name="horizontalLayout_92">
                              <property name="spacing">
                               <number>0</number>
                              </property>
@@ -4649,7 +4016,7 @@ border-top: 1px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_92">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_93">
                                   <item>
                                    <widget class="QLabel" name="label_alpha_8">
                                     <property name="sizePolicy">
@@ -4793,7 +4160,7 @@ border-top: 0.5px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_93">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_94">
                                   <item>
                                    <widget class="QLabel" name="label_lda_nr_topics_8">
                                     <property name="sizePolicy">
@@ -4993,7 +4360,7 @@ border-top: 0.5px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_94">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_95">
                                   <item>
                                    <widget class="QLabel" name="label_optmize_interval_8">
                                     <property name="sizePolicy">
@@ -5137,7 +4504,7 @@ border-top: 0.5px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_95">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_96">
                                   <item>
                                    <widget class="QLabel" name="label_nr_threads_8">
                                     <property name="sizePolicy">
@@ -5309,7 +4676,7 @@ border-top: 1px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_96">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_97">
                                   <item>
                                    <widget class="QLabel" name="label_nr_iterations_7">
                                     <property name="sizePolicy">
@@ -5453,7 +4820,7 @@ border-top: 1px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_97">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_98">
                                   <item>
                                    <widget class="QLabel" name="label_nr_iterations_8">
                                     <property name="sizePolicy">
@@ -5597,7 +4964,7 @@ border-top: 0.5px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_98">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_99">
                                   <item>
                                    <widget class="QLabel" name="label_doc_top_thr_7">
                                     <property name="sizePolicy">
@@ -5777,7 +5144,7 @@ border-top: 0.5px solid #FFFFFF;
                                  <property name="frameShadow">
                                   <enum>QFrame::Plain</enum>
                                  </property>
-                                 <layout class="QHBoxLayout" name="horizontalLayout_99">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_100">
                                   <item>
                                    <widget class="QLabel" name="label_thetas_thr_5">
                                     <property name="sizePolicy">
@@ -5937,403 +5304,16 @@ border:none;</string>
                         </widget>
                        </widget>
                       </item>
-                      <item>
-                       <widget class="QTextEdit" name="text_logs_train_AVITM">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>0</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>16777215</height>
-                         </size>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <family>Arial</family>
-                          <pointsize>12</pointsize>
-                          <weight>50</weight>
-                          <italic>false</italic>
-                          <bold>false</bold>
-                         </font>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QTextEdit {	
-	background-color: #F2F2F2;
-	border-radius: 0px;
-	gridline-color: #FFFFFF;
-	color:black;
-	}
-
- QScrollBar:vertical {
-	border: none;
-    background: #233821;
-    width: 2px;
-    margin: 2px 0 2px 0;
-	border-radius: 0px;
- }</string>
-                        </property>
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_select_options_name_3">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">background-color: #F2F2F2;
-border:none;
-</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::NoFrame</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_25">
-                      <item>
-                       <widget class="QLabel" name="label_12">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <family>Avenir</family>
-                          <pointsize>13</pointsize>
-                          <weight>75</weight>
-                          <italic>false</italic>
-                          <bold>true</bold>
-                         </font>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">padding-left: 10px;
-font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-</string>
-                        </property>
-                        <property name="text">
-                         <string>Name for the model:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="lineEdit_model_name_prodlda">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                        </property>
-                        <property name="readOnly">
-                         <bool>false</bool>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <spacer name="horizontalSpacer_12">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                         <enum>QSizePolicy::Fixed</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>15</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_middle_trainAVITM">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">border:none;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::StyledPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_64">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_102">
-                        <item>
-                         <spacer name="horizontalSpacer_38">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="pushButton_trainAVITM">
-                          <property name="styleSheet">
-                           <string notr="true">QPushButton {
-	background-color: #1A2E40;
-	font: 87 13pt &quot;Avenir&quot;;
-	font-weight: bold;
-	color: #FFFFFF;
-}
-QPushButton:hover {
-	background-color: #4D6F8C;
- }
-QPushButton:pressed {	
-	background-color: #4D6F8C;
-}
-
-</string>
-                          </property>
-                          <property name="text">
-                           <string>  TRAIN  </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer_39">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <widget class="QProgressBar" name="progress_bar_AVITM">
-                        <property name="styleSheet">
-                         <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #4D6F8C;
-    width: 20px;
-}</string>
-                        </property>
-                        <property name="value">
-                         <number>24</number>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_bottom_trainAVITM">
-                     <property name="styleSheet">
-                      <string notr="true">border:none;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::StyledPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_103">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <widget class="QTableWidget" name="table_training_results_AVITM">
-                        <property name="styleSheet">
-                         <string notr="true">QTableWidget {	
-	background-color: #F2F2F2;
-	padding: 0px;
-	border-radius: 5px;
-	font: 87 12pt &quot;Avenir&quot;;
-	gridline-color:#FFFFFF;
-}
-QTableWidget::item{
-	padding-left: 5px;
-	padding-right: 5px;
-	background-color: #F2F2F2;
-	color:black;
-	gridline-color:#FFFFFF;
-}
-QTableWidget::item:selected{
-	background-color: #4D6F8C;
-}
-QScrollBar:horizontal {
-	background: #4D6F8C;
-    border: none;
-    height: 2px;
-	margin: 0px 2px 0 2px;
-}
- QScrollBar:vertical {
-    background: #4D6F8C;
-    border: none;
-    width: 2px;
-    margin: 2px 0 2px 0;
-	border-radius: 0px;
- }
-
-QHeaderView::section:horizontal
-{
-	background-color: #1A2E40;
-	padding: 3px;
-    border-bottom: 1px solid #FFFFFF;
-    border-right: 1px solid #FFFFFF;
-    border-top: 1px solid #FFFFFF;
-    border-left: 1px solid #FFFFFF;
-	color:white;
-}
-
-</string>
-                        </property>
-                        <attribute name="horizontalHeaderStretchLastSection">
-                         <bool>true</bool>
-                        </attribute>
-                        <attribute name="verticalHeaderVisible">
-                         <bool>false</bool>
-                        </attribute>
-                        <attribute name="verticalHeaderStretchLastSection">
-                         <bool>true</bool>
-                        </attribute>
-                        <column>
-                         <property name="text">
-                          <string>TOPIC ID</string>
-                         </property>
-                         <property name="font">
-                          <font>
-                           <weight>75</weight>
-                           <bold>true</bold>
-                          </font>
-                         </property>
-                        </column>
-                        <column>
-                         <property name="text">
-                          <string>TOPIC DESCRIPTION</string>
-                         </property>
-                         <property name="font">
-                          <font>
-                           <weight>75</weight>
-                           <bold>true</bold>
-                          </font>
-                         </property>
-                        </column>
-                       </widget>
-                      </item>
                      </layout>
                     </widget>
                    </item>
                   </layout>
                  </widget>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="page_trainCTM">
-               <property name="styleSheet">
-                <string notr="true">border:none;</string>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_66">
-                <item>
-                 <widget class="QFrame" name="frame_trainCTM">
-                  <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
+                 <widget class="QWidget" name="page_trainCTM">
+                  <property name="styleSheet">
+                   <string notr="true">border:none;</string>
                   </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_67">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_10">
                    <item>
                     <widget class="QFrame" name="frame_top_trainCTM">
                      <property name="sizePolicy">
@@ -8704,37 +7684,44 @@ border:none;</string>
                         </widget>
                        </widget>
                       </item>
-                      <item>
-                       <widget class="QTextEdit" name="text_logs_train_ctm">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>0</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>16777215</height>
-                         </size>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <family>Arial</family>
-                          <pointsize>12</pointsize>
-                          <weight>50</weight>
-                          <italic>false</italic>
-                          <bold>false</bold>
-                         </font>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QTextEdit {	
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </item>
+               <item>
+                <widget class="QTextEdit" name="text_logs_train">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>400</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Arial</family>
+                   <pointsize>12</pointsize>
+                   <weight>50</weight>
+                   <italic>false</italic>
+                   <bold>false</bold>
+                  </font>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QTextEdit {	
 	background-color: #F2F2F2;
 	border-radius: 0px;
 	gridline-color: #FFFFFF;
@@ -8748,166 +7735,386 @@ border:none;</string>
     margin: 2px 0 2px 0;
 	border-radius: 0px;
  }</string>
-                        </property>
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_select_options_name_4">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="train_content_bottom">
+              <property name="styleSheet">
+               <string notr="true">border:none;</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_3">
+               <item>
+                <widget class="QFrame" name="frame">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_11">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QFrame" name="frame_name_privacy">
+                    <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_2">
+                     <property name="spacing">
+                      <number>0</number>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true">background-color: #F2F2F2;
-border:none;
-</string>
+                     <property name="leftMargin">
+                      <number>0</number>
                      </property>
-                     <property name="frameShape">
-                      <enum>QFrame::NoFrame</enum>
+                     <property name="topMargin">
+                      <number>0</number>
                      </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
+                     <property name="rightMargin">
+                      <number>0</number>
                      </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_26">
-                      <item>
-                       <widget class="QLabel" name="label_13">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <family>Avenir</family>
-                          <pointsize>13</pointsize>
-                          <weight>75</weight>
-                          <italic>false</italic>
-                          <bold>true</bold>
-                         </font>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">padding-left: 10px;
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QFrame" name="frame_select_options_name">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">background-color: #F2F2F2;</string>
+                       </property>
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                       </property>
+                       <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
+                       </property>
+                       <layout class="QHBoxLayout" name="horizontalLayout_26">
+                        <item>
+                         <widget class="QLabel" name="label_13">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>45</height>
+                           </size>
+                          </property>
+                          <property name="font">
+                           <font>
+                            <family>Avenir</family>
+                            <pointsize>13</pointsize>
+                            <weight>75</weight>
+                            <italic>false</italic>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true">padding-left: 10px;
 font: 87 13pt &quot;Avenir&quot;;
 color:#1A2E40;
 font-weight: bold;
 </string>
-                        </property>
-                        <property name="text">
-                         <string>Name for the model:</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="lineEdit_model_name_ctm">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QLineEdit {	
+                          </property>
+                          <property name="text">
+                           <string>Name for the new model: </string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="lineEdit_model_name">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true">QLineEdit {	
 	background-color: #FFFFFF;
 	font: 87 italic 12pt &quot;Avenir&quot;;
 	border-radius: 5px;
 	border: 1px solid #1A2E40;
 	color:black;
 }</string>
-                        </property>
-                        <property name="readOnly">
-                         <bool>false</bool>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <spacer name="horizontalSpacer_13">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                         <enum>QSizePolicy::Fixed</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>15</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_middle_trainCTM">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">border:none;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::StyledPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_70">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_121">
+                          </property>
+                          <property name="readOnly">
+                           <bool>false</bool>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QFrame" name="frame_select_options_privacy_2">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">background-color: #F2F2F2;</string>
+                       </property>
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                       </property>
+                       <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
+                       </property>
+                       <layout class="QHBoxLayout" name="horizontalLayout_27">
                         <item>
-                         <spacer name="horizontalSpacer_40">
+                         <widget class="QLabel" name="label_14">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>45</height>
+                           </size>
+                          </property>
+                          <property name="font">
+                           <font>
+                            <family>Avenir</family>
+                            <pointsize>13</pointsize>
+                            <weight>75</weight>
+                            <italic>false</italic>
+                            <bold>true</bold>
+                           </font>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true">padding-left: 10px;
+font: 87 13pt &quot;Avenir&quot;;
+color:#1A2E40;
+font-weight: bold;
+</string>
+                          </property>
+                          <property name="text">
+                           <string>Privacy level</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="comboBox_model_privacy_level">
+                          <property name="styleSheet">
+                           <string notr="true">/*COMBO BOX*/
+QComboBox {
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 1px 18px 1px 3px;
+    min-width: 6em;
+    background-color:#F2F2F2;
+	color:black;
+}
+
+
+QComboBox:on { /* shift the text when the popup opens */
+    padding-top: 3px;
+    padding-left: 4px;
+}
+
+</string>
+                          </property>
+                          <item>
+                           <property name="text">
+                            <string>private</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>public</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_12">
                           <property name="orientation">
                            <enum>Qt::Horizontal</enum>
                           </property>
+                          <property name="sizeType">
+                           <enum>QSizePolicy::Fixed</enum>
+                          </property>
                           <property name="sizeHint" stdset="0">
                            <size>
-                            <width>40</width>
+                            <width>15</width>
                             <height>20</height>
                            </size>
                           </property>
                          </spacer>
                         </item>
-                        <item>
-                         <widget class="QPushButton" name="pushButton_trainCTM">
-                          <property name="styleSheet">
-                           <string notr="true">QPushButton {
+                       </layout>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QFrame" name="frame_select_options_bottom_down_2">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">background-color: #F2F2F2;</string>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_19">
+                     <item>
+                      <widget class="QLabel" name="label_8">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>45</height>
+                        </size>
+                       </property>
+                       <property name="font">
+                        <font>
+                         <family>Avenir</family>
+                         <pointsize>13</pointsize>
+                         <weight>75</weight>
+                         <italic>false</italic>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">padding-left: 10px;
+font: 87 13pt &quot;Avenir&quot;;
+color:#1A2E40;
+font-weight: bold;
+</string>
+                       </property>
+                       <property name="text">
+                        <string>Description for the new model:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QTextEdit" name="textEdit_model_description">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>30</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QTextEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_6">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeType">
+                        <enum>QSizePolicy::Fixed</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>15</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_85">
+                 <item>
+                  <spacer name="horizontalSpacer_38">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_train">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
 	background-color: #1A2E40;
 	font: 87 13pt &quot;Avenir&quot;;
 	font-weight: bold;
@@ -8921,31 +8128,31 @@ QPushButton:pressed {
 }
 
 </string>
-                          </property>
-                          <property name="text">
-                           <string>  TRAIN  </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer_41">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <widget class="QProgressBar" name="progress_bar_CTM">
-                        <property name="styleSheet">
-                         <string notr="true">QProgressBar {
+                   </property>
+                   <property name="text">
+                    <string>  TRAIN  </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_39">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="QProgressBar" name="progress_bar_train">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
     border: 2px solid grey;
     border-radius: 5px;
 }
@@ -8954,43 +8161,16 @@ QProgressBar::chunk {
     background-color: #4D6F8C;
     width: 20px;
 }</string>
-                        </property>
-                        <property name="value">
-                         <number>24</number>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QFrame" name="frame_bottom_trainCTM">
-                     <property name="styleSheet">
-                      <string notr="true">border:none;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::StyledPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_122">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <widget class="QTableWidget" name="table_training_results_CTM">
-                        <property name="styleSheet">
-                         <string notr="true">QTableWidget {	
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QTableWidget" name="table_training_results">
+                 <property name="styleSheet">
+                  <string notr="true">QTableWidget {	
 	background-color: #F2F2F2;
 	padding: 0px;
 	border-radius: 5px;
@@ -9033,48 +8213,41 @@ QHeaderView::section:horizontal
 }
 
 </string>
-                        </property>
-                        <attribute name="horizontalHeaderStretchLastSection">
-                         <bool>true</bool>
-                        </attribute>
-                        <attribute name="verticalHeaderVisible">
-                         <bool>false</bool>
-                        </attribute>
-                        <attribute name="verticalHeaderStretchLastSection">
-                         <bool>true</bool>
-                        </attribute>
-                        <column>
-                         <property name="text">
-                          <string>TOPIC ID</string>
-                         </property>
-                         <property name="font">
-                          <font>
-                           <weight>75</weight>
-                           <bold>true</bold>
-                          </font>
-                         </property>
-                        </column>
-                        <column>
-                         <property name="text">
-                          <string>TOPIC DESCRIPTION</string>
-                         </property>
-                         <property name="font">
-                          <font>
-                           <weight>75</weight>
-                           <bold>true</bold>
-                          </font>
-                         </property>
-                        </column>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
+                 </property>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <column>
+                  <property name="text">
+                   <string>TOPIC ID</string>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>TOPIC DESCRIPTION</string>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                 </column>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>

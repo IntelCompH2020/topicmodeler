@@ -4650,7 +4650,7 @@ QScrollBar:horizontal {
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>609</width>
+                                <width>266</width>
                                 <height>734</height>
                                </rect>
                               </property>
@@ -5413,7 +5413,7 @@ padding-left: 10px;</string>
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>585</width>
+                                   <width>412</width>
                                    <height>1097</height>
                                   </rect>
                                  </property>
@@ -6489,7 +6489,7 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>585</width>
+                                   <width>359</width>
                                    <height>1460</height>
                                   </rect>
                                  </property>

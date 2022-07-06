@@ -138,14 +138,8 @@ class TrainModelWindow(QtWidgets.QDialog):
         #####################################################################################
         # Connect buttons
         #####################################################################################
-        self.pushButton_train_LDA.clicked.connect(
-            self.clicked_pushButton_train_LDA)
-        self.pushButton_train_sparklda.clicked.connect(
-            self.clicked_pushButton_train_sparklda)
-        self.pushButton_trainAVITM.clicked.connect(
-            self.clicked_pushButton_trainAVTIM)
-        self.pushButton_trainCTM.clicked.connect(
-            self.clicked_pushButton_trainCTM)
+        self.pushButton_train.clicked.connect(
+            self.clicked_pushButton_train)
 
     def init_ui(self):
         """Configures the elements of the GUI window that are not configured in the UI, i.e., icon of the application, the application's title, and the position of the window at its opening.
@@ -294,84 +288,6 @@ class TrainModelWindow(QtWidgets.QDialog):
             self.model_name = self.lineEdit_model_name_lda.text()
 
         return okay
-
-    @pyqtSlot(str)
-    def append_text_mallet_train(self, text):
-        """
-        Method to redirect the stdout and stderr in the "text_logs_trainLDA"
-        while the training of a Mallet model is being performed.
-        """
-
-        self.text_logs_trainLDA.moveCursor(QTextCursor.MoveOperation.End)
-        self.text_logs_trainLDA.insertPlainText(text)
-
-        return
-
-    def execute_train_mallet(self):
-        """Method to control the execution of the training of a Mallet model. To do so, it shows log information in the 'text_logs_trainLDA' QTextEdit and calls the corresponding TaskManager function that is in charge of training a Mallet model.
-        """
-
-        # Connect pyslots for the stdout and stderr redirection during the time the training is being performed
-        self.stdout.outputWritten.connect(self.append_text_mallet_train)
-        self.stderr.outputWritten.connect(self.append_text_mallet_train)
-
-        # Train the Mallet model by invoking the task manager method
-        # @TODO : Update
-        self.tm.train_mallet_model()
-
-        return
-
-    def do_after_execute_train_mallet(self):
-        """Method after the completition of a Mallet's model training. Among other things, it is in charge of:
-        - Making the training loading bar invisible for the user.
-        - Showing messages about the completion of the training.
-        - Show the topics' chemical description of the just trained model.
-        """
-
-        # Hide progress bar
-        self.progress_bar_LDA.setVisible(False)
-
-        # Show messages in the status bar and pop up window
-        msg = "'The model " + self.model_name + "' was trained."
-        self.statusBar().showMessage(msg, Constants.LONG_TIME_SHOW_SB)
-        QtWidgets.QMessageBox.information(
-            self, Constants.SMOOTH_SPOON_MSG, msg)
-
-        # Show model's topics' chemical description
-        self.table_training_resultsLDA.clearContents()
-        # self.table_training_resultsLDA.setRowCount(int(num_topics))
-        # self.table_training_resultsLDA.setColumnCount(2)
-
-        # for i in np.arange(0, len(list_description), 1):
-        #    item_topic_nr = QtWidgets.QTableWidgetItem(str(i))
-        #    self.table_training_resultsLDA.setItem(i, 0, item_topic_nr)
-        #    item_topic_description = QtWidgets.QTableWidgetItem(
-        #        str(list_description[i]))
-        #    self.table_training_resultsLDA.setItem(
-        #        i, 1, item_topic_description)
-
-        self.table_training_resultsLDA.resizeRowsToContents()
-
-        return
-
-    def clicked_pushButton_train_LDA(self):
-        """Method to control the clicking of the 'pushButton_train_LDA' which is in charge of starting the training of a Mallet model. Once the buttons have been clicked, it checks whether an appropriate corpus for training has been selected, and Mallet training parameters have been configured appropriately. In case both former conditions are fulfilled, the training of a Mallet model is carried out in a secondary thread, while the execution of the GUI is kept in the main one.
-        """
-
-        if self.training_corpus is None:
-            QMessageBox.warning(
-                self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_TR_CORPUS)
-            return
-
-        okay = self.get_mallet_params_from_user()
-
-        if okay:
-            utils.execute_in_thread(
-                self, self.do_after_execute_train_mallet,
-                self.do_after_execute_train_mallet,
-                self.progress_bar_LDA)
-        else:
-            return
 
     # PRODLDA
     def get_prodlda_params(self):
@@ -547,84 +463,6 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         return okay
 
-    @pyqtSlot(str)
-    def append_text_AVITM_train(self, text):
-        """
-        Method to redirect the stdout and stderr in the "text_logs_train_AVITM"
-        while the training of a AVITM model is being performed.
-        """
-
-        self.text_logs_train_AVITM.moveCursor(QTextCursor.MoveOperation.End)
-        self.text_logs_train_AVITM.insertPlainText(text)
-
-        return
-
-    def execute_train_AVITM(self):
-        """Method to control the execution of the training of a AVTIM model. To do so, it shows log information in the 'text_logs_train_AVITM' QTextEdit and calls the corresponding TaskManager function that is in charge of training an AVTIM model.
-        """
-
-        # Connect pyslots for the stdout and stderr redirection during the time the training is being performed
-        self.stdout.outputWritten.connect(self.append_text_AVITM_train)
-        self.stderr.outputWritten.connect(self.append_text_AVITM_train)
-
-        # Train the CTM model by invoking the task manager method
-        # @TODO : Update
-        self.tm.train_avitm_model()
-
-        return
-
-    def do_after_execute_train_AVITM(self):
-        """Method after the completition of a AVITM's model training. Among other things, it is in charge of:
-        - Making the training loading bar invisible for the user.
-        - Showing messages about the completion of the training.
-        - Show the topics' chemical description of the just trained model.
-        """
-
-        # Hide progress bar
-        self.progress_bar_AVITM.setVisible(False)
-
-        # Show messages in the status bar and pop up window
-        msg = "'The model " + self.model_name + "' was trained."
-        self.statusBar().showMessage(msg, Constants.LONG_TIME_SHOW_SB)
-        QtWidgets.QMessageBox.information(
-            self, Constants.SMOOTH_SPOON_MSG, msg)
-
-        # Show model's topics' chemical description
-        self.table_training_results_AVITM.clearContents()
-        # self.table_training_results_AVITM.setRowCount(int(num_topics))
-        # self.table_training_results_AVITM.setColumnCount(2)
-
-        # for i in np.arange(0, len(list_description), 1):
-        #    item_topic_nr = QtWidgets.QTableWidgetItem(str(i))
-        #    self.table_training_results_AVITM.setItem(i, 0, item_topic_nr)
-        #    item_topic_description = QtWidgets.QTableWidgetItem(
-        #        str(list_description[i]))
-        #    self.table_training_results_AVITM.setItem(
-        #        i, 1, item_topic_description)
-
-        self.table_training_results_AVITM.resizeRowsToContents()
-
-        return
-
-    def clicked_pushButton_trainAVTIM(self):
-        """Method to control the clicking of the 'pushButton_trainAVITM' which is in charge of starting the training of a AVITM model. Once the buttons have been clicked, it checks whether an appropriate corpus for training has been selected, and AVITM training parameters have been configured appropriately. In case both former conditions are fulfilled, the training of a AVITM model is carried out in a secondary thread, while the execution of the GUI is kept in the main one.
-        """
-
-        if self.training_corpus is None:
-            QMessageBox.warning(
-                self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_TR_CORPUS)
-            return
-
-        okay = self.get_prodlda_params_from_user()
-
-        if okay:
-            utils.execute_in_thread(
-                self, self.execute_train_AVITM,
-                self.do_after_execute_train_AVITM,
-                self.progress_bar_AVITM)
-        else:
-            return
-
     # CTM
     def get_ctm_params(self):
         """Method that reads from the config file the default parameters for training a CTM  model, and sets the corresponding values in the 'tabWidget_settings_ctm'.
@@ -780,6 +618,13 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         return okay
 
+    # SPARKLDA
+    def get_sparklda_params(self):
+        return
+
+    def get_sparklda__params_from_user(self):
+        return
+
     @pyqtSlot(str)
     def append_text_ctm_train(self, text):
         """
@@ -839,7 +684,7 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         return
 
-    def clicked_pushButton_trainCTM(self):
+    def clicked_pushButton_train(self):
         """Method to control the clicking of the 'pushButton_trainCTM' which is in charge of starting the training of a CTM model. Once the buttons have been clicked, it checks whether an appropriate corpus for training has been selected, and CTM training parameters have been configured appropriately. In case both former conditions are fulfilled, the training of a CTM model is carried out in a secondary thread, while the execution of the GUI is kept in the main one.
         """
 
@@ -857,13 +702,3 @@ class TrainModelWindow(QtWidgets.QDialog):
                 self.progress_bar_CTM)
         else:
             return
-
-    # SPARKLDA
-    def get_sparklda_params(self):
-        return
-
-    def get_sparklda__params_from_user(self):
-        return
-
-    def clicked_pushButton_train_sparklda(self):
-        return

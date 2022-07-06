@@ -329,6 +329,114 @@ class ITMTTaskManager(BaseTaskManager):
         self.load_listWdLists()
 
         return status
+    
+    def trainTM(self, modelname, ModelDesc, privacy, trainer, TrDtSet, Preproc, training_params):
+        """
+        Topic modeling trainer. Initial training of a topic model
+
+        Parameters
+        ----------
+        trainer : string
+            Optimizer to use for training the topic model
+            Possible values are mallet|sparkLDA|prodLDA|ctm
+        """
+
+        # 1. Create model directory 
+        modeldir = self.p2p.joinpath(
+            self._dir_struct['LDAmodels']).joinpath(modelname)
+        if modeldir.exists():
+
+            # Remove current backup folder, if it exists
+            old_model_dir = Path(str(modeldir) + '_old/')
+            if old_model_dir.exists():
+                shutil.rmtree(old_model_dir)
+
+            # Copy current project folder to the backup folder.
+            shutil.move(modeldir, old_model_dir)
+            self.logger.info(
+                f'-- -- Creating backup of existing model in {old_model_dir}')
+
+        # 2. Create corpus_folder and save model training configuration
+        modeldir.mkdir()
+        configFile = modeldir.joinpath('trainconfig.json')
+
+        train_config = {
+            "name": modelname,
+            "description": ModelDesc,
+            "visibility": privacy,
+            "trainer": trainer,
+            "TrDtSet": TrDtSet,
+            "Preproc": Preproc,
+            "LDAparam": training_params
+        }
+
+        with configFile.open('w', encoding='utf-8') as outfile:
+            json.dump(train_config, outfile,
+                      ensure_ascii=False, indent=2, default=str)
+
+        # 3. Topic Modeling starts 
+        # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+        # This fragment of code creates a spark cluster and submits the task
+        # This function is dependent on UC3M local deployment infrastructure
+        # and will not work in BSC production environment
+        #
+        # Needs to be modified with the BSC Spark Cluster and/or CITE SparkSubmit
+        # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+        # Step 1: Preprocessing of Training Data
+        if self.cf.get('Spark', 'spark_available') == 'True':
+            script_spark = self.cf.get('Spark', 'script_spark')
+            token_spark = self.cf.get('Spark', 'token_spark')
+            script_path = './src/topicmodeling/topicmodeling.py'
+            options = '"--spark --preproc --config ' + configFile.resolve().as_posix() + '"'
+            cmd = script_spark + ' -C ' + token_spark + \
+                ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+            printred(cmd)
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                output = check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Execution of script failed')
+
+        else:
+            # Run command for corpus preprocessing using gensim
+            cmd = f'python topicmodeling.py --preproc --config {configFile.as_posix()}'
+            printred(cmd)
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                output = check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Command execution failed')
+
+        # Step 2: Training of Topic Model
+        if trainer=="sparkLDA":
+            if not self.cf.get('Spark', 'spark_available') == 'True':
+                self.logger.error("-- -- sparkLDA requires access to a Spark cluster")
+            else:
+                script_spark = self.cf.get('Spark', 'script_spark')
+                token_spark = self.cf.get('Spark', 'token_spark')
+                script_path = './src/topicmodeling/topicmodeling.py'
+                options = '"--spark --train --config ' + configFile.resolve().as_posix() + '"'
+                cmd = script_spark + ' -C ' + token_spark + \
+                    ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+                printred(cmd)
+                try:
+                    self.logger.info(f'-- -- Running command {cmd}')
+                    check_output(args=cmd, shell=True)
+                except:
+                    self.logger.error('-- -- Execution of script failed')
+
+        else:
+            # Other models do not require Spark
+            cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
+            printred(cmd)
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                output = check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Command execution failed')
+        return
+
 
 
 ##############################################################################
@@ -1990,8 +2098,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         if self.allTrDtsets:
             allTrDtsets = json.loads(self.allTrDtsets)
             for TrDts in allTrDtsets.keys():
-                print(corpus_to_delete)
-                print(allTrDtsets[TrDts]['name'])
                 if allTrDtsets[TrDts]['name'] == corpus_to_delete:
                     reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
                                                  allTrDtsets[TrDts]['name'] + ' will be deleted. Proceed?',  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
@@ -2038,6 +2144,32 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                               QtWidgets.QTableWidgetItem(', '.join([el for el in allWdLists[TrDts]['wordlist']])))
                 row += 1
 
+        return
+    
+    def listWdListsByType(self, table, type):
+        """
+        This method shows the wordlists of type "type" available for the project in the corresponding table within the GUI.
+
+        Parameters
+        ----------
+        table : QTableWidget
+            GUI's table in which the wordlists are going to be displayed
+        type: str
+            Type of the lists ('stopwords', 'equivalences')
+        """
+
+        if self.allWdLists:
+            allWdLists = json.loads(self.allWdLists)
+            typeWdLists = [WdList for WdList in allWdLists.keys() if allWdLists[WdList]['valid_for'] == type]
+            table.setRowCount(len(typeWdLists))
+            row = 0
+            for WdList in allWdLists.keys():
+                if allWdLists[WdList]['valid_for'] == type:
+                    table.setItem(row, 1, QtWidgets.QTableWidgetItem(
+                        allWdLists[WdList]['name']))
+                    table.setItem(row, 2, QtWidgets.QTableWidgetItem(
+                        allWdLists[WdList]['description']))
+                    row += 1
         return
 
     def NewWdList(self, listType, wds, lst_name, lst_privacy, lst_desc):
@@ -2143,3 +2275,27 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                                    'wordlist': allWdLists[WdLst]['wordlist']
                                    }
         return wdList_info
+
+    def trainTM(self, trainer, TrDts_name, preproc_settings, training_params, modelname, ModelDesc, privacy):
+        """
+        Topic modeling trainer. Initial training of a topic model
+
+        Parameters
+        ----------
+        trainer : string
+            Optimizer to use for training the topic model
+            Possible values are mallet|sparkLDA|prodLDA|ctm
+        """
+
+        # First thing to do is to select a corpus
+        if self.allTrDtsets:
+            allTrDtsets = json.loads(self.allTrDtsets)
+            for TrDts in allTrDtsets.keys():
+                if allTrDtsets[TrDts]['name'] == TrDts_name:
+                    TrDtSet = TrDts
+        self.logger.info(
+            f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
+
+        super().trainTM(modelname, ModelDesc, privacy, trainer, TrDtSet, preproc_settings, training_params)
+
+        return

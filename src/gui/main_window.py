@@ -25,6 +25,7 @@ from PyQt6.uic import loadUi
 from src.gui.manage_corpus.generate_tm_corpus_window import GenerateTMCorpus
 from src.gui.manage_lists.create_sw_lst_window import CreateSwLstWindow
 from src.gui.manage_lists.edit_sw_lst_window import EditSwLstWindow
+from src.gui.topic_modeling.preprocessing_window import PreprocessingWindow
 from src.gui.topic_modeling.train_model_window import TrainModelWindow
 from src.gui.utils import utils
 from src.gui.utils.constants import Constants
@@ -92,6 +93,7 @@ class MainWindow(QMainWindow):
         self.create_tm_corpus_subwindow = None
         self.create_stopwords_list_subwindow = None
         self.edit_stopwords_list_subwindow = None
+        self.preprocessing_subwindow = None
 
         self.training_corpus = None
 
@@ -367,8 +369,7 @@ class MainWindow(QMainWindow):
 
         # Load datasets available in the parquet folder into "table_available_local_corpus"
         self.tm.listDownloaded(self)
-        # Add checkboxes in the last column of "table_available_local_corpus" so the user can select from which of the
-        # datasets he wants to create a training corpus
+        # Add checkboxes in the last column of "table_available_local_corpus" so the user can select from which of the datasets he wants to create a training corpus
         utils.add_checkboxes_to_table(self.table_available_local_corpus)
 
         # Load available training corpus (if any) into "table_available_training_datasets"
@@ -381,7 +382,7 @@ class MainWindow(QMainWindow):
         self.tm.listAllWdLists(self)
 
         # Update the style of the tables in the wordlists page
-        utils.configure_table_header(Constants.WORDLISTS_TABLES, self)
+        #utils.configure_table_header(Constants.WORDLISTS_TABLES, self)
 
         # Fill settings table
         self.set_default_settings("all", False, False)
@@ -655,6 +656,11 @@ class MainWindow(QMainWindow):
         return
 
     def clicked_train_dataset(self):
+        
+        # Get preprocessing settings
+        self.preprocessing_subwindow = PreprocessingWindow(self.tm)
+        self.preprocessing_subwindow.exec()
+
         self.train_model_subwindow = TrainModelWindow(
             self.tm, self.stdout, self.stderr, self.training_corpus)
         self.train_model_subwindow.exec()

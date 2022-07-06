@@ -76,7 +76,8 @@ class Constants:
     NR_PARAMS_TRAIN_LDA_MALLET = 7
     NR_PARAMS_TRAIN_PRODLDA = 12
     NR_PARAMS_TRAIN_CTM = 14
-
+    NR_PARAMS_PREPROC = 4
+    
     WRONG_NR_TOPICS_LDA_MSG = "The number of training topics must be larger than 0"
     WRONG_ALPHA_LDA_MSG = "The sum over topics of smoothing over doc-topic distributions (alpha) must be larger than 0."
     WRONG_OI_LDA_MSG = "The number of iterations between reestimating dirichlet hyperparameters (optimize interval) must be larger than 0. "
@@ -102,10 +103,9 @@ class Constants:
     WARNING_NO_TR_CORPUS = "An appropiate training dataset must be selected to proceed."
     NO_NAME_FOR_MODEL = "A name for training the model must be specified"
 
-    TRAIN_MODEL_TABLES = ["table_training_resultsLDA",
-                          "table_training_results_AVITM", "table_training_results_CTM", "table_training_results_sparklda"]
-    TRAIN_LOADING_BARS = ["progress_bar_LDA",
-                          "progress_bar_AVITM", "progress_bar_CTM", "progress_bar_sparklda"]
+    TRAIN_MODEL_TABLES = ["table_training_results"]
+    TRAIN_LOADING_BARS = ["progress_bar_train"]
+    PREPROC_TABLES = ["table_available_stopwords","table_available_equivalences"]
 
     # Stylesheets
     HOME_BUTTON_SELECTED_STYLESHEET = \

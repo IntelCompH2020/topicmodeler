@@ -117,7 +117,7 @@ def initialize_progress_bar(list_progress_bars, window):
     return
 
 
-def add_checkboxes_to_table(table):
+def add_checkboxes_to_table(table, column=None):
     """
     Adds a checkbox at the last column of every row of the table specified by "table".
 
@@ -126,7 +126,8 @@ def add_checkboxes_to_table(table):
     table: QTableWidget
         Table to which the checkboxes will be added to
     """
-    column = table.columnCount() - 1
+    if column is None:
+        column = table.columnCount() - 1
     for row in range(table.rowCount()):
         chkBoxItem = QTableWidgetItem()
         chkBoxItem.setFlags(
