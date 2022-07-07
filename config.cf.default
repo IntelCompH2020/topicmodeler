@@ -65,7 +65,6 @@ num_data_loader_workers=0
 thetas_thr=3e-3
 
 [CTM]
-num_topics=10
 model_type=prodLDA
 ctm_model_type=CombinedTM
 hidden_sizes=(100,100)

@@ -32,7 +32,7 @@ from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QMessageBox
 from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
 from src.utils.misc import (printgr, printmag, printred, query_options,
-                            request_confirmation, var_num_keyboard)
+                            request_confirmation, var_num_keyboard, var_string_keyboard)
 
 from ..gui.utils.constants import Constants
 from .base_task_manager import BaseTaskManager
@@ -1128,9 +1128,188 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         elif trainer == "sparkLDA":
             LDAparam = {}
         elif trainer == "prodLDA":
-            LDAparam = {}
+            model_type = str(self.cf.get('ProdLDA', 'model_type'))
+            hidden_sizes = tuple(
+                map(int, self.cf['ProdLDA']['hidden_sizes'][1:-1].split(',')))
+            activation = str(self.cf.get('ProdLDA', 'activation'))
+            dropout = float(self.cf.get('ProdLDA', 'dropout'))
+            learn_priors = True if self.cf['ProdLDA']['learn_priors'] == "True" else False
+            lr = float(self.cf.get('ProdLDA', 'lr'))
+            momentum = float(self.cf.get('ProdLDA', 'momentum'))
+            solver = str(self.cf.get('ProdLDA', 'solver'))
+            num_epochs = int(self.cf.get('ProdLDA', 'num_epochs'))
+            reduce_on_plateau = True if self.cf['ProdLDA']['reduce_on_plateau'] == "True" else False
+            batch_size = int(self.cf.get('ProdLDA', 'batch_size'))
+            topic_prior_mean = float(
+                self.cf.get('ProdLDA', 'topic_prior_mean'))
+            topic_prior_variance = None if self.cf['ProdLDA']['topic_prior_variance'] == "None" else \
+                float(self.cf['Training']['topic_prior_variance'])
+            num_samples = int(self.cf.get('ProdLDA', 'num_samples'))
+            num_data_loader_workers = int(self.cf.get(
+                'ProdLDA', 'num_data_loader_workers'))
+            thetas_thr = float(self.cf.get(
+                'ProdLDA', 'lineEdit_thetas_thr_prod'))
+
+            # Basic settings
+            model_type = var_string_keyboard(
+                'str', model_type, "Type of the model that is going to be trained, 'prodLDA' or 'LDA'")
+            num_epochs = var_num_keyboard(
+                'int', num_epochs, 'Number of epochs to train the model for')
+            batch_size = var_num_keyboard(
+                'int', batch_size, 'Size of the batch to use for training')
+            
+            # Advanced settings
+            Y_or_N = input(
+                f"Do you wish to access the advanced settings panel [Y/N]?:")
+            if Y_or_N.upper() == "Y":
+                hidden_sizes = var_string_keyboard(
+                    'comma_separated', hidden_sizes, 'Size of the hidden layer')
+                activation = var_num_keyboard(
+                    'int', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
+                dropout = var_num_keyboard(
+                    'float', dropout, 'Percent of neurons to drop out')
+                learn_priors = var_string_keyboard(
+                    'bool', learn_priors, 'If true, priors are made learnable parameters')
+                lr = var_num_keyboard(
+                    'float', lr, 'Learning rate to be used for training')
+                momentum = var_num_keyboard(
+                    'float', momentum, 'Momentum to be used for training')
+                solver = var_string_keyboard(
+                    'str', solver, "NN optimizer to be used, chosen from 'adagrad', 'adam', 'sgd', 'adadelta' or 'rmsprop'")
+                reduce_on_plateau = var_string_keyboard(
+                    'bool', reduce_on_plateau, 'If true, reduce learning rate by 10x on plateau of 10 epochs')
+                topic_prior_mean = var_num_keyboard(
+                    'float', topic_prior_mean, 'Mean parameter for the prior')
+                topic_prior_variance = var_num_keyboard(
+                    'float', topic_prior_variance, 'Variance parameter for the prior')
+                num_samples = var_num_keyboard(
+                    'int', num_samples, 'Number of times the theta needs to be sampled')
+                num_data_loader_workers = var_num_keyboard(
+                    'int', num_data_loader_workers, 'Number of subprocesses to use for data loading')
+                thetas_thr = var_num_keyboard(
+                    'float', thetas_thr, 'Threshold for topic activation in a doc (sparsification)')
+
+            LDAparam = {
+                "ntopics": ntopics,
+                "model_type": model_type,
+                "hidden_sizes": hidden_sizes,
+                "activation": activation,
+                "dropout": dropout,
+                "learn_priors": learn_priors,
+                "lr": lr,
+                "momentum": momentum,
+                "solver": solver,
+                "num_epochs": num_epochs,
+                "reduce_on_plateau": reduce_on_plateau,
+                "batch_size": batch_size,
+                "topic_prior_mean": topic_prior_mean,
+                "topic_prior_variance": topic_prior_variance,
+                "num_samples": num_samples,
+                "num_data_loader_workers": num_data_loader_workers,
+                "thetas_thr": thetas_thr,
+            }
+
         elif trainer == "ctm":
-            LDAparam = {}
+            model_type = str(self.cf['CTM']['model_type'])
+            ctm_model_type = str(self.cf['CTM']['ctm_model_type'])
+            hidden_sizes = tuple(
+                map(int, self.cf['CTM']['hidden_sizes'][1:-1].split(',')))
+            activation = str(self.cf['CTM']['activation'])
+            dropout = float(self.cf['CTM']['dropout'])
+            learn_priors = True if self.cf['CTM']['learn_priors'] == "True" else False
+            batch_size = int(self.cf['CTM']['batch_size'])
+            lr = float(self.cf['CTM']['lr'])
+            momentum = float(self.cf['CTM']['momentum'])
+            solver = str(self.cf['CTM']['solver'])
+            num_epochs = int(self.cf['CTM']['num_epochs'])
+            num_samples = int(self.cf['CTM']['num_samples'])
+            reduce_on_plateau = True if self.cf['CTM']['reduce_on_plateau'] == "True" else False
+            topic_prior_mean = float(self.cf['CTM']['topic_prior_mean'])
+            topic_prior_variance = \
+                None if self.cf['CTM']['topic_prior_variance'] == "None" else \
+                float(self.cf['CTM']['topic_prior_variance'])
+            num_data_loader_workers = int(
+                self.cf['CTM']['num_data_loader_workers'])
+            label_size= float(self.cf['CTM']['label_size'])
+            loss_weights = None if self.cf['CTM']['loss_weights'] == "None" else json.loads(self.cf['CTM']['loss_weights'])
+            thetas_thr = float(self.cf['CTM']['thetas_thr'])
+            sbert_model_to_load = str(
+                self.cf['CTM']['sbert_model_to_load'])
+            
+            # Basic settings
+            model_type = var_string_keyboard(
+                'str', model_type, "Type of the model that is going to be trained, 'prodLDA' or 'LDA'")
+            ctm_model_type = var_string_keyboard(
+                'str', ctm_model_type, "CTM model to use: 'CombinedTM', 'ZeroShotTM', 'SuperCTM', 'BetaCTM'")
+            num_epochs = var_num_keyboard(
+                'int', num_epochs, 'Number of epochs to train the model for')
+            batch_size = var_num_keyboard(
+                'int', batch_size, 'Size of the batch to use for training')
+            
+            # Advanced settings
+            Y_or_N = input(
+                f"Do you wish to access the advanced settings panel [Y/N]?:")
+            if Y_or_N.upper() == "Y":
+                hidden_sizes = var_string_keyboard(
+                    'comma_separated', hidden_sizes, 'Size of the hidden layer')
+                activation = var_num_keyboard(
+                    'int', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
+                dropout = var_num_keyboard(
+                    'float', dropout, 'Percent of neurons to drop out')
+                learn_priors = var_string_keyboard(
+                    'bool', learn_priors, 'If true, priors are made learnable parameters')
+                lr = var_num_keyboard(
+                    'float', lr, 'Learning rate to be used for training')
+                momentum = var_num_keyboard(
+                    'float', momentum, 'Momentum to be used for training')
+                solver = var_string_keyboard(
+                    'str', solver, "NN optimizer to be used, chosen from 'adagrad', 'adam', 'sgd', 'adadelta' or 'rmsprop'")
+                num_samples = var_num_keyboard(
+                    'int', num_samples, 'Number of times the theta needs to be sampled')
+                reduce_on_plateau = var_string_keyboard(
+                    'bool', reduce_on_plateau, 'If true, reduce learning rate by 10x on plateau of 10 epochs')
+                topic_prior_mean = var_num_keyboard(
+                    'float', topic_prior_mean, 'Mean parameter for the prior')
+                topic_prior_variance = var_num_keyboard(
+                    'float', topic_prior_variance, 'Variance parameter for the prior')
+                num_data_loader_workers = var_num_keyboard(
+                    'int', num_data_loader_workers, 'Number of subprocesses to use for data loading')
+                # @TODO: Check that it has the same size as the training corpus if SuperCTM selected; exit otherwise
+                label_size = var_num_keyboard(
+                    'int', label_size, 'Number of total labels')
+                # @TODO: Check that this actually works
+                # @TODO: Check that is not None if BetaCTM selected; exit otherwise
+                loss_weights = var_string_keyboard(
+                    'dict', loss_weights, 'Dictionary with the name of the weight parameter (key) and the weight (value) for each loss')
+                sbert_model_to_load = var_string_keyboard(
+                'str', sbert_model_to_load, "Model to be used for calculating the embeddings. Available models can be checked here: 'https://huggingface.co/models?library=sentence-transformers'.")
+
+                thetas_thr = var_num_keyboard(
+                    'float', thetas_thr, 'Threshold for topic activation in a doc (sparsification)')
+
+            LDAparam = {
+                "ntopics": ntopics,
+                "model_type": model_type,
+                "ctm_model_type": ctm_model_type,
+                "hidden_sizes": hidden_sizes,
+                "activation": activation,
+                "dropout": dropout,
+                "learn_priors": learn_priors,
+                "batch_size": batch_size,
+                "lr": lr,
+                "momentum": momentum,
+                "solver": solver,
+                "num_epochs": num_epochs,
+                "num_samples": num_samples,
+                "reduce_on_plateau": reduce_on_plateau,
+                "topic_prior_mean": topic_prior_mean,
+                "topic_prior_variance": topic_prior_variance,
+                "num_data_loader_workers": num_data_loader_workers,
+                "label_size": label_size,
+                "loss_weights": loss_weights,
+                "thetas_thr": thetas_thr,
+                "sbert_model_to_load": sbert_model_to_load
+            }
 
         displaytext = """
         *************************************************************************************
@@ -2255,7 +2434,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                         TrDtSet, preproc_settings, training_params)
 
         return
-    
+
     def load_listTMmodels(self):
         """
         Extends the load_listTMmodels method from the parent class to load into execution time an XML structure of all the available TM models that are going to be used for visualization purposes in the GUI.
@@ -2265,14 +2444,13 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         if self.allTMmodels:
             all_models = self.p2p.joinpath(
-                self._dir_struct['LDAmodels']).resolve().as_posix() # @TODO: Change LDAmodels to TMmodels
-            
+                self._dir_struct['LDAmodels']).resolve().as_posix()  # @TODO: Change LDAmodels to TMmodels
+
             # Create XML structure of the models for visaulization purposes
             if pathlib.Path(all_models).is_dir():
                 self.models_xml = get_model_xml(all_models)
 
         return
-    
 
     def listAllTMmodels(self, gui):
         """
@@ -2290,7 +2468,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                 printTree(self.models_xml, gui.treeView_trained_models)
 
         return
-    
+
     def listTMmodel(self, gui, model_name):
         """
         This method show the description in the table 'table_available_trained_models_desc' of the topic selected in the 'treeView_trained_models'.
@@ -2301,7 +2479,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             QMainWindow object associated which the GUI
         model_name: str
             Name of the topic model whose information is going to be displayed
-        """        
+        """
 
         if self.allTMmodels:
 
@@ -2330,6 +2508,5 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                         ""))
                     table.setItem(0, 7, QtWidgets.QTableWidgetItem(
                         allTMmodels[TMmodel]['creation_date']))
-            
+
         return
-                

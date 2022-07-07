@@ -1,3 +1,4 @@
+import json
 import colored
 
 
@@ -75,7 +76,48 @@ def var_num_keyboard(vartype,default,question):
         else:
             print('The value you provided is not valid. Using default value.')
             return default
+            
+#@TODO: Revise this method
+def var_string_keyboard(option, default, question):
+    """Read a string variable from the keyboard
 
+    Parameters
+    ----------      
+    option: str
+        Expected format of the string provided  
+    default: str
+        Default value for the variable
+    question: str
+        Text for querying the user the variable value
+    
+    Returns
+    -------
+    :
+        The value provided by the user, or the default value
+    """
+    
+    aux = input(question + ' [' + str(default) + ']: ')
+    if option == 'comma_separated':
+        aux2 = [el.strip() for el in aux.split(',') if len(el)]
+        if len(aux) <= 1:
+            print('The value you provided is not valid. Using default value.')
+        return default
+    elif option == "bool":
+        if aux != "True" and aux != "False":
+            print('The value you provided is not valid. Using default value.')
+        return default
+    elif option == 'dict':
+        if aux == "None":
+            return default
+        else:
+            try:
+                aux2 = json.loads(aux)
+            except:
+                print('The value you provided is not valid. Using default value.')
+                return default
+            return aux2
+    elif option == "str":
+        return aux
 
 def request_confirmation(msg="     Are you sure?"):
 
