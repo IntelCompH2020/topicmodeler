@@ -50,16 +50,17 @@ class MainWindow(QMainWindow):
 
         super(MainWindow, self).__init__()
 
-        #####################################################################################
+        ########################################################################
         # Load UI
-        #####################################################################################
+        ########################################################################
         loadUi("src/gui/uis/main_window.ui", self)
         self.setWindowIcon(QtGui.QIcon(
             'src/gui/resources/images/fuzzy_training.png'))
         self.setWindowTitle(Constants.SMOOTH_SPOON_TITLE)
-        #####################################################################################
+
+        ########################################################################
         # Attributes
-        #####################################################################################
+        ########################################################################
         # Attributes to redirect stdout and stderr
         self.stdout = OutputWrapper(self, True)
         self.stderr = OutputWrapper(self, False)
@@ -100,9 +101,9 @@ class MainWindow(QMainWindow):
         print("Multithreading with maximum"
               " %d threads" % self.thread_pool.maxThreadCount())
 
-        #####################################################################################
+        ########################################################################
         # Connect pages
-        #####################################################################################
+        ########################################################################
         self.menu_buttons = []
         for id_button in np.arange(Constants.MAX_MENU_BUTTONS):
             menu_button_name = "menu_button_" + str(id_button + 1)
@@ -224,10 +225,9 @@ class MainWindow(QMainWindow):
         self.settings_button_5_6.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_tm_hierarchical))
 
-        #####################################################################################
+        ########################################################################
         # Widgets initial configuration
-        #####################################################################################
-
+        ########################################################################
         # MENU BUTTONS
         # When the app is first opened, menu buttons are disabled until the user selects properly the project and parquet folders
         for menu_button in self.menu_buttons:
@@ -254,9 +254,9 @@ class MainWindow(QMainWindow):
 
         # PAGE 5: Settings
 
-        #####################################################################################
+        ########################################################################
         # Connect buttons
-        #####################################################################################
+        ########################################################################
         self.pushButton_open_project_folder.clicked.connect(
             self.get_project_folder)
         self.pushButton_open_parquet_folder.clicked.connect(
@@ -401,9 +401,9 @@ class MainWindow(QMainWindow):
 
         return
 
-    #####################################################################################
+    ############################################################################
     # HANDLERS
-    #####################################################################################
+    ############################################################################
     def get_project_folder(self):
         """
         Method to control the clicking of the button "pushButton_open_project_folder. When this button is clicked, the folder selector of the user's OS is open so the user can select the project folder. Once the project is selected, if a proper parquet and wordlists folders were also already selected, the GUI's associated Task Manager object is configured.
@@ -881,6 +881,16 @@ class MainWindow(QMainWindow):
                 str(cf.get('ProdLDA', 'reduce_on_plateau')))
             self.lineEdit_settings_batch_size_prod.setText(
                 str(cf.get('ProdLDA', 'batch_size')))
+            self.lineEdit_settings_topic_prior_mean_prod.setText(
+                str(cf.get('ProdLDA', 'topic_prior_mean')))
+            self.lineEdit_prior_stlineEdit_settings_topic_prior_var_prodd_prod.setText(
+                str(cf.get('ProdLDA', 'topic_prior_variance')))
+            self.lineEdit_settings_nr_samples_prod.setText(
+                str(cf.get('ProdLDA', 'num_samples')))
+            self.lineEdit_settings_workers_prod.setText(
+                str(cf.get('ProdLDA', 'num_data_loader_workers')))
+            self.lineEdit_settings_thetas_thr_prod.setText(
+                str(cf.get('ProdLDA', 'lineEdit_thetas_thr_prod')))
             if save:
                 self.clicked_pushButton_apply_changes_prodlda_settings()
         elif option == "ctm":
@@ -917,10 +927,20 @@ class MainWindow(QMainWindow):
                 str(cf.get('CTM', 'topic_prior_variance')))
             self.lineEdit_settings_nr_workers_ctm.setText(
                 str(cf.get('CTM', 'num_data_loader_workers')))
+            self.lineEdit_settings_label_size_ctm.setText(
+                str(self.cf.get('CTM', 'label_size')))
+            self.lineEdit_settings_loss_weights_ctm.setText(
+                str(self.cf.get('CTM', 'loss_weights')))
+            self.lineEdit_settings_thetas_thr_ctm.setText(
+                str(self.cf.get('CTM', 'thetas_thr')))
+            self.lineEdit_settings_sbert_model_ctm.setText(
+                str(self.cf.get('CTM', 'sbert_model_to_load')))
             if save:
                 self.clicked_pushButton_apply_changes_ctm_settings()
         elif option == "tm_general":
             # GENERAL TM SETTINGS
+            self.lineEdit_settings_nr_topics.setText(
+                str(cf.get('TM', 'ntopics')))
             self.lineEdit_settings_nr_words.setText(
                 str(cf.get('TMedit', 'n_palabras')))
             self.lineEdit_settings_round_size.setText(
@@ -1067,8 +1087,6 @@ class MainWindow(QMainWindow):
         cf.set('ProdLDA', 'lr', str(self.lineEdit_settings_lr_prod.text()))
         cf.set('ProdLDA', 'momentum', str(
             self.lineEdit_settings_momentum_prod.text()))
-        cf.set('ProdLDA', 'lr', str(
-            self.lineEdit_settings_lr_prod.text()))
         cf.set('ProdLDA', 'solver', str(
             self.lineEdit_settings_nr_epochs_prod.text()))
         cf.set('ProdLDA', 'num_epochs', str(
@@ -1077,6 +1095,16 @@ class MainWindow(QMainWindow):
             self.lineEdit_settings_plateau_prod.text()))
         cf.set('ProdLDA', 'batch_size', str(
             self.lineEdit_settings_batch_size_prod.text()))
+        cf.set('ProdLDA', 'topic_prior_mean', str(
+            self.lineEdit_settings_topic_prior_mean_prod.text()))
+        cf.set('ProdLDA', 'topic_prior_variance', str(
+            self.lineEdit_settings_topic_prior_var_prod.text()))
+        cf.set('ProdLDA', 'num_samples', str(
+            self.lineEdit_settings_nr_samples_prod.text()))
+        cf.set('ProdLDA', 'num_data_loader_workers', str(
+            self.lineEdit_settings_workers_prod.text()))
+        cf.set('ProdLDA', 'thetas_thr', str(
+            self.lineEdit_settings_thetas_thr_prod.text()))
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
@@ -1115,7 +1143,7 @@ class MainWindow(QMainWindow):
             self.lineEdit_settings_priors_ctm.text()))
         cf.set('CTM', 'batch_size', str(
             self.lineEdit_settings_batch_size_ctm.text()))
-        cf.set('CTM', 'lr', str(self.lineEdit_settings_momentum_ctm.text()))
+        cf.set('CTM', 'lr', str(self.lineEdit_settings_lr_ctm.text()))
         cf.set('CTM', 'momentum', str(
             self.lineEdit_settings_momentum_ctm.text()))
         cf.set('CTM', 'solver', str(self.lineEdit_settings_solver_ctm.text()))
@@ -1131,6 +1159,14 @@ class MainWindow(QMainWindow):
             self.lineEdit_settings_topic_prior_std_ctm.text()))
         cf.set('CTM', 'num_data_loader_workers', str(
             self.lineEdit_settings_nr_workers_ctm.text()))
+        cf.set('CTM', 'label_size', str(
+            self.lineEdit_settings_label_size_ctm.text()))
+        cf.set('CTM', 'loss_weights', str(
+            self.lineEdit_settings_loss_weights_ctm.text()))
+        cf.set('CTM', 'thetas_thr', str(
+            self.lineEdit_settings_thetas_thr_ctm.text()))
+        cf.set('CTM', 'sbert_model_to_load', str(
+            self.lineEdit_settings_sbert_model_ctm.text()))
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)

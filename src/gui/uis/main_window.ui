@@ -2748,7 +2748,7 @@ QHeaderView::section:horizontal
                                 </attribute>
                                 <column>
                                  <property name="text">
-                                  <string>MODEL NAME</string>
+                                  <string>NAME</string>
                                  </property>
                                  <property name="font">
                                   <font>
@@ -2759,7 +2759,7 @@ QHeaderView::section:horizontal
                                 </column>
                                 <column>
                                  <property name="text">
-                                  <string>MODEL TYPE</string>
+                                  <string>DESCRIPTION</string>
                                  </property>
                                  <property name="font">
                                   <font>
@@ -2770,7 +2770,29 @@ QHeaderView::section:horizontal
                                 </column>
                                 <column>
                                  <property name="text">
-                                  <string>HIERARCHY LEVEL</string>
+                                  <string>VISIBILITY</string>
+                                 </property>
+                                 <property name="font">
+                                  <font>
+                                   <weight>75</weight>
+                                   <bold>true</bold>
+                                  </font>
+                                 </property>
+                                </column>
+                                <column>
+                                 <property name="text">
+                                  <string>TRAINER</string>
+                                 </property>
+                                 <property name="font">
+                                  <font>
+                                   <weight>75</weight>
+                                   <bold>true</bold>
+                                  </font>
+                                 </property>
+                                </column>
+                                <column>
+                                 <property name="text">
+                                  <string>TRAINING DATASET</string>
                                  </property>
                                  <property name="font">
                                   <font>
@@ -6488,9 +6510,9 @@ QScrollBar:horizontal {
                                  <property name="geometry">
                                   <rect>
                                    <x>0</x>
-                                   <y>0</y>
+                                   <y>-1374</y>
                                    <width>585</width>
-                                   <height>1339</height>
+                                   <height>1944</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_104">
@@ -7655,6 +7677,516 @@ p, li { white-space: pre-wrap; }
                                     </layout>
                                    </widget>
                                   </item>
+                                  <item>
+                                   <widget class="QFrame" name="frame_settings_batch_size_prod_6">
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                                    </property>
+                                    <property name="frameShape">
+                                     <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                     <enum>QFrame::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_84">
+                                     <item>
+                                      <widget class="QFrame" name="frame_122">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_176">
+                                        <item>
+                                         <widget class="QLabel" name="label_settings_batch_size_prod_6">
+                                          <property name="styleSheet">
+                                           <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>Number of samples</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_settings_nr_samples_prod">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>200</width>
+                                            <height>16777215</height>
+                                           </size>
+                                          </property>
+                                          <property name="styleSheet">
+                                           <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QFrame" name="frame_123">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_177">
+                                        <item>
+                                         <widget class="QTextEdit" name="textEdit_56">
+                                          <property name="styleSheet">
+                                           <string notr="true">QTextEdit {	
+	background-color: #F2F2F2;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: none;
+}</string>
+                                          </property>
+                                          <property name="html">
+                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;Number of times the theta distribution needs to be sampled&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QFrame" name="frame_settings_batch_size_prod_3">
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                                    </property>
+                                    <property name="frameShape">
+                                     <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                     <enum>QFrame::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_72">
+                                     <item>
+                                      <widget class="QFrame" name="frame_120">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_174">
+                                        <item>
+                                         <widget class="QLabel" name="label_settings_batch_size_prod_3">
+                                          <property name="styleSheet">
+                                           <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>Topic prior mean</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_settings_topic_prior_mean_prod">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>200</width>
+                                            <height>16777215</height>
+                                           </size>
+                                          </property>
+                                          <property name="styleSheet">
+                                           <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QFrame" name="frame_121">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_175">
+                                        <item>
+                                         <widget class="QTextEdit" name="textEdit_55">
+                                          <property name="styleSheet">
+                                           <string notr="true">QTextEdit {	
+	background-color: #F2F2F2;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: none;
+}</string>
+                                          </property>
+                                          <property name="html">
+                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;Mean parameter for the prior&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QFrame" name="frame_settings_batch_size_prod_4">
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                                    </property>
+                                    <property name="frameShape">
+                                     <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                     <enum>QFrame::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_69">
+                                     <item>
+                                      <widget class="QFrame" name="frame_118">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_172">
+                                        <item>
+                                         <widget class="QLabel" name="label_settings_batch_size_prod_4">
+                                          <property name="styleSheet">
+                                           <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>Number of workers</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_settings_workers_prod">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>200</width>
+                                            <height>16777215</height>
+                                           </size>
+                                          </property>
+                                          <property name="styleSheet">
+                                           <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QFrame" name="frame_119">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_173">
+                                        <item>
+                                         <widget class="QTextEdit" name="textEdit_54">
+                                          <property name="styleSheet">
+                                           <string notr="true">QTextEdit {	
+	background-color: #F2F2F2;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: none;
+}</string>
+                                          </property>
+                                          <property name="html">
+                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;Number of subprocesses to use for data loading&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QFrame" name="frame_settings_batch_size_prod_2">
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                                    </property>
+                                    <property name="frameShape">
+                                     <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                     <enum>QFrame::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_53">
+                                     <item>
+                                      <widget class="QFrame" name="frame_74">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_136">
+                                        <item>
+                                         <widget class="QLabel" name="label_settings_batch_size_prod_2">
+                                          <property name="styleSheet">
+                                           <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>Topic prior variance</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_settings_topic_prior_var_prod">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>200</width>
+                                            <height>16777215</height>
+                                           </size>
+                                          </property>
+                                          <property name="styleSheet">
+                                           <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QFrame" name="frame_75">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_137">
+                                        <item>
+                                         <widget class="QTextEdit" name="textEdit_36">
+                                          <property name="styleSheet">
+                                           <string notr="true">QTextEdit {	
+	background-color: #F2F2F2;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: none;
+}</string>
+                                          </property>
+                                          <property name="html">
+                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Variance parameter of the prior&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QFrame" name="frame_settings_batch_size_prod_5">
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                                    </property>
+                                    <property name="frameShape">
+                                     <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                     <enum>QFrame::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_68">
+                                     <item>
+                                      <widget class="QFrame" name="frame_110">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_170">
+                                        <item>
+                                         <widget class="QLabel" name="label_settings_batch_size_prod_5">
+                                          <property name="styleSheet">
+                                           <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>Thetas threshold</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_settings_thetas_thr_prod">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>200</width>
+                                            <height>16777215</height>
+                                           </size>
+                                          </property>
+                                          <property name="styleSheet">
+                                           <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QFrame" name="frame_117">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_171">
+                                        <item>
+                                         <widget class="QTextEdit" name="textEdit_53">
+                                          <property name="styleSheet">
+                                           <string notr="true">QTextEdit {	
+	background-color: #F2F2F2;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: none;
+}</string>
+                                          </property>
+                                          <property name="html">
+                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;Minimum value for the sparsification of topic proportions after training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
                                  </layout>
                                 </widget>
                                </widget>
@@ -7922,9 +8454,9 @@ QScrollBar:horizontal {
                                  <property name="geometry">
                                   <rect>
                                    <x>0</x>
-                                   <y>0</y>
+                                   <y>-651</y>
                                    <width>585</width>
-                                   <height>1944</height>
+                                   <height>2428</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_135">
@@ -9599,6 +10131,415 @@ p, li { white-space: pre-wrap; }
                                     </layout>
                                    </widget>
                                   </item>
+                                  <item>
+                                   <widget class="QFrame" name="frame_settings_batch_size_ctm_5">
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                                    </property>
+                                    <property name="frameShape">
+                                     <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                     <enum>QFrame::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_88">
+                                     <item>
+                                      <widget class="QFrame" name="frame_130">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_184">
+                                        <item>
+                                         <widget class="QLabel" name="label_settings_batch_size_ctm_5">
+                                          <property name="styleSheet">
+                                           <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>SBERT model</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_settings_sbert_model_ctm">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>200</width>
+                                            <height>16777215</height>
+                                           </size>
+                                          </property>
+                                          <property name="styleSheet">
+                                           <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QFrame" name="frame_131">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_185">
+                                        <item>
+                                         <widget class="QTextEdit" name="textEdit_60">
+                                          <property name="styleSheet">
+                                           <string notr="true">QTextEdit {	
+	background-color: #F2F2F2;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: none;
+}</string>
+                                          </property>
+                                          <property name="html">
+                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;Model to be used for calculating the embeddings. &lt;/span&gt;&lt;a href=&quot;https://huggingface.co/models?library=sentence-transformers&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Available models can be checked here.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QFrame" name="frame_settings_batch_size_ctm_3">
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                                    </property>
+                                    <property name="frameShape">
+                                     <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                     <enum>QFrame::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_87">
+                                     <item>
+                                      <widget class="QFrame" name="frame_128">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_182">
+                                        <item>
+                                         <widget class="QLabel" name="label_settings_batch_size_ctm_3">
+                                          <property name="styleSheet">
+                                           <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>Label size</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_settings_label_size_ctm">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>200</width>
+                                            <height>16777215</height>
+                                           </size>
+                                          </property>
+                                          <property name="styleSheet">
+                                           <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QFrame" name="frame_129">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_183">
+                                        <item>
+                                         <widget class="QTextEdit" name="textEdit_59">
+                                          <property name="styleSheet">
+                                           <string notr="true">QTextEdit {	
+	background-color: #F2F2F2;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: none;
+}</string>
+                                          </property>
+                                          <property name="html">
+                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a name=&quot;docs-internal-guid-72fe2cc2-7fff-5ffe-c917-75056847404a&quot;&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of total labels&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QFrame" name="frame_settings_batch_size_ctm_2">
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                                    </property>
+                                    <property name="frameShape">
+                                     <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                     <enum>QFrame::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_86">
+                                     <item>
+                                      <widget class="QFrame" name="frame_126">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_180">
+                                        <item>
+                                         <widget class="QLabel" name="label_settings_batch_size_ctm_2">
+                                          <property name="styleSheet">
+                                           <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>Loss weights</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_settings_loss_weights_ctm">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>200</width>
+                                            <height>16777215</height>
+                                           </size>
+                                          </property>
+                                          <property name="styleSheet">
+                                           <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QFrame" name="frame_127">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_181">
+                                        <item>
+                                         <widget class="QTextEdit" name="textEdit_58">
+                                          <property name="styleSheet">
+                                           <string notr="true">QTextEdit {	
+	background-color: #F2F2F2;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: none;
+}</string>
+                                          </property>
+                                          <property name="html">
+                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;Dictionary with the name of the weight parameter (key) and the weight (value) for each loss&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QFrame" name="frame_settings_batch_size_ctm_4">
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color: #F2F2F2;
+border-right: 2px solid #8FA4BF;
+border-left: 2px solid #8FA4BF;
+border-top: 2px solid #8FA4BF;
+border-bottom: 2px solid #8FA4BF;
+
+</string>
+                                    </property>
+                                    <property name="frameShape">
+                                     <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                     <enum>QFrame::Raised</enum>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_85">
+                                     <item>
+                                      <widget class="QFrame" name="frame_124">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_178">
+                                        <item>
+                                         <widget class="QLabel" name="label_settings_batch_size_ctm_4">
+                                          <property name="styleSheet">
+                                           <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;
+border:none;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>Thetas threshold</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_settings_thetas_thr_ctm">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>200</width>
+                                            <height>16777215</height>
+                                           </size>
+                                          </property>
+                                          <property name="styleSheet">
+                                           <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QFrame" name="frame_125">
+                                       <property name="styleSheet">
+                                        <string notr="true">border:none;</string>
+                                       </property>
+                                       <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                       </property>
+                                       <property name="frameShadow">
+                                        <enum>QFrame::Raised</enum>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_179">
+                                        <item>
+                                         <widget class="QTextEdit" name="textEdit_57">
+                                          <property name="styleSheet">
+                                           <string notr="true">QTextEdit {	
+	background-color: #F2F2F2;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: none;
+}</string>
+                                          </property>
+                                          <property name="html">
+                                           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Avenir'; font-size:12pt; font-weight:80; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;Minimum value for sparsification of topic proportions after training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
                                  </layout>
                                 </widget>
                                </widget>
@@ -9858,7 +10799,7 @@ border:none;</string>
                                </widget>
                               </item>
                               <item>
-                               <widget class="QLineEdit" name="lineEdit_settings_nr_words_2">
+                               <widget class="QLineEdit" name="lineEdit_settings_nr_topics">
                                 <property name="maximumSize">
                                  <size>
                                   <width>200</width>
