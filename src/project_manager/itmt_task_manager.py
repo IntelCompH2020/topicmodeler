@@ -2276,8 +2276,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
     def listAllTMmodels(self, gui):
         """
-        This method shows all topic models available for the project in the corresponding table
-        within the GUI.
+        This method shows all topic models available for the project in the corresponding tree view.
 
         Parameters
         ----------
@@ -2293,6 +2292,16 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         return
     
     def listTMmodel(self, gui, model_name):
+        """
+        This method show the description in the table 'table_available_trained_models_desc' of the topic selected in the 'treeView_trained_models'.
+
+        Parameters
+        ----------
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+        model_name: str
+            Name of the topic model whose information is going to be displayed
+        """        
 
         if self.allTMmodels:
 

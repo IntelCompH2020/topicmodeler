@@ -22,11 +22,7 @@ class CTM(object):
     This is the more general class, so in order to create one of the CTM models, the subclasses ZeroShotTM and CombinedTM should be used.
     """
 
-    def __init__(self, logger, input_size, contextual_size, inference_type="combined",
-                 n_components=10, model_type='prodLDA', hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
-                 learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, solver='adam', num_epochs=100,
-                 num_samples=10, reduce_on_plateau=False, topic_prior_mean=0.0, topic_prior_variance=None,
-                 num_data_loader_workers=mp.cpu_count(), label_size=0, loss_weights=None, verbose=True):
+    def __init__(self, logger, input_size, contextual_size,inference_type="combined", n_components=10, model_type='prodLDA', hidden_sizes=(100, 100), activation='softplus', dropout=0.2, learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, solver='adam', num_epochs=100, num_samples=10, reduce_on_plateau=False, topic_prior_mean=0.0, topic_prior_variance=None, num_data_loader_workers=mp.cpu_count(), label_size=0, loss_weights=None, verbose=True):
 
         """
         Sets the main attributes to create a specific CTM model.

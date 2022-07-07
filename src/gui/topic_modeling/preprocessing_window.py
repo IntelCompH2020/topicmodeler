@@ -6,14 +6,10 @@ Class that defines the subwindow for the Interactive Topic Model Trainer App for
 """
 
 import configparser
-import re
-from functools import partial
 
 import numpy as np
-from PyQt6 import QtGui, QtWidgets, QtCore
-from PyQt6.QtCore import QThreadPool, QUrl, pyqtSlot
-from PyQt6.QtGui import QTextCursor
-from PyQt6.QtWidgets import QLabel, QMessageBox, QPushButton
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtWidgets import QLabel
 from PyQt6.uic import loadUi
 from src.gui.utils import utils
 from src.gui.utils.constants import Constants
@@ -60,7 +56,7 @@ class PreprocessingWindow(QtWidgets.QDialog):
             self.preproc_checkboxes_params.append(checkbox_widget)
         for checkbox in self.preproc_checkboxes_params:
             checkbox.hide()
-        
+
         self.set_settings()
 
         #####################################################################################
@@ -82,7 +78,7 @@ class PreprocessingWindow(QtWidgets.QDialog):
         # Get config object
         cf = configparser.ConfigParser()
         cf.read(self.tm.p2config_dft)
-        
+
         # Fill default values of preprocessing settings
         self.lineEdit_min_lemas.setText(str(cf.get('Preproc', 'min_lemas')))
         self.lineEdit_no_below.setText(str(cf.get('Preproc', 'no_below')))
@@ -95,19 +91,20 @@ class PreprocessingWindow(QtWidgets.QDialog):
         utils.add_checkboxes_to_table(self.table_available_stopwords, 0)
 
         # Fill table of stopwords with the available lists of equivalences
-        self.tm.listWdListsByType(self.table_available_equivalences, "equivalences")
+        self.tm.listWdListsByType(
+            self.table_available_equivalences, "equivalences")
         # Add checkboxes in the first column so the user can select the stopwords to use
         utils.add_checkboxes_to_table(self.table_available_equivalences, 0)
 
         return
-    
+
     def clicked_pushButton_select_params(self):
         min_lemas = int(self.lineEdit_min_lemas.text())
         no_below = int(self.lineEdit_no_below.text())
         no_above = float(self.lineEdit_no_above.text())
         keep_n = int(self.lineEdit_keep_n.text())
 
-        # Get ids of the stopword lists that are going to be used 
+        # Get ids of the stopword lists that are going to be used
         StwLists = []
         for i in range(self.table_available_stopwords.rowCount()):
             item = self.table_available_stopwords.item(
@@ -115,14 +112,14 @@ class PreprocessingWindow(QtWidgets.QDialog):
             if item.checkState() == QtCore.Qt.CheckState.Checked:
                 StwLists.append(i)
 
-        # Get ids of the equivalences lists that are going to be used 
+        # Get ids of the equivalences lists that are going to be used
         EqLists = []
         for i in range(self.table_available_equivalences.rowCount()):
             item = self.table_available_equivalences.item(
                 i, 0)
             if item.checkState() == QtCore.Qt.CheckState.Checked:
                 EqLists.append(i)
-        
+
         self.preproc_settings = {
             "min_lemas": min_lemas,
             "no_below": no_below,
@@ -135,4 +132,4 @@ class PreprocessingWindow(QtWidgets.QDialog):
         # Hide window
         self.hide()
 
-        return 
+        return

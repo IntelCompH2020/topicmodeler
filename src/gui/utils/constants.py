@@ -74,8 +74,8 @@ class Constants:
 
     # Training related constants
     NR_PARAMS_TRAIN_LDA_MALLET = 7
-    NR_PARAMS_TRAIN_PRODLDA = 12
-    NR_PARAMS_TRAIN_CTM = 14
+    NR_PARAMS_TRAIN_PRODLDA = 17
+    NR_PARAMS_TRAIN_CTM = 21
     NR_PARAMS_PREPROC = 4
     
     WRONG_NR_TOPICS_LDA_MSG = "The number of training topics must be larger than 0"
@@ -100,6 +100,11 @@ class Constants:
     WRONG_REDUCE_ON_PLATEAU_MSG = "Reduce_on_plateau must be type bool."
     WRONG_TOPIC_PRIOR_MEAN_MSG = ""
     WRONG_TOPIC_PRIOR_VAR_MSG = ""
+    WRONG_NR_SAMPLES = "The number of samples must be a positive integer larger than 0."
+    WRONG_NR_WORKERS = "The number of data loader workers must be a positive integer larger than 0."
+    WRONG_LABEL_SIZE = "The label size must be equals to the number of documents."
+    WRONG_LABEL_SIZE_FOR_SUPERCTM = "The label size cannot be 0 if SuperCTM is being used. It must be equal to the number of documents in the training corpus."
+    WRONG_LOSS_WEIGTHS_FOR_BETACTM = "The weight loss cannot be None for a BetaCTM model."
     WARNING_NO_TR_CORPUS = "An appropiate training dataset must be selected to proceed."
     NO_NAME_FOR_MODEL = "A name for training the model must be specified"
     NO_DESC_FOR_MODEL = "A description for training the model must be specified"

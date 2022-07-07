@@ -640,7 +640,7 @@ QPushButton:pressed {
                <item>
                 <widget class="QStackedWidget" name="train_tabs">
                  <property name="currentIndex">
-                  <number>0</number>
+                  <number>3</number>
                  </property>
                  <widget class="QWidget" name="page_trainLDA">
                   <property name="styleSheet">
@@ -1031,7 +1031,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Prior parameter for the Dirichlet for document generation.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-f5f06296-7fff-9f24-265c-d3205619f7d2&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;S&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;um over topics of smoothing over doc-topic distributions&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -1175,7 +1175,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Iterations between Dirichlet priors optimization.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-fcfcc363-7fff-d1c4-c9f0-8df70d4db19c&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of iterations between reestimating dirichlet hyperparameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -1319,7 +1319,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Number of threads for mallet parallelization.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-1be4ca53-7fff-fe7b-1785-407779cda4e7&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of threads for parallel training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -1470,7 +1470,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Number of Gibbs Sampling iterations.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-0aa6a5fe-7fff-2676-9386-426d00ca5214&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of iterations of Gibbs sampling&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -1614,7 +1614,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Threshold for topic activation in a document (mallet training).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-e71806fe-7fff-531d-bf0f-9dab0670cb17&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;hreshold for topic activation in a doc (mallet training)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -1758,7 +1758,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Threshold for topic activation in a document (sparsification).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-f01e3a87-7fff-8516-50c1-68bb60bb69ff&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;hreshold for topic activation in a doc (sparsification)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -3291,7 +3291,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each word in the vocabulary.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Number of topics to train the model with.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -3435,7 +3435,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-f72d80e0-7fff-0e63-76aa-b2a2fa2beb96&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ype of the model that is going to be trained, 'prodLDA' or 'LDA'&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -3600,7 +3600,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-52e530f1-7fff-3942-ed5c-d1aaf554bca5&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of epochs to train for&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -3744,7 +3744,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-4332794e-7fff-6b78-09bf-712c9e1cffe1&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;S&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ize of the batch to use for training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -3951,7 +3951,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-fbc0d1d5-7fff-9358-11a3-4f1b156c9af8&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;S&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ize of the hidden layer&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -4095,7 +4095,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each word in the vocabulary.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-b9da72ce-7fff-b71b-c9c1-c22c335a751d&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;A&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ctivation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -4295,7 +4295,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-406d3f29-7fff-d2cd-976b-75e48f2343a0&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;P&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ercent of neurons to drop out&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -4439,7 +4439,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-8b42d71f-7fff-ef6a-42f5-c9b48410ceb9&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;I&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;f true, priors are made learnable parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -4604,7 +4604,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-6210ddca-7fff-ff3d-ee39-7a7008276949&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ean parameter of the prior&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -4636,6 +4636,9 @@ border:None;</string>
                                       <width>60</width>
                                       <height>16777215</height>
                                      </size>
+                                    </property>
+                                    <property name="toolTip">
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">QLineEdit {	
@@ -4748,7 +4751,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-aa7e3118-7fff-3ccb-da9c-0412a5b07453&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;V&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ariance parameter of the prior&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -4780,6 +4783,9 @@ border:None;</string>
                                       <width>60</width>
                                       <height>16777215</height>
                                      </size>
+                                    </property>
+                                    <property name="toolTip">
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">QLineEdit {	
@@ -4892,7 +4898,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-21c2fd79-7fff-5eb1-9469-94738a6fd64d&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of times the theta needs to be sampled&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -4924,6 +4930,9 @@ border:None;</string>
                                       <width>60</width>
                                       <height>16777215</height>
                                      </size>
+                                    </property>
+                                    <property name="toolTip">
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">QLineEdit {	
@@ -5043,7 +5052,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-be38a88e-7fff-0bb9-5455-69d8b1c68400&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;earning rate to be used for training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -5075,6 +5084,9 @@ border:None;</string>
                                       <width>60</width>
                                       <height>16777215</height>
                                      </size>
+                                    </property>
+                                    <property name="toolTip">
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">QLineEdit {	
@@ -5187,7 +5199,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-b987f1c5-7fff-28a3-113a-bac660da0ba9&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;omentum to be used for training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -5219,6 +5231,9 @@ border:None;</string>
                                       <width>60</width>
                                       <height>16777215</height>
                                      </size>
+                                    </property>
+                                    <property name="toolTip">
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">QLineEdit {	
@@ -5331,7 +5346,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each word in the vocabulary.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-8380a9c1-7fff-42a3-f8ae-eff7ebb6fd0d&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N optimizer to be used, chosen from 'adagrad', 'adam', 'sgd', 'adadelta' or 'rmsprop'&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -5511,7 +5526,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-d9c0b161-7fff-db2d-f35a-c14c18350cac&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;I&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;f true, reduce learning rate by 10x on plateau of 10 epochs&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -5676,7 +5691,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-786ccc19-7fff-380b-8bb0-45b7f103e16e&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of subprocesses to use for data loading&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -5820,7 +5835,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-942ed9ee-7fff-5aa7-b384-37f25a55c486&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;inimum value for sparsification of topic proportions after training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -6118,7 +6133,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-45b2d2b8-7fff-4538-5d88-191baabd07a0&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;'&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;CombinedTM', 'ZeroShotTM'&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -6181,6 +6196,16 @@ QComboBox:on { /* shift the text when the popup opens */
                                       <string>ZeroShotTM</string>
                                      </property>
                                     </item>
+                                    <item>
+                                     <property name="text">
+                                      <string>SuperCTM</string>
+                                     </property>
+                                    </item>
+                                    <item>
+                                     <property name="text">
+                                      <string>BetaCTM</string>
+                                     </property>
+                                    </item>
                                    </widget>
                                   </item>
                                   <item>
@@ -6214,6 +6239,171 @@ border:none;</string>
                                   </item>
                                   <item>
                                    <widget class="QLabel" name="checkBox_ctm_1_bad">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>20</width>
+                                      <height>20</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color:transparent;
+border:none;</string>
+                                    </property>
+                                    <property name="text">
+                                     <string/>
+                                    </property>
+                                    <property name="pixmap">
+                                     <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                    </property>
+                                    <property name="scaledContents">
+                                     <bool>true</bool>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                 </layout>
+                                </widget>
+                               </item>
+                               <item>
+                                <widget class="QFrame" name="frame_alpha_11">
+                                 <property name="styleSheet">
+                                  <string notr="true">border-bottom: 0.5px solid #FFFFFF;
+border-right: 0.5px solid #FFFFFF;
+border-top: 1px solid #FFFFFF;
+</string>
+                                 </property>
+                                 <property name="frameShape">
+                                  <enum>QFrame::NoFrame</enum>
+                                 </property>
+                                 <property name="frameShadow">
+                                  <enum>QFrame::Plain</enum>
+                                 </property>
+                                 <layout class="QHBoxLayout" name="horizontalLayout_121">
+                                  <item>
+                                   <widget class="QLabel" name="label_alpha_11">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>16777215</width>
+                                      <height>16777215</height>
+                                     </size>
+                                    </property>
+                                    <property name="font">
+                                     <font>
+                                      <family>Avenir</family>
+                                      <pointsize>13</pointsize>
+                                      <weight>75</weight>
+                                      <italic>false</italic>
+                                      <bold>true</bold>
+                                     </font>
+                                    </property>
+                                    <property name="toolTip">
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-f72d80e0-7fff-0e63-76aa-b2a2fa2beb96&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ype of the model that is going to be trained, 'prodLDA' or 'LDA'&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">font: 87 13pt &quot;Avenir&quot;;
+color:#1A2E40;
+font-weight: bold;
+border:None;</string>
+                                    </property>
+                                    <property name="text">
+                                     <string>Model type:</string>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QComboBox" name="comboBox_model_type_ctm">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="minimumSize">
+                                     <size>
+                                      <width>119</width>
+                                      <height>0</height>
+                                     </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>100</width>
+                                      <height>16777215</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">/*COMBO BOX*/
+QComboBox {
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 1px 18px 1px 3px;
+    min-width: 6em;
+    background-color:#FFFFFF;
+	color:black;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+}
+
+
+QComboBox:on { /* shift the text when the popup opens */
+    padding-top: 3px;
+    padding-left: 4px;
+}
+
+</string>
+                                    </property>
+                                    <item>
+                                     <property name="text">
+                                      <string>ProdLDA</string>
+                                     </property>
+                                    </item>
+                                    <item>
+                                     <property name="text">
+                                      <string>LDA</string>
+                                     </property>
+                                    </item>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLabel" name="checkBox_prod_21_good">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>20</width>
+                                      <height>20</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color:transparent;
+border:none;</string>
+                                    </property>
+                                    <property name="text">
+                                     <string/>
+                                    </property>
+                                    <property name="pixmap">
+                                     <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                    </property>
+                                    <property name="scaledContents">
+                                     <bool>true</bool>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLabel" name="checkBox_prod_21_bad">
                                     <property name="sizePolicy">
                                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                       <horstretch>0</horstretch>
@@ -6283,7 +6473,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each word in the vocabulary.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Number of training topics.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -6427,7 +6617,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-fc0bab1f-7fff-a5a8-0454-4b78b6a474db&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of epochs to train for&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -6571,7 +6761,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-2c7e85ec-7fff-c78f-5ebf-b43bfcaebb4b&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;S&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ize of the batch to use for training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -6778,7 +6968,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-62ff0ed3-7fff-ef03-91df-0e03849e1786&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;S&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ize of the hidden layer&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -6922,7 +7112,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each word in the vocabulary.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-27f071e5-7fff-0bdb-9ce7-7ba7e422f708&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;A&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ctivation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -7122,7 +7312,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-00cd5907-7fff-2825-a8ca-f5ee6369512c&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;P&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ercent of neurons to drop out&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -7266,7 +7456,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-3dd268ad-7fff-43ee-eb8a-2929dc5470bd&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;I&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;f true, priors are made learnable parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -7431,7 +7621,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-c42666d6-7fff-7c97-d2c2-0fa4e82653de&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;earning rate to be used for training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -7575,7 +7765,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-1c8297ea-7fff-4453-ca96-79913f551d42&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of times the theta needs to be sampled&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -7589,7 +7779,7 @@ border:None;</string>
                                    </widget>
                                   </item>
                                   <item>
-                                   <widget class="QLineEdit" name="lineEdit_ctm_learning_rate_3">
+                                   <widget class="QLineEdit" name="lineEdit_ctm_nr_samples">
                                     <property name="sizePolicy">
                                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                       <horstretch>0</horstretch>
@@ -7719,7 +7909,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-37e3fb5d-7fff-ee07-bd09-08fbd10b0d4f&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of subprocesses to use for data loading&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -7733,7 +7923,7 @@ border:None;</string>
                                    </widget>
                                   </item>
                                   <item>
-                                   <widget class="QLineEdit" name="lineEdit_ctm_learning_rate_4">
+                                   <widget class="QLineEdit" name="lineEdit_ctm_workers">
                                     <property name="sizePolicy">
                                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                       <horstretch>0</horstretch>
@@ -7863,7 +8053,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-1c29dfac-7fff-1538-2468-b190ad15d1d3&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;umber of total labels&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -7877,7 +8067,7 @@ border:None;</string>
                                    </widget>
                                   </item>
                                   <item>
-                                   <widget class="QLineEdit" name="lineEdit_ctm_learning_rate_5">
+                                   <widget class="QLineEdit" name="lineEdit_ctm_label_size">
                                     <property name="sizePolicy">
                                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                       <horstretch>0</horstretch>
@@ -8014,7 +8204,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each word in the vocabulary.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-049ef0b4-7fff-d555-74c9-74cd6ca1649b&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;V&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ariance parameter of the prior&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -8158,7 +8348,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-6f72f20e-7fff-ae05-449f-37d9ca0cc9af&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ean parameter of the prior&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -8626,7 +8816,7 @@ border-top: 0.5px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic in each document.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-45c779d6-7fff-7b48-129e-1d67f3937735&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;I&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;f true, reduce learning rate by 10x on plateau of 10 epochs&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -8791,7 +8981,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-2077d9f0-7fff-3a0e-a5d6-db42b3e0fcf7&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;D&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;ictionary with the name of the weight parameter (key) and the weight (value) for each loss&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -8805,7 +8995,7 @@ border:None;</string>
                                    </widget>
                                   </item>
                                   <item>
-                                   <widget class="QLineEdit" name="lineEdit_ctm_learning_rate_6">
+                                   <widget class="QLineEdit" name="lineEdit_ctm_loss_weigths">
                                     <property name="sizePolicy">
                                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                       <horstretch>0</horstretch>
@@ -8935,7 +9125,7 @@ border-top: 1px solid #FFFFFF;
                                      </font>
                                     </property>
                                     <property name="toolTip">
-                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;The weight of each topic.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-14f741fe-7fff-0557-579d-2946037ef7f0&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;odel to be used for calculating the embeddings. &lt;/span&gt;&lt;a href=&quot;https://huggingface.co/models?library=sentence-transformers&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;You can check available models here.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                     </property>
                                     <property name="styleSheet">
                                      <string notr="true">font: 87 13pt &quot;Avenir&quot;;
@@ -8949,7 +9139,7 @@ border:None;</string>
                                    </widget>
                                   </item>
                                   <item>
-                                   <widget class="QLineEdit" name="lineEdit_ctm_learning_rate_8">
+                                   <widget class="QLineEdit" name="lineEdit_ctm_sbert_model">
                                     <property name="sizePolicy">
                                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                       <horstretch>0</horstretch>
@@ -9010,6 +9200,150 @@ border:none;</string>
                                   </item>
                                   <item>
                                    <widget class="QLabel" name="checkBox_ctm_19_bad">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>20</width>
+                                      <height>20</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color:transparent;
+border:none;</string>
+                                    </property>
+                                    <property name="text">
+                                     <string/>
+                                    </property>
+                                    <property name="pixmap">
+                                     <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                    </property>
+                                    <property name="scaledContents">
+                                     <bool>true</bool>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                 </layout>
+                                </widget>
+                               </item>
+                               <item>
+                                <widget class="QFrame" name="frame_nr_iterations_16">
+                                 <property name="styleSheet">
+                                  <string notr="true">border-bottom: 0.5px solid #FFFFFF;
+border-left: 0.5px solid #FFFFFF;
+border-top: 1px solid #FFFFFF;
+</string>
+                                 </property>
+                                 <property name="frameShape">
+                                  <enum>QFrame::NoFrame</enum>
+                                 </property>
+                                 <property name="frameShadow">
+                                  <enum>QFrame::Plain</enum>
+                                 </property>
+                                 <layout class="QHBoxLayout" name="horizontalLayout_136">
+                                  <item>
+                                   <widget class="QLabel" name="label_nr_iterations_18">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>16777215</width>
+                                      <height>16777215</height>
+                                     </size>
+                                    </property>
+                                    <property name="font">
+                                     <font>
+                                      <family>Avenir</family>
+                                      <pointsize>13</pointsize>
+                                      <weight>75</weight>
+                                      <italic>false</italic>
+                                      <bold>true</bold>
+                                     </font>
+                                    </property>
+                                    <property name="toolTip">
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a name=&quot;docs-internal-guid-5b1ea98c-7fff-6fb8-5741-d8f18cb4ada0&quot;/&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt; font-weight:400; color:#000000; background-color:transparent;&quot;&gt;inimum value for sparsification of topic proportions after training&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">font: 87 13pt &quot;Avenir&quot;;
+color:#1A2E40;
+font-weight: bold;
+border:None;</string>
+                                    </property>
+                                    <property name="text">
+                                     <string>Thetas threshold:</string>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLineEdit" name="lineEdit_ctm_thetas_thr">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="minimumSize">
+                                     <size>
+                                      <width>0</width>
+                                      <height>0</height>
+                                     </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>60</width>
+                                      <height>16777215</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLabel" name="checkBox_ctm_20_good">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>20</width>
+                                      <height>20</height>
+                                     </size>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">background-color:transparent;
+border:none;</string>
+                                    </property>
+                                    <property name="text">
+                                     <string/>
+                                    </property>
+                                    <property name="pixmap">
+                                     <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                    </property>
+                                    <property name="scaledContents">
+                                     <bool>true</bool>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLabel" name="checkBox_ctm_20_bad">
                                     <property name="sizePolicy">
                                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                       <horstretch>0</horstretch>

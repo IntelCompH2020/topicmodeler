@@ -5,17 +5,15 @@ Class that defines the subwindow for the Interactive Topic Model Trainer App for
 
 """
 
-from concurrent.futures import thread
 import configparser
-import pathlib
 import re
 from functools import partial
 
 import numpy as np
 from PyQt6 import QtGui, QtWidgets
-from PyQt6.QtCore import QThreadPool, QUrl, pyqtSlot
+from PyQt6.QtCore import pyqtSlot
 from PyQt6.QtGui import QTextCursor
-from PyQt6.QtWidgets import QLabel, QMessageBox, QPushButton, QWidget
+from PyQt6.QtWidgets import QLabel, QMessageBox, QPushButton
 from PyQt6.uic import loadUi
 from src.gui.utils import utils
 from src.gui.utils.constants import Constants
@@ -31,8 +29,8 @@ class TrainModelWindow(QtWidgets.QDialog):
         ----------
         tm : TaskManager
             TaskManager object associated with the project
-        thread_pool:
-
+        thread_pool: QThreadPool
+            Pool of threads for submitting the training tasks
         stdout : OutputWrapper
             Attribute in which stdout is redirected
         stderr : OutputWrapper
@@ -48,7 +46,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         # Load UI and configure default geometry of the window
         # #####################################################################
         loadUi("src/gui/uis/train_window.ui", self)
-
+        self.init_ui()
         #####################################################################################
         # ATTRIBUTES
         #####################################################################################
@@ -61,7 +59,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.trainer = None
         self.TrDts_name = training_corpus
         self.preproc_settings = preproc_settings
-        self.training_params = None 
+        self.training_params = None
         self.modelname = None
         self.ModelDesc = None
         self.privacy = None
@@ -69,9 +67,10 @@ class TrainModelWindow(QtWidgets.QDialog):
         # Reload config object in case changes were doing from the settings page
         self.cf = configparser.ConfigParser()
         self.cf.read(self.tm.p2config)
-        #####################################################################################
+
+        ########################################################################
         # Widgets initial configuration
-        #####################################################################################
+        ########################################################################
         # Initialize progress bars
         utils.initialize_progress_bar(Constants.TRAIN_LOADING_BARS, self)
 
@@ -115,9 +114,9 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.get_ctm_params()
         self.get_sparklda_params()
 
-        #####################################################################################
+        ########################################################################
         # Connect buttons
-        #####################################################################################
+        ########################################################################
         train_buttons = []
         for id_button in np.arange(Constants.MAX_TRAIN_OPTIONS):
             train_button_name = "train_button_" + str(id_button + 1)
@@ -147,9 +146,9 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.train_button_4.clicked.connect(
             lambda: self.train_tabs.setCurrentWidget(self.page_trainSparkLDA))
 
-        #####################################################################################
-        # Connect buttons
-        #####################################################################################
+        ########################################################################
+        # Handlers
+        ########################################################################
         self.pushButton_train.clicked.connect(
             self.clicked_pushButton_train)
 
@@ -198,7 +197,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             str(self.cf.get('MalletTM', 'doc_topic_thr')))
         self.lineEdit_thetas_thr_lda.setText(
             str(self.cf.get('MalletTM', 'thetas_thr')))
-       
+
         return
 
     def get_mallet_params_from_user(self):
@@ -219,7 +218,8 @@ class TrainModelWindow(QtWidgets.QDialog):
             messages += Constants.WRONG_NR_TOPICS_LDA_MSG + "\n"
         else:
             self.checkBox_lda_1_good.show()
-            self.training_params['ntopics'] = self.lineEdit_nr_topics_lda.text()
+            self.training_params['ntopics'] = self.lineEdit_nr_topics_lda.text(
+            )
 
         if int(self.lineEdit_alpha_lda.text()) < 0:
             self.checkBox_lda_2_bad.show()
@@ -233,50 +233,56 @@ class TrainModelWindow(QtWidgets.QDialog):
             messages += Constants.WRONG_OI_LDA_MSG + "\n"
         else:
             self.checkBox_lda_3_good.show()
-            self.training_params['optimize_interval'] = self.lineEdit_optimize_interval_lda.text()
+            self.training_params['optimize_interval'] = self.lineEdit_optimize_interval_lda.text(
+            )
 
         if int(self.lineEdit_nr_threads_lda.text()) < 0:
             self.checkBox_lda_4_bad.show()
             messages += Constants.WRONG_NR_THREADS_LDA_MSG + "\n"
         else:
             self.checkBox_lda_4_good.show()
-            self.training_params['num_threads'] = self.lineEdit_nr_threads_lda.text()
+            self.training_params['num_threads'] = self.lineEdit_nr_threads_lda.text(
+            )
 
         if int(self.lineEdit_nr_iterations_lda.text()) < 0:
             self.checkBox_lda_5_bad.show()
             messages += Constants.WRONG_NR_ITER_LDA_MSG + "\n"
         else:
             self.checkBox_lda_5_good.show()
-            self.training_params['num_iterations'] = self.lineEdit_nr_iterations_lda.text()
+            self.training_params['num_iterations'] = self.lineEdit_nr_iterations_lda.text(
+            )
 
         if float(self.lineEdit_doc_top_thr_lda.text()) > 1:
             self.checkBox_lda_6_bad.show()
             messages += Constants.WRONG_DOC_TPC_THR_LDA_MSG + "\n"
         else:
             self.checkBox_lda_6_good.show()
-            self.training_params['doc_topic_thr'] = self.lineEdit_doc_top_thr_lda.text()
+            self.training_params['doc_topic_thr'] = self.lineEdit_doc_top_thr_lda.text(
+            )
 
         if float(self.lineEdit_thetas_thr_lda.text()) > 1:
             self.checkBox_lda_7_bad.show()
             messages += Constants.WRONG_THETAS_THR_LDA_MSG + "\n"
         else:
             self.checkBox_lda_7_good.show()
-            self.training_params['thetas_thr'] = self.lineEdit_thetas_thr_lda.text()
+            self.training_params['thetas_thr'] = self.lineEdit_thetas_thr_lda.text(
+            )
 
         if len(self.training_params.keys()) != Constants.NR_PARAMS_TRAIN_LDA_MALLET:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, messages)
             return False
-        
+
         cf = configparser.ConfigParser()
         cf.read(self.tm.p2config)
         self.training_params["mallet_path"] = cf.get('MalletTM', 'mallet_path')
-        self.training_params["token_regexp"] = cf.get('MalletTM', 'token_regexp')
+        self.training_params["token_regexp"] = cf.get(
+            'MalletTM', 'token_regexp')
 
         # Hide checkboxes
         for checkbox in self.lda_mallet_checkboxes_params:
             checkbox.hide()
-        
+
         return okay
 
     # PRODLDA
@@ -308,6 +314,16 @@ class TrainModelWindow(QtWidgets.QDialog):
             str(self.cf.get('ProdLDA', 'reduce_on_plateau')))
         self.lineEdit_batch_size_prod.setText(
             str(self.cf.get('ProdLDA', 'batch_size')))
+        self.lineEdit_prior_mean_prod.setText(
+            str(self.cf.get('ProdLDA', 'topic_prior_mean')))
+        self.lineEdit_prior_std_prod.setText(
+            str(self.cf.get('ProdLDA', 'topic_prior_variance')))
+        self.lineEdit_nr_samples_prod.setText(
+            str(self.cf.get('ProdLDA', 'num_samples')))
+        self.lineEdit_workers_prod.setText(
+            str(self.cf.get('ProdLDA', 'num_data_loader_workers')))
+        self.thetas_thr.setText(
+            str(self.cf.get('ProdLDA', 'lineEdit_thetas_thr_prod')))
 
         return
 
@@ -329,7 +345,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             messages += Constants.WRONG_NR_TOPIC_MSG + "\n"
         else:
             self.checkBox_prod_1_good.show()
-            dict_params['num_topics'] = self.lineEdit_ctm_nr_topics.text()
+            dict_params['n_components'] = self.lineEdit_ctm_nr_topics.text()
 
         if self.comboBox_model_type_prod.currentText() not in \
                 ['prodLDA', 'lda']:
@@ -409,6 +425,42 @@ class TrainModelWindow(QtWidgets.QDialog):
         else:
             self.checkBox_prod_12_good.show()
             dict_params['reduce_on_plateau'] = self.comboBox_prod_reduce_on_plateau.currentText()
+        
+        if re.match(r'^-?\d+(?:\.\d+)$', self.lineEdit_prior_mean_prod.text()) is None:
+            self.checkBox_prod_13_bad.show()
+            messages += Constants.WRONG_TOPIC_PRIOR_MEAN_MSG + "\n"
+        else:
+            self.checkBox_prod_13_good.show()
+            dict_params['topic_prior_mean'] = self.lineEdit_prior_mean_prod.text()
+        
+        # if re.match(r'^-?\d+(?:\.\d+)$', self.lineEdit_prior_std_prod.text()) is None:
+        #    self.checkBox_prod_14_bad.show()
+        #    messages += Constants.WRONG_TOPIC_PRIOR_VAR_MSG + "\n"
+        # else:
+        self.checkBox_prod_14_good.show()
+        dict_params['topic_prior_variance'] = self.lineEdit_ctm_topic_prior_variance.text()
+        
+        if not self.lineEdit_nr_samples_prod.text().isdigit() or int(self.lineEdit_nr_samples_prod.text()) < 0 or int(self.lineEdit_nr_samples_prod.text()) == 0:
+            self.checkBox_prod_15_bad.show()
+            messages += Constants.WRONG_NR_SAMPLES + "\n"
+        else:
+            self.checkBox_prod_15_good.show()
+            dict_params['num_samples'] = self.lineEdit_nr_samples_prod.text()
+        
+        if not self.lineEdit_workers_prod.text().isdigit() or int(self.lineEdit_workers_prod.text()) < 0 or int(self.lineEdit_workers_prod.text()) == 0:
+            self.checkBox_prod_16_bad.show()
+            messages += Constants.WRONG_NR_WORKERS + "\n"
+        else:
+            self.checkBox_prod_16_good.show()
+            dict_params['num_data_loader_workers'] = self.lineEdit_workers_prod.text()
+        
+        if float(self.lineEdit_thetas_thr_prod.text()) > 1:
+            self.checkBox_prod_17_bad.show()
+            messages += Constants.WRONG_THETAS_THR_LDA_MSG + "\n"
+        else:
+            self.checkBox_prod_17_good.show()
+            self.training_params['thetas_thr'] = self.lineEdit_thetas_thr_prod.text(
+            )
 
         if len(dict_params.keys()) != Constants.NR_PARAMS_TRAIN_PRODLDA:
             QMessageBox.warning(
@@ -430,9 +482,12 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.comboBox_ctm_model_type.setCurrentText(
             str(self.cf.get('CTM', 'ctm_model_type')))
         self.lineEdit_nr_topics_ctm.setText(str(self.cf.get('TM', 'ntopics')))
-        self.lineEdit_nr_epochs_ctm.setText(str(self.cf.get('CTM', 'num_epochs')))
-        self.lineEdit_batch_size_ctm.setText(str(self.cf.get('CTM', 'batch_size')))
-        self.lineEdit_ctm_hidden_sizes.setText(self.cf.get('CTM', 'hidden_sizes'))
+        self.lineEdit_nr_epochs_ctm.setText(
+            str(self.cf.get('CTM', 'num_epochs')))
+        self.lineEdit_batch_size_ctm.setText(
+            str(self.cf.get('CTM', 'batch_size')))
+        self.lineEdit_ctm_hidden_sizes.setText(
+            self.cf.get('CTM', 'hidden_sizes'))
         self.comboBox_ctm_activation.setCurrentText(
             str(self.cf.get('CTM', 'activation')))
         self.lineEdit_ctm_dropout.setText(str(self.cf.get('CTM', 'dropout')))
@@ -440,13 +495,24 @@ class TrainModelWindow(QtWidgets.QDialog):
             self.cf.get('CTM', 'learn_priors'))
         self.lineEdit_ctm_learning_rate.setText(str(self.cf.get('CTM', 'lr')))
         self.lineEdit_ctm_momentum.setText(str(self.cf.get('CTM', 'momentum')))
-        self.comboBox_ctm_solver.setCurrentText(str(self.cf.get('CTM', 'solver')))
+        self.comboBox_ctm_solver.setCurrentText(
+            str(self.cf.get('CTM', 'solver')))
         self.comboBox_ctm_reduce_on_plateau.setCurrentText(
             self.cf.get('CTM', 'reduce_on_plateau'))
         self.lineEdit_ctm_topic_prior_mean.setText(
             str(self.cf.get('CTM', 'topic_prior_mean')))
         self.lineEdit_ctm_topic_prior_variance.setText(
             str(self.cf.get('CTM', 'topic_prior_variance')))
+        self.lineEdit_ctm_workers.setText(
+            str(self.cf.get('CTM', 'num_data_loader_workers')))
+        self.lineEdit_ctm_label_size.setText(
+            str(self.cf.get('CTM', 'label_size')))
+        self.lineEdit_ctm_loss_weigths.setText(
+            str(self.cf.get('CTM', 'loss_weights')))
+        self.lineEdit_ctm_sbert_model.setText(
+            str(self.cf.get('CTM', 'thetas_thr')))
+        self.lineEdit_ctm_topic_prior_variance.setText(
+            str(self.cf.get('CTM', 'sbert_model_to_load')))
 
         return
 
@@ -462,19 +528,27 @@ class TrainModelWindow(QtWidgets.QDialog):
         okay = True
         dict_params = {}
         messages = ""
-        if self.comboBox_ctm_model_type.currentText() != "CombinedTM" and "ZeroShotTM":
+        if self.comboBox_ctm_model_type.currentText() != "CombinedTM" and "ZeroShotTM" and "SuperCTM" and "BetaCTM":
             self.checkBox_ctm_1_bad.show()
             messages += Constants.WRONG_MODEL_TYPE_MSG + "\n"
         else:
             self.checkBox_ctm_1_good.show()
             dict_params['ctm_model_type'] = self.comboBox_ctm_model_type.currentText()
+        
+        if self.comboBox_model_type_ctm.currentText() not in \
+                ['prodLDA', 'lda']:
+            self.checkBox_ctm_21_bad.show()
+            messages += Constants.WRONG_UNDERLYING_MODEL_TYPE_MSG + "\n"
+        else:
+            self.checkBox_ctm_21_good.show()
+            dict_params['model_type'] = self.comboBox_model_type_ctm.currentText()
 
         if int(self.lineEdit_nr_topics_ctm.text()) < 0:
             self.checkBox_ctm_2_bad.show()
             messages += Constants.WRONG_NR_TOPIC_MSG + "\n"
         else:
             self.checkBox_ctm_2_good.show()
-            dict_params['num_topics'] = self.lineEdit_nr_topics_ctm.text()
+            dict_params['n_components'] = self.lineEdit_nr_topics_ctm.text()
 
         if int(self.lineEdit_nr_epochs_ctm.text()) < 0:
             self.checkBox_ctm_3_bad.show()
@@ -561,6 +635,52 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.checkBox_ctm_14_good.show()
         dict_params['topic_prior_variance'] = self.lineEdit_ctm_topic_prior_variance.text()
 
+        if not self.lineEdit_ctm_nr_samples.text().isdigit() or int(self.lineEdit_ctm_nr_samples.text()) < 0 or int(self.lineEdit_ctm_nr_samples.text()) == 0:
+            self.checkBox_ctm_15_bad.show()
+            messages += Constants.WRONG_NR_SAMPLES + "\n"
+        else:
+            self.checkBox_ctm_15_good.show()
+            dict_params['num_samples'] = self.lineEdit_ctm_nr_samples.text()
+        
+        if not self.lineEdit_ctm_workers.text().isdigit() or int(self.lineEdit_ctm_workers.text()) < 0 or int(self.lineEdit_ctm_workers.text()) == 0:
+            self.checkBox_prod_16_bad.show()
+            messages += Constants.WRONG_NR_WORKERS + "\n"
+        else:
+            self.checkBox_prod_16_good.show()
+            dict_params['num_data_loader_workers'] = self.lineEdit_ctm_workers.text()
+        
+        if float(self.lineEdit_ctm_thetas_thr.text()) > 1:
+            self.checkBox_prod_20_bad.show()
+            messages += Constants.WRONG_THETAS_THR_LDA_MSG + "\n"
+        else:
+            self.checkBox_prod_20_good.show()
+            self.training_params['thetas_thr'] = self.lineEdit_ctm_thetas_thr.text(
+            )
+        
+        len_trdtset = 0 # @TODO: TO BE COMPLETED
+        if int(self.lineEdit_ctm_label_size.split()) != 0 and len(self.lineEdit_ctm_label_size.split()) != len_trdtset:
+            self.checkBox_ctm_17_bad.show()
+            messages += Constants.WRONG_LABEL_SIZE + "\n"
+        elif self.comboBox_ctm_model_type.currentText == "SuperCTM" and (int(self.lineEdit_ctm_label_size.split()) < 0 or int(self.lineEdit_ctm_label_size.split()) == 0):
+            self.checkBox_ctm_17_bad.show()
+            messages += Constants.WRONG_LABEL_SIZE_FOR_SUPERCTM + "\n"
+        else:
+            self.checkBox_ctm_17_good.show()
+            self.training_params['label_size'] = self.lineEdit_ctm_thetas_thr.text(
+            )
+        
+        # @TODO: Add control for loss weights
+        if self.comboBox_ctm_model_type.currentText == "BetaCTM" and self.lineEdit_ctm_loss_weigths.text() == "None":
+            self.checkBox_ctm_18_bad.show()
+            messages += Constants.WRONG_LOSS_WEIGTHS_FOR_BETACTM + "\n"
+        else:
+            self.checkBox_ctm_18_good.show()
+            dict_params['loss_weights'] = self.lineEdit_ctm_loss_weigths.text()
+
+        # @TODO: Add check for if sbert is available in hf
+        self.checkBox_ctm_19_good.show()
+        dict_params['sbert_model_to_load'] = self.lineEdit_ctm_sbert_model.text()
+
         if len(dict_params.keys()) != Constants.NR_PARAMS_TRAIN_CTM:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, messages)
@@ -578,10 +698,10 @@ class TrainModelWindow(QtWidgets.QDialog):
 
     def get_sparklda_params_from_user(self):
         return
-    
+
     def additional_training_params(self):
         """Method to get additional training parameters for the topic model, namely the name with which the model is going to be saved, its description and privacy level.
-        """        
+        """
 
         # Model name
         if self.lineEdit_model_name.text() is None or self.lineEdit_model_name.text() == "":
@@ -603,7 +723,6 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.privacy = self.comboBox_model_privacy_level.currentText()
 
         return True
-        
 
     @pyqtSlot(str)
     def append_text_train(self, text):
@@ -626,7 +745,8 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.stderr.outputWritten.connect(self.append_text_train)
 
         # Train the topic model by invoking the task manager method
-        self.tm.trainTM(self.trainer, self.TrDts_name, self.preproc_settings, self.training_params, self.modelname, self.ModelDesc, self.privacy)
+        self.tm.trainTM(self.trainer, self.TrDts_name, self.preproc_settings,
+                        self.training_params, self.modelname, self.ModelDesc, self.privacy)
 
         return
 
@@ -653,7 +773,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_TR_CORPUS)
             return
-        
+
         if self.train_tabs.currentWidget().objectName() == "page_trainLDA":
             self.trainer = "mallet"
             okay = self.get_mallet_params_from_user()
@@ -666,7 +786,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         elif self.train_tabs.currentWidget().objectName() == "page_trainCTM":
             self.trainer = "ctm"
             okay = self.get_ctm_params_from_user()
-        
+
         additional_okay = self.additional_training_params()
 
         if okay and additional_okay:

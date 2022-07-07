@@ -26,7 +26,7 @@ import pandas as pd
 from scipy import sparse
 from sklearn.preprocessing import normalize
 
-from src.topicmodeling.neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM
+from src.topicmodeling.neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
 from src.topicmodeling.neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
 from src.topicmodeling.neural_models.pytorchavitm.avitm_network.avitm import AVITM
 from src.topicmodeling.neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
@@ -1766,25 +1766,18 @@ class CTMTrainer(Trainer):
 
     """
 
-    def __init__(self, inference_type="combined", n_components=10, model_type='prodLDA',
-                hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
-                learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, 
-                solver='adam', num_epochs=100, num_samples=10, reduce_on_plateau=False,
-                topic_prior_mean=0.0, topic_prior_variance=None,
-                num_data_loader_workers=mp.cpu_count(), label_size=0, loss_weights=None,
-                thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1',
-                logger=None, ):
+    def __init__(self, n_components=10, ctm_model_type='CombinedTM', model_type='prodLDA', hidden_sizes=(100, 100), activation='softplus', dropout=0.2, learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99,solver='adam', num_epochs=100, num_samples=10, reduce_on_plateau=False,topic_prior_mean=0.0, topic_prior_variance=None, num_data_loader_workers=mp.cpu_count(), label_size=0, loss_weights=None, thetas_thr=0.003,sbert_model_to_load='paraphrase-distilroberta-base-v1',logger=None):
         """
         Initilization Method
 
         Parameters
         ----------
-        inference_type: string (default='combined')
-            Type of inference network to be used. It can be either 'combined' or 'contextual'
         n_components : int (default=10)
             Number of topic components
         model_type : string (default='prodLDA')
             Type of the model that is going to be trained, 'prodLDA' or 'LDA'
+        ctm_model_type : string (default='CombinedTM')
+            CTM model that is going to used for training
         hidden_sizes : tuple, length = n_layers (default=(100,100))
             Size of the hidden layer
         activation : string (default='softplus')
@@ -1827,9 +1820,9 @@ class CTMTrainer(Trainer):
 
         super().__init__(logger)
 
-        self._inference_type = inference_type
         self._n_components = n_components
         self._model_type = model_type
+        self._ctm_model_type = ctm_model_type
         self._hidden_sizes = hidden_sizes
         self._activation = activation
         self._dropout = dropout
@@ -1947,27 +1940,51 @@ class CTMTrainer(Trainer):
         ctm_dataset_file = modelFolder.joinpath('ctm_dataset.pickle')
         with open(ctm_dataset_file, 'wb') as f:
             pickle.dump(data, f)
-        
-        ctm = CombinedTM(
-            logger=self.logger,
-            input_size=self._input_size,
-            contextual_size=768,
-            n_components=self._n_components,
-            model_type=self._model_type,
-            hidden_sizes=self._hidden_sizes,
-            activation=self._activation,
-            dropout=self._dropout,
-            learn_priors=self._learn_priors,
-            batch_size=self._batch_size,
-            lr=self._lr,
-            momentum=self._momentum,
-            solver=self._solver,
-            num_epochs=self._num_epochs,
-            num_samples=self._num_samples,
-            reduce_on_plateau=self._reduce_on_plateau,
-            topic_prior_mean=self._topic_prior_mean,
-            topic_prior_variance=self._topic_prior_variance,
-            num_data_loader_workers=self._num_data_loader_workers)
+        # @ TODO: Maybe is better to add another parameter to ask for inference type for beta and super
+        if self._ctm_model_type == 'ZeroShotTM':
+            ctm = ZeroShotTM(
+                logger=self.logger,
+                input_size=self._input_size,
+                contextual_size=768,
+                n_components=self._n_components,
+                model_type=self._model_type,
+                hidden_sizes=self._hidden_sizes,
+                activation=self._activation,
+                dropout=self._dropout,
+                learn_priors=self._learn_priors,
+                batch_size=self._batch_size,
+                lr=self._lr,
+                momentum=self._momentum,
+                solver=self._solver,
+                num_epochs=self._num_epochs,
+                num_samples=self._num_samples,
+                reduce_on_plateau=self._reduce_on_plateau,
+                topic_prior_mean=self._topic_prior_mean,
+                topic_prior_variance=self._topic_prior_variance,
+                num_data_loader_workers=self._num_data_loader_workers)
+        else:
+            ctm = CombinedTM(
+                logger=self.logger,
+                input_size=self._input_size,
+                contextual_size=768,
+                n_components=self._n_components,
+                model_type=self._model_type,
+                hidden_sizes=self._hidden_sizes,
+                activation=self._activation,
+                dropout=self._dropout,
+                learn_priors=self._learn_priors,
+                batch_size=self._batch_size,
+                lr=self._lr,
+                momentum=self._momentum,
+                solver=self._solver,
+                num_epochs=self._num_epochs,
+                num_samples=self._num_samples,
+                reduce_on_plateau=self._reduce_on_plateau,
+                topic_prior_mean=self._topic_prior_mean,
+                topic_prior_variance=self._topic_prior_variance,
+                num_data_loader_workers=self._num_data_loader_workers,
+                label_size=self._label_size, 
+                loss_weights=self._loss_weights)
 
         ctm.fit(self._train_dataset, self._val_dataset)
 
@@ -2150,9 +2167,9 @@ if __name__ == "__main__":
                     ProdLDATr.fit()
                 elif train_config['trainer'] == 'ctm':
                     CTMr = CTMTrainer(
-                            inference_type=train_config['CTMparam']['inference_type'],
                             n_components=train_config['CTMparam']['n_components'],
                             model_type=train_config['CTMparam']['model_type'],
+                            ctm_model_type=train_config['CTMparam']['ctm_model_type'],
                             hidden_sizes=train_config['CTMparam']['hidden_sizes'],
                             activation=train_config['CTMparam']['activation'],
                             dropout=train_config['CTMparam']['dropout'],
