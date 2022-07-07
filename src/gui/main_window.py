@@ -883,14 +883,14 @@ class MainWindow(QMainWindow):
                 str(cf.get('ProdLDA', 'batch_size')))
             self.lineEdit_settings_topic_prior_mean_prod.setText(
                 str(cf.get('ProdLDA', 'topic_prior_mean')))
-            self.lineEdit_prior_stlineEdit_settings_topic_prior_var_prodd_prod.setText(
+            self.lineEdit_settings_topic_prior_var_prod.setText(
                 str(cf.get('ProdLDA', 'topic_prior_variance')))
             self.lineEdit_settings_nr_samples_prod.setText(
                 str(cf.get('ProdLDA', 'num_samples')))
             self.lineEdit_settings_workers_prod.setText(
                 str(cf.get('ProdLDA', 'num_data_loader_workers')))
             self.lineEdit_settings_thetas_thr_prod.setText(
-                str(cf.get('ProdLDA', 'lineEdit_thetas_thr_prod')))
+                str(cf.get('ProdLDA', 'thetas_thr')))
             if save:
                 self.clicked_pushButton_apply_changes_prodlda_settings()
         elif option == "ctm":
@@ -928,13 +928,13 @@ class MainWindow(QMainWindow):
             self.lineEdit_settings_nr_workers_ctm.setText(
                 str(cf.get('CTM', 'num_data_loader_workers')))
             self.lineEdit_settings_label_size_ctm.setText(
-                str(self.cf.get('CTM', 'label_size')))
+                str(cf.get('CTM', 'label_size')))
             self.lineEdit_settings_loss_weights_ctm.setText(
-                str(self.cf.get('CTM', 'loss_weights')))
+                str(cf.get('CTM', 'loss_weights')))
             self.lineEdit_settings_thetas_thr_ctm.setText(
-                str(self.cf.get('CTM', 'thetas_thr')))
+                str(cf.get('CTM', 'thetas_thr')))
             self.lineEdit_settings_sbert_model_ctm.setText(
-                str(self.cf.get('CTM', 'sbert_model_to_load')))
+                str(cf.get('CTM', 'sbert_model_to_load')))
             if save:
                 self.clicked_pushButton_apply_changes_ctm_settings()
         elif option == "tm_general":
