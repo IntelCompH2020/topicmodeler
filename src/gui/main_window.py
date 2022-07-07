@@ -688,52 +688,39 @@ class MainWindow(QMainWindow):
             return
         else:
             model_selected = self.treeView_trained_models.currentItem().text(0)
-
-            for model in self.tm.models.keys():
-                if self.tm.models[model]['name'] == model_selected:
-                    self.table_available_trained_models_desc.setRowCount(1)
-                    self.table_available_trained_models_desc.setItem(0, 0, QtWidgets.QTableWidgetItem(
-                        self.tm.models[model]['name']))
-                    self.table_available_trained_models_desc.setItem(0, 1, QtWidgets.QTableWidgetItem(
-                        self.tm.models[model]['model_type']))
-                    self.table_available_trained_models_desc.setItem(0, 2, QtWidgets.QTableWidgetItem(
-                        self.tm.models[model]['hierarchy_level']))
-                    self.table_available_trained_models_desc.setItem(0, 3, QtWidgets.QTableWidgetItem(
-                        self.tm.models[model]['hierarchical_type']))
-                    self.table_available_trained_models_desc.setItem(0, 4, QtWidgets.QTableWidgetItem(
-                        self.tm.models[model]['creation_date']))
+            self.tm.listTMmodel(self, model_selected)
 
             # Show topics in table
-            self.tableWidget_trained_models_topics.clearContents()
-            self.tableWidget_trained_models_topics.setRowCount(
-                int(model.num_topics))
-            self.tableWidget_trained_models_topics.setColumnCount(2)
+            # self.tableWidget_trained_models_topics.clearContents()
+            # self.tableWidget_trained_models_topics.setRowCount(
+            #     int(model.num_topics))
+            # self.tableWidget_trained_models_topics.setColumnCount(2)
 
-            list_description = []
-            for i in np.arange(0, len(model.topics_models), 1):
-                if str(type(model.topics_models[i])) == "<class 'src.htms.topic.Topic'>":
-                    description = ' '.join(
-                        str(x) for x in model.topics_models[i].description)
-                    list_description.append(description)
-            for i in np.arange(0, len(list_description), 1):
-                item_topic_nr = QtWidgets.QTableWidgetItem(str(i))
-                self.tableWidget_trained_models_topics.setItem(
-                    i, 0, item_topic_nr)
-                item_topic_description = QtWidgets.QTableWidgetItem(
-                    str(list_description[i]))
-                self.tableWidget_trained_models_topics.setItem(
-                    i, 1, item_topic_description)
+            # list_description = []
+            # for i in np.arange(0, len(model.topics_models), 1):
+            #     if str(type(model.topics_models[i])) == "<class 'src.htms.topic.Topic'>":
+            #         description = ' '.join(
+            #             str(x) for x in model.topics_models[i].description)
+            #         list_description.append(description)
+            # for i in np.arange(0, len(list_description), 1):
+            #     item_topic_nr = QtWidgets.QTableWidgetItem(str(i))
+            #     self.tableWidget_trained_models_topics.setItem(
+            #         i, 0, item_topic_nr)
+            #     item_topic_description = QtWidgets.QTableWidgetItem(
+            #         str(list_description[i]))
+            #     self.tableWidget_trained_models_topics.setItem(
+            #         i, 1, item_topic_description)
 
             # Show PyLDAvis
-            if self.web:
-                self.web.setParent(None)
-            self.web = QWebEngineView()
-            # self.web.setZoomFactor(0.25)
-            url = QUrl.fromLocalFile(pathlib.Path(
-                model.model_path, "pyLDAvis.html").as_posix())
-            self.web.load(url)
-            self.layout_plot_pyldavis.addWidget(self.web)
-            self.web.show()
+            # if self.web:
+            #     self.web.setParent(None)
+            # self.web = QWebEngineView()
+            # # self.web.setZoomFactor(0.25)
+            # url = QUrl.fromLocalFile(pathlib.Path(
+            #     model.model_path, "pyLDAvis.html").as_posix())
+            # self.web.load(url)
+            # self.layout_plot_pyldavis.addWidget(self.web)
+            # self.web.show()
 
         return
 

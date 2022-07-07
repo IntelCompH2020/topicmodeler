@@ -13,6 +13,7 @@ It implements the functions needed to
 # import configparser
 import datetime as DT
 import json
+import pathlib
 # import logging
 import shutil
 # from gensim import corpora
@@ -29,6 +30,7 @@ import pyarrow.parquet as pt
 # from sklearn.preprocessing import normalize
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QMessageBox
+from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
 from src.utils.misc import (printgr, printmag, printred, query_options,
                             request_confirmation, var_num_keyboard)
 
@@ -1139,19 +1141,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         modelname = ''
         while not len(modelname):
             modelname = input('Enter a name to save the new model: ')
-        modeldir = self.p2p.joinpath(
-            self._dir_struct['LDAmodels']).joinpath(modelname)
-        if modeldir.exists():
-
-            # Remove current backup folder, if it exists
-            old_model_dir = Path(str(modeldir) + '_old/')
-            if old_model_dir.exists():
-                shutil.rmtree(old_model_dir)
-
-            # Copy current project folder to the backup folder.
-            shutil.move(modeldir, old_model_dir)
-            self.logger.info(
-                f'-- -- Creating backup of existing model in {old_model_dir}')
 
         # Introduce a description for the model
         ModelDesc = ""
@@ -1163,89 +1152,10 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         opt = query_options(privacy, 'Define visibility for the model')
         privacy = privacy[opt]
 
-        # Create corpus_folder and save model training configuration
-        modeldir.mkdir()
-        configFile = modeldir.joinpath('trainconfig.json')
+        # Actual training of the topic model takes place
+        super().trainTM(modelname, ModelDesc, privacy, trainer,
+                        TrDtSet, Preproc, LDAparam)
 
-        train_config = {
-            "name": modelname,
-            "description": ModelDesc,
-            "visibility": privacy,
-            "trainer": trainer,
-            "TrDtSet": TrDtSet,
-            "Preproc": Preproc,
-            "LDAparam": LDAparam
-        }
-
-        with configFile.open('w', encoding='utf-8') as outfile:
-            json.dump(train_config, outfile,
-                      ensure_ascii=False, indent=2, default=str)
-
-        #############################################################
-        # END IMT Interface: Next, the actual training should happen
-        #############################################################
-
-        # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-        # This fragment of code creates a spark cluster and submits the task
-        # This function is dependent on UC3M local deployment infrastructure
-        # and will not work in BSC production environment
-        #
-        # Needs to be modified with the BSC Spark Cluster and/or CITE SparkSubmit
-        # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-        # Step 1: Preprocessing of Training Data
-        if self.cf.get('Spark', 'spark_available') == 'True':
-            script_spark = self.cf.get('Spark', 'script_spark')
-            token_spark = self.cf.get('Spark', 'token_spark')
-            script_path = './src/topicmodeling/topicmodeling.py'
-            options = '"--spark --preproc --config ' + configFile.resolve().as_posix() + '"'
-            cmd = script_spark + ' -C ' + token_spark + \
-                ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
-            printred(cmd)
-            try:
-                self.logger.info(f'-- -- Running command {cmd}')
-                output = check_output(args=cmd, shell=True)
-            except:
-                self.logger.error('-- -- Execution of script failed')
-
-        else:
-            # Run command for corpus preprocessing using gensim
-            cmd = f'python topicmodeling.py --preproc --config {configFile.as_posix()}'
-            printred(cmd)
-            try:
-                self.logger.info(f'-- -- Running command {cmd}')
-                output = check_output(args=cmd, shell=True)
-            except:
-                self.logger.error('-- -- Command execution failed')
-
-        # Step 2: Training of Topic Model
-        if trainer == "sparkLDA":
-            if not self.cf.get('Spark', 'spark_available') == 'True':
-                self.logger.error(
-                    "-- -- sparkLDA requires access to a Spark cluster")
-            else:
-                script_spark = self.cf.get('Spark', 'script_spark')
-                token_spark = self.cf.get('Spark', 'token_spark')
-                script_path = './src/topicmodeling/topicmodeling.py'
-                options = '"--spark --train --config ' + configFile.resolve().as_posix() + '"'
-                cmd = script_spark + ' -C ' + token_spark + \
-                    ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
-                printred(cmd)
-                try:
-                    self.logger.info(f'-- -- Running command {cmd}')
-                    check_output(args=cmd, shell=True)
-                except:
-                    self.logger.error('-- -- Execution of script failed')
-
-        else:
-            # Other models do not require Spark
-            cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
-            printred(cmd)
-            try:
-                self.logger.info(f'-- -- Running command {cmd}')
-                output = check_output(args=cmd, shell=True)
-            except:
-                self.logger.error('-- -- Command execution failed')
         return
 
     def corpus2JSON(self):
@@ -2340,7 +2250,77 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         self.logger.info(
             f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
 
+        # Actual training of the topic model takes place
         super().trainTM(modelname, ModelDesc, privacy, trainer,
                         TrDtSet, preproc_settings, training_params)
 
         return
+    
+    def load_listTMmodels(self):
+        """
+        Extends the load_listTMmodels method from the parent class to load into execution time an XML structure of all the available TM models that are going to be used for visualization purposes in the GUI.
+        """
+
+        super().load_listTMmodels()
+
+        if self.allTMmodels:
+            all_models = self.p2p.joinpath(
+                self._dir_struct['LDAmodels']).resolve().as_posix() # @TODO: Change LDAmodels to TMmodels
+            
+            # Create XML structure of the models for visaulization purposes
+            if pathlib.Path(all_models).is_dir():
+                self.models_xml = get_model_xml(all_models)
+
+        return
+    
+
+    def listAllTMmodels(self, gui):
+        """
+        This method shows all topic models available for the project in the corresponding table
+        within the GUI.
+
+        Parameters
+        ----------
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+        """
+
+        if self.allTMmodels:
+            if self.models_xml:
+                clearQTreeWidget(gui.treeView_trained_models)
+                printTree(self.models_xml, gui.treeView_trained_models)
+
+        return
+    
+    def listTMmodel(self, gui, model_name):
+
+        if self.allTMmodels:
+
+            # Get dictionary with the information of all models
+            allTMmodels = json.loads(self.allTMmodels)
+
+            # Get table where TMmodel information is going to be displayed
+            table = gui.table_available_trained_models_desc
+            table.setRowCount(1)
+
+            for TMmodel in allTMmodels.keys():
+                if allTMmodels[TMmodel]['name'] == model_name:
+                    table.setItem(0, 0, QtWidgets.QTableWidgetItem(
+                        allTMmodels[TMmodel]['name']))
+                    table.setItem(0, 1, QtWidgets.QTableWidgetItem(
+                        allTMmodels[TMmodel]['description']))
+                    table.setItem(0, 2, QtWidgets.QTableWidgetItem(
+                        allTMmodels[TMmodel]['visibility']))
+                    table.setItem(0, 3, QtWidgets.QTableWidgetItem(
+                        allTMmodels[TMmodel]['trainer']))
+                    table.setItem(0, 4, QtWidgets.QTableWidgetItem(
+                        allTMmodels[TMmodel]['TrDtSet']))
+                    table.setItem(0, 5, QtWidgets.QTableWidgetItem(
+                        ""))
+                    table.setItem(0, 6, QtWidgets.QTableWidgetItem(
+                        ""))
+                    table.setItem(0, 7, QtWidgets.QTableWidgetItem(
+                        allTMmodels[TMmodel]['creation_date']))
+            
+        return
+                

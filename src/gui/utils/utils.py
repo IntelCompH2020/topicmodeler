@@ -13,25 +13,24 @@ import os
 import pathlib
 import pickle
 import shutil
+import xml.etree.ElementTree as ET
 
-from PyQt6.QtGui import QTextCursor
 from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtGui import QTextCursor
 from PyQt6.QtWidgets import (QProgressBar, QPushButton, QTableWidget,
                              QTableWidgetItem, QTextEdit)
-# Local imports
 from src.gui.utils.worker import Worker
 
 
 def execute_in_thread(gui, function, function_output, progress_bar):
     """
     Method to execute a certain function in a secondary thread while keeping the GUI's execution in the main thread.
-    A progress bar is shown at the time the function is being executed if a progress bar object is provided. When finished, it forces the execution of the method to be executed after the function executing in a thread is completed. Based on the functions provided in the manual available at:
-    https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/
+    A progress bar is shown at the time the function is being executed if a progress bar object is provided. When finished, it forces the execution of the method to be executed after the function executing in a thread is completed. Based on the functions provided in the manual available at: https://www.pythonguis.com/tutorials multithreading-pyqt-applications-qthreadpool/
 
     Parameters
     ----------
     gui: MainWindow
-        ...
+        Window associated to the execution in the main thread
     function: UDF
         Function to be executed in thread
     function_output: UDF
