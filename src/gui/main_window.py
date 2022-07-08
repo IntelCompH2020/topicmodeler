@@ -400,6 +400,9 @@ class MainWindow(QMainWindow):
         # Fill settings table
         self.set_default_settings("all", False, False)
 
+        # Load models
+        self.tm.listAllTMmodels(self)
+
         self.train_model_subwindow = TrainModelWindow(
             tm=self.tm, thread_pool=self.thread_pool, stdout=self.stdout, stderr=self.stderr, training_corpus=None, preproc_settings=None)
 
@@ -711,7 +714,7 @@ class MainWindow(QMainWindow):
         #self.train_model_subwindow = TrainModelWindow(
         #    tm=self.tm, thread_pool=self.thread_pool, stdout=self.stdout, #stderr=self.stderr, training_corpus=training_corpus, #preproc_settings=self.preprocessing_subwindow.preproc_settings)
 
-        self.train_model_subwindow.training_corpus = training_corpus
+        self.train_model_subwindow.TrDts_name = training_corpus
         self.train_model_subwindow.preproc_settings = self.preprocessing_subwindow.preproc_settings
         self.train_model_subwindow.exec()
 
@@ -725,7 +728,7 @@ class MainWindow(QMainWindow):
         """
 
         if self.treeView_trained_models.currentItem() is None or \
-                self.treeView_available_models_topic_desc.currentItem().text(0).lower().startswith("models"):
+                self.treeView_trained_models.currentItem().text(0).lower().startswith("models"):
             return
         else:
             model_selected = self.treeView_trained_models.currentItem().text(0)

@@ -197,7 +197,7 @@ class textPreproc(object):
         bow representation of the documents
         """
         if isinstance(trDF, dd.DataFrame):
-            
+
             def tkz_clean_str(rawtext):
                 """Function to carry out tokenization and cleaning of text
 
@@ -214,19 +214,22 @@ class textPreproc(object):
                 if rawtext == None or rawtext == '':
                     return ''
                 else:
-                    #lowercase and tokenization (similar to Spark tokenizer)
+                    # lowercase and tokenization (similar to Spark tokenizer)
                     cleantext = rawtext.lower().split()
-                    #remove stopwords
-                    cleantext = [el for el in cleantext if el not in self._stopwords]
-                    #replacement of equivalent words
+                    # remove stopwords
+                    cleantext = [
+                        el for el in cleantext if el not in self._stopwords]
+                    # replacement of equivalent words
                     cleantext = [self._equivalents[el] if el in self._equivalents else el
-                        for el in cleantext]
+                                 for el in cleantext]
                 return cleantext
-            
+
             # Compute tokens, clean them, and filter out documents
             # with less than minimum number of lemmas
-            trDF['final_tokens'] = trDF['all_lemmas'].apply(tkz_clean_str, meta=('all_lemmas', 'object'))
-            trDF = trDF.loc[trDF.final_tokens.apply(len, meta=('final_tokens', 'int64')) >= self._min_lemas]
+            trDF['final_tokens'] = trDF['all_lemmas'].apply(
+                tkz_clean_str, meta=('all_lemmas', 'object'))
+            trDF = trDF.loc[trDF.final_tokens.apply(
+                len, meta=('final_tokens', 'int64')) >= self._min_lemas]
 
             # Gensim dictionary creation. It persists the created Dataframe
             # to accelerate dictionary calculation
@@ -236,7 +239,8 @@ class textPreproc(object):
             with ProgressBar():
                 DFtokens = trDF[['final_tokens']]
                 DFtokens = DFtokens.compute(scheduler='processes')
-            self._GensimDict = corpora.Dictionary(DFtokens['final_tokens'].values.tolist())
+            self._GensimDict = corpora.Dictionary(
+                DFtokens['final_tokens'].values.tolist())
 
             # Remove words that appear in less than no_below documents, or in more than
             # no_above, and keep at most keep_n most frequent terms
@@ -244,7 +248,7 @@ class textPreproc(object):
             self._logger.info('-- -- Gensim Filter Extremes')
 
             self._GensimDict.filter_extremes(no_below=self._no_below,
-                no_above=self._no_above, keep_n=self._keep_n)
+                                             no_above=self._no_above, keep_n=self._keep_n)
 
             # We skip the calculation of the bow for each document, because Spark LDA will
             # not be used in this case. Note that this is different from what is done for
@@ -380,7 +384,9 @@ class textPreproc(object):
             # Dask dataframe
 
             # Remove words not in dictionary, and return a string
-            vocabulary = set([self._GensimDict[idx] for idx in range(len(self._GensimDict))])
+            vocabulary = set([self._GensimDict[idx]
+                             for idx in range(len(self._GensimDict))])
+
             def tk_2_text(tokens):
                 """Function to filter words not in dictionary, and
                 return a string of lemmas 
@@ -396,27 +402,30 @@ class textPreproc(object):
                     Clean text including only the lemmas in the dictionary
                 """
                 #bow = self._GensimDict.doc2bow(tokens)
-                #return ''.join([el[1] * (self._GensimDict[el[0]]+ ' ') for el in bow])
+                # return ''.join([el[1] * (self._GensimDict[el[0]]+ ' ') for el in bow])
                 return ' '.join([el for el in tokens if el in vocabulary])
 
-            trDF['cleantext'] = trDF['final_tokens'].apply(tk_2_text, meta=('final_tokens', 'str'))
+            trDF['cleantext'] = trDF['final_tokens'].apply(
+                tk_2_text, meta=('final_tokens', 'str'))
 
             if tmTrainer == "mallet":
 
                 outFile = dirpath.joinpath('corpus.txt')
                 if outFile.is_file():
                     outFile.unlink()
-                
-                trDF['2mallet'] = trDF['id'].apply(str, meta=('id', 'str')) + " 0 " + trDF['cleantext']
+
+                trDF['2mallet'] = trDF['id'].apply(
+                    str, meta=('id', 'str')) + " 0 " + trDF['cleantext']
 
                 with ProgressBar():
                     #trDF = trDF.persist(scheduler='processes')
                     DFmallet = trDF[['2mallet']]
                     DFmallet.to_csv(outFile, index=False, header=False, single_file=True,
-                        compute_kwargs={'scheduler': 'processes'})
+                                    compute_kwargs={'scheduler': 'processes'})
 
             elif tmTrainer == 'sparkLDA':
-                self._logger.error('-- -- sparkLDA requires preprocessing with spark')
+                self._logger.error(
+                    '-- -- sparkLDA requires preprocessing with spark')
                 return
             elif tmTrainer == "prodLDA":
 
@@ -426,11 +435,11 @@ class textPreproc(object):
 
                 with ProgressBar():
                     #trDF = trDF.persist(scheduler='processes')
-                    DFparquet = trDF[['id', 'cleantext']] #allrawtext
-                    #https://docs.dask.org/en/stable/generated/dask.dataframe.to_parquet.html
+                    DFparquet = trDF[['id', 'cleantext']]  # allrawtext
+                    # https://docs.dask.org/en/stable/generated/dask.dataframe.to_parquet.html
                     DFparquet.to_parquet(outFile, index=False, header=False, single_file=True,
-                        compute_kwargs={'scheduler': 'processes'})
-                    
+                                         compute_kwargs={'scheduler': 'processes'})
+
             elif tmTrainer == "ctm":
                 pass
         else:
@@ -484,7 +493,7 @@ class textPreproc(object):
                 outFile = dirpath.joinpath('lemas.parquet')
                 lemas_raw_df = (trDF.withColumn("bow_text", back2textUDF(F.col("bow")))
                                 .select("id", "bow_text", "all_raw_text")
-                               )
+                                )
                 lemas_raw_df.write.parquet(
                     f"file://{outFile.as_posix()}", mode="overwrite")
 
@@ -498,8 +507,7 @@ class TMmodel(object):
     # _betas: The weight of each word in the vocabulary
     # _thetas: The weight of each topic in each document
     #
-    # The TM can be trained with Blei's LDA, Mallet, or any other toolbox that
-    # produces a model according to this representation
+    # The TM can be trained with Blei's LDA, Mallet, or any other toolbox that produces a model according to this representation
 
     # Estas variables guardarán los valores originales de las alphas, betas, thetas
     # servirán para resetear el modelo después de su optimización
@@ -656,6 +664,9 @@ class TMmodel(object):
 
     def get_ntopics(self):
         return self._ntopics
+
+    def get_vocab_size(self):
+        return self._size_vocab
 
     def get_tpc_corrcoef(self):
         # Computes topic correlation. Highly correlated topics
@@ -1312,13 +1323,13 @@ class MalletTrainer(Trainer):
         super().__init__(logger)
 
         self._mallet_path = Path(mallet_path)
-        self._ntopics = ntopics
+        self._ntopics = int(ntopics)
         self._alpha = alpha
         self._optimize_interval = optimize_interval
         self._num_threads = num_threads
         self._num_iterations = num_iterations
         self._doc_topic_thr = doc_topic_thr
-        self._thetas_thr = thetas_thr
+        self._thetas_thr = float(thetas_thr)
         self._token_regexp = token_regexp
 
         if not self._mallet_path.is_file():
@@ -1359,6 +1370,7 @@ class MalletTrainer(Trainer):
         # Set to zeros all thetas below threshold, and renormalize
         thetas32[thetas32 < self._thetas_thr] = 0
         thetas32 = normalize(thetas32, axis=1, norm='l1')
+        print(thetas32.shape)
         thetas32 = sparse.csr_matrix(thetas32, copy=True)
 
         # Recalculate topic weights to avoid errors due to sparsification
@@ -1502,10 +1514,10 @@ class ProdLDATrainer(Trainer):
     """
 
     def __init__(self, n_components=10, model_type='prodLDA',
-                hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
-                learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99,
-                solver='adam', num_epochs=100, reduce_on_plateau=False,
-                topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10, num_data_loader_workers=mp.cpu_count(), thetas_thr=0.003, logger=None):
+                 hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
+                 learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99,
+                 solver='adam', num_epochs=100, reduce_on_plateau=False,
+                 topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10, num_data_loader_workers=mp.cpu_count(), thetas_thr=0.003, logger=None):
         """
         Initilization Method
 
@@ -1573,7 +1585,7 @@ class ProdLDATrainer(Trainer):
         self._thetas_thr = thetas_thr
 
         return
-    
+
     def _createTMmodel(self, modelFolder, avitm):
         """Creates an object of class TMmodel hosting the topic model
         that has been trained using ProdLDA topic modeling and whose
@@ -1657,17 +1669,18 @@ class ProdLDATrainer(Trainer):
         self.logger.info('-- -- ProdLDA Corpus Generation: BOW Dataset object')
         df = pd.read_parquet(corpusFile)
         df_lemas = df[["bow_text"]].values.tolist()
-        df_lemas = [doc[0].split() for doc in df_lemas]       
+        df_lemas = [doc[0].split() for doc in df_lemas]
 
         self._corpus = [el for el in df_lemas]
         self._train_dataset, self._val_dataset, self._bow_size, self._id2token = \
             prepare_dataset(self._corpus)
-       
-        data = [self._train_dataset, self._val_dataset, self._bow_size, self._id2token]
+
+        data = [self._train_dataset, self._val_dataset,
+                self._bow_size, self._id2token]
         bowdataset_file = modelFolder.joinpath('bowdataset.pickle')
         with open(bowdataset_file, 'wb') as f:
             pickle.dump(data, f)
-        
+
         avitm = AVITM(logger=self.logger,
                       input_size=self._bow_size,
                       n_components=self._n_components,
@@ -1695,6 +1708,7 @@ class ProdLDATrainer(Trainer):
 
         return
 
+
 class CTMTrainer(Trainer):
     """
     Wrapper for the CTM Topic Model Training. Implements the
@@ -1706,7 +1720,7 @@ class CTMTrainer(Trainer):
 
     """
 
-    def __init__(self, n_components=10, ctm_model_type='CombinedTM', model_type='prodLDA', hidden_sizes=(100, 100), activation='softplus', dropout=0.2, learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99,solver='adam', num_epochs=100, num_samples=10, reduce_on_plateau=False,topic_prior_mean=0.0, topic_prior_variance=None, num_data_loader_workers=mp.cpu_count(), label_size=0, loss_weights=None, thetas_thr=0.003,sbert_model_to_load='paraphrase-distilroberta-base-v1',logger=None):
+    def __init__(self, n_components=10, ctm_model_type='CombinedTM', model_type='prodLDA', hidden_sizes=(100, 100), activation='softplus', dropout=0.2, learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, solver='adam', num_epochs=100, num_samples=10, reduce_on_plateau=False, topic_prior_mean=0.0, topic_prior_variance=None, num_data_loader_workers=mp.cpu_count(), label_size=0, loss_weights=None, thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1', logger=None):
         """
         Initilization Method
 
@@ -1875,8 +1889,9 @@ class CTMTrainer(Trainer):
             prepare_ctm_dataset(corpus=self._corpus,
                                 unpreprocessed_corpus=self._unpreprocessed_corpus,
                                 sbert_model_to_load=self._sbert_model_to_load)
-        
-        data = [self._train_dataset, self._val_dataset, self._input_size, self._id2token]
+
+        data = [self._train_dataset, self._val_dataset,
+                self._input_size, self._id2token]
         ctm_dataset_file = modelFolder.joinpath('ctm_dataset.pickle')
         with open(ctm_dataset_file, 'wb') as f:
             pickle.dump(data, f)
@@ -1923,7 +1938,7 @@ class CTMTrainer(Trainer):
                 topic_prior_mean=self._topic_prior_mean,
                 topic_prior_variance=self._topic_prior_variance,
                 num_data_loader_workers=self._num_data_loader_workers,
-                label_size=self._label_size, 
+                label_size=self._label_size,
                 loss_weights=self._loss_weights)
 
         ctm.fit(self._train_dataset, self._val_dataset)
@@ -1933,6 +1948,102 @@ class CTMTrainer(Trainer):
         tm.save_npz(corpusFile.parent.joinpath('model.npz'))
 
         return
+
+
+class HierarchicalTMManager(object):
+
+    def __init__(self, logger=None):
+        """
+        Initilization Method
+
+        Parameters
+        ----------
+        logger: Logger object
+            To log object activity
+        """
+
+        if logger:
+            self._logger = logger
+        else:
+            import logging
+            logging.basicConfig(level='INFO')
+            self._logger = logging.getLogger('textPreproc')
+
+        return
+
+    def create_submodel_tr_corpus(self, TMmodel, configFile_f, configFile_c):
+        """
+
+        Parameters
+        ----------
+        TMmodel: TMmodel
+            TModel object associated with the father model
+        train_config_f: str
+            Father model's configuration file' s path
+        train_config_c: str
+            Submodel's configuration file' s path
+        """
+
+        # Read training configurations from father model and submodel
+        configFile_f = Path(configFile_f)
+        with configFile_f.open('r', encoding='utf8') as fin:
+            tr_config_f = json.load(fin)
+        configFile_c = Path(configFile_c)
+        with configFile_c.open('r', encoding='utf8') as fin:
+            tr_config_c = json.load(fin)
+
+        # Get father model's training corpus as dask dataframe
+        # TODO: Save training data of CTM and prod as corpus.txt
+        corpusFile = tr_config_f.parent.joinpath('corpus.txt')
+        tr_data = [line.rsplit(' 0 ')[1].strip().split() for line in open(
+            corpusFile, encoding="utf-8").readlines()]
+        tr_data_df = pd.DataFrame(tr_data, columns=['doc'])
+        tr_data_ddf = dd.from_pandas(tr_data_df)
+
+        # Get embeddings if the trainer is CTM
+        # TODO: Allow passing embeddings from file for training CTM
+        if tr_config_f['trainer'] == "ctm":
+            embeddingsFile = tr_config_f.parent.joinpath('embeddings.npy')
+            embeddings = np.load(embeddingsFile, allow_pickle=True)
+
+        # Get father model's thetas and betas
+        thetas = TMmodel.thetas.toarray()
+        betas = TMmodel.betas
+
+        # Get expansion topic
+        exp_tpc = tr_config_c['expansion_tpc']
+
+        if tr_config_c['version'] == "htm-ws":
+            self._logger.info(
+                '-- -- -- HierarchicalTMManager: Creating training corpus according to HTM-WS.')
+
+            for d in tr_data:
+                thetas_d = thetas[:, d]
+                p_z_dw = np.outer(thetas_d, betas)
+
+        elif tr_config_c['version'] == "htm-ds":
+            self.logger.info(
+                '-- -- -- HierarchicalTMManager: Creating training corpus according to HTM-DS.')
+
+            # Get ids of documents that meet the condition of having a representation of the expansion topic larger than thr
+            thr = tr_config_c['thr']
+            doc_ids_to_keep = \
+                [idx for idx in range(thetas.shape[0])
+                 if thetas[idx, exp_tpc] > thr]
+            # Keep selected documents from the father's t
+            corpus = [tr_data[id_doc] for id_doc in doc_ids_to_keep]
+            if configFile_f['trainer'] == "ctm":
+                # Keep embeddings related to the selected documents t
+                embeddings = embeddings[doc_ids_to_keep, :]
+            else:
+                embeddings = None
+
+        else:
+            self.logger.error(
+                '-- -- -- HierarchicalTMManager: The specified HTM version is not available.')
+
+        return
+
 
 ##############################################################################
 #                                  MAIN                                      #
@@ -1951,8 +2062,12 @@ if __name__ == "__main__":
                         help="Preprocess training data according to config file")
     parser.add_argument('--train', action='store_true', default=False,
                         help="Train Topic Model according to config file")
+    parser.add_argument('--hierarchical', action='store_true', default=False,
+                        help='Create submodel training data according to config files', required=False)
     parser.add_argument('--config', type=str, default=None,
                         help="path to configuration file")
+    parser.add_argument('--config_child', type=str, default=None,
+                        help="Path to submodel's config file", required=False)
     args = parser.parse_args()
 
     if args.spark:
@@ -1971,7 +2086,7 @@ if __name__ == "__main__":
     else:
         spark = None
 
-    #Listing of topic models
+    # Listing of topic models
     if args.listTMmodels:
         if not args.path_models:
             sys.exit('You need to indicate the location of training datasets')
@@ -2061,25 +2176,25 @@ if __name__ == "__main__":
                         pass
                     # Concatenate text fields
                     for idx2, col in enumerate(DtSet['lemmasfld']):
-                        if idx2==0:
+                        if idx2 == 0:
                             df["all_lemmas"] = df[col]
                         else:
                             df["all_lemmas"] += " " + df[col]
                     for idx2, col in enumerate(DtSet['rawtxtfld']):
-                        if idx2==0:
+                        if idx2 == 0:
                             df["all_rawtext"] = df[col]
                         else:
                             df["all_rawtext"] += " " + df[col]
                     df["source"] = DtSet["source"]
                     df = df[["id", "source", "all_lemmas", "all_rawtext"]]
-                    
-                    #Concatenate dataframes
+
+                    # Concatenate dataframes
                     if idx == 0:
                         trDF = df
                     else:
                         trDF = dd.concat([trDF, df])
-                
-                #trDF = trDF.drop_duplicates(subset=["id"], ignore_index=True)  
+
+                #trDF = trDF.drop_duplicates(subset=["id"], ignore_index=True)
                 # We preprocess the data and save the Gensim Model used to obtain the BoW
                 trDF = tPreproc.preprocBOW(trDF)
                 tPreproc.saveGensimDict(configFile.parent.resolve())
@@ -2087,7 +2202,7 @@ if __name__ == "__main__":
                                                    dirpath=configFile.parent.resolve(),
                                                    tmTrainer=train_config['trainer'])
                 sys.stdout.write(trDataFile.as_posix())
-                
+
         else:
             sys.exit('You need to provide a valid configuration file')
 
@@ -2122,48 +2237,59 @@ if __name__ == "__main__":
                         configFile.parent.joinpath('corpus.parquet'))
                 elif train_config['trainer'] == 'prodLDA':
                     ProdLDATr = ProdLDATrainer(
-                                n_components=train_config['PRODparam']['n_components'],
-                                model_type=train_config['PRODparam']['model_type'],
-                                hidden_sizes=train_config['PRODparam']['hidden_sizes'],
-                                activation=train_config['PRODparam']['activation'],
-                                dropout=train_config['PRODparam']['dropout'],
-                                learn_priors=train_config['PRODparam']['learn_priors'],
-                                batch_size=train_config['PRODparam']['batch_size'],
-                                lr=train_config['PRODparam']['lr'],
-                                momentum=train_config['PRODparam']['momentum'],
-                                solver=train_config['PRODparam']['solver'],
-                                num_epochs=train_config['PRODparam']['num_epochs'],
-                                reduce_on_plateau=train_config['PRODparam']['reduce_on_plateau'],
-                                topic_prior_mean=train_config['PRODparam']['topic_prior_mean'],
-                                topic_prior_variance=train_config['PRODparam']['topic_prior_variance'],
-                                num_samples=train_config['PRODparam']['num_samples'],
-                                num_data_loader_workers=train_config['PRODparam']['num_data_loader_workers'],
-                                thetas_thr=train_config['PRODparam']['thetas_thr'])
+                        n_components=train_config['PRODparam']['n_components'],
+                        model_type=train_config['PRODparam']['model_type'],
+                        hidden_sizes=train_config['PRODparam']['hidden_sizes'],
+                        activation=train_config['PRODparam']['activation'],
+                        dropout=train_config['PRODparam']['dropout'],
+                        learn_priors=train_config['PRODparam']['learn_priors'],
+                        batch_size=train_config['PRODparam']['batch_size'],
+                        lr=train_config['PRODparam']['lr'],
+                        momentum=train_config['PRODparam']['momentum'],
+                        solver=train_config['PRODparam']['solver'],
+                        num_epochs=train_config['PRODparam']['num_epochs'],
+                        reduce_on_plateau=train_config['PRODparam']['reduce_on_plateau'],
+                        topic_prior_mean=train_config['PRODparam']['topic_prior_mean'],
+                        topic_prior_variance=train_config['PRODparam']['topic_prior_variance'],
+                        num_samples=train_config['PRODparam']['num_samples'],
+                        num_data_loader_workers=train_config['PRODparam']['num_data_loader_workers'],
+                        thetas_thr=train_config['PRODparam']['thetas_thr'])
                     ProdLDATr.fit()
                 elif train_config['trainer'] == 'ctm':
                     CTMr = CTMTrainer(
-                            n_components=train_config['CTMparam']['n_components'],
-                            model_type=train_config['CTMparam']['model_type'],
-                            ctm_model_type=train_config['CTMparam']['ctm_model_type'],
-                            hidden_sizes=train_config['CTMparam']['hidden_sizes'],
-                            activation=train_config['CTMparam']['activation'],
-                            dropout=train_config['CTMparam']['dropout'],
-                            learn_priors=train_config['CTMparam']['learn_priors'],
-                            batch_size=train_config['CTMparam']['batch_size'],
-                            lr=train_config['CTMparam']['lr'],
-                            momentum=train_config['CTMparam']['momentum'],
-                            solver=train_config['CTMparam']['solver'],
-                            num_epochs=train_config['CTMparam']['num_epochs'],
-                            num_samples=train_config['CTMparam']['num_samples'],
-                            reduce_on_plateau=train_config['CTMparam']['reduce_on_plateau'],
-                            topic_prior_mean=train_config['CTMparam']['topic_prior_mean'],
-                            topic_prior_variance=train_config['CTMparam']['topic_prior_variance'],
-                            num_data_loader_workers=train_config['CTMparam']['num_data_loader_workers'],
-                            label_size=train_config['CTMparam']['label_size'],
-                            loss_weights=train_config['CTMparam']['loss_weights'],
-                            thetas_thr=train_config['CTMparam']['thetas_thr'],
-                            sbert_model_to_load=train_config['CTMparam']['sbert_model_to_load'])
+                        n_components=train_config['CTMparam']['n_components'],
+                        model_type=train_config['CTMparam']['model_type'],
+                        ctm_model_type=train_config['CTMparam']['ctm_model_type'],
+                        hidden_sizes=train_config['CTMparam']['hidden_sizes'],
+                        activation=train_config['CTMparam']['activation'],
+                        dropout=train_config['CTMparam']['dropout'],
+                        learn_priors=train_config['CTMparam']['learn_priors'],
+                        batch_size=train_config['CTMparam']['batch_size'],
+                        lr=train_config['CTMparam']['lr'],
+                        momentum=train_config['CTMparam']['momentum'],
+                        solver=train_config['CTMparam']['solver'],
+                        num_epochs=train_config['CTMparam']['num_epochs'],
+                        num_samples=train_config['CTMparam']['num_samples'],
+                        reduce_on_plateau=train_config['CTMparam']['reduce_on_plateau'],
+                        topic_prior_mean=train_config['CTMparam']['topic_prior_mean'],
+                        topic_prior_variance=train_config['CTMparam']['topic_prior_variance'],
+                        num_data_loader_workers=train_config['CTMparam']['num_data_loader_workers'],
+                        label_size=train_config['CTMparam']['label_size'],
+                        loss_weights=train_config['CTMparam']['loss_weights'],
+                        thetas_thr=train_config['CTMparam']['thetas_thr'],
+                        sbert_model_to_load=train_config['CTMparam']['sbert_model_to_load'])
                     CTMr.fit()
 
         else:
             sys.exit('You need to provide a valid configuration file')
+    
+    if args.hierarchical:
+        if not args.config_child:
+            sys.exit('You need to provide a configuration file for the submodel')
+        else:
+            configFile_c = Path(args.config)
+            if not configFile.is_file():
+                sys.exit('You need to provide a valid configuration file')
+            else:
+                HierarchicalTMManager = HierarchicalTMManager()
+                # TODO: Continue

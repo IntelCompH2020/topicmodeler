@@ -2101,6 +2101,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         super().__init__(
             p2p, p2parquet, p2wdlist, config_fname=config_fname, metadata_fname=metadata_fname)
+        self.models_xml = None
 
     def listDownloaded(self, gui):
         """
@@ -2444,7 +2445,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             all_models = self.p2p.joinpath(
                 self._dir_struct['LDAmodels']).resolve().as_posix()  # @TODO: Change LDAmodels to TMmodels
 
-            # Create XML structure of the models for visaulization purposes
+            # Create XML structure of the models for visualization purposes
             if pathlib.Path(all_models).is_dir():
                 self.models_xml = get_model_xml(all_models)
 
@@ -2460,6 +2461,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             QMainWindow object associated which the GUI
         """
 
+        print(self.allTMmodels)
+        print(self.models_xml)
         if self.allTMmodels:
             if self.models_xml:
                 clearQTreeWidget(gui.treeView_trained_models)
