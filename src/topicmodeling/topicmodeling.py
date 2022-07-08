@@ -23,13 +23,16 @@ from subprocess import check_output
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import dask.dataframe as dd
+from dask.diagnostics import ProgressBar
 from scipy import sparse
 from sklearn.preprocessing import normalize
+from gensim import corpora
 
-from src.topicmodeling.neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
-from src.topicmodeling.neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
-from src.topicmodeling.neural_models.pytorchavitm.avitm_network.avitm import AVITM
-from src.topicmodeling.neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
+#from src.topicmodeling.neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
+#from src.topicmodeling.neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
+#from src.topicmodeling.neural_models.pytorchavitm.avitm_network.avitm import AVITM
+#from src.topicmodeling.neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
 
 """
 # from scipy.spatial.distance import jensenshannon
@@ -39,7 +42,6 @@ import regex as javare
 import re
 from tqdm import tqdm
 import ipdb
-from gensim import corpora
 from gensim.utils import check_output, tokenize
 import pickle
 
@@ -81,7 +83,8 @@ class textPreproc(object):
 
     def __init__(self, stw_files=[], eq_files=[],
                  min_lemas=15, no_below=10, no_above=0.6,
-                 keep_n=100000, cntVecModel=None, logger=None):
+                 keep_n=100000, cntVecModel=None,
+                 GensimDict=None, logger=None):
         """
         Initilization Method
         Stopwords and the dictionary of equivalences will be loaded
@@ -103,6 +106,8 @@ class textPreproc(object):
             Maximum vocabulary size
         cntVecModel : pyspark.ml.feature.CountVectorizerModel
             CountVectorizer Model to be used for the BOW calculation
+        GensimDict : gensim.corpora.Dictionary
+            Optimized Gensim Dictionary Object
         logger: Logger object
             To log object activity
         """
@@ -113,6 +118,7 @@ class textPreproc(object):
         self._no_above = no_above
         self._keep_n = keep_n
         self._cntVecModel = cntVecModel
+        self._GensimDict = GensimDict
 
         if logger:
             self._logger = logger
@@ -190,96 +196,66 @@ class textPreproc(object):
         trDFnew: A new dataframe with a new colum bow containing the
         bow representation of the documents
         """
-        if isinstance(trDF, pd.DataFrame):
-            print('pandas')
+        if isinstance(trDF, dd.DataFrame):
+            
+            def tkz_clean_str(rawtext):
+                """Function to carry out tokenization and cleaning of text
 
-            """
-                    Preprocessing of files
-            For the training we have access (in self._corpusFiles) to a number of lemmatized
-            documents. This function:
-                1) Carries out a first set of cleaning and homogeneization tasks
-                2) Allow to reduce the size of the vocabulary (removing very rare or common terms)
-                3) Import the training corpus into Mallet format
+                Parameters
+                ----------
+                rawtext: str
+                    string with the text to lemmatize
 
-            # Identification of words that are too rare or common that need to be
-            # removed from the dictionary.
-            self.logger.info('-- -- Mallet Corpus Generation: Vocabulary generation')
-            dictionary = corpora.Dictionary()
+                Returns
+                -------
+                cleantxt: str
+                    Cleaned text
+                """
+                if rawtext == None or rawtext == '':
+                    return ''
+                else:
+                    #lowercase and tokenization (similar to Spark tokenizer)
+                    cleantext = rawtext.lower().split()
+                    #remove stopwords
+                    cleantext = [el for el in cleantext if el not in self._stopwords]
+                    #replacement of equivalent words
+                    cleantext = [self._equivalents[el] if el in self._equivalents else el
+                        for el in cleantext]
+                return cleantext
+            
+            # Compute tokens, clean them, and filter out documents
+            # with less than minimum number of lemmas
+            trDF['final_tokens'] = trDF['all_lemmas'].apply(tkz_clean_str, meta=('all_lemmas', 'object'))
+            trDF = trDF.loc[trDF.final_tokens.apply(len, meta=('final_tokens', 'int64')) >= self._min_lemas]
 
-            # We iterate over all CSV files
-            #### Very important
-            #### Corpus that can be used for Topic Modeling must contain
-            #### two fields: ["id", "lemmas"]
-            print('Processing files for vocabulary creation')
-            pbar = tqdm(self._corpusFiles)
-            for csvFile in pbar:
-                df = pd.read_csv(csvFile, escapechar="\\", on_bad_lines="skip")
-                if "id" not in df.columns or "lemmas" not in df.columns:
-                    self.logger.error('-- -- Traning corpus error: must contain "id" and "lemmas" - Exit')
-                    sys.exit()
-                # Keep only relevant fields
-                id_lemas = df[["id", "lemmas"]].values.tolist()
-                # Apply regular expression to identify tokens
-                id_lemas = [[el[0], ' '.join(self._token_regexp.findall(el[1].replace('\n', ' ').strip()))]
-                            for el in id_lemas]
-                # Apply stopwords and equivalence files
-                id_lemas = [[el[0], self._stwEQ.cleanstr(el[1])] for el in id_lemas]
-                # Apply gensim tokenizer
-                id_lemas = [[el[0], list(tokenize(el[1], lowercase=True, deacc=True))] for el in id_lemas]
-                # Retain only documents with minimum extension
-                id_lemas = [el for el in id_lemas if len(el[1]) >= self._min_lemas]
-                # Add to dictionary
-                all_lemas = [el[1] for el in id_lemas]
-                dictionary.add_documents(all_lemas)
+            # Gensim dictionary creation. It persists the created Dataframe
+            # to accelerate dictionary calculation
+            # Filtering of words is carried out according to provided values
+            self._logger.info('-- -- Gensim Dictionary Generation')
+
+            with ProgressBar():
+                trDF = trDF.persist(scheduler='processes')
+            class DaskCorpus:
+                def __iter__(self):
+                    for row in trDF[['final_tokens']].itertuples():
+                        yield row[-1]
+
+            daskcorpus = DaskCorpus()
+            self._GensimDict = corpora.Dictionary(daskcorpus)
 
             # Remove words that appear in less than no_below documents, or in more than
-            # no_above, and keep at most keep_n most frequent terms, keep track of removed
-            # words for debugging purposes
-            all_words = [dictionary[idx] for idx in range(len(dictionary))]
-            dictionary.filter_extremes(no_below=self._no_below, no_above=self._no_above, keep_n=self._keep_n)
-            kept_words = set([dictionary[idx] for idx in range(len(dictionary))])
-            rmv_words = [el for el in all_words if el not in kept_words]
-            # Save extreme words that will be removed
-            self.logger.info(f'-- -- Saving {len(rmv_words)} extreme words to file')
-            rmv_file = self._modelFolder.joinpath('commonrare_words.txt')
-            with rmv_file.open('w', encoding='utf-8') as fout:
-                [fout.write(el + '\n') for el in sorted(rmv_words)]
-            # Save dictionary to file
-            self.logger.info(f'-- -- Saving dictionary to file. Number of words: {len(kept_words)}')
-            vocab_txt = self._modelFolder.joinpath('vocabulary.txt')
-            with vocab_txt.open('w', encoding='utf-8') as fout:
-                [fout.write(el + '\n') for el in sorted(kept_words)]
-            # Save also in gensim text format
-            vocab_gensim = self._modelFolder.joinpath('vocabulary.gensim')
-            dictionary.save_as_text(vocab_gensim)
+            # no_above, and keep at most keep_n most frequent terms
 
-            ##################################################
-            # Create corpus txt files
-            self.logger.info('-- -- Mallet Corpus generation: TXT file')
+            self._logger.info('-- -- Gensim Filter Extremes')
 
-            corpus_file = self._modelFolder.joinpath('training_data.txt')
+            self._GensimDict.filter_extremes(no_below=self._no_below,
+                no_above=self._no_above, keep_n=self._keep_n)
 
-            fcorpus = corpus_file.open('w', encoding='utf-8')
+            # We skip the calculation of the bow for each document, because Spark LDA will
+            # not be used in this case. Note that this is different from what is done for
+            # Spark preprocessing
+            trDFnew = trDF
 
-            print('Processing files for training dataset creation')
-            pbar = tqdm(self._corpusFiles)
-            for csvFile in pbar:
-                # Document preprocessing is same as before, but now we apply an additional filter
-                # and keep only words in the vocabulary
-                df = pd.read_csv(csvFile, escapechar="\\", on_bad_lines="skip")
-                id_lemas = df[["id", "lemmas"]].values.tolist()
-                id_lemas = [[el[0], ' '.join(self._token_regexp.findall(el[1].replace('\n', ' ').strip()))]
-                            for el in id_lemas]
-                id_lemas = [[el[0], self._stwEQ.cleanstr(el[1])] for el in id_lemas]
-                id_lemas = [[el[0], list(tokenize(el[1], lowercase=True, deacc=True))] for el in id_lemas]
-                id_lemas = [[el[0], [tk for tk in el[1] if tk in kept_words]] for el in id_lemas]
-                id_lemas = [el for el in id_lemas if len(el[1]) >= self._min_lemas]
-                # Write to corpus file
-                [fcorpus.write(el[0] + ' 0 ' + ' '.join(el[1]) + '\n') for el in id_lemas]
-
-            fcorpus.close()
-
-            """
         else:
             # Preprocess data using Spark
             # tokenization
@@ -351,6 +327,36 @@ class textPreproc(object):
         else:
             return 0
 
+    def saveGensimDict(self, dirpath):
+        """
+        Saves a Gensim Dictionary to the specified path
+        Saves also a text document with the corresponding
+        vocabulary
+
+        Parameters
+        ----------
+        dirpath: pathlib.Path
+            The folder where the Gensim dictionary and the
+            text file with the vocabulary will be saved
+
+        Returns
+        -------
+        status: int
+            - 1: If the files were generated sucessfully
+            - 0: Error (Gensim dictionary does not exist)
+        """
+        if self._GensimDict:
+            GensimFile = dirpath.joinpath('dictionary.gensim')
+            if GensimFile.is_file():
+                GensimFile.unlink()
+            self._GensimDict.save_as_text(GensimFile)
+            with dirpath.joinpath('vocabulary.txt').open('w', encoding='utf8') as fout:
+                fout.write(
+                    '\n'.join([self._GensimDict[idx] for idx in range(len(self._GensimDict))]))
+            return 1
+        else:
+            return 0
+
     def exportTrData(self, trDF, dirpath, tmTrainer):
         """
         Exports the training data in the provided dataset to the
@@ -358,9 +364,10 @@ class textPreproc(object):
 
         Parameters
         ----------
-        trDF: Pandas or Spark dataframe
-            The dataframe should contain a column "bow" that will
+        trDF: Dask or Spark dataframe
+            If Spark, the dataframe should contain a column "bow" that will
             be used to calculate the training data
+            If Dask, it should contain a column "final_tokens"
         dirpath: pathlib.Path
             The folder where the data will be saved
         tmTrainer: string
@@ -372,9 +379,51 @@ class textPreproc(object):
             A path containing the location of the training data in the indicated format
         """
 
-        if isinstance(trDF, pd.DataFrame):
-            print('pandas')
+        self._logger.info(f'-- -- Exporting corpus to {tmTrainer} format')
+
+        if isinstance(trDF, dd.DataFrame):
+            # Dask dataframe
+            if tmTrainer == "mallet":
+
+                outFile = dirpath.joinpath('corpus.txt')
+                vocabulary = set([self._GensimDict[idx] for idx in range(len(self._GensimDict))])
+                
+                # Remove words not in dictionary, and return a string
+                def tk_2_text(tokens):
+                    """Function to filter words not in dictionary, and
+                    return a string of lemmas 
+
+                    Parameters
+                    ----------
+                    tokens: list
+                        list of "final_tokens"
+
+                    Returns
+                    -------
+                    lemmasstr: str
+                        Clean text including only the lemmas in the dictionary
+                    """
+                    return ' '.join([el for el in tokens if el in vocabulary])
+
+                trDF['cleantext'] = trDF['final_tokens'].apply(tk_2_text, meta=('final_tokens', 'str'))
+                trDF['2mallet'] = trDF['id'].apply(str) + " 0 " + trDF['cleantext']
+
+                with ProgressBar():
+                    trDF = trDF.persist(scheduler='processes')
+
+                with outFile.open("w", encoding="utf8") as fout:
+                    for row in trDF[['2mallet']].itertuples():
+                        fout.write(row[-1] + "\n")
+
+            elif tmTrainer == 'sparkLDA':
+                self._logger.error('-- -- sparkLDA requires preprocessing with spark')
+                return
+            elif tmTrainer == "prodLDA":
+                pass
+            elif tmTrainer == "ctm":
+                pass
         else:
+            # Spark dataframe
             if tmTrainer == "mallet":
                 # We need to convert the bow back to text, and save text file
                 # in mallet format
@@ -429,129 +478,6 @@ class textPreproc(object):
                     f"file://{outFile.as_posix()}", mode="overwrite")
 
         return outFile
-
-
-class stwEQcleaner(object):
-    """Simpler version of the english lemmatizer
-    It only provides stopword removal and application of equivalences
-
-    Public methods:
-        - cleanstr: Apply stopwords and equivalences on provided string
-    """
-
-    def __init__(self, stw_files=[], dict_eq_file='', logger=None):
-        """
-        Initilization Method
-        Stopwwords and the dictionary of equivalences will be loaded
-        during initialization
-
-        Parameters
-        ----------
-        stw_file: list
-            List of files of stopwords
-        dict_eq_file: pathlib.Path
-            Dictionary of equivalent words A : B means A will be replaced by B
-
-        """
-        self.__stopwords = []
-
-        # Unigrams for word replacement
-        self.__useunigrams = False
-        self.__pattern_unigrams = None
-        self.__unigramdictio = None
-        if logger:
-            self.logger = logger
-        else:
-            import logging
-            logging.basicConfig(level='INFO')
-            self.logger = logging.getLogger('stwEQcleaner')
-        # Load stopwords
-        for stw_file in stw_files:
-            if stw_file.is_file():
-                self.__stopwords += self.__loadStopFile(stw_file)
-            else:
-                self.logger.info('-- -- Stopwords file not found')
-        self.__stopwords = set(self.__stopwords)
-
-        # Predefined equivalences as provided in file
-        if dict_eq_file.is_file():
-            self.__unigramdictio, self.__pattern_unigrams = self.__loadEQFile(
-                dict_eq_file)
-            if len(self.__unigramdictio):
-                self.__useunigrams = True
-        else:
-            self.logger.info('-- -- Equivalence file not found')
-
-        return
-
-    def cleanstr(self, rawtext):
-        """Function to remove stopwords and apply equivalences
-
-        Parameters
-        ----------
-        rawtext: str
-            string with the text to lemmatize
-        """
-        if rawtext == None or rawtext == '':
-            return ''
-        else:
-            texto = ' '.join(self.__removeSTW(rawtext.split()))
-            # Make equivalences according to dictionary
-            if self.__useunigrams:
-                texto = self.__pattern_unigrams.sub(
-                    lambda x: self.__unigramdictio[x.group()], texto)
-        return texto
-
-    def __loadStopFile(self, file):
-        """Function to load the stopwords from a file. The stopwords will be
-        read from the file, one stopword per line
-
-        Parameters
-        ----------
-        file:
-            The file to read the stopwords from
-        """
-        with open(file, encoding='utf-8') as f:
-            stopw = f.read().splitlines()
-
-        return [word.strip() for word in stopw if word]
-
-    def __loadEQFile(self, file):
-        """Function to load equivalences from a file. The equivalence file
-        will contain an equivalence per line in the format original : target
-        where original will be changed to target after lemmatization
-
-        Parameters
-        ----------
-        file:
-            The file to read the equivalences from
-        """
-        unigrams = []
-        with open(file, 'r', encoding='utf-8') as f:
-            unigramlines = f.readlines()
-        unigramlines = [el.strip() for el in unigramlines]
-        unigramlines = [x.split(' : ') for x in unigramlines]
-        unigramlines = [x for x in unigramlines if len(x) == 2]
-
-        if len(unigramlines):
-            # This dictionary contains the necessary replacements to carry out
-            unigramdictio = dict(unigramlines)
-            unigrams = [x[0] for x in unigramlines]
-            # Regular expression to find the tokens that need to be replaced
-            pattern_unigrams = re.compile(r'\b(' + '|'.join(unigrams) + r')\b')
-            return unigramdictio, pattern_unigrams
-        else:
-            return None, None
-
-    def __removeSTW(self, tokens):
-        """Removes stopwords from the provided list
-
-        Parameters
-        ----------
-        tokens:
-            Input list of string to be cleaned from stw
-        """
-        return [el for el in tokens if el not in self.__stopwords]
 
 
 class TMmodel(object):
@@ -1306,7 +1232,9 @@ class Trainer(object):
 
     @abstractmethod
     def _createTMmodel(self, modelFolder):
-        """Creates an object of class TMmodel hosting the topic model that has been trained and whose output is available at the provided folder
+        """Creates an object of class TMmodel hosting the topic model
+        that has been trained and whose output is available at the
+        provided folder
 
         Parameters
         ----------
@@ -2111,8 +2039,43 @@ if __name__ == "__main__":
                 sys.stdout.write(trDataFile.as_posix())
 
             else:
-                # TBD Preprocess training data with Gensim
-                pass
+                # Read all training data and configure them as a pandas dataframe
+                for idx, DtSet in enumerate(trDtSet['Dtsets']):
+                    df = dd.read_parquet(DtSet['parquet']).fillna("")
+                    if len(DtSet['filter']):
+                        # To be implemented
+                        # Needs a dask command to carry out the filtering
+                        # df = df.filter ...
+                        pass
+                    #Concatenate text fields
+                    for idx2,col in enumerate(DtSet['lemmasfld']):
+                        if idx2==0:
+                            df["all_lemmas"] = df[col]
+                        else:
+                            df["all_lemmas"] += " " + df[col]
+                    for idx2,col in enumerate(DtSet['rawtxtfld']):
+                        if idx2==0:
+                            df["all_rawtext"] = df[col]
+                        else:
+                            df["all_rawtext"] += " " + df[col]
+                    df["source"] = DtSet["source"]
+                    df = df[["id", "source", "all_lemmas", "all_rawtext"]]
+                    
+                    #Concatenate dataframes
+                    if idx == 0:
+                        trDF = df
+                    else:
+                        trDF = dd.concat([trDF, df])
+                
+                #trDF = trDF.drop_duplicates(subset=["id"], ignore_index=True)  
+                # We preprocess the data and save the Gensim Model used to obtain the BoW
+                trDF = tPreproc.preprocBOW(trDF)
+                tPreproc.saveGensimDict(configFile.parent.resolve())
+                trDataFile = tPreproc.exportTrData(trDF=trDF,
+                                                   dirpath=configFile.parent.resolve(),
+                                                   tmTrainer=train_config['trainer'])
+                sys.stdout.write(trDataFile.as_posix())
+                
         else:
             sys.exit('You need to provide a valid configuration file')
 
