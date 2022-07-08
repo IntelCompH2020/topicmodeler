@@ -2115,17 +2115,17 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         if self.allDtsets:
             allDtsets = json.loads(self.allDtsets)
-            table = gui.table_available_local_corpus
+            table = gui.table_available_local_corpora
             table.setRowCount(len(allDtsets.keys()))
             row = 0
             for Dts in allDtsets.keys():
-                table.setItem(row, 0, QtWidgets.QTableWidgetItem(
-                    allDtsets[Dts]['name']))
                 table.setItem(row, 1, QtWidgets.QTableWidgetItem(
-                    allDtsets[Dts]['source']))
+                    allDtsets[Dts]['name']))
                 table.setItem(row, 2, QtWidgets.QTableWidgetItem(
-                    allDtsets[Dts]['description']))
+                    allDtsets[Dts]['source']))
                 table.setItem(row, 3, QtWidgets.QTableWidgetItem(
+                    allDtsets[Dts]['description']))
+                table.setItem(row, 7, QtWidgets.QTableWidgetItem(
                     ', '.join([el for el in allDtsets[Dts]['schema']])))
                 table.setItem(row, 4, QtWidgets.QTableWidgetItem(
                     str(allDtsets[Dts]['records'])))
@@ -2197,7 +2197,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         if self.allTrDtsets:
             allTrDtsets = json.loads(self.allTrDtsets)
-            table = gui.table_available_training_datasets
+            table = gui.table_available_tr_datasets
             table.setRowCount(len(allTrDtsets.keys()))
             row = 0
             for TrDts in allTrDtsets.keys():
@@ -2272,11 +2272,9 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                     allWdLists[TrDts]['creation_date']))
                 table.setItem(row, 4, QtWidgets.QTableWidgetItem(
                     allWdLists[TrDts]['visibility']))
-                table.setItem(row, 5,
-                              QtWidgets.QTableWidgetItem(', '.join([el for el in allWdLists[TrDts]['wordlist']])))
                 row += 1
-
         return
+    #table.setItem(row, 5, QtWidgets.QTableWidgetItem(', '.join([el for el in allWdLists[TrDts]['wordlist']])))
 
     def listWdListsByType(self, table, type):
         """

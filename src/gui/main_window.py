@@ -53,10 +53,12 @@ class MainWindow(QMainWindow):
         ########################################################################
         # Load UI
         ########################################################################
-        loadUi("src/gui/uis/main_window.ui", self)
+        loadUi("src/gui/uis/main_window copy.ui", self)
         self.setWindowIcon(QtGui.QIcon(
             'src/gui/resources/images/fuzzy_training.png'))
         self.setWindowTitle(Constants.SMOOTH_SPOON_TITLE)
+        # Initally, the menu is hidden
+        self.frame_menu_title.hide()
 
         ########################################################################
         # Attributes
@@ -365,12 +367,12 @@ class MainWindow(QMainWindow):
         It loads the data and its associated metadata (local datasets available in the parquet folder, corpus for training and trained models) into the corresponding GUI's tables.
         """
 
-        # Load datasets available in the parquet folder into "table_available_local_corpus"
+        # Load datasets available in the parquet folder into "table_available_local_corpora"
         self.tm.listDownloaded(self)
-        # Add checkboxes in the last column of "table_available_local_corpus" so the user can select from which of the datasets he wants to create a training corpus
-        utils.add_checkboxes_to_table(self.table_available_local_corpus)
+        # Add checkboxes in the last column of "table_available_local_corpora" so the user can select from which of the datasets he wants to create a training corpus
+        utils.add_checkboxes_to_table(self.table_available_local_corpora,0)
 
-        # Load available training corpus (if any) into "table_available_training_datasets"
+        # Load available training corpus (if any) into "table_available_tr_datasets"
         self.tm.listTMCorpus(self)
 
         # Update the style of the tables in the corpus page
@@ -380,7 +382,7 @@ class MainWindow(QMainWindow):
         self.tm.listAllWdLists(self)
 
         # Update the style of the tables in the wordlists page
-        #utils.configure_table_header(Constants.WORDLISTS_TABLES, self)
+        utils.configure_table_header(Constants.WORDLISTS_TABLES, self)
 
         # Fill settings table
         self.set_default_settings("all", False, False)
@@ -395,6 +397,9 @@ class MainWindow(QMainWindow):
         # Once project and parquet folders are properly selected, app's functionalities are enabled
         for menu_button in self.menu_buttons:
             menu_button.setEnabled(True)
+
+        # Make menu visible
+        self.frame_menu_title.show()
 
         # Already available data is visualized in the corresponding tables
         self.load_data()
@@ -516,9 +521,9 @@ class MainWindow(QMainWindow):
 
         # Get ids of the datasets that are going to be used for the training corpus generation
         checked_list = []
-        for i in range(self.table_available_local_corpus.rowCount()):
-            item = self.table_available_local_corpus.item(
-                i, self.table_available_local_corpus.columnCount() - 1)
+        for i in range(self.table_available_local_corpora.rowCount()):
+            item = self.table_available_local_corpora.item(
+                i, 0)
             if item.checkState() == QtCore.Qt.CheckState.Checked:
                 checked_list.append(i)
 
@@ -547,8 +552,8 @@ class MainWindow(QMainWindow):
         """
 
         # Get selected dataset for deletion
-        r = self.table_available_training_datasets.currentRow()
-        print(self.table_available_training_datasets.item(
+        r = self.table_available_tr_datasets.currentRow()
+        print(self.table_available_tr_datasets.item(
             r, 0).text())
 
         # If no training corpus is selected for deletion before clicking the 'pushButton_delete_trdtst' button,
@@ -558,7 +563,7 @@ class MainWindow(QMainWindow):
                 self, Constants.SMOOTH_SPOON_MSG, Constants.TM_DELETE_NO_CORPUS_MSG)
             return
         # Get name of the corpus to be deleted
-        corpus_to_delete = self.table_available_training_datasets.item(
+        corpus_to_delete = self.table_available_tr_datasets.item(
             r, 0).text()
 
         # Delete corpus by invoking the corresponding task manager function
@@ -656,7 +661,7 @@ class MainWindow(QMainWindow):
     def clicked_train_dataset(self):
 
         # Get training dataset
-        r = self.table_available_training_datasets.currentRow()
+        r = self.table_available_tr_datasets.currentRow()
 
         # If no training dataset is selected for before clicking the 'train_dataset' button, a warning message is shown to the user
         if not r:
@@ -664,7 +669,7 @@ class MainWindow(QMainWindow):
                 self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_TR_CORPUS)
             return
 
-        training_corpus = self.table_available_training_datasets.item(r, 0).text()
+        training_corpus = self.table_available_tr_datasets.item(r, 0).text()
         
         # Get preprocessing settings
         self.preprocessing_subwindow = PreprocessingWindow(tm=self.tm)

@@ -21,8 +21,8 @@ class Constants:
     TM_CORPUS_MSG_STATUS_2 = "The dataset replaced an existing dataset"
     TM_DELETE_NO_CORPUS_MSG = "A corpus to be deleted must be selected first."
 
-    CORPUS_TABLES = ["table_available_local_corpus",
-                     "table_available_training_datasets"]
+    CORPUS_TABLES = ["table_available_local_corpora",
+                     "table_available_tr_datasets"]
     DOWNLOAD_CORPUS_TABLES = ["table_available_fields",
                               "table_fields_to_include", "table_filters"]
     CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",
