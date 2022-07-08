@@ -111,6 +111,9 @@ class MainWindow(QMainWindow):
             menu_button_name = "menu_button_" + str(id_button + 1)
             menu_button_widget = self.findChild(QPushButton, menu_button_name)
             self.menu_buttons.append(menu_button_widget)
+        self.extra_menu_buttons = [self.pushButton_corpus_home,
+                                   self.pushButton_wordlists_home, 
+                                   self.pushButton_models_home]
 
         for menu_button in self.menu_buttons:
             menu_button.clicked.connect(
@@ -149,6 +152,8 @@ class MainWindow(QMainWindow):
         #################
         self.menu_button_2.clicked.connect(
             lambda: self.content_tabs.setCurrentWidget(self.page_corpus))
+        self.pushButton_corpus_home.clicked.connect(
+            lambda: self.content_tabs.setCurrentWidget(self.page_corpus))
 
         self.corpus_buttons = []
         for id_button in np.arange(Constants.MAX_CORPUS_BUTTONS):
@@ -170,10 +175,14 @@ class MainWindow(QMainWindow):
         #####################
         self.menu_button_3.clicked.connect(
             lambda: self.content_tabs.setCurrentWidget(self.page_wordlists))
+        self.pushButton_wordlists_home.clicked.connect(
+            lambda: self.content_tabs.setCurrentWidget(self.page_wordlists))
 
         # PAGE 4: Models
         #################
         self.menu_button_4.clicked.connect(
+            lambda: self.content_tabs.setCurrentWidget(self.page_models))
+        self.pushButton_models_home.clicked.connect(
             lambda: self.content_tabs.setCurrentWidget(self.page_models))
 
         # PAGE 5: Settings
@@ -234,6 +243,8 @@ class MainWindow(QMainWindow):
         # When the app is first opened, menu buttons are disabled until the user selects properly the project and parquet folders
         for menu_button in self.menu_buttons:
             menu_button.setEnabled(False)
+        for extra_menu_button in self.extra_menu_buttons:
+            extra_menu_button.setEnabled(False)
 
         # PAGE 1: Home
         utils.set_recent_buttons(self)
@@ -279,6 +290,8 @@ class MainWindow(QMainWindow):
             self.clicked_pushButton_edit_wordlist)
         self.pushButton_delete_wordlist.clicked.connect(
             self.clicked_pushButton_delete_wordlist)
+        self.table_available_wordlists.cellClicked.connect(
+            self.show_wordlist_description)
 
         self.treeView_trained_models.clicked.connect(
             self.clicked_treeView_trained_models)
@@ -370,7 +383,7 @@ class MainWindow(QMainWindow):
         # Load datasets available in the parquet folder into "table_available_local_corpora"
         self.tm.listDownloaded(self)
         # Add checkboxes in the last column of "table_available_local_corpora" so the user can select from which of the datasets he wants to create a training corpus
-        utils.add_checkboxes_to_table(self.table_available_local_corpora,0)
+        utils.add_checkboxes_to_table(self.table_available_local_corpora, 0)
 
         # Load available training corpus (if any) into "table_available_tr_datasets"
         self.tm.listTMCorpus(self)
@@ -397,6 +410,9 @@ class MainWindow(QMainWindow):
         # Once project and parquet folders are properly selected, app's functionalities are enabled
         for menu_button in self.menu_buttons:
             menu_button.setEnabled(True)
+
+        for extra_menu_button in self.extra_menu_buttons:
+            extra_menu_button.setEnabled(True)
 
         # Make menu visible
         self.frame_menu_title.show()
@@ -658,6 +674,20 @@ class MainWindow(QMainWindow):
 
         return
 
+    def show_wordlist_description(self):
+
+        # Get wordlist selected for deletion
+        r = self.table_available_wordlists.currentRow()
+
+        wlst = self.table_available_wordlists.item(r, 0).text()
+
+        wlst_dict = self.tm.get_wdlist_info(wlst)
+
+        self.textEdit_wordlist_content.setPlainText(
+            ', '.join([el for el in wlst_dict['wordlist']]))
+
+        return
+
     def clicked_train_dataset(self):
 
         # Get training dataset
@@ -670,13 +700,13 @@ class MainWindow(QMainWindow):
             return
 
         training_corpus = self.table_available_tr_datasets.item(r, 0).text()
-        
+
         # Get preprocessing settings
         self.preprocessing_subwindow = PreprocessingWindow(tm=self.tm)
         self.preprocessing_subwindow.exec()
 
         self.train_model_subwindow = TrainModelWindow(
-             tm=self.tm, thread_pool=self.thread_pool, stdout=self.stdout, stderr=self.stderr, training_corpus=training_corpus, preproc_settings=self.preprocessing_subwindow.preproc_settings)
+            tm=self.tm, thread_pool=self.thread_pool, stdout=self.stdout, stderr=self.stderr, training_corpus=training_corpus, preproc_settings=self.preprocessing_subwindow.preproc_settings)
         self.train_model_subwindow.exec()
 
         # @TODO: Reload models

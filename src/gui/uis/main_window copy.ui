@@ -3918,6 +3918,18 @@ padding-left: 10px;</string>
                         </widget>
                        </item>
                        <item>
+                        <widget class="QLabel" name="label_5">
+                         <property name="styleSheet">
+                          <string notr="true">color:#1A2E40;
+font: 87 12pt italic &quot;Avenir&quot;;
+padding-left: 15px;</string>
+                         </property>
+                         <property name="text">
+                          <string>Click on the wordlist to see its description</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
                         <widget class="QFrame" name="frame_70">
                          <property name="styleSheet">
                           <string notr="true">border:none;</string>
@@ -3987,6 +3999,9 @@ QHeaderView::section:horizontal
                                </property>
                                <property name="sizeAdjustPolicy">
                                 <enum>QAbstractScrollArea::AdjustToContents</enum>
+                               </property>
+                               <property name="editTriggers">
+                                <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
                                </property>
                                <attribute name="horizontalHeaderStretchLastSection">
                                 <bool>true</bool>
@@ -4076,10 +4091,25 @@ QHeaderView::section:horizontal
                               <widget class="QTextEdit" name="textEdit_wordlist_content">
                                <property name="styleSheet">
                                 <string notr="true">QTextEdit {	
-	background-color: transparent;
+	background-color: #F2F2F2;
 	font: 87 italic 12pt &quot;Avenir&quot;;
 	border-radius: 5px;
-	}</string>
+	border: none;
+	color:black;
+}
+QScrollBar:horizontal {
+	background: #4D6F8C;
+    border: none;
+    height: 2px;
+	margin: 0px 2px 0 2px;
+}
+QScrollBar:vertical {
+    background: #4D6F8C;
+    border: none;
+    width: 4px;
+    margin: 2px 0 2px 0;
+	border-radius: 0px;
+ }</string>
                                </property>
                               </widget>
                              </item>
@@ -5242,7 +5272,7 @@ QScrollBar:horizontal {
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>266</width>
+                                <width>800</width>
                                 <height>734</height>
                                </rect>
                               </property>
@@ -6005,7 +6035,7 @@ padding-left: 10px;</string>
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>412</width>
+                                   <width>776</width>
                                    <height>1097</height>
                                   </rect>
                                  </property>
@@ -7081,7 +7111,7 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>324</width>
+                                   <width>776</width>
                                    <height>1944</height>
                                   </rect>
                                  </property>
@@ -9025,7 +9055,7 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>351</width>
+                                   <width>776</width>
                                    <height>2428</height>
                                   </rect>
                                  </property>
@@ -12078,8 +12108,8 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>288</width>
-                                   <height>492</height>
+                                   <width>780</width>
+                                   <height>570</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_67">
