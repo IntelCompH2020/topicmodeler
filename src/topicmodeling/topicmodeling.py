@@ -234,14 +234,9 @@ class textPreproc(object):
             self._logger.info('-- -- Gensim Dictionary Generation')
 
             with ProgressBar():
-                trDF = trDF.persist(scheduler='processes')
-            class DaskCorpus:
-                def __iter__(self):
-                    for row in trDF[['final_tokens']].itertuples():
-                        yield row[-1]
-
-            daskcorpus = DaskCorpus()
-            self._GensimDict = corpora.Dictionary(daskcorpus)
+                DFtokens = trDF[['final_tokens']]
+                DFtokens = DFtokens.compute(scheduler='processes')
+            self._GensimDict = corpora.Dictionary(DFtokens['final_tokens'].values.tolist())
 
             # Remove words that appear in less than no_below documents, or in more than
             # no_above, and keep at most keep_n most frequent terms
@@ -383,43 +378,59 @@ class textPreproc(object):
 
         if isinstance(trDF, dd.DataFrame):
             # Dask dataframe
+
+            # Remove words not in dictionary, and return a string
+            vocabulary = set([self._GensimDict[idx] for idx in range(len(self._GensimDict))])
+            def tk_2_text(tokens):
+                """Function to filter words not in dictionary, and
+                return a string of lemmas 
+
+                Parameters
+                ----------
+                tokens: list
+                    list of "final_tokens"
+
+                Returns
+                -------
+                lemmasstr: str
+                    Clean text including only the lemmas in the dictionary
+                """
+                #bow = self._GensimDict.doc2bow(tokens)
+                #return ''.join([el[1] * (self._GensimDict[el[0]]+ ' ') for el in bow])
+                return ' '.join([el for el in tokens if el in vocabulary])
+
+            trDF['cleantext'] = trDF['final_tokens'].apply(tk_2_text, meta=('final_tokens', 'str'))
+
             if tmTrainer == "mallet":
 
                 outFile = dirpath.joinpath('corpus.txt')
-                vocabulary = set([self._GensimDict[idx] for idx in range(len(self._GensimDict))])
+                if outFile.is_file():
+                    outFile.unlink()
                 
-                # Remove words not in dictionary, and return a string
-                def tk_2_text(tokens):
-                    """Function to filter words not in dictionary, and
-                    return a string of lemmas 
-
-                    Parameters
-                    ----------
-                    tokens: list
-                        list of "final_tokens"
-
-                    Returns
-                    -------
-                    lemmasstr: str
-                        Clean text including only the lemmas in the dictionary
-                    """
-                    return ' '.join([el for el in tokens if el in vocabulary])
-
-                trDF['cleantext'] = trDF['final_tokens'].apply(tk_2_text, meta=('final_tokens', 'str'))
-                trDF['2mallet'] = trDF['id'].apply(str) + " 0 " + trDF['cleantext']
+                trDF['2mallet'] = trDF['id'].apply(str, meta=('id', 'str')) + " 0 " + trDF['cleantext']
 
                 with ProgressBar():
-                    trDF = trDF.persist(scheduler='processes')
-
-                with outFile.open("w", encoding="utf8") as fout:
-                    for row in trDF[['2mallet']].itertuples():
-                        fout.write(row[-1] + "\n")
+                    #trDF = trDF.persist(scheduler='processes')
+                    DFmallet = trDF[['2mallet']]
+                    DFmallet.to_csv(outFile, index=False, header=False, single_file=True,
+                        compute_kwargs={'scheduler': 'processes'})
 
             elif tmTrainer == 'sparkLDA':
                 self._logger.error('-- -- sparkLDA requires preprocessing with spark')
                 return
             elif tmTrainer == "prodLDA":
-                pass
+
+                outFile = dirpath.joinpath('corpus.parquet')
+                if outFile.is_file():
+                    outFile.unlink()
+
+                with ProgressBar():
+                    #trDF = trDF.persist(scheduler='processes')
+                    DFparquet = trDF[['id', 'cleantext']] #allrawtext
+                    #https://docs.dask.org/en/stable/generated/dask.dataframe.to_parquet.html
+                    DFparquet.to_parquet(outFile, index=False, header=False, single_file=True,
+                        compute_kwargs={'scheduler': 'processes'})
+                    
             elif tmTrainer == "ctm":
                 pass
         else:
@@ -2039,7 +2050,7 @@ if __name__ == "__main__":
                 sys.stdout.write(trDataFile.as_posix())
 
             else:
-                # Read all training data and configure them as a pandas dataframe
+                # Read all training data and configure them as a dask dataframe
                 for idx, DtSet in enumerate(trDtSet['Dtsets']):
                     df = dd.read_parquet(DtSet['parquet']).fillna("")
                     if len(DtSet['filter']):
