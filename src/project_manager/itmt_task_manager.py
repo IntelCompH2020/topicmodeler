@@ -425,7 +425,7 @@ class ITMTTaskManager(BaseTaskManager):
 
         else:
             # Run command for corpus preprocessing using gensim
-            cmd = f'python topicmodeling.py --preproc --config {configFile.as_posix()}'
+            cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {configFile.as_posix()}'
             printred(cmd)
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
@@ -454,7 +454,7 @@ class ITMTTaskManager(BaseTaskManager):
 
         else:
             # Other models do not require Spark
-            cmd = f'python topicmodeling.py --train --config {configFile.as_posix()}'
+            cmd = f'python src/topicmodeling/topicmodeling.py --train --config {configFile.as_posix()}'
             printred(cmd)
             try:
                 self.logger.info(f'-- -- Running command {cmd}')

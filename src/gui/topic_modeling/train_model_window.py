@@ -46,7 +46,6 @@ class TrainModelWindow(QtWidgets.QDialog):
         # Load UI and configure default geometry of the window
         # #####################################################################
         loadUi("src/gui/uis/train_window.ui", self)
-        self.init_ui()
         #####################################################################################
         # ATTRIBUTES
         #####################################################################################
@@ -322,8 +321,8 @@ class TrainModelWindow(QtWidgets.QDialog):
             str(self.cf.get('ProdLDA', 'num_samples')))
         self.lineEdit_workers_prod.setText(
             str(self.cf.get('ProdLDA', 'num_data_loader_workers')))
-        self.thetas_thr.setText(
-            str(self.cf.get('ProdLDA', 'lineEdit_thetas_thr_prod')))
+        self.lineEdit_thetas_thr_prod.setText(
+            str(self.cf.get('ProdLDA', 'thetas_thr')))
 
         return
 

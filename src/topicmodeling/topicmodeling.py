@@ -29,10 +29,10 @@ from scipy import sparse
 from sklearn.preprocessing import normalize
 from gensim import corpora
 
-#from src.topicmodeling.neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
-#from src.topicmodeling.neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
-#from src.topicmodeling.neural_models.pytorchavitm.avitm_network.avitm import AVITM
-#from src.topicmodeling.neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
+from neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
+from neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
+from neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
+from neural_models.pytorchavitm.avitm_network.avitm import AVITM
 
 """
 # from scipy.spatial.distance import jensenshannon
@@ -1399,6 +1399,7 @@ class MalletTrainer(Trainer):
         """
 
         # Output model folder and training file for the corpus
+        print(corpusFile)
         if not corpusFile.is_file():
             self._logger.error(
                 f'-- -- Provided corpus Path does not exist -- Stop')
