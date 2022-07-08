@@ -2059,13 +2059,13 @@ if __name__ == "__main__":
                         # Needs a dask command to carry out the filtering
                         # df = df.filter ...
                         pass
-                    #Concatenate text fields
-                    for idx2,col in enumerate(DtSet['lemmasfld']):
+                    # Concatenate text fields
+                    for idx2, col in enumerate(DtSet['lemmasfld']):
                         if idx2==0:
                             df["all_lemmas"] = df[col]
                         else:
                             df["all_lemmas"] += " " + df[col]
-                    for idx2,col in enumerate(DtSet['rawtxtfld']):
+                    for idx2, col in enumerate(DtSet['rawtxtfld']):
                         if idx2==0:
                             df["all_rawtext"] = df[col]
                         else:

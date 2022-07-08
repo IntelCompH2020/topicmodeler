@@ -400,6 +400,9 @@ class MainWindow(QMainWindow):
         # Fill settings table
         self.set_default_settings("all", False, False)
 
+        self.train_model_subwindow = TrainModelWindow(
+            tm=self.tm, thread_pool=self.thread_pool, stdout=self.stdout, stderr=self.stderr, training_corpus=None, preproc_settings=None)
+
         return
 
     def init_user_interaction(self):
@@ -705,8 +708,11 @@ class MainWindow(QMainWindow):
         self.preprocessing_subwindow = PreprocessingWindow(tm=self.tm)
         self.preprocessing_subwindow.exec()
 
-        self.train_model_subwindow = TrainModelWindow(
-            tm=self.tm, thread_pool=self.thread_pool, stdout=self.stdout, stderr=self.stderr, training_corpus=training_corpus, preproc_settings=self.preprocessing_subwindow.preproc_settings)
+        #self.train_model_subwindow = TrainModelWindow(
+        #    tm=self.tm, thread_pool=self.thread_pool, stdout=self.stdout, #stderr=self.stderr, training_corpus=training_corpus, #preproc_settings=self.preprocessing_subwindow.preproc_settings)
+
+        self.train_model_subwindow.training_corpus = training_corpus
+        self.train_model_subwindow.preproc_settings = self.preprocessing_subwindow.preproc_settings
         self.train_model_subwindow.exec()
 
         # @TODO: Reload models
@@ -1021,6 +1027,10 @@ class MainWindow(QMainWindow):
             QMessageBox.information(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.RESTORE_DFT_MSGS[id_msg])
 
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
+        
         return
 
     def clicked_pushButton_apply_changes_gui_settings(self):
@@ -1036,6 +1046,10 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_GUI_SETTINGS)
+        
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
 
         return
 
@@ -1062,6 +1076,10 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_LOG_SETTINGS)
+        
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
 
         return
 
@@ -1097,6 +1115,11 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_MALLET_SETTINGS)
+
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
+        self.train_model_subwindow.get_lda_mallet_params()
 
         return
 
@@ -1146,6 +1169,11 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_PRODLDA_SETTINGS)
+        
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
+        self.train_model_subwindow.get_prodlda_params()
 
         return
 
@@ -1153,6 +1181,13 @@ class MainWindow(QMainWindow):
         """
         Method for controling the clicking of the button 'pushButton_apply_changes_sparklda_settings' that controls the actualization of the Topic Modeler's SparkLDA settings.
         """
+
+        #@TODO
+
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
+        self.train_model_subwindow.get_sparklda_params()
 
         return
 
@@ -1208,6 +1243,11 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_CTM_SETTINGS)
+        
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
+        self.train_model_subwindow.get_ctm_params()
 
         return
 
@@ -1244,6 +1284,10 @@ class MainWindow(QMainWindow):
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_TM_GENERAL_SETTINGS)
 
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
+
         return
 
     def clicked_pushButton_apply_spark_settings(self):
@@ -1267,6 +1311,10 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_SPARK_SETTINGS)
+        
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
 
         return
 
@@ -1293,6 +1341,10 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_PREPROC_SETTINGS)
+        
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
 
         return
 

@@ -108,10 +108,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             checkbox.hide()
 
         # Initialize settings
-        self.get_lda_mallet_params()
-        self.get_prodlda_params()
-        self.get_ctm_params()
-        self.get_sparklda_params()
+        self.initialize_training_settings()
 
         ########################################################################
         # Connect buttons
@@ -151,15 +148,6 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.pushButton_train.clicked.connect(
             self.clicked_pushButton_train)
 
-    def init_ui(self):
-        """Configures the elements of the GUI window that are not configured in the UI, i.e., icon of the application, the application's title, and the position of the window at its opening.
-        """
-
-        self.setWindowIcon(QtGui.QIcon(
-            'src/gui/resources/images/fuzzy_training.png'))
-        self.setWindowTitle(Constants.SMOOTH_SPOON_TITLE)
-        self.center()
-
     def clicked_change_train_button(self, train_button):
         """
         Method to control the selection of one of the buttons in the train bar.
@@ -174,6 +162,13 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.previous_train_button.setStyleSheet(
             Constants.TRAIN_BUTTONS_SELECTED_STYLESHEET)
 
+        return
+
+    def initialize_training_settings(self):
+        self.get_lda_mallet_params()
+        self.get_prodlda_params()
+        self.get_ctm_params()
+        self.get_sparklda_params()
         return
 
     # Mallet functions

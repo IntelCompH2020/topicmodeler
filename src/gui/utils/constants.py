@@ -75,7 +75,7 @@ class Constants:
     # Training related constants
     NR_PARAMS_TRAIN_LDA_MALLET = 7
     NR_PARAMS_TRAIN_PRODLDA = 17
-    NR_PARAMS_TRAIN_CTM = 20
+    NR_PARAMS_TRAIN_CTM = 21
     NR_PARAMS_PREPROC = 4
     
     WRONG_NR_TOPICS_LDA_MSG = "The number of training topics must be larger than 0"
