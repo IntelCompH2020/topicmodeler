@@ -13,6 +13,7 @@ Provides several classes for Topic Modeling
 import argparse
 import json
 import multiprocessing as mp
+import os
 import pickle
 import shutil
 import sys
@@ -24,6 +25,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import dask.dataframe as dd
+import dask.array as da
 from dask.diagnostics import ProgressBar
 from scipy import sparse
 from sklearn.preprocessing import normalize
@@ -434,14 +436,18 @@ class textPreproc(object):
                     outFile.unlink()
 
                 with ProgressBar():
-                    #trDF = trDF.persist(scheduler='processes')
-                    DFparquet = trDF[['id', 'cleantext']]  # allrawtext
-                    # https://docs.dask.org/en/stable/generated/dask.dataframe.to_parquet.html
-                    DFparquet.to_parquet(outFile, index=False, header=False, single_file=True,
-                                         compute_kwargs={'scheduler': 'processes'})
+                    DFparquet = trDF[['id', 'cleantext']].rename(columns={"cleantext": "bow_text"})    # allrawtext
+                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={'scheduler': 'processes'})
 
             elif tmTrainer == "ctm":
-                pass
+                outFile = dirpath.joinpath('corpus.parquet')
+                if outFile.is_file():
+                    outFile.unlink()
+
+                with ProgressBar():
+                    DFparquet = trDF[['id', 'cleantext', 'allrawtext']].rename(columns={"cleantext": "bow_text", "allrawtext":"all_rawtext"})
+                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={'scheduler': 'processes'})
+
         else:
             # Spark dataframe
             if tmTrainer == "mallet":
@@ -483,17 +489,13 @@ class textPreproc(object):
                 trDF.select("id", "source", "bow").write.parquet(
                     f"file://{outFile.as_posix()}", mode="overwrite")
             elif tmTrainer == "prodLDA":
-                outFile = dirpath.joinpath('lemas.parquet')
-                lemas_df = (trDF.withColumn("bow_text", back2textUDF(F.col("bow")))
-                            .select("id", "bow_text")
-                            )
+                outFile = dirpath.joinpath('corpus.parquet')
+                lemas_df = (trDF.withColumn("bow_text", back2textUDF(F.col("bow"))).select("id", "bow_text"))
                 lemas_df.write.parquet(
                     f"file://{outFile.as_posix()}", mode="overwrite")
             elif tmTrainer == "ctm":
-                outFile = dirpath.joinpath('lemas.parquet')
-                lemas_raw_df = (trDF.withColumn("bow_text", back2textUDF(F.col("bow")))
-                                .select("id", "bow_text", "all_raw_text")
-                                )
+                outFile = dirpath.joinpath('corpus.parquet')
+                lemas_raw_df = (trDF.withColumn("bow_text", back2textUDF(F.col("bow"))).select("id", "bow_text", "all_raw_text"))
                 lemas_raw_df.write.parquet(
                     f"file://{outFile.as_posix()}", mode="overwrite")
 
@@ -664,9 +666,12 @@ class TMmodel(object):
 
     def get_ntopics(self):
         return self._ntopics
-
-    def get_vocab_size(self):
-        return self._size_vocab
+    
+    def get_vocab_id2w(self):
+        return self._vocab_id2w
+    
+    def get_vocab_w2id(self):
+        return self._vocab_w2id
 
     def get_tpc_corrcoef(self):
         # Computes topic correlation. Highly correlated topics
@@ -1422,7 +1427,6 @@ class MalletTrainer(Trainer):
         """
 
         # Output model folder and training file for the corpus
-        print(corpusFile)
         if not corpusFile.is_file():
             self._logger.error(
                 f'-- -- Provided corpus Path does not exist -- Stop')
@@ -1608,11 +1612,11 @@ class ProdLDATrainer(Trainer):
             avitm.get_doc_topic_distribution(avitm.train_data))  # .T
 
         # Sparsification of thetas matrix
-        self.logger.debug('-- -- Sparsifying doc-topics matrix')
+        self._logger.debug('-- -- Sparsifying doc-topics matrix')
         # Create figure to check thresholding is correct
-        self._SaveThrFig(thetas32)
+        self._SaveThrFig(thetas32, modelFolder.joinpath('thetasDist.pdf'))
         # Set to zeros all thetas below threshold, and renormalize
-        thetas32[thetas32 < self._sparse_thr] = 0
+        thetas32[thetas32 < self._thetas_thr] = 0
         thetas32 = normalize(thetas32, axis=1, norm='l1')
         thetas32 = sparse.csr_matrix(thetas32, copy=True)
 
@@ -1657,7 +1661,7 @@ class ProdLDATrainer(Trainer):
         """
 
         # Output model folder and training file for the corpus
-        if not corpusFile.is_file():
+        if not os.path.exists(corpusFile):
             self._logger.error(
                 f'-- -- Provided corpus Path does not exist -- Stop')
             sys.exit()
@@ -1666,22 +1670,24 @@ class ProdLDATrainer(Trainer):
         modelFolder.mkdir()
 
         # Generating the corpus in the input format required by ProdLDA
-        self.logger.info('-- -- ProdLDA Corpus Generation: BOW Dataset object')
+        self._logger.info('-- -- ProdLDA Corpus Generation: BOW Dataset object')
         df = pd.read_parquet(corpusFile)
         df_lemas = df[["bow_text"]].values.tolist()
         df_lemas = [doc[0].split() for doc in df_lemas]
 
         self._corpus = [el for el in df_lemas]
-        self._train_dataset, self._val_dataset, self._bow_size, self._id2token = \
+        self._train_dataset, self._val_dataset, self._bow_size, self._id2token, self._docs_train = \
             prepare_dataset(self._corpus)
+        
+        # Save training corpus
+        corpus_file = modelFolder.joinpath('corpus.txt')
+        with open(corpus_file, 'w', encoding='utf-8') as fout:
+            id = 0
+            for el in self._docs_train:
+                fout.write(str(id) + ' 0 ' + ' '.join(el) + '\n')
+                id += 1
 
-        data = [self._train_dataset, self._val_dataset,
-                self._bow_size, self._id2token]
-        bowdataset_file = modelFolder.joinpath('bowdataset.pickle')
-        with open(bowdataset_file, 'wb') as f:
-            pickle.dump(data, f)
-
-        avitm = AVITM(logger=self.logger,
+        avitm = AVITM(logger=self._logger,
                       input_size=self._bow_size,
                       n_components=self._n_components,
                       model_type=self._model_type,
@@ -1766,10 +1772,10 @@ class CTMTrainer(Trainer):
             It contains the name of the weight parameter (key) and the weight (value) for each loss.
         thetas_thr: float
             Min value for sparsification of topic proportions after training
-        logger: Logger object
-            To log object activity
         sbert_model_to_load: str (default='paraphrase-distilroberta-base-v1')
             Model to be used for calculating the embeddings
+        logger: Logger object
+            To log object activity
         """
 
         super().__init__(logger)
@@ -1818,11 +1824,11 @@ class CTMTrainer(Trainer):
         thetas32 = np.asarray(ctm.get_doc_topic_distribution(ctm.train_data))
 
         # Sparsification of thetas matrix
-        self.logger.debug('-- -- Sparsifying doc-topics matrix')
+        self._logger.debug('-- -- Sparsifying doc-topics matrix')
         # Create figure to check thresholding is correct
-        self._SaveThrFig(thetas32)
+        self._SaveThrFig(thetas32, modelFolder.joinpath('thetasDist.pdf'))
         # Set to zeros all thetas below threshold, and renormalize
-        thetas32[thetas32 < self._sparse_thr] = 0
+        thetas32[thetas32 < self._thetas_thr] = 0
         thetas32 = normalize(thetas32, axis=1, norm='l1')
         thetas32 = sparse.csr_matrix(thetas32, copy=True)
 
@@ -1843,7 +1849,7 @@ class CTMTrainer(Trainer):
                 cnt = betas[top][idx]
                 term_freq[idx] += cnt  # Cuántas veces aparece una palabra
 
-        vocabfreq_file = modelFolder.joinpath('vocab_freq_ctm.txt')
+        vocabfreq_file = modelFolder.joinpath('vocab_freq.txt')
         with vocabfreq_file.open('w', encoding='utf8') as fout:
             [fout.write(el[0] + '\t' + str(int(el[1])) + '\n')
              for el in zip(vocab, term_freq)]
@@ -1854,7 +1860,7 @@ class CTMTrainer(Trainer):
 
         return tm
 
-    def fit(self, corpusFile):
+    def fit(self, corpusFile, embeddingsFile=None):
         """
         Training of CTM Topic Model
 
@@ -1866,7 +1872,7 @@ class CTMTrainer(Trainer):
         """
 
         # Output model folder and training file for the corpus
-        if not corpusFile.is_file():
+        if not os.path.exists(corpusFile):
             self._logger.error(
                 f'-- -- Provided corpus Path does not exist -- Stop')
             sys.exit()
@@ -1875,30 +1881,48 @@ class CTMTrainer(Trainer):
         modelFolder.mkdir()
 
         # Generating the corpus in the input format required by ProdLDA
-        self.logger.info('-- -- CTM Corpus Generation: BOW Dataset object')
+        self._logger.info('-- -- CTM Corpus Generation: BOW Dataset object')
         df = pd.read_parquet(corpusFile)
         df_lemas = df[["bow_text"]].values.tolist()
         df_lemas = [doc[0].split() for doc in df_lemas]
-        df_raw = df[["all_rawtext"]].values.tolist()
-        df_raw = [doc[0].split() for doc in df_raw]
         self._corpus = [el for el in df_lemas]
-        self._unpreprocessed_corpus = [el for el in df_raw]
+
+        if embeddingsFile is None:
+            df_raw = df[["all_rawtext"]].values.tolist()
+            df_raw = [doc[0].split() for doc in df_raw]
+            self._unpreprocessed_corpus = [el for el in df_raw]
+            self._embeddings = None
+        else:
+            if not embeddingsFile.is_file():
+                self._logger.error(
+                    f'-- -- Provided embeddings Path does not exist -- Stop')
+                sys.exit()
+            self._embeddings = np.load(embeddingsFile, allow_pickle=True)
+            self._unpreprocessed_corpus = None
 
         # Generate the corpus in the input format required by CTM
-        self._train_dataset, self._val_dataset, self._input_size, self._id2token, self._qt, self.embeddings_train, custom_embeddings, self.docs_train = \
+        self._train_dts, self._val_dts, self._input_size, self._id2token, _, self._embeddings_train, _, self._docs_train = \
             prepare_ctm_dataset(corpus=self._corpus,
                                 unpreprocessed_corpus=self._unpreprocessed_corpus,
+                                custom_embeddings=self._embeddings,
                                 sbert_model_to_load=self._sbert_model_to_load)
+        
+        # Save embeddings
+        embeddings_file = modelFolder.joinpath('embeddings.npy')
+        np.save(embeddings_file, self.embeddings_train)
 
-        data = [self._train_dataset, self._val_dataset,
-                self._input_size, self._id2token]
-        ctm_dataset_file = modelFolder.joinpath('ctm_dataset.pickle')
-        with open(ctm_dataset_file, 'wb') as f:
-            pickle.dump(data, f)
-        # @ TODO: Maybe is better to add another parameter to ask for inference type for beta and super
+        # Save training corpus
+        corpus_file = modelFolder.joinpath('corpus.txt')
+        with open(corpus_file, 'w', encoding='utf-8') as fout:
+            id = 0
+            for el in self._docs_train:
+                fout.write(str(id) + ' 0 ' + ' '.join(el) + '\n')
+                id += 1
+
+        # TODO: Maybe is better to add another parameter to ask for inference type for beta and super
         if self._ctm_model_type == 'ZeroShotTM':
             ctm = ZeroShotTM(
-                logger=self.logger,
+                logger=self._logger,
                 input_size=self._input_size,
                 contextual_size=768,
                 n_components=self._n_components,
@@ -1919,7 +1943,7 @@ class CTMTrainer(Trainer):
                 num_data_loader_workers=self._num_data_loader_workers)
         else:
             ctm = CombinedTM(
-                logger=self.logger,
+                logger=self._logger,
                 input_size=self._input_size,
                 contextual_size=768,
                 n_components=self._n_components,
@@ -1941,7 +1965,7 @@ class CTMTrainer(Trainer):
                 label_size=self._label_size,
                 loss_weights=self._loss_weights)
 
-        ctm.fit(self._train_dataset, self._val_dataset)
+        ctm.fit(self._train_dts, self._val_dts)
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, ctm)
@@ -1967,25 +1991,32 @@ class HierarchicalTMManager(object):
         else:
             import logging
             logging.basicConfig(level='INFO')
-            self._logger = logging.getLogger('textPreproc')
+            self._logger = logging.getLogger('HierarchicalTMManager')
 
         return
 
-    def create_submodel_tr_corpus(self, TMmodel, configFile_f, configFile_c):
+    def create_submodel_tr_corpus(self, TMmodel_path, configFile_f, configFile_c):
         """
 
         Parameters
         ----------
-        TMmodel: TMmodel
-            TModel object associated with the father model
+        TMmodel_path: str
+            Path to the TModel object associated with the father model
         train_config_f: str
             Father model's configuration file' s path
         train_config_c: str
             Submodel's configuration file' s path
         """
 
-        # Read training configurations from father model and submodel
+        # Load TMmodel
+        configFile_c = Path(configFile_c)
         configFile_f = Path(configFile_f)
+        vocabFile = configFile_f.parent.joinpath(
+            'malletModel/vocab_freq_mallet.txt')
+        tmmodel = TMmodel(vocabfreq_file=vocabFile,
+                          from_file=Path(TMmodel_path))
+
+        # Read training configurations from father model and submodel
         with configFile_f.open('r', encoding='utf8') as fin:
             tr_config_f = json.load(fin)
         configFile_c = Path(configFile_c)
@@ -1993,37 +2024,79 @@ class HierarchicalTMManager(object):
             tr_config_c = json.load(fin)
 
         # Get father model's training corpus as dask dataframe
-        # TODO: Save training data of CTM and prod as corpus.txt
-        corpusFile = tr_config_f.parent.joinpath('corpus.txt')
-        tr_data = [line.rsplit(' 0 ')[1].strip().split() for line in open(
+        corpusFile = configFile_f.parent.joinpath('corpus.txt')
+        corpus = [line.rsplit(' 0 ')[1].strip() for line in open(
             corpusFile, encoding="utf-8").readlines()]
-        tr_data_df = pd.DataFrame(tr_data, columns=['doc'])
-        tr_data_ddf = dd.from_pandas(tr_data_df)
+        tr_data_df = pd.DataFrame(data=corpus, columns=['doc'])
+        tr_data_df['id'] = range(1, len(tr_data_df) + 1)
+        tr_data_ddf = dd.from_pandas(tr_data_df, npartitions=2)
 
         # Get embeddings if the trainer is CTM
-        # TODO: Allow passing embeddings from file for training CTM
         if tr_config_f['trainer'] == "ctm":
-            embeddingsFile = tr_config_f.parent.joinpath('embeddings.npy')
+            embeddingsFile = configFile_f.parent.joinpath('embeddings.npy')
             embeddings = np.load(embeddingsFile, allow_pickle=True)
 
-        # Get father model's thetas and betas
-        thetas = TMmodel.thetas.toarray()
-        betas = TMmodel.betas
+        # Get father model's thetas and betas and expansion topic
+        thetas = tmmodel.get_thetas().toarray() # (ndocs, ntopics)
+        betas = tmmodel.get_betas() # (ntopics, nwords)
+        vocab_id2w = tmmodel.get_vocab_id2w()
+        vocab_w2id = tmmodel.get_vocab_w2id()
+        exp_tpc = int(tr_config_c['expansion_tpc'])
 
-        # Get expansion topic
-        exp_tpc = tr_config_c['expansion_tpc']
-
-        if tr_config_c['version'] == "htm-ws":
+        if tr_config_c['htm-version'] == "htm-ws":
             self._logger.info(
-                '-- -- -- HierarchicalTMManager: Creating training corpus according to HTM-WS.')
+                '-- -- -- Creating training corpus according to HTM-WS.')
 
-            for d in tr_data:
-                thetas_d = thetas[:, d]
-                p_z_dw = np.outer(thetas_d, betas)
+            def get_htm_ws_corpus(row, thetas, betas, vocab_id2w, vocab_w2id, exp_tpc):
+                """Function to carry out the selection of words according to HTM-WS.
+
+                Parameters
+                ----------
+                thetas: ndarray
+                    Document-topic distribution
+                betas: ndarray
+                    Word-topic distribution
+                vocab_id2w: dict
+                    Dictionary in the form {i: word_i}
+                exp_tpc: int
+                    Expansion topic
+
+                Returns
+                -------
+
+                """
+                id_doc = int(row["id"])
+                doc = row["doc"].split()
+                thetas_d = thetas[id_doc, :]
+                # ids of words in d
+                words_doc_idx = [vocab_w2id[str(word)] for word in doc] 
+
+                # ids of words in d assigned to exp_tpc
+                words_exp_idx = [idx_w for idx_w in words_doc_idx if np.argmax(
+                    np.multiply(thetas_d, betas[:, idx_w])) == exp_tpc]
+
+                #words_idx = [w for w in range(betas.shape[1]) if np.random.multinomial(len(betas), np.multiply(thetas_d, betas[:, w])) == exp_tpc]
+                reduced_doc = [vocab_id2w[str(id_word)] for id_word in words_exp_idx]
+                
+                return ' '.join([el for el in reduced_doc])
+
+            tr_data_ddf['reduced_doc'] = tr_data_ddf.apply(
+                get_htm_ws_corpus, axis=1, meta=('x', 'object'), args=(thetas,betas,vocab_id2w,vocab_w2id,exp_tpc))
+            
+            outFile = configFile_c.parent.joinpath('corpus.txt')
+            if outFile.is_file():
+                outFile.unlink()
+
+            tr_data_ddf['2mallet'] = tr_data_ddf['id'].apply(
+                str, meta=('id', 'str')) + " 0 " + tr_data_ddf['reduced_doc']
+
+            with ProgressBar():
+                DFmallet = tr_data_ddf[['2mallet']]
+                DFmallet.to_csv(outFile, index=False, header=False, single_file=True,compute_kwargs={'scheduler': 'processes'})
 
         elif tr_config_c['version'] == "htm-ds":
-            self.logger.info(
-                '-- -- -- HierarchicalTMManager: Creating training corpus according to HTM-DS.')
+            self._logger.info(
+                '-- -- -- Creating training corpus according to HTM-DS.')
 
             # Get ids of documents that meet the condition of having a representation of the expansion topic larger than thr
             thr = tr_config_c['thr']
@@ -2039,8 +2112,8 @@ class HierarchicalTMManager(object):
                 embeddings = None
 
         else:
-            self.logger.error(
-                '-- -- -- HierarchicalTMManager: The specified HTM version is not available.')
+            self._logger.error(
+                '-- -- -- The specified HTM version is not available.')
 
         return
 
@@ -2237,59 +2310,68 @@ if __name__ == "__main__":
                         configFile.parent.joinpath('corpus.parquet'))
                 elif train_config['trainer'] == 'prodLDA':
                     ProdLDATr = ProdLDATrainer(
-                        n_components=train_config['PRODparam']['n_components'],
-                        model_type=train_config['PRODparam']['model_type'],
-                        hidden_sizes=train_config['PRODparam']['hidden_sizes'],
-                        activation=train_config['PRODparam']['activation'],
-                        dropout=train_config['PRODparam']['dropout'],
-                        learn_priors=train_config['PRODparam']['learn_priors'],
-                        batch_size=train_config['PRODparam']['batch_size'],
-                        lr=train_config['PRODparam']['lr'],
-                        momentum=train_config['PRODparam']['momentum'],
-                        solver=train_config['PRODparam']['solver'],
-                        num_epochs=train_config['PRODparam']['num_epochs'],
-                        reduce_on_plateau=train_config['PRODparam']['reduce_on_plateau'],
-                        topic_prior_mean=train_config['PRODparam']['topic_prior_mean'],
-                        topic_prior_variance=train_config['PRODparam']['topic_prior_variance'],
-                        num_samples=train_config['PRODparam']['num_samples'],
-                        num_data_loader_workers=train_config['PRODparam']['num_data_loader_workers'],
-                        thetas_thr=train_config['PRODparam']['thetas_thr'])
-                    ProdLDATr.fit()
+                        n_components=train_config['LDAparam']['ntopics'],
+                        model_type=train_config['LDAparam']['model_type'],
+                        hidden_sizes=tuple(train_config['LDAparam']['hidden_sizes']),
+                        activation=train_config['LDAparam']['activation'],
+                        dropout=train_config['LDAparam']['dropout'],
+                        learn_priors=train_config['LDAparam']['learn_priors'],
+                        batch_size=train_config['LDAparam']['batch_size'],
+                        lr=train_config['LDAparam']['lr'],
+                        momentum=train_config['LDAparam']['momentum'],
+                        solver=train_config['LDAparam']['solver'],
+                        num_epochs=train_config['LDAparam']['num_epochs'],
+                        reduce_on_plateau=train_config['LDAparam']['reduce_on_plateau'],
+                        topic_prior_mean=train_config['LDAparam']['topic_prior_mean'],
+                        topic_prior_variance=train_config['LDAparam']['topic_prior_variance'],
+                        num_samples=train_config['LDAparam']['num_samples'],
+                        num_data_loader_workers=train_config['LDAparam']['num_data_loader_workers'],
+                        thetas_thr=train_config['LDAparam']['thetas_thr'])
+                    ProdLDATr.fit(
+                        corpusFile=configFile.parent.joinpath('corpus.parquet'))
                 elif train_config['trainer'] == 'ctm':
                     CTMr = CTMTrainer(
-                        n_components=train_config['CTMparam']['n_components'],
-                        model_type=train_config['CTMparam']['model_type'],
-                        ctm_model_type=train_config['CTMparam']['ctm_model_type'],
-                        hidden_sizes=train_config['CTMparam']['hidden_sizes'],
-                        activation=train_config['CTMparam']['activation'],
-                        dropout=train_config['CTMparam']['dropout'],
-                        learn_priors=train_config['CTMparam']['learn_priors'],
-                        batch_size=train_config['CTMparam']['batch_size'],
-                        lr=train_config['CTMparam']['lr'],
-                        momentum=train_config['CTMparam']['momentum'],
-                        solver=train_config['CTMparam']['solver'],
-                        num_epochs=train_config['CTMparam']['num_epochs'],
-                        num_samples=train_config['CTMparam']['num_samples'],
-                        reduce_on_plateau=train_config['CTMparam']['reduce_on_plateau'],
-                        topic_prior_mean=train_config['CTMparam']['topic_prior_mean'],
-                        topic_prior_variance=train_config['CTMparam']['topic_prior_variance'],
-                        num_data_loader_workers=train_config['CTMparam']['num_data_loader_workers'],
-                        label_size=train_config['CTMparam']['label_size'],
-                        loss_weights=train_config['CTMparam']['loss_weights'],
-                        thetas_thr=train_config['CTMparam']['thetas_thr'],
-                        sbert_model_to_load=train_config['CTMparam']['sbert_model_to_load'])
-                    CTMr.fit()
+                        n_components=train_config['LDAparam']['n_components'],
+                        model_type=train_config['LDAparam']['model_type'],
+                        ctm_model_type=train_config['LDAparam']['ctm_model_type'],
+                        hidden_sizes=tuple(train_config['LDAparam']['hidden_sizes']),
+                        activation=train_config['LDAparam']['activation'],
+                        dropout=train_config['LDAparam']['dropout'],
+                        learn_priors=train_config['LDAparam']['learn_priors'],
+                        batch_size=train_config['LDAparam']['batch_size'],
+                        lr=train_config['LDAparam']['lr'],
+                        momentum=train_config['LDAparam']['momentum'],
+                        solver=train_config['LDAparam']['solver'],
+                        num_epochs=train_config['LDAparam']['num_epochs'],
+                        num_samples=train_config['LDAparam']['num_samples'],
+                        reduce_on_plateau=train_config['LDAparam']['reduce_on_plateau'],
+                        topic_prior_mean=train_config['LDAparam']['topic_prior_mean'],
+                        topic_prior_variance=train_config['LDAparam']['topic_prior_variance'],
+                        num_data_loader_workers=train_config['LDAparam']['num_data_loader_workers'],
+                        label_size=train_config['LDAparam']['label_size'],
+                        loss_weights=train_config['LDAparam']['loss_weights'],
+                        thetas_thr=train_config['LDAparam']['thetas_thr'],
+                        sbert_model_to_load=train_config['LDAparam']['sbert_model_to_load'])
+                    CTMr.fit(
+                        corpusFile=configFile.parent.joinpath('corpus.parquet'))
 
         else:
             sys.exit('You need to provide a valid configuration file')
-    
+
     if args.hierarchical:
         if not args.config_child:
             sys.exit('You need to provide a configuration file for the submodel')
         else:
             configFile_c = Path(args.config)
-            if not configFile.is_file():
+            if not configFile_c.is_file():
                 sys.exit('You need to provide a valid configuration file')
             else:
-                HierarchicalTMManager = HierarchicalTMManager()
+                hierarchicalTMManager = HierarchicalTMManager()
+                # TODO: check TMmodel_path is path
+                # Read training configurations from father model and submodel
+                configFile_c = Path(args.config_child)
+                with configFile_c.open('r', encoding='utf8') as fin:
+                    tr_config_c = json.load(fin)
+                hierarchicalTMManager.create_submodel_tr_corpus(
+                    tr_config_c["father_model"], args.config, args.config_child)
                 # TODO: Continue

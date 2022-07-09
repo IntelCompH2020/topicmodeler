@@ -1148,11 +1148,11 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             num_data_loader_workers = int(self.cf.get(
                 'ProdLDA', 'num_data_loader_workers'))
             thetas_thr = float(self.cf.get(
-                'ProdLDA', 'lineEdit_thetas_thr_prod'))
+                'ProdLDA', 'thetas_thr'))
 
             # Basic settings
             model_type = var_string_keyboard(
-                'str', model_type, "Type of the model that is going to be trained, 'prodLDA' or 'LDA'")
+                'str', model_type, "Type of the model that is going to be trained, 'ProdLDA' or 'LDA'")
             num_epochs = var_num_keyboard(
                 'int', num_epochs, 'Number of epochs to train the model for')
             batch_size = var_num_keyboard(
@@ -2461,8 +2461,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             QMainWindow object associated which the GUI
         """
 
-        print(self.allTMmodels)
-        print(self.models_xml)
         if self.allTMmodels:
             if self.models_xml:
                 clearQTreeWidget(gui.treeView_trained_models)

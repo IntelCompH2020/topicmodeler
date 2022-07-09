@@ -43,8 +43,8 @@ class DecoderNetwork(nn.Module):
         assert isinstance(input_size, int), "input_size must by type int."
         assert isinstance(n_components, int) and n_components > 0, \
             "n_components must be type int > 0."
-        assert model_type in ['prodLDA', 'LDA'], \
-            "model type must be 'prodLDA' or 'LDA'"
+        assert model_type in ['ProdLDA', 'LDA'], \
+            "model type must be 'ProdLDA' or 'LDA'"
         assert isinstance(hidden_sizes, tuple), \
             "hidden_sizes must be type tuple."
         assert activation in ['softplus', 'relu', 'sigmoid', 'tanh', 'leakyrelu',
@@ -120,7 +120,7 @@ class DecoderNetwork(nn.Module):
         theta = self.drop_theta(theta)
 
         # prodLDA vs LDA
-        if self.model_type == 'prodLDA':
+        if self.model_type == 'ProdLDA':
             # in: batch_size x input_size x n_components
             word_dist = F.softmax(
                 self.beta_batchnorm(torch.matmul(theta, self.beta)), dim=1)

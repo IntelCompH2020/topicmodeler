@@ -75,8 +75,8 @@ class AVITM(object):
             "input_size must by type int > 0."
         assert isinstance(n_components, int) and input_size > 0, \
             "n_components must by type int > 0."
-        assert model_type in ['LDA', 'prodLDA'], \
-            "model must be 'LDA' or 'prodLDA'."
+        assert model_type in ['LDA', 'ProdLDA'], \
+            "model must be 'LDA' or 'ProdLDA'."
         assert isinstance(hidden_sizes, tuple), \
             "hidden_sizes must be type tuple."
         assert activation in ['softplus', 'relu', 'sigmoid', 'swish', 'tanh', 'leakyrelu',

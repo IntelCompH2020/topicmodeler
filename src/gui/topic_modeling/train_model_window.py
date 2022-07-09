@@ -339,10 +339,10 @@ class TrainModelWindow(QtWidgets.QDialog):
             messages += Constants.WRONG_NR_TOPIC_MSG + "\n"
         else:
             self.checkBox_prod_1_good.show()
-            self.training_params['n_components'] = self.lineEdit_ctm_nr_topics.text()
+            self.training_params['ntopics'] = self.lineEdit_nr_topics_prod.text()
 
-        if self.comboBox_model_type_prod.currentText() not in \
-                ['prodLDA', 'lda']:
+        if self.comboBox_model_type_prod.currentText().lower() not in \
+                ['prodlda', 'lda']:
             self.checkBox_prod_2_bad.show()
             messages += Constants.WRONG_UNDERLYING_MODEL_TYPE_MSG + "\n"
         else:
@@ -404,7 +404,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             messages += Constants.WRONG_MOMENTUM_MSG + "\n"
         else:
             self.checkBox_prod_10_good.show()
-            self.training_params['momentum'] = self.lineEdit_prod_momentum.text()
+            self.training_params['momentum'] = self.lineEdit_momentum_prod.text()
 
         if self.comboBox_prod_solver.currentText() not in ['adagrad', 'adam', 'sgd', 'adadelta', 'rmsprop']:
             self.checkBox_prod_11_bad.show()
@@ -432,7 +432,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         #    messages += Constants.WRONG_TOPIC_PRIOR_VAR_MSG + "\n"
         # else:
         self.checkBox_prod_14_good.show()
-        self.training_params['topic_prior_variance'] = self.lineEdit_ctm_topic_prior_variance.text()
+        self.training_params['topic_prior_variance'] = self.lineEdit_prior_std_prod.text()
         
         if not self.lineEdit_nr_samples_prod.text().isdigit() or int(self.lineEdit_nr_samples_prod.text()) < 0 or int(self.lineEdit_nr_samples_prod.text()) == 0:
             self.checkBox_prod_15_bad.show()
@@ -441,7 +441,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             self.checkBox_prod_15_good.show()
             self.training_params['num_samples'] = self.lineEdit_nr_samples_prod.text()
         
-        if not self.lineEdit_workers_prod.text().isdigit() or int(self.lineEdit_workers_prod.text()) < 0 or int(self.lineEdit_workers_prod.text()) == 0:
+        if not self.lineEdit_workers_prod.text().isdigit() or int(self.lineEdit_workers_prod.text()) < 0:
             self.checkBox_prod_16_bad.show()
             messages += Constants.WRONG_NR_WORKERS + "\n"
         else:
@@ -505,7 +505,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             str(self.cf.get('CTM', 'loss_weights')))
         self.lineEdit_ctm_sbert_model.setText(
             str(self.cf.get('CTM', 'thetas_thr')))
-        self.lineEdit_ctm_topic_prior_variance.setText(
+        self.lineEdit_ctm_sbert_model.setText(
             str(self.cf.get('CTM', 'sbert_model_to_load')))
 
         return
@@ -542,7 +542,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             messages += Constants.WRONG_NR_TOPIC_MSG + "\n"
         else:
             self.checkBox_ctm_2_good.show()
-            self.training_params['n_components'] = self.lineEdit_nr_topics_ctm.text()
+            self.training_params['ntopics'] = self.lineEdit_nr_topics_ctm.text()
 
         if int(self.lineEdit_nr_epochs_ctm.text()) < 0:
             self.checkBox_ctm_3_bad.show()
@@ -636,7 +636,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             self.checkBox_ctm_15_good.show()
             self.training_params['num_samples'] = self.lineEdit_ctm_nr_samples.text()
         
-        if not self.lineEdit_ctm_workers.text().isdigit() or int(self.lineEdit_ctm_workers.text()) < 0 or int(self.lineEdit_ctm_workers.text()) == 0:
+        if not self.lineEdit_ctm_workers.text().isdigit() or int(self.lineEdit_ctm_workers.text()) < 0:
             self.checkBox_prod_16_bad.show()
             messages += Constants.WRONG_NR_WORKERS + "\n"
         else:
