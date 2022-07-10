@@ -6,11 +6,12 @@ Class that defines the subwindow for the Interactive Topic Model Trainer App for
 """
 
 import configparser
+import json
 import re
 from functools import partial
 
 import numpy as np
-from PyQt6 import QtGui, QtWidgets
+from PyQt6 import QtWidgets
 from PyQt6.QtCore import pyqtSlot
 from PyQt6.QtGui import QTextCursor
 from PyQt6.QtWidgets import QLabel, QMessageBox, QPushButton
@@ -43,12 +44,13 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         super(TrainModelWindow, self).__init__()
 
-        # Load UI and configure default geometry of the window
+        # Load UI
         # #####################################################################
         loadUi("src/gui/uis/train_window.ui", self)
-        #####################################################################################
+
+        ########################################################################
         # ATTRIBUTES
-        #####################################################################################
+        ########################################################################
         self.tm = tm
         self.thread_pool = thread_pool
         self.stdout = stdout
@@ -165,10 +167,14 @@ class TrainModelWindow(QtWidgets.QDialog):
         return
 
     def initialize_training_settings(self):
+        """Sets the value of the initial training settings (read from the config file) in the corresponding widgets.
+        """
+
         self.get_lda_mallet_params()
         self.get_prodlda_params()
         self.get_ctm_params()
         self.get_sparklda_params()
+
         return
 
     # Mallet functions
@@ -334,127 +340,144 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.training_params = {}
         messages = ""
 
-        if int(self.lineEdit_nr_topics_prod.text()) < 0:
+        nr_topics = int(self.lineEdit_nr_topics_prod.text())
+        if nr_topics < 0:
             self.checkBox_prod_1_bad.show()
             messages += Constants.WRONG_NR_TOPIC_MSG + "\n"
         else:
             self.checkBox_prod_1_good.show()
-            self.training_params['ntopics'] = self.lineEdit_nr_topics_prod.text()
+            self.training_params['ntopics'] = nr_topics
 
-        if self.comboBox_model_type_prod.currentText().lower() not in \
+        prod_type = self.comboBox_model_type_prod.currentText()
+        if prod_type.lower() not in \
                 ['prodlda', 'lda']:
             self.checkBox_prod_2_bad.show()
             messages += Constants.WRONG_UNDERLYING_MODEL_TYPE_MSG + "\n"
         else:
             self.checkBox_prod_2_good.show()
-            self.training_params['model_type'] = self.comboBox_model_type_prod.currentText()
+            self.training_params['model_type'] = prod_type
 
-        if int(self.lineEdit_nr_epochs_prod.text()) < 0:
+        num_epochs = int(self.lineEdit_nr_epochs_prod.text())
+        if num_epochs < 0:
             self.checkBox_prod_3_bad.show()
             messages += Constants.WRONG_NR_EPOCHS_MSG + "\n"
         else:
             self.checkBox_prod_3_good.show()
-            self.training_params['num_epochs'] = self.lineEdit_nr_epochs_prod.text()
+            self.training_params['num_epochs'] = num_epochs
 
-        if int(self.lineEdit_batch_size_prod.text()) < 0:
+        batch_size = int(self.lineEdit_batch_size_prod.text())
+        if batch_size < 0:
             self.checkBox_prod_4_bad.show()
             messages += Constants.WRONG_BATCH_SIZE_MSG + "\n"
         else:
             self.checkBox_prod_4_good.show()
-            self.training_params['batch_size'] = self.lineEdit_batch_size_prod.text()
+            self.training_params['batch_size'] = batch_size
 
-        if type(tuple(map(int, self.lineEdit_hidden_prod.text()[1:-1].split(',')))) != tuple:
+        hidden_sizes = tuple(
+            map(int, self.lineEdit_hidden_prod.text()[1:-1].split(',')))
+        if type(hidden_sizes) != tuple:
             self.checkBox_prod_5_bad.show()
             messages += Constants.WRONG_HIDDEN_SIZES_MSG + "\n"
         else:
             self.checkBox_prod_5_good.show()
-            self.training_params['hidden_sizes'] = self.lineEdit_ctm_hidden_sizes.text()
+            self.training_params['hidden_sizes'] = hidden_sizes
 
-        if self.comboBox_prod_activation.currentText() not in \
+        activation = self.comboBox_prod_activation.currentText()
+        if activation not in \
                 ['softplus', 'relu', 'sigmoid', 'swish', 'tanh', 'leakyrelu', 'rrelu', 'elu', 'selu']:
             self.checkBox_prod_6_bad.show()
             messages += Constants.WRONG_ACTIVATION_MSG + "\n"
         else:
             self.checkBox_prod_6_good.show()
-            self.training_params['activation'] = self.comboBox_prod_activation.currentText()
+            self.training_params['activation'] = activation
 
-        if float(self.lineEdit_dropout_prod.text()) < 0:
+        dropout = float(self.lineEdit_dropout_prod.text())
+        if dropout < 0:
             self.checkBox_prod_7_bad.show()
             messages += Constants.WRONG_DROPOUT_MSG + "\n"
         else:
             self.checkBox_ctm_7_good.show()
-            self.training_params['dropout'] = self.lineEdit_dropout_prod.text()
+            self.training_params['dropout'] = dropout
 
         if self.comboBox_prod_learn_priors.currentText() != "True" and self.comboBox_prod_learn_priors.currentText() != "False":
             self.checkBox_prod_8_bad.show()
             messages += Constants.WRONG_LEARN_PRIORS_MSG + "\n"
         else:
             self.checkBox_prod_8_good.show()
-            self.training_params['learn_priors'] = self.comboBox_prod_learn_priors.currentText()
+            self.training_params['learn_priors'] = True if self.comboBox_prod_learn_priors.currentText(
+            ) == "True" else False
 
-        if float(self.lineEdit_lr_prod.text()) < 0 or float(self.lineEdit_lr_prod.text()) > 1:
+        lr = float(self.lineEdit_lr_prod.text())
+        if lr < 0 or float(self.lineEdit_lr_prod.text()) > 1:
             self.checkBox_ctm_9_bad.show()
             messages += Constants.WRONG_LR_MSG + "\n"
         else:
             self.checkBox_prod_9_good.show()
-            self.training_params['lr'] = self.lineEdit_lr_prod.text()
+            self.training_params['lr'] = lr
 
-        if float(self.lineEdit_momentum_prod.text()) < 0 or float(self.lineEdit_momentum_prod.text()) > 1:
+        momentum = float(self.lineEdit_momentum_prod.text())
+        if momentum < 0 or momentum > 1:
             self.checkBox_prod_10_bad.show()
             messages += Constants.WRONG_MOMENTUM_MSG + "\n"
         else:
             self.checkBox_prod_10_good.show()
-            self.training_params['momentum'] = self.lineEdit_momentum_prod.text()
+            self.training_params['momentum'] = momentum
 
-        if self.comboBox_prod_solver.currentText() not in ['adagrad', 'adam', 'sgd', 'adadelta', 'rmsprop']:
+        solver = self.comboBox_prod_solver.currentText()
+        if solver not in ['adagrad', 'adam', 'sgd', 'adadelta', 'rmsprop']:
             self.checkBox_prod_11_bad.show()
             messages += Constants.WRONG_SOLVER_MSG + "\n"
         else:
             self.checkBox_prod_11_good.show()
-            self.training_params['solver'] = self.comboBox_prod_solver.currentText()
+            self.training_params['solver'] = solver
 
+        reduce_on_plateau = self.comboBox_prod_reduce_on_plateau.currentText()
         if self.comboBox_prod_reduce_on_plateau.currentText() != "True" and self.comboBox_prod_reduce_on_plateau.currentText() != "False":
             self.checkBox_prod_12_bad.show()
             messages += Constants.WRONG_REDUCE_ON_PLATEAU_MSG + "\n"
         else:
             self.checkBox_prod_12_good.show()
-            self.training_params['reduce_on_plateau'] = self.comboBox_prod_reduce_on_plateau.currentText()
-        
+            self.training_params['reduce_on_plateau'] = reduce_on_plateau
+
         if re.match(r'^-?\d+(?:\.\d+)$', self.lineEdit_prior_mean_prod.text()) is None:
             self.checkBox_prod_13_bad.show()
             messages += Constants.WRONG_TOPIC_PRIOR_MEAN_MSG + "\n"
         else:
             self.checkBox_prod_13_good.show()
-            self.training_params['topic_prior_mean'] = self.lineEdit_prior_mean_prod.text()
-        
+            self.training_params['topic_prior_mean'] = float(self.lineEdit_prior_mean_prod.text(
+            ))
+
         # if re.match(r'^-?\d+(?:\.\d+)$', self.lineEdit_prior_std_prod.text()) is None:
         #    self.checkBox_prod_14_bad.show()
         #    messages += Constants.WRONG_TOPIC_PRIOR_VAR_MSG + "\n"
         # else:
         self.checkBox_prod_14_good.show()
-        self.training_params['topic_prior_variance'] = self.lineEdit_prior_std_prod.text()
-        
-        if not self.lineEdit_nr_samples_prod.text().isdigit() or int(self.lineEdit_nr_samples_prod.text()) < 0 or int(self.lineEdit_nr_samples_prod.text()) == 0:
+        self.training_params['topic_prior_variance'] = None if self.lineEdit_prior_std_prod.text() == "None" else \
+            float(self.lineEdit_prior_std_prod.text())
+
+        nr_samples = int(self.lineEdit_nr_samples_prod.text())
+        if not self.lineEdit_nr_samples_prod.text().isdigit() or nr_samples < 0 or nr_samples == 0:
             self.checkBox_prod_15_bad.show()
             messages += Constants.WRONG_NR_SAMPLES + "\n"
         else:
             self.checkBox_prod_15_good.show()
-            self.training_params['num_samples'] = self.lineEdit_nr_samples_prod.text()
-        
-        if not self.lineEdit_workers_prod.text().isdigit() or int(self.lineEdit_workers_prod.text()) < 0:
+            self.training_params['num_samples'] = nr_samples
+
+        nr_workers = int(self.lineEdit_workers_prod.text())
+        if not self.lineEdit_workers_prod.text().isdigit() or nr_workers < 0:
             self.checkBox_prod_16_bad.show()
             messages += Constants.WRONG_NR_WORKERS + "\n"
         else:
             self.checkBox_prod_16_good.show()
-            self.training_params['num_data_loader_workers'] = self.lineEdit_workers_prod.text()
-        
-        if float(self.lineEdit_thetas_thr_prod.text()) > 1:
+            self.training_params['num_data_loader_workers'] = nr_workers
+
+        thetas_thr = float(self.lineEdit_thetas_thr_prod.text())
+        if thetas_thr > 1:
             self.checkBox_prod_17_bad.show()
             messages += Constants.WRONG_THETAS_THR_LDA_MSG + "\n"
         else:
             self.checkBox_prod_17_good.show()
-            self.training_params['thetas_thr'] = self.lineEdit_thetas_thr_prod.text(
-            )
+            self.training_params['thetas_thr'] = thetas_thr
 
         if len(self.training_params.keys()) != Constants.NR_PARAMS_TRAIN_PRODLDA:
             QMessageBox.warning(
@@ -522,137 +545,158 @@ class TrainModelWindow(QtWidgets.QDialog):
         okay = True
         self.training_params = {}
         messages = ""
-        if self.comboBox_ctm_model_type.currentText() != "CombinedTM" and "ZeroShotTM" and "SuperCTM" and "BetaCTM":
+
+        # TODO: Add conversions
+        ctm_model_type = self.comboBox_ctm_model_type.currentText()
+        if ctm_model_type.lower != "combinedtm" and "zeroshottm" and "superctm" and "betactm":
             self.checkBox_ctm_1_bad.show()
             messages += Constants.WRONG_MODEL_TYPE_MSG + "\n"
         else:
             self.checkBox_ctm_1_good.show()
-            self.training_params['ctm_model_type'] = self.comboBox_ctm_model_type.currentText()
-        
-        if self.comboBox_model_type_ctm.currentText() not in \
+            self.training_params['ctm_model_type'] = ctm_model_type
+
+        ctm_prod_type = self.comboBox_model_type_ctm.currentText()
+        if ctm_prod_type.lower() not in \
                 ['prodLDA', 'lda']:
             self.checkBox_ctm_21_bad.show()
             messages += Constants.WRONG_UNDERLYING_MODEL_TYPE_MSG + "\n"
         else:
             self.checkBox_ctm_21_good.show()
-            self.training_params['model_type'] = self.comboBox_model_type_ctm.currentText()
+            self.training_params['model_type'] = ctm_prod_type
 
-        if int(self.lineEdit_nr_topics_ctm.text()) < 0:
+        nr_topics = int(self.lineEdit_nr_topics_ctm.text())
+        if nr_topics < 0:
             self.checkBox_ctm_2_bad.show()
             messages += Constants.WRONG_NR_TOPIC_MSG + "\n"
         else:
             self.checkBox_ctm_2_good.show()
-            self.training_params['ntopics'] = self.lineEdit_nr_topics_ctm.text()
+            self.training_params['ntopics'] = nr_topics
 
-        if int(self.lineEdit_nr_epochs_ctm.text()) < 0:
+        num_epochs = int(self.lineEdit_nr_epochs_ctm.text())
+        if num_epochs < 0:
             self.checkBox_ctm_3_bad.show()
             messages += Constants.WRONG_NR_EPOCHS_MSG + "\n"
         else:
             self.checkBox_ctm_3_good.show()
-            self.training_params['num_epochs'] = self.lineEdit_nr_epochs_ctm.text()
+            self.training_params['num_epochs'] = num_epochs
 
-        if int(self.lineEdit_batch_size_ctm.text()) < 0:
+        batch_size = int(self.lineEdit_batch_size_ctm.text())
+        if batch_size < 0:
             self.checkBox_ctm_4_bad.show()
             messages += Constants.WRONG_BATCH_SIZE_MSG + "\n"
         else:
             self.checkBox_ctm_4_good.show()
-            self.training_params['batch_size'] = self.lineEdit_batch_size_ctm.text()
+            self.training_params['batch_size'] = batch_size
 
-        if type(tuple(map(int, self.lineEdit_ctm_hidden_sizes.text()[1:-1].split(',')))) != tuple:
+        hidden_sizes = tuple(
+            map(int, self.lineEdit_ctm_hidden_sizes.text()[1:-1].split(',')))
+        if type(hidden_sizes) != tuple:
             self.checkBox_ctm_5_bad.show()
             messages += Constants.WRONG_HIDDEN_SIZES_MSG + "\n"
         else:
             self.checkBox_ctm_5_good.show()
-            self.training_params['hidden_sizes'] = self.lineEdit_ctm_hidden_sizes.text()
+            self.training_params['hidden_sizes'] = hidden_sizes
 
-        if self.comboBox_ctm_activation.currentText() not in \
+        activation = self.comboBox_ctm_activation.currentText()
+        if activation not in \
                 ['softplus', 'relu', 'sigmoid', 'swish', 'tanh', 'leakyrelu', 'rrelu', 'elu', 'selu']:
             self.checkBox_ctm_6_bad.show()
             messages += Constants.WRONG_ACTIVATION_MSG + "\n"
         else:
             self.checkBox_ctm_6_good.show()
-            self.training_params['activation'] = self.comboBox_ctm_activation.currentText()
+            self.training_params['activation'] = activation
 
-        if float(self.lineEdit_ctm_dropout.text()) < 0:
+        dropout = float(self.lineEdit_ctm_dropout.text())
+        if dropout < 0:
             self.checkBox_ctm_7_bad.show()
             messages += Constants.WRONG_DROPOUT_MSG + "\n"
         else:
             self.checkBox_ctm_7_good.show()
-            self.training_params['dropout'] = self.lineEdit_ctm_dropout.text()
+            self.training_params['dropout'] = dropout
 
         if self.comboBox_ctm_learn_priors.currentText() != "True" and self.comboBox_ctm_learn_priors.currentText() != "False":
             self.checkBox_ctm_8_bad.show()
             messages += Constants.WRONG_LEARN_PRIORS_MSG + "\n"
         else:
             self.checkBox_ctm_8_good.show()
-            self.training_params['learn_priors'] = self.comboBox_ctm_learn_priors.currentText()
+            self.training_params['learn_priors'] = True if self.comboBox_ctm_learn_priors.currentText(
+            ) == "True" else False
 
-        if float(self.lineEdit_ctm_learning_rate.text()) < 0:
+        lr = float(self.lineEdit_ctm_learning_rate.text())
+        if lr < 0:
             self.checkBox_ctm_9_bad.show()
             messages += Constants.WRONG_LR_MSG + "\n"
         else:
             self.checkBox_ctm_9_good.show()
-            self.training_params['lr'] = self.lineEdit_ctm_learning_rate.text()
+            self.training_params['lr'] = lr
 
-        if float(self.lineEdit_ctm_momentum.text()) < 0 or float(self.lineEdit_ctm_momentum.text()) > 1:
+        momentum = float(self.lineEdit_ctm_momentum.text())
+        if momentum < 0 or float(self.lineEdit_ctm_momentum.text()) > 1:
             self.checkBox_ctm_10_bad.show()
             messages += Constants.WRONG_MOMENTUM_MSG + "\n"
         else:
             self.checkBox_ctm_10_good.show()
-            self.training_params['momentum'] = self.lineEdit_ctm_momentum.text()
+            self.training_params['momentum'] = momentum
 
-        if self.comboBox_ctm_solver.currentText() not in ['adagrad', 'adam', 'sgd', 'adadelta', 'rmsprop']:
+        solver = self.comboBox_ctm_solver.currentText()
+        if solver not in ['adagrad', 'adam', 'sgd', 'adadelta', 'rmsprop']:
             self.checkBox_ctm_11_bad.show()
             messages += Constants.WRONG_SOLVER_MSG + "\n"
         else:
             self.checkBox_ctm_11_good.show()
-            self.training_params['solver'] = self.comboBox_ctm_solver.currentText()
+            self.training_params['solver'] = solver
 
         if self.comboBox_ctm_reduce_on_plateau.currentText() != "True" and self.comboBox_ctm_reduce_on_plateau.currentText() != "False":
             self.checkBox_ctm_12_bad.show()
             messages += Constants.WRONG_REDUCE_ON_PLATEAU_MSG + "\n"
         else:
             self.checkBox_ctm_12_good.show()
-            self.training_params['reduce_on_plateau'] = self.comboBox_ctm_reduce_on_plateau.currentText()
+            self.training_params['reduce_on_plateau'] = True if self.comboBox_ctm_reduce_on_plateau.currentText(
+            ) == "True" else False
 
         if re.match(r'^-?\d+(?:\.\d+)$', self.lineEdit_ctm_topic_prior_mean.text()) is None:
             self.checkBox_ctm_13_bad.show()
             messages += Constants.WRONG_TOPIC_PRIOR_MEAN_MSG + "\n"
         else:
             self.checkBox_ctm_13_good.show()
-            self.training_params['topic_prior_mean'] = self.lineEdit_ctm_topic_prior_mean.text()
+            self.training_params['topic_prior_mean'] = float(self.lineEdit_ctm_topic_prior_mean.text(
+            ))
 
         # if re.match(r'^-?\d+(?:\.\d+)$', self.lineEdit_ctm_topic_prior_variance.text()) is None:
         #    self.checkBox_ctm_14_bad.show()
         #    messages += Constants.WRONG_TOPIC_PRIOR_VAR_MSG + "\n"
         # else:
         self.checkBox_ctm_14_good.show()
-        self.training_params['topic_prior_variance'] = self.lineEdit_ctm_topic_prior_variance.text()
+        self.training_params['topic_prior_variance'] = None if self.lineEdit_ctm_topic_prior_variance.text() == "None" else \
+            float(self.lineEdit_ctm_topic_prior_variance.text())
 
-        if not self.lineEdit_ctm_nr_samples.text().isdigit() or int(self.lineEdit_ctm_nr_samples.text()) < 0 or int(self.lineEdit_ctm_nr_samples.text()) == 0:
+        nr_samples = int(self.lineEdit_ctm_nr_samples.text())
+        if not self.lineEdit_ctm_nr_samples.text().isdigit() or nr_samples < 0 or nr_samples == 0:
             self.checkBox_ctm_15_bad.show()
             messages += Constants.WRONG_NR_SAMPLES + "\n"
         else:
             self.checkBox_ctm_15_good.show()
-            self.training_params['num_samples'] = self.lineEdit_ctm_nr_samples.text()
-        
-        if not self.lineEdit_ctm_workers.text().isdigit() or int(self.lineEdit_ctm_workers.text()) < 0:
+            self.training_params['num_samples'] = nr_samples
+
+        nr_workers = int(self.lineEdit_ctm_workers.text())
+        if not self.lineEdit_ctm_workers.text().isdigit() or nr_workers < 0:
             self.checkBox_prod_16_bad.show()
             messages += Constants.WRONG_NR_WORKERS + "\n"
         else:
             self.checkBox_prod_16_good.show()
-            self.training_params['num_data_loader_workers'] = self.lineEdit_ctm_workers.text()
-        
-        if float(self.lineEdit_ctm_thetas_thr.text()) > 1:
+            self.training_params['num_data_loader_workers'] = nr_workers
+
+        thetas_thr = float(self.lineEdit_ctm_thetas_thr.text())
+        if thetas_thr > 1:
             self.checkBox_prod_20_bad.show()
             messages += Constants.WRONG_THETAS_THR_LDA_MSG + "\n"
         else:
             self.checkBox_prod_20_good.show()
-            self.training_params['thetas_thr'] = self.lineEdit_ctm_thetas_thr.text(
-            )
-        
-        len_trdtset = 0 # @TODO: TO BE COMPLETED
-        if int(self.lineEdit_ctm_label_size.split()) != 0 and len(self.lineEdit_ctm_label_size.split()) != len_trdtset:
+            self.training_params['thetas_thr'] = thetas_thr
+
+        len_trdtset = 0  # TODO: TO BE COMPLETED
+        label_size = int(self.lineEdit_ctm_label_size.text())
+        if label_size != 0 and len(self.lineEdit_ctm_label_size.text()) != len_trdtset:
             self.checkBox_ctm_17_bad.show()
             messages += Constants.WRONG_LABEL_SIZE + "\n"
         elif self.comboBox_ctm_model_type.currentText == "SuperCTM" and (int(self.lineEdit_ctm_label_size.split()) < 0 or int(self.lineEdit_ctm_label_size.split()) == 0):
@@ -660,20 +704,21 @@ class TrainModelWindow(QtWidgets.QDialog):
             messages += Constants.WRONG_LABEL_SIZE_FOR_SUPERCTM + "\n"
         else:
             self.checkBox_ctm_17_good.show()
-            self.training_params['label_size'] = self.lineEdit_ctm_thetas_thr.text(
-            )
-        
-        # @TODO: Add control for loss weights
+            self.training_params['label_size'] = label_size
+
+        # TODO: Add control for loss weights
         if self.comboBox_ctm_model_type.currentText == "BetaCTM" and self.lineEdit_ctm_loss_weigths.text() == "None":
             self.checkBox_ctm_18_bad.show()
             messages += Constants.WRONG_LOSS_WEIGTHS_FOR_BETACTM + "\n"
         else:
             self.checkBox_ctm_18_good.show()
-            self.training_params['loss_weights'] = self.lineEdit_ctm_loss_weigths.text()
+            self.training_params['loss_weights'] = None if self.lineEdit_ctm_loss_weigths.text() == "None" else json.loads(
+                self.lineEdit_ctm_loss_weigths.text())
 
-        # @TODO: Add check for if sbert is available in hf
+        # TODO: Add check for if sbert is available in hf
         self.checkBox_ctm_19_good.show()
-        self.training_params['sbert_model_to_load'] = self.lineEdit_ctm_sbert_model.text()
+        self.training_params['sbert_model_to_load'] = self.lineEdit_ctm_sbert_model.text(
+        )
 
         if len(self.training_params.keys()) != Constants.NR_PARAMS_TRAIN_CTM:
             QMessageBox.warning(

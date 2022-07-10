@@ -4,9 +4,8 @@
 Class that defines the subwindow for the Interactive Topic Model Trainer App for the creation of a new wordlist.
 
 """
-from PyQt6 import QtGui, QtWidgets
+from PyQt6 import QtWidgets
 from PyQt6.uic import loadUi
-from src.gui.utils.constants import Constants
 
 
 class CreateSwLstWindow(QtWidgets.QDialog):
@@ -23,38 +22,29 @@ class CreateSwLstWindow(QtWidgets.QDialog):
 
         super(CreateSwLstWindow, self).__init__()
 
-        # Load UI and configure default geometry of the window
+        # Load UI 
         # #####################################################################
         loadUi("src/gui/uis/create_wordlist.ui", self)
 
-        #####################################################################################
+        ########################################################################
         # ATTRIBUTES
-        #####################################################################################
+        ########################################################################
         self.tm = tm
         self.status = 0
         self.list_type = None
 
-        #####################################################################################
+        ########################################################################
         # Widgets initial configuration
-        #####################################################################################
+        ########################################################################
         self.textEdit_wordlst.setPlainText("stw1,stw2, ...")
 
-        #####################################################################################
+        ########################################################################
         # Connect buttons
-        #####################################################################################
+        ########################################################################
         self.pushButton_create_wordlist.clicked.connect(
             self.clicked_pushButton_create_wordlist)
         self.comboBox_wordlst_type.currentIndexChanged.connect(
             self.changed_comboBox_wordlst_type)
-
-    def init_ui(self):
-        """Configures the elements of the GUI window that are not configured in the UI, i.e., icon of the application, the application's title, and the position of the window at its opening.
-        """
-
-        self.setWindowIcon(QtGui.QIcon(
-            'src/gui/resources/images/fuzzy_training.png'))
-        self.setWindowTitle(Constants.SMOOTH_SPOON_TITLE)
-        self.center()
 
     def changed_comboBox_wordlst_type(self):
         """It adapts the format of the wordlist that needs to be introdued in the 'textEdit_wordlst' for the wordlist type selected in the 'comboBox_wordlst_type'.
@@ -70,6 +60,7 @@ class CreateSwLstWindow(QtWidgets.QDialog):
         else:
             return
         self.textEdit_wordlst.setPlainText(msg)
+
         return
 
     def clicked_pushButton_create_wordlist(self):

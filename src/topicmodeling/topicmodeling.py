@@ -437,7 +437,7 @@ class textPreproc(object):
 
                 with ProgressBar():
                     DFparquet = trDF[['id', 'cleantext']].rename(
-                        columns={"cleantext": "bow_text"})    # allrawtext
+                        columns={"cleantext": "bow_text"})
                     DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
                                          'scheduler': 'processes'})
 
@@ -447,8 +447,8 @@ class textPreproc(object):
                     outFile.unlink()
 
                 with ProgressBar():
-                    DFparquet = trDF[['id', 'cleantext', 'allrawtext']].rename(
-                        columns={"cleantext": "bow_text", "allrawtext": "all_rawtext"})
+                    DFparquet = trDF[['id', 'cleantext', 'all_rawtext']].rename(
+                        columns={"cleantext": "bow_text"})
                     DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
                                          'scheduler': 'processes'})
 
@@ -1334,13 +1334,13 @@ class MalletTrainer(Trainer):
         super().__init__(logger)
 
         self._mallet_path = Path(mallet_path)
-        self._ntopics = int(ntopics)
+        self._ntopics = ntopics
         self._alpha = alpha
         self._optimize_interval = optimize_interval
         self._num_threads = num_threads
         self._num_iterations = num_iterations
         self._doc_topic_thr = doc_topic_thr
-        self._thetas_thr = float(thetas_thr)
+        self._thetas_thr = thetas_thr
         self._token_regexp = token_regexp
 
         if not self._mallet_path.is_file():
@@ -2050,7 +2050,7 @@ class HierarchicalTMManager(object):
         vocab_w2id = tmmodel.get_vocab_w2id()
         exp_tpc = int(tr_config_c['expansion_tpc'])
 
-        if tr_config_c['htm-version'] == "htm-ws":
+        if tr_config_c['htm_version'] == "htm-ws":
             self._logger.info(
                 '-- -- -- Creating training corpus according to HTM-WS.')
 
@@ -2132,7 +2132,7 @@ class HierarchicalTMManager(object):
                         outFile, write_index=False,
                         compute_kwargs={'scheduler': 'processes'})
 
-        elif tr_config_c['htm-version'] == "htm-ds":
+        elif tr_config_c['htm_version'] == "htm-ds":
             self._logger.info(
                 '-- -- -- Creating training corpus according to HTM-DS.')
 
@@ -2405,7 +2405,7 @@ if __name__ == "__main__":
                         corpusFile=configFile.parent.joinpath('corpus.parquet'))
                 elif train_config['trainer'] == 'ctm':
                     CTMr = CTMTrainer(
-                        n_components=train_config['LDAparam']['n_components'],
+                        n_components=train_config['LDAparam']['ntopics'],
                         model_type=train_config['LDAparam']['model_type'],
                         ctm_model_type=train_config['LDAparam']['ctm_model_type'],
                         hidden_sizes=tuple(

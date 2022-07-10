@@ -95,3 +95,8 @@ round_size=6
 NETLworkers=3
 LDAvis_ndocs=25000
 LDAvis_njobs=15
+
+[Hierarchical]
+expansion_tpc=0
+htm_version=htm-ds
+thr=0.2

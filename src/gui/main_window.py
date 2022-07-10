@@ -548,6 +548,11 @@ class MainWindow(QMainWindow):
                 i, 0)
             if item.checkState() == QtCore.Qt.CheckState.Checked:
                 checked_list.append(i)
+        
+        if len(checked_list) == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.CREATE_TR_DST_NOT_SELECTED_MSG)
+            return
 
         self.create_tm_corpus_subwindow = GenerateTMCorpus(
             checked_list, self.tm)

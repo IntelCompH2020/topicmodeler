@@ -4,9 +4,8 @@
 Class that defines the subwindow for the Interactive Topic Model Trainer App for the edition of an existing wordlist selected by the user in the GUI's main window.
 
 """
-from PyQt6 import QtGui, QtWidgets
+from PyQt6 import QtWidgets
 from PyQt6.uic import loadUi
-from src.gui.utils.constants import Constants
 
 
 class EditSwLstWindow(QtWidgets.QDialog):
@@ -25,20 +24,20 @@ class EditSwLstWindow(QtWidgets.QDialog):
 
         super(EditSwLstWindow, self).__init__()
 
-        # Load UI and configure default geometry of the window
+        # Load UI
         # #####################################################################
         loadUi("src/gui/uis/edit_wordlist.ui", self)
 
-        #####################################################################################
+        ########################################################################
         # ATTRIBUTES
-        #####################################################################################
+        ########################################################################
         self.tm = tm
         self.dict_wordlist = dict_wordlist
         self.status = 0
 
-        #####################################################################################
+        ########################################################################
         # Widgets initial configuration
-        #####################################################################################
+        ########################################################################
         self.label_wordlist_type.setText(self.dict_wordlist['valid_for'])
         self.textEdit_wordlst.setPlainText(
             ",".join(self.dict_wordlist['wordlist']))
@@ -48,20 +47,11 @@ class EditSwLstWindow(QtWidgets.QDialog):
         self.textEdit_wordlst_description.setPlainText(
             self.dict_wordlist['description'])
 
-        #####################################################################################
+        ########################################################################
         # Connect buttons
-        #####################################################################################
+        ########################################################################
         self.pushButton_edit_wordlist.clicked.connect(
             self.clicked_pushButton_edit_wordlist)
-
-    def init_ui(self):
-        """Configures the elements of the GUI window that are not configured in the UI, i.e., icon of the application, the application's title, and the position of the window at its opening.
-        """
-
-        self.setWindowIcon(QtGui.QIcon(
-            'src/gui/resources/images/fuzzy_training.png'))
-        self.setWindowTitle(Constants.SMOOTH_SPOON_TITLE)
-        self.center()
 
     def clicked_pushButton_edit_wordlist(self):
         """It controls the clicking of the 'pushButton_edit_wordlist'. Once the button is clicked, the updates on the wordlist are taken from the 'textEdit_wordlst'. Once the wordlist new words are attained, these are updated 'dict_wordlist' describing the wordlist being edited and the task manager function in charge of editing the wordlist is invoked. After the wordlist edition completion, the window is closed.
