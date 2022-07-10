@@ -436,8 +436,10 @@ class textPreproc(object):
                     outFile.unlink()
 
                 with ProgressBar():
-                    DFparquet = trDF[['id', 'cleantext']].rename(columns={"cleantext": "bow_text"})    # allrawtext
-                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={'scheduler': 'processes'})
+                    DFparquet = trDF[['id', 'cleantext']].rename(
+                        columns={"cleantext": "bow_text"})    # allrawtext
+                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
+                                         'scheduler': 'processes'})
 
             elif tmTrainer == "ctm":
                 outFile = dirpath.joinpath('corpus.parquet')
@@ -445,8 +447,10 @@ class textPreproc(object):
                     outFile.unlink()
 
                 with ProgressBar():
-                    DFparquet = trDF[['id', 'cleantext', 'allrawtext']].rename(columns={"cleantext": "bow_text", "allrawtext":"all_rawtext"})
-                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={'scheduler': 'processes'})
+                    DFparquet = trDF[['id', 'cleantext', 'allrawtext']].rename(
+                        columns={"cleantext": "bow_text", "allrawtext": "all_rawtext"})
+                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
+                                         'scheduler': 'processes'})
 
         else:
             # Spark dataframe
@@ -490,12 +494,14 @@ class textPreproc(object):
                     f"file://{outFile.as_posix()}", mode="overwrite")
             elif tmTrainer == "prodLDA":
                 outFile = dirpath.joinpath('corpus.parquet')
-                lemas_df = (trDF.withColumn("bow_text", back2textUDF(F.col("bow"))).select("id", "bow_text"))
+                lemas_df = (trDF.withColumn("bow_text", back2textUDF(
+                    F.col("bow"))).select("id", "bow_text"))
                 lemas_df.write.parquet(
                     f"file://{outFile.as_posix()}", mode="overwrite")
             elif tmTrainer == "ctm":
                 outFile = dirpath.joinpath('corpus.parquet')
-                lemas_raw_df = (trDF.withColumn("bow_text", back2textUDF(F.col("bow"))).select("id", "bow_text", "all_raw_text"))
+                lemas_raw_df = (trDF.withColumn("bow_text", back2textUDF(
+                    F.col("bow"))).select("id", "bow_text", "all_raw_text"))
                 lemas_raw_df.write.parquet(
                     f"file://{outFile.as_posix()}", mode="overwrite")
 
@@ -666,10 +672,10 @@ class TMmodel(object):
 
     def get_ntopics(self):
         return self._ntopics
-    
+
     def get_vocab_id2w(self):
         return self._vocab_id2w
-    
+
     def get_vocab_w2id(self):
         return self._vocab_w2id
 
@@ -1670,7 +1676,8 @@ class ProdLDATrainer(Trainer):
         modelFolder.mkdir()
 
         # Generating the corpus in the input format required by ProdLDA
-        self._logger.info('-- -- ProdLDA Corpus Generation: BOW Dataset object')
+        self._logger.info(
+            '-- -- ProdLDA Corpus Generation: BOW Dataset object')
         df = pd.read_parquet(corpusFile)
         df_lemas = df[["bow_text"]].values.tolist()
         df_lemas = [doc[0].split() for doc in df_lemas]
@@ -1678,7 +1685,7 @@ class ProdLDATrainer(Trainer):
         self._corpus = [el for el in df_lemas]
         self._train_dataset, self._val_dataset, self._bow_size, self._id2token, self._docs_train = \
             prepare_dataset(self._corpus)
-        
+
         # Save training corpus
         corpus_file = modelFolder.joinpath('corpus.txt')
         with open(corpus_file, 'w', encoding='utf-8') as fout:
@@ -1906,7 +1913,7 @@ class CTMTrainer(Trainer):
                                 unpreprocessed_corpus=self._unpreprocessed_corpus,
                                 custom_embeddings=self._embeddings,
                                 sbert_model_to_load=self._sbert_model_to_load)
-        
+
         # Save embeddings
         embeddings_file = modelFolder.joinpath('embeddings.npy')
         np.save(embeddings_file, self.embeddings_train)
@@ -2037,8 +2044,8 @@ class HierarchicalTMManager(object):
             embeddings = np.load(embeddingsFile, allow_pickle=True)
 
         # Get father model's thetas and betas and expansion topic
-        thetas = tmmodel.get_thetas().toarray() # (ndocs, ntopics)
-        betas = tmmodel.get_betas() # (ntopics, nwords)
+        thetas = tmmodel.get_thetas().toarray()  # (ndocs, ntopics)
+        betas = tmmodel.get_betas()  # (ntopics, nwords)
         vocab_id2w = tmmodel.get_vocab_id2w()
         vocab_w2id = tmmodel.get_vocab_w2id()
         exp_tpc = int(tr_config_c['expansion_tpc'])
@@ -2052,6 +2059,8 @@ class HierarchicalTMManager(object):
 
                 Parameters
                 ----------
+                row: pandas.Series
+                    ndarray representation of the document
                 thetas: ndarray
                     Document-topic distribution
                 betas: ndarray
@@ -2063,57 +2072,121 @@ class HierarchicalTMManager(object):
 
                 Returns
                 -------
-
+                reduced_doc_str: str
+                    String representation of the words to keep in the document given by row
                 """
-                id_doc = int(row["id"])
+
+                id_doc = int(row["id"]) - 1
                 doc = row["doc"].split()
                 thetas_d = thetas[id_doc, :]
+
                 # ids of words in d
-                words_doc_idx = [vocab_w2id[str(word)] for word in doc] 
+                words_doc_idx = [vocab_w2id[word]
+                                 for word in doc if word in vocab_w2id]
 
                 # ids of words in d assigned to exp_tpc
                 words_exp_idx = [idx_w for idx_w in words_doc_idx if np.argmax(
                     np.multiply(thetas_d, betas[:, idx_w])) == exp_tpc]
 
-                #words_idx = [w for w in range(betas.shape[1]) if np.random.multinomial(len(betas), np.multiply(thetas_d, betas[:, w])) == exp_tpc]
-                reduced_doc = [vocab_id2w[str(id_word)] for id_word in words_exp_idx]
-                
-                return ' '.join([el for el in reduced_doc])
+                # words_idx = [w for w in range(betas.shape[1]) if np.random.multinomial(len(betas), np.multiply(thetas_d, betas[:, idx_w])) == exp_tpc]
+
+                # Only words generated by exp_tpc are kept
+                reduced_doc = [vocab_id2w[str(id_word)]
+                               for id_word in words_exp_idx]
+                reduced_doc_str = ' '.join([el for el in reduced_doc])
+
+                return reduced_doc_str
 
             tr_data_ddf['reduced_doc'] = tr_data_ddf.apply(
-                get_htm_ws_corpus, axis=1, meta=('x', 'object'), args=(thetas,betas,vocab_id2w,vocab_w2id,exp_tpc))
-            
-            outFile = configFile_c.parent.joinpath('corpus.txt')
-            if outFile.is_file():
-                outFile.unlink()
+                get_htm_ws_corpus, axis=1, meta=('x', 'object'), args=(thetas, betas, vocab_id2w, vocab_w2id, exp_tpc))
 
-            tr_data_ddf['2mallet'] = tr_data_ddf['id'].apply(
-                str, meta=('id', 'str')) + " 0 " + tr_data_ddf['reduced_doc']
+            if tr_config_c['trainer'] == "mallet":
 
-            with ProgressBar():
-                DFmallet = tr_data_ddf[['2mallet']]
-                DFmallet.to_csv(outFile, index=False, header=False, single_file=True,compute_kwargs={'scheduler': 'processes'})
+                outFile = configFile_c.parent.joinpath('corpus.txt')
+                if outFile.is_file():
+                    outFile.unlink()
 
-        elif tr_config_c['version'] == "htm-ds":
+                tr_data_ddf['2mallet'] = tr_data_ddf['id'].apply(
+                    str, meta=('id', 'str')) + " 0 " + tr_data_ddf['reduced_doc']
+
+                with ProgressBar():
+                    DFmallet = tr_data_ddf[['2mallet']]
+                    DFmallet.to_csv(
+                        outFile, index=False,
+                        header=False, single_file=True,
+                        compute_kwargs={'scheduler': 'processes'})
+
+            elif tr_config_c['trainer'] == 'sparkLDA':
+                pass
+
+            elif tr_config_c['trainer'] == "prodLDA" or tr_config_c['trainer'] == "ctm":
+
+                outFile = configFile_c.parent.joinpath('corpus.parquet')
+                if outFile.is_file():
+                    outFile.unlink()
+
+                with ProgressBar():
+                    DFparquet = tr_data_ddf[['id', 'reduced_doc']].rename(
+                        columns={"reduced_doc": "bow_text"})
+                    DFparquet.to_parquet(
+                        outFile, write_index=False,
+                        compute_kwargs={'scheduler': 'processes'})
+
+        elif tr_config_c['htm-version'] == "htm-ds":
             self._logger.info(
                 '-- -- -- Creating training corpus according to HTM-DS.')
 
             # Get ids of documents that meet the condition of having a representation of the expansion topic larger than thr
-            thr = tr_config_c['thr']
+            thr = float(tr_config_c['thr'])
             doc_ids_to_keep = \
                 [idx for idx in range(thetas.shape[0])
                  if thetas[idx, exp_tpc] > thr]
-            # Keep selected documents from the father's t
-            corpus = [tr_data[id_doc] for id_doc in doc_ids_to_keep]
-            if configFile_f['trainer'] == "ctm":
-                # Keep embeddings related to the selected documents t
+
+            # Keep selected documents from the father's corpus
+            tr_data_ddf = tr_data_ddf.loc[doc_ids_to_keep, :]
+
+            # Save corpus file in the format required by each trainer
+            if tr_config_c['trainer'] == "mallet":
+
+                outFile = configFile_c.parent.joinpath('corpus.txt')
+                if outFile.is_file():
+                    outFile.unlink()
+
+                tr_data_ddf['2mallet'] = tr_data_ddf['id'].apply(
+                    str, meta=('id', 'str')) + " 0 " + tr_data_ddf['doc']
+
+                with ProgressBar():
+                    DFmallet = tr_data_ddf[['2mallet']]
+                    DFmallet.to_csv(outFile, index=False, header=False, single_file=True, compute_kwargs={
+                                    'scheduler': 'processes'})
+
+            elif tr_config_c['trainer'] == 'sparkLDA':
+                pass
+
+            elif tr_config_c['trainer'] == "prodLDA" or tr_config_c['trainer'] == "ctm":
+
+                outFile = configFile_c.parent.joinpath('corpus.parquet')
+                if outFile.is_file():
+                    outFile.unlink()
+
+                with ProgressBar():
+                    DFparquet = tr_data_ddf[['id', 'doc']].rename(
+                        columns={"doc": "bow_text"})
+                    DFparquet.to_parquet(
+                        outFile, write_index=False,
+                        compute_kwargs={'scheduler': 'processes'})
+
+            # If the trainer is CTM, keep embeddings related to the selected documents t
+            if tr_config_c['trainer'] == "ctm":
                 embeddings = embeddings[doc_ids_to_keep, :]
-            else:
-                embeddings = None
 
         else:
             self._logger.error(
                 '-- -- -- The specified HTM version is not available.')
+
+        # Save embeddings
+        embeddings_file = configFile_c.parent.joinpath('embeddings.npy')
+        np.save(embeddings_file, embeddings)
 
         return
 
@@ -2312,7 +2385,8 @@ if __name__ == "__main__":
                     ProdLDATr = ProdLDATrainer(
                         n_components=train_config['LDAparam']['ntopics'],
                         model_type=train_config['LDAparam']['model_type'],
-                        hidden_sizes=tuple(train_config['LDAparam']['hidden_sizes']),
+                        hidden_sizes=tuple(
+                            train_config['LDAparam']['hidden_sizes']),
                         activation=train_config['LDAparam']['activation'],
                         dropout=train_config['LDAparam']['dropout'],
                         learn_priors=train_config['LDAparam']['learn_priors'],
@@ -2334,7 +2408,8 @@ if __name__ == "__main__":
                         n_components=train_config['LDAparam']['n_components'],
                         model_type=train_config['LDAparam']['model_type'],
                         ctm_model_type=train_config['LDAparam']['ctm_model_type'],
-                        hidden_sizes=tuple(train_config['LDAparam']['hidden_sizes']),
+                        hidden_sizes=tuple(
+                            train_config['LDAparam']['hidden_sizes']),
                         activation=train_config['LDAparam']['activation'],
                         dropout=train_config['LDAparam']['dropout'],
                         learn_priors=train_config['LDAparam']['learn_priors'],
@@ -2354,7 +2429,6 @@ if __name__ == "__main__":
                         sbert_model_to_load=train_config['LDAparam']['sbert_model_to_load'])
                     CTMr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.parquet'))
-
         else:
             sys.exit('You need to provide a valid configuration file')
 
@@ -2366,12 +2440,18 @@ if __name__ == "__main__":
             if not configFile_c.is_file():
                 sys.exit('You need to provide a valid configuration file')
             else:
-                hierarchicalTMManager = HierarchicalTMManager()
-                # TODO: check TMmodel_path is path
                 # Read training configurations from father model and submodel
                 configFile_c = Path(args.config_child)
                 with configFile_c.open('r', encoding='utf8') as fin:
                     tr_config_c = json.load(fin)
+
+                tMmodel_path = Path(tr_config_c["father_model"])
+                if not tMmodel_path.is_file():
+                    sys.exit('There must exist a valid TMmodel file for the parent corpus')
+                
+                # Create hierarhicalTMManager object
+                hierarchicalTMManager = HierarchicalTMManager()
+                
+                # Create corpus
                 hierarchicalTMManager.create_submodel_tr_corpus(
                     tr_config_c["father_model"], args.config, args.config_child)
-                # TODO: Continue
