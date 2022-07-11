@@ -41,6 +41,8 @@ class TrainModelWindow(QtWidgets.QDialog):
             Name of the training dataset
         preproc_settings: dict
             Dictionary with the configuration for the preprocessing of the training corpus
+        hierarchy_level: int
+            It determines whether a model or submodel topic model is being trained so their corresponding parameters are updated accordingly
         """
 
         super(TrainModelWindow, self).__init__()
@@ -65,6 +67,8 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.modelname = None
         self.ModelDesc = None
         self.privacy = None
+        self.hierarchy_level = 0
+        self.hierarchical_version = "htm-ds"
 
         # Reload config object in case changes were doing from the settings page
         self.cf = configparser.ConfigParser()
@@ -110,8 +114,14 @@ class TrainModelWindow(QtWidgets.QDialog):
         for checkbox in self.ctm_checkboxes_params:
             checkbox.hide()
 
+        self.tabWidget_settingsLDA.tabBar().setExpanding(True)
+        self.tabWidget_settings_sparklda.tabBar().setExpanding(True)
+        self.tabWidget_settings_avitm.tabBar().setExpanding(True)
+        self.tabWidget_settings_ctm.tabBar().setExpanding(True)
+
         # Initialize settings
         self.initialize_training_settings()
+        self.initialize_hierarchical_level_settings()
 
         ########################################################################
         # Connect buttons
@@ -151,6 +161,9 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.pushButton_train.clicked.connect(
             self.clicked_pushButton_train)
 
+        self.comboBox_version_htm.currentIndexChanged.connect(
+            self.changed_comboBox_htm_version)
+
     def clicked_change_train_button(self, train_button):
         """
         Method to control the selection of one of the buttons in the train bar.
@@ -175,6 +188,31 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.get_prodlda_params()
         self.get_ctm_params()
         self.get_sparklda_params()
+
+        return
+
+    def initialize_hierarchical_level_settings(self): 
+        """Sets the correspinding parameters according to whether a model or submodel is bein trained.
+        """
+        if self.hierarchy_level == 0:
+            self.frame_hierarchical.hide()
+        elif self.hierarchy_level == 1:
+            self.frame_hierarchical.show()
+
+        return
+
+    def changed_comboBox_htm_version(self):
+        """It controls the selection of the HTM version used for the generation of the submodel corpus.
+        """        
+
+        htm_type = self.comboBox_version_htm.currentText()
+
+        if htm_type.lower() == "htm-ws":
+            self.lineEdit_htm_thr.hide()
+            self.label_htm_ds_thr.hide()
+        elif htm_type.lower() == "htm-ds":
+            self.lineEdit_htm_thr.show()
+            self.label_htm_ds_thr.show()
 
         return
 
@@ -439,7 +477,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             messages += Constants.WRONG_REDUCE_ON_PLATEAU_MSG + "\n"
         else:
             self.checkBox_prod_12_good.show()
-            self.training_params['reduce_on_plateau'] = reduce_on_plateau
+            self.training_params['reduce_on_plateau'] = True if reduce_on_plateau == "True" else False
 
         if re.match(r'^-?\d+(?:\.\d+)$', self.lineEdit_prior_mean_prod.text()) is None:
             self.checkBox_prod_13_bad.show()

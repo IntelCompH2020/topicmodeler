@@ -1290,6 +1290,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # Default values are read from config file
         expansion_tpc = int(self.cf.get('Hierarchical', 'expansion_tpc'))
+        # TODO: Father model's description should be visualize here
         htm_version = str(self.cf.get('Hierarchical', 'htm_version'))
         thr = float(self.cf.get('Hierarchical', 'thr'))
 

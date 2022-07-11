@@ -718,6 +718,8 @@ class MainWindow(QMainWindow):
 
         self.train_model_subwindow.TrDts_name = training_corpus
         self.train_model_subwindow.preproc_settings = self.preprocessing_subwindow.preproc_settings
+        self.train_model_subwindow.hierarchy_level = 0
+        self.train_model_subwindow.initialize_hierarchical_level_settings()
         self.train_model_subwindow.exec()
 
         # @TODO: Reload models
