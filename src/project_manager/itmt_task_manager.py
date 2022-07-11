@@ -405,7 +405,9 @@ class ITMTTaskManager(BaseTaskManager):
             "TrDtSet": TrDtSet,
             "Preproc": Preproc,
             "LDAparam": training_params,
-            "creation_date": DT.datetime.now()
+            "creation_date": DT.datetime.now(),
+            "hierarchy-level": 0,
+            "htm-version": None,
         }
 
         with configFile.open('w', encoding='utf-8') as outfile:
@@ -539,10 +541,11 @@ class ITMTTaskManager(BaseTaskManager):
             "visibility": privacy,
             "trainer": trainer,
             "expansion_tpc": expansion_tpc,
-            "htm-version": htm_version,
             "thr": thr,
             "LDAparam": training_params,
-            "creation_date": DT.datetime.now()
+            "creation_date": DT.datetime.now(),
+            "hierarchy-level": 1,
+            "htm-version": htm_version,
         }
 
         with configFile_c.open('w', encoding='utf-8') as outfile:
@@ -550,7 +553,7 @@ class ITMTTaskManager(BaseTaskManager):
                       ensure_ascii=False, indent=2, default=str)
 
         # 6. Create submodel training corpus
-        cmd = f'python src/topicmodeling/topicmodeling.py --hierarchical --config {configFile_f.as_posix()} ----config_child {configFile_c.as_posix()}'
+        cmd = f'python src/topicmodeling/topicmodeling.py --hierarchical --config {configFile_f.as_posix()} --config_child {configFile_c.as_posix()}'
         printred(cmd)
         try:
             self.logger.info(f'-- -- Running command {cmd}')
@@ -1080,12 +1083,21 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         allTMmodels = json.loads(self.allTMmodels)
         for TMmodel in allTMmodels.keys():
-            printmag('\nTraining Dataset ' + allTMmodels[TMmodel]['name'])
-            print('\tDescription:', allTMmodels[TMmodel]['description'])
-            print('\tTraining Dataset:', allTMmodels[TMmodel]['TrDtSet'])
-            print('\tTrainer:', allTMmodels[TMmodel]['trainer'])
-            print('\tCreation date:', allTMmodels[TMmodel]['creation_date'])
-            print('\tVisibility:', allTMmodels[TMmodel]['visibility'])
+            if allTMmodels[TMmodel]['hierarchy-level'] == 1:
+                sep = "\t\t"
+                printmag('\n\t2nd level Topic Model ' + allTMmodels[TMmodel]['name'])
+            else:
+                sep = "\t"
+                printmag('\nTopic Model ' + allTMmodels[TMmodel]['name'])
+            
+            print(sep + 'Description:', allTMmodels[TMmodel]['description'])
+            print(sep + 'Training Dataset:', allTMmodels[TMmodel]['TrDtSet'])
+            print(sep + 'Trainer:', allTMmodels[TMmodel]['trainer'])
+            print(sep + 'Creation date:', allTMmodels[TMmodel]['creation_date'])
+            print(sep + 'Visibility:', allTMmodels[TMmodel]['visibility'])
+            print(sep + 'Hierarchy-level:', allTMmodels[TMmodel]['hierarchy-level'])
+            if allTMmodels[TMmodel]['hierarchy-level'] == 1:
+                print(sep + 'Hierarchical-version:', allTMmodels[TMmodel]['hierarchy-level'])
 
         return
 
@@ -1262,7 +1274,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         allTMmodels = json.loads(self.allTMmodels)
         models = [model for model in allTMmodels.keys()]
         displayModels = [allTMmodels[id_model]['name'] + ': ' +
-                         allTMmodels[id_model]['description'] for id_model in models if allTMmodels[id_model]['hierarchy-level'] == '0']
+                         allTMmodels[id_model]['description'] for id_model in models if allTMmodels[id_model]['hierarchy-level'] == 0]
         selection = query_options(
             displayModels, "Select model from which a second-level submodel will be generated")
         fathermodel = models[selection]

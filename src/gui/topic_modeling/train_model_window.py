@@ -7,6 +7,7 @@ Class that defines the subwindow for the Interactive Topic Model Trainer App for
 
 import configparser
 import json
+from pickletools import optimize
 import re
 from functools import partial
 
@@ -213,60 +214,61 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.training_params = {}
         messages = ""
 
+        ntopics = self.lineEdit_nr_topics_lda.text()
         if int(self.lineEdit_nr_topics_lda.text()) < 0 or int(self.lineEdit_nr_topics_lda.text()) == 0:
             self.checkBox_lda_1_bad.show()
             messages += Constants.WRONG_NR_TOPICS_LDA_MSG + "\n"
         else:
             self.checkBox_lda_1_good.show()
-            self.training_params['ntopics'] = self.lineEdit_nr_topics_lda.text(
-            )
+            self.training_params['ntopics'] = ntopics
 
-        if int(self.lineEdit_alpha_lda.text()) < 0:
+        alpha = float(self.lineEdit_alpha_lda.text())
+        if alpha < 0:
             self.checkBox_lda_2_bad.show()
             messages += Constants.WRONG_ALPHA_LDA_MSG + "\n"
         else:
             self.checkBox_lda_2_good.show()
-            self.training_params['alpha'] = self.lineEdit_alpha_lda.text()
+            self.training_params['alpha'] = alpha
 
-        if int(self.lineEdit_optimize_interval_lda.text()) < 0:
+        optimize_interval = int(self.lineEdit_optimize_interval_lda.text())
+        if optimize_interval < 0:
             self.checkBox_lda_3_bad.show()
             messages += Constants.WRONG_OI_LDA_MSG + "\n"
         else:
             self.checkBox_lda_3_good.show()
-            self.training_params['optimize_interval'] = self.lineEdit_optimize_interval_lda.text(
-            )
+            self.training_params['optimize_interval'] = optimize_interval
 
-        if int(self.lineEdit_nr_threads_lda.text()) < 0:
+        nr_threads = int(self.lineEdit_nr_threads_lda.text())
+        if  nr_threads < 0:
             self.checkBox_lda_4_bad.show()
             messages += Constants.WRONG_NR_THREADS_LDA_MSG + "\n"
         else:
             self.checkBox_lda_4_good.show()
-            self.training_params['num_threads'] = self.lineEdit_nr_threads_lda.text(
-            )
+            self.training_params['num_threads'] = nr_threads
 
-        if int(self.lineEdit_nr_iterations_lda.text()) < 0:
+        nr_iter = int(self.lineEdit_nr_iterations_lda.text())
+        if nr_iter < 0:
             self.checkBox_lda_5_bad.show()
             messages += Constants.WRONG_NR_ITER_LDA_MSG + "\n"
         else:
             self.checkBox_lda_5_good.show()
-            self.training_params['num_iterations'] = self.lineEdit_nr_iterations_lda.text(
-            )
+            self.training_params['num_iterations'] = nr_iter
 
-        if float(self.lineEdit_doc_top_thr_lda.text()) > 1:
+        doc_tp_thr = float(self.lineEdit_doc_top_thr_lda.text())
+        if doc_tp_thr > 1:
             self.checkBox_lda_6_bad.show()
             messages += Constants.WRONG_DOC_TPC_THR_LDA_MSG + "\n"
         else:
             self.checkBox_lda_6_good.show()
-            self.training_params['doc_topic_thr'] = self.lineEdit_doc_top_thr_lda.text(
-            )
+            self.training_params['doc_topic_thr'] = doc_tp_thr
 
-        if float(self.lineEdit_thetas_thr_lda.text()) > 1:
+        thetas_thr_lda = float(self.lineEdit_thetas_thr_lda.text())
+        if thetas_thr_lda > 1:
             self.checkBox_lda_7_bad.show()
             messages += Constants.WRONG_THETAS_THR_LDA_MSG + "\n"
         else:
             self.checkBox_lda_7_good.show()
-            self.training_params['thetas_thr'] = self.lineEdit_thetas_thr_lda.text(
-            )
+            self.training_params['thetas_thr'] = thetas_thr_lda
 
         if len(self.training_params.keys()) != Constants.NR_PARAMS_TRAIN_LDA_MALLET:
             QMessageBox.warning(
