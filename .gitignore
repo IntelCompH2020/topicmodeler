@@ -138,9 +138,9 @@ config.cf
 #Hive data store folder
 metastore_db
 
-#dockerfiles
-.devcontainer
-Dockerfile
+# #dockerfiles
+# .devcontainer
+# Dockerfile
 
 # local project and parquet folder
 folder
