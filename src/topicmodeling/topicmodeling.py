@@ -2033,6 +2033,7 @@ class HierarchicalTMManager(object):
         # Get father model's training corpus as dask dataframe
         if tr_config_f['trainer'] == "ctm" or  tr_config_f['trainer'] == "prodLDA":
             corpusFile = configFile_f.parent.joinpath('modelFiles/corpus.txt')
+            self._logger.info(corpusFile)
         else:
             corpusFile = configFile_f.parent.joinpath('corpus.txt')
         corpus = [line.rsplit(' 0 ')[1].strip() for line in open(
@@ -2043,7 +2044,7 @@ class HierarchicalTMManager(object):
 
         # Get embeddings if the trainer is CTM
         if tr_config_f['trainer'] == "ctm":
-            embeddingsFile = configFile_f.parent.joinpath('embeddings.npy')
+            embeddingsFile = configFile_f.parent.joinpath('modelFiles/embeddings.npy')
             embeddings = np.load(embeddingsFile, allow_pickle=True)
 
         # Get father model's thetas and betas and expansion topic
