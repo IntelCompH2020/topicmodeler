@@ -2180,16 +2180,19 @@ class HierarchicalTMManager(object):
                         outFile, write_index=False,
                         compute_kwargs={'scheduler': 'processes'})
 
+            if tr_config_c['trainer'] == "ctm":
+                embeddings = embeddings[doc_ids_to_keep, :]
+
         else:
             self._logger.error(
                 '-- -- -- The specified HTM version is not available.')
         
                 # If the trainer is CTM, keep embeddings related to the selected documents t
+        
         if tr_config_c['trainer'] == "ctm":
-            embeddings = embeddings[doc_ids_to_keep, :]
-        # Save embeddings
-        embeddings_file = configFile_c.parent.joinpath('embeddings.npy')
-        np.save(embeddings_file, embeddings)
+            # Save embeddings
+            embeddings_file = configFile_c.parent.joinpath('embeddings.npy')
+            np.save(embeddings_file, embeddings)
 
         
         return
@@ -2259,7 +2262,7 @@ if __name__ == "__main__":
                         "hierarchy-level": modelInfo['hierarchy-level'],
                         "htm-version": modelInfo['htm-version']
                     }
-                submodelFolders = [el for el in TMf.iterdir() if not el.as_posix().endswith("MalletModel")]
+                submodelFolders = [el for el in TMf.iterdir() if not el.as_posix().endswith("modelFiles") and not el.as_posix().endswith("corpus.parquet") and not el.as_posix().endswith("_old")]
                 for sub_TMf in submodelFolders:
                     submodelConfig = sub_TMf.joinpath('trainconfig.json')
                     if submodelConfig.is_file():
