@@ -21,7 +21,7 @@ def get_bag_of_words(data, min_length):
     return vect
 
 
-def bert_embeddings_from_file(text_file, sbert_model_to_load, batch_size=200, max_seq_length=None):
+def bert_embeddings_from_file(text_file, sbert_model_to_load, batch_size=32, max_seq_length=None):
     """
     Creates SBERT Embeddings from an input file, assumes one document per line
     """
@@ -39,7 +39,7 @@ def bert_embeddings_from_file(text_file, sbert_model_to_load, batch_size=200, ma
     return np.array(model.encode(texts, show_progress_bar=True, batch_size=batch_size))
 
 
-def bert_embeddings_from_list(texts, sbert_model_to_load, batch_size=200, max_seq_length=None):
+def bert_embeddings_from_list(texts, sbert_model_to_load, batch_size=32, max_seq_length=None):
     """
     Creates SBERT Embeddings from a list
     """
