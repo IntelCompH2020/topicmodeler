@@ -2019,7 +2019,7 @@ class HierarchicalTMManager(object):
         configFile_c = Path(configFile_c)
         configFile_f = Path(configFile_f)
         vocabFile = configFile_f.parent.joinpath(
-            'malletModel/vocab_freq.txt')
+            'modelFiles/vocab_freq.txt')
         tmmodel = TMmodel(vocabfreq_file=vocabFile,
                           from_file=TMmodel_path)
 
@@ -2031,7 +2031,10 @@ class HierarchicalTMManager(object):
             tr_config_c = json.load(fin)
 
         # Get father model's training corpus as dask dataframe
-        corpusFile = configFile_f.parent.joinpath('corpus.txt')
+        if tr_config_f['trainer'] == "ctm" or  tr_config_f['trainer'] == "prodLDA":
+            corpusFile = configFile_f.parent.joinpath('modelFiles/corpus.txt')
+        else:
+            corpusFile = configFile_f.parent.joinpath('corpus.txt')
         corpus = [line.rsplit(' 0 ')[1].strip() for line in open(
             corpusFile, encoding="utf-8").readlines()]
         tr_data_df = pd.DataFrame(data=corpus, columns=['doc'])

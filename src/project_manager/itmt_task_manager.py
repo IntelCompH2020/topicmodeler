@@ -31,6 +31,7 @@ import pyarrow.parquet as pt
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QMessageBox
 from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
+from src.topicmodeling.topicmodeling import TMmodel
 from src.utils.misc import (printgr, printmag, printred, query_options,
                             request_confirmation, var_num_keyboard, var_string_keyboard)
 
@@ -1290,12 +1291,20 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # Default values are read from config file
         expansion_tpc = int(self.cf.get('Hierarchical', 'expansion_tpc'))
-        # TODO: Father model's description should be visualize here
         htm_version = str(self.cf.get('Hierarchical', 'htm_version'))
         thr = float(self.cf.get('Hierarchical', 'thr'))
 
+        tmModel_father_path = self.p2p / "TMmodels" / fathermodel / "model.npz"
+        vocabFile_father = self.p2p / "TMmodels" / fathermodel / "modelFiles/vocab_freq.txt"
+
+        tmmodel = TMmodel(vocabfreq_file=vocabFile_father,
+                          from_file=tmModel_father_path)
+
+        tmmodel.muestra_descriptions()
+        
         expansion_tpc = var_num_keyboard('int', expansion_tpc,
-                                         "Father model's topic from which the submdodel's corpus will be generated.")
+                                         "Father model's topic from which the submdodel's corpus will be generated. Select one of the above listed:")
+
         htm_version = var_string_keyboard('str', htm_version,
                                           "Hierarhical topic model algorithm according to which the submodel's corpus is generated. Possible values are htm-ws|htm-ds")
         if htm_version == "htm-ds":
