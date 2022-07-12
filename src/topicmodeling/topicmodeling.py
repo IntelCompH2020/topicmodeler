@@ -2450,8 +2450,15 @@ if __name__ == "__main__":
                         loss_weights=train_config['LDAparam']['loss_weights'],
                         thetas_thr=train_config['LDAparam']['thetas_thr'],
                         sbert_model_to_load=train_config['LDAparam']['sbert_model_to_load'])
-                    CTMr.fit(
-                        corpusFile=configFile.parent.joinpath('corpus.parquet'))
+                    
+                    if configFile.parent.joinpath('embeddings.npy').is_file():
+                        CTMr.fit(
+                            corpusFile=configFile.parent.joinpath('corpus.parquet'),
+                            embeddingsFile=configFile.parent.joinpath('embeddings.npy'))
+                    else:
+                        CTMr.fit(
+                            corpusFile=configFile.parent.joinpath('corpus.parquet'))
+
         else:
             sys.exit('You need to provide a valid configuration file')
 
