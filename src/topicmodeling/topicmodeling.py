@@ -2180,16 +2180,16 @@ class HierarchicalTMManager(object):
                         outFile, write_index=False,
                         compute_kwargs={'scheduler': 'processes'})
 
-            # If the trainer is CTM, keep embeddings related to the selected documents t
-            if tr_config_c['trainer'] == "ctm":
-                embeddings = embeddings[doc_ids_to_keep, :]
-            # Save embeddings
-            embeddings_file = configFile_c.parent.joinpath('embeddings.npy')
-            np.save(embeddings_file, embeddings)
-
         else:
             self._logger.error(
                 '-- -- -- The specified HTM version is not available.')
+        
+                # If the trainer is CTM, keep embeddings related to the selected documents t
+        if tr_config_c['trainer'] == "ctm":
+            embeddings = embeddings[doc_ids_to_keep, :]
+        # Save embeddings
+        embeddings_file = configFile_c.parent.joinpath('embeddings.npy')
+        np.save(embeddings_file, embeddings)
 
         
         return
@@ -2450,11 +2450,11 @@ if __name__ == "__main__":
                         loss_weights=train_config['LDAparam']['loss_weights'],
                         thetas_thr=train_config['LDAparam']['thetas_thr'],
                         sbert_model_to_load=train_config['LDAparam']['sbert_model_to_load'])
-                    
-                    if configFile.parent.joinpath('modelFiles/embeddings.npy').is_file():
+
+                    if Path(train_config['embeddings_file']).is_file():
                         CTMr.fit(
                             corpusFile=configFile.parent.joinpath('corpus.parquet'),
-                            embeddingsFile=configFile.parent.joinpath('modelFiles/embeddings.npy'))
+                            embeddingsFile=Path(train_config['embeddings_file']))
                     else:
                         CTMr.fit(
                             corpusFile=configFile.parent.joinpath('corpus.parquet'))

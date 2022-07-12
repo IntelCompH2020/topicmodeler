@@ -536,6 +536,8 @@ class ITMTTaskManager(BaseTaskManager):
 
         configFile_c = submodeldir.joinpath('trainconfig.json')
 
+        embeddings_file = configFile_c.parent.joinpath('embeddings.npy')
+
         train_config = {
             "name": submodelname,
             "description": submodelDesc,
@@ -547,6 +549,7 @@ class ITMTTaskManager(BaseTaskManager):
             "creation_date": DT.datetime.now(),
             "hierarchy-level": 1,
             "htm-version": htm_version,
+            "embeddings": embeddings_file.as_posix()
         }
 
         with configFile_c.open('w', encoding='utf-8') as outfile:
