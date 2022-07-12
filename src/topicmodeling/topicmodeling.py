@@ -2387,15 +2387,15 @@ if __name__ == "__main__":
                 train_config = json.load(fin)
 
                 if train_config['trainer'] == 'mallet':
-                    MallTr = MalletTrainer(mallet_path=train_config['LDAparam']['mallet_path'],
-                                           ntopics=train_config['LDAparam']['ntopics'],
-                                           alpha=train_config['LDAparam']['alpha'],
-                                           optimize_interval=train_config['LDAparam']['optimize_interval'],
-                                           num_threads=train_config['LDAparam']['num_threads'],
-                                           num_iterations=train_config['LDAparam']['num_iterations'],
-                                           doc_topic_thr=train_config['LDAparam']['doc_topic_thr'],
-                                           thetas_thr=train_config['LDAparam']['thetas_thr'],
-                                           token_regexp=train_config['LDAparam']['token_regexp'])
+                    MallTr = MalletTrainer(mallet_path=train_config['TMparam']['mallet_path'],
+                                           ntopics=train_config['TMparam']['ntopics'],
+                                           alpha=train_config['TMparam']['alpha'],
+                                           optimize_interval=train_config['TMparam']['optimize_interval'],
+                                           num_threads=train_config['TMparam']['num_threads'],
+                                           num_iterations=train_config['TMparam']['num_iterations'],
+                                           doc_topic_thr=train_config['TMparam']['doc_topic_thr'],
+                                           thetas_thr=train_config['TMparam']['thetas_thr'],
+                                           token_regexp=train_config['TMparam']['token_regexp'])
                     MallTr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.txt'))
                 elif train_config['trainer'] == 'sparkLDA':
@@ -2409,50 +2409,50 @@ if __name__ == "__main__":
                         configFile.parent.joinpath('corpus.parquet'))
                 elif train_config['trainer'] == 'prodLDA':
                     ProdLDATr = ProdLDATrainer(
-                        n_components=train_config['LDAparam']['ntopics'],
-                        model_type=train_config['LDAparam']['model_type'],
+                        n_components=train_config['TMparam']['ntopics'],
+                        model_type=train_config['TMparam']['model_type'],
                         hidden_sizes=tuple(
-                            train_config['LDAparam']['hidden_sizes']),
-                        activation=train_config['LDAparam']['activation'],
-                        dropout=train_config['LDAparam']['dropout'],
-                        learn_priors=train_config['LDAparam']['learn_priors'],
-                        batch_size=train_config['LDAparam']['batch_size'],
-                        lr=train_config['LDAparam']['lr'],
-                        momentum=train_config['LDAparam']['momentum'],
-                        solver=train_config['LDAparam']['solver'],
-                        num_epochs=train_config['LDAparam']['num_epochs'],
-                        reduce_on_plateau=train_config['LDAparam']['reduce_on_plateau'],
-                        topic_prior_mean=train_config['LDAparam']['topic_prior_mean'],
-                        topic_prior_variance=train_config['LDAparam']['topic_prior_variance'],
-                        num_samples=train_config['LDAparam']['num_samples'],
-                        num_data_loader_workers=train_config['LDAparam']['num_data_loader_workers'],
-                        thetas_thr=train_config['LDAparam']['thetas_thr'])
+                            train_config['TMparam']['hidden_sizes']),
+                        activation=train_config['TMparam']['activation'],
+                        dropout=train_config['TMparam']['dropout'],
+                        learn_priors=train_config['TMparam']['learn_priors'],
+                        batch_size=train_config['TMparam']['batch_size'],
+                        lr=train_config['TMparam']['lr'],
+                        momentum=train_config['TMparam']['momentum'],
+                        solver=train_config['TMparam']['solver'],
+                        num_epochs=train_config['TMparam']['num_epochs'],
+                        reduce_on_plateau=train_config['TMparam']['reduce_on_plateau'],
+                        topic_prior_mean=train_config['TMparam']['topic_prior_mean'],
+                        topic_prior_variance=train_config['TMparam']['topic_prior_variance'],
+                        num_samples=train_config['TMparam']['num_samples'],
+                        num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
+                        thetas_thr=train_config['TMparam']['thetas_thr'])
                     ProdLDATr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.parquet'))
                 elif train_config['trainer'] == 'ctm':
                     CTMr = CTMTrainer(
-                        n_components=train_config['LDAparam']['ntopics'],
-                        model_type=train_config['LDAparam']['model_type'],
-                        ctm_model_type=train_config['LDAparam']['ctm_model_type'],
+                        n_components=train_config['TMparam']['ntopics'],
+                        model_type=train_config['TMparam']['model_type'],
+                        ctm_model_type=train_config['TMparam']['ctm_model_type'],
                         hidden_sizes=tuple(
-                            train_config['LDAparam']['hidden_sizes']),
-                        activation=train_config['LDAparam']['activation'],
-                        dropout=train_config['LDAparam']['dropout'],
-                        learn_priors=train_config['LDAparam']['learn_priors'],
-                        batch_size=train_config['LDAparam']['batch_size'],
-                        lr=train_config['LDAparam']['lr'],
-                        momentum=train_config['LDAparam']['momentum'],
-                        solver=train_config['LDAparam']['solver'],
-                        num_epochs=train_config['LDAparam']['num_epochs'],
-                        num_samples=train_config['LDAparam']['num_samples'],
-                        reduce_on_plateau=train_config['LDAparam']['reduce_on_plateau'],
-                        topic_prior_mean=train_config['LDAparam']['topic_prior_mean'],
-                        topic_prior_variance=train_config['LDAparam']['topic_prior_variance'],
-                        num_data_loader_workers=train_config['LDAparam']['num_data_loader_workers'],
-                        label_size=train_config['LDAparam']['label_size'],
-                        loss_weights=train_config['LDAparam']['loss_weights'],
-                        thetas_thr=train_config['LDAparam']['thetas_thr'],
-                        sbert_model_to_load=train_config['LDAparam']['sbert_model_to_load'])
+                            train_config['TMparam']['hidden_sizes']),
+                        activation=train_config['TMparam']['activation'],
+                        dropout=train_config['TMparam']['dropout'],
+                        learn_priors=train_config['TMparam']['learn_priors'],
+                        batch_size=train_config['TMparam']['batch_size'],
+                        lr=train_config['TMparam']['lr'],
+                        momentum=train_config['TMparam']['momentum'],
+                        solver=train_config['TMparam']['solver'],
+                        num_epochs=train_config['TMparam']['num_epochs'],
+                        num_samples=train_config['TMparam']['num_samples'],
+                        reduce_on_plateau=train_config['TMparam']['reduce_on_plateau'],
+                        topic_prior_mean=train_config['TMparam']['topic_prior_mean'],
+                        topic_prior_variance=train_config['TMparam']['topic_prior_variance'],
+                        num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
+                        label_size=train_config['TMparam']['label_size'],
+                        loss_weights=train_config['TMparam']['loss_weights'],
+                        thetas_thr=train_config['TMparam']['thetas_thr'],
+                        sbert_model_to_load=train_config['TMparam']['sbert_model_to_load'])
 
                     if Path(train_config['embeddings']).is_file():
                         CTMr.fit(

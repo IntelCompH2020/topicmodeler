@@ -1144,7 +1144,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                          allTrDtsets[dts]['description'] for dts in dtSets]
         selection = query_options(displaydtSets, "Select Training Dataset")
         TrDtSet = dtSets[selection]
-        ndocs = allTrDtsets[TrDtSet]['records']
+        #ndocs = allTrDtsets[TrDtSet]['records']
         self.logger.info(
             f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
 
@@ -1229,7 +1229,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         """
         printgr(displaytext)
 
-        TMparam = self.get_training_params(trainer, ndocs)
+        # TODO: Get nr docs
+        TMparam = self.get_training_params(trainer, ndocs=None)
 
         displaytext = """
         *************************************************************************************
