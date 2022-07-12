@@ -101,6 +101,8 @@ def var_string_keyboard(option, default, question):
         if aux2 is not None and len(aux2) <= 1:
             print('The value you provided is not valid. Using default value.')
             return default
+        else:
+            aux2 = tuple(map(int, aux))
     elif option == "bool":
         if aux is not None and aux != "True" and aux != "False":
             print('The value you provided is not valid. Using default value.')

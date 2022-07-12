@@ -1459,8 +1459,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             if Y_or_N.upper() == "Y":
                 hidden_sizes = var_string_keyboard(
                     'comma_separated', hidden_sizes, 'Size of the hidden layer')
-                activation = var_num_keyboard(
-                    'int', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
+                activation = var_string_keyboard(
+                    'str', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
                 dropout = var_num_keyboard(
                     'float', dropout, 'Percent of neurons to drop out')
                 learn_priors = var_string_keyboard(
@@ -1568,8 +1568,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             if Y_or_N.upper() == "Y":
                 hidden_sizes = var_string_keyboard(
                     'comma_separated', hidden_sizes, 'Size of the hidden layer')
-                activation = var_num_keyboard(
-                    'int', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
+                activation = var_string_keyboard(
+                    'str', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
                 dropout = var_num_keyboard(
                     'float', dropout, 'Percent of neurons to drop out')
                 learn_priors = var_string_keyboard(
