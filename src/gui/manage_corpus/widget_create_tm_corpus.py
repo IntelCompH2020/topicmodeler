@@ -4,6 +4,7 @@
 Class that defines a customized QWidget that is instantiated and embedded within the 'generate_tm_corpus_window' a number of times equal to the number of local datasets selected for the generation of the training corpus. From this widget, the fields to be used for the raw text and the lemmas can be chosen by the user.
 """
 
+import numpy as np
 from PyQt6.QtWidgets import QTableWidgetItem, QWidget
 from PyQt6.uic import loadUi
 from src.gui.utils import utils
@@ -42,7 +43,7 @@ class WidgetCreateTMCorpus(QWidget):
 
     def populate_widgets(self):
         """It fills the contents of the widgets contained in the WidgetCreateTMCorpus.
-        """        
+        """
 
         self.comboBox_trdts_id.addItems(self.columns_dts)
         self.tableWidget_available_fields_raw.setRowCount(
@@ -54,11 +55,10 @@ class WidgetCreateTMCorpus(QWidget):
         self.tableWidget_fields_to_include_lemmas.setRowCount(
             len(self.columns_dts)-1)
 
-        for i in range(len(self.columns_dts)):
-            if str(self.columns_dts[i]) != "id":
-                self.tableWidget_available_fields_raw.setItem(
-                    i, 0, QTableWidgetItem(str(self.columns_dts[i])))
-                self.tableWidget_available_fields_lemmas.setItem(
-                    i, 0, QTableWidgetItem(str(self.columns_dts[i])))
-        
+        for i in np.arange(1, len(self.columns_dts), 1):
+            self.tableWidget_available_fields_raw.setItem(
+                i-1, 0, QTableWidgetItem(str(self.columns_dts[i])))
+            self.tableWidget_available_fields_lemmas.setItem(
+                i-1, 0, QTableWidgetItem(str(self.columns_dts[i])))
+
         return

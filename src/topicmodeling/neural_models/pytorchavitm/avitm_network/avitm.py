@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
+import datetime
+import multiprocessing as mp
 import os
 from collections import defaultdict
-import multiprocessing as mp
+
 import numpy as np
-import datetime
 import torch
-from torch import nn
-from torch import optim
-from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-from tqdm import tqdm
 from scipy.special import softmax
+from torch import nn, optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 # Local imports
 from ...utils.early_stopping.pytorchtools import EarlyStopping
@@ -26,7 +26,6 @@ class AVITM(object):
                  solver='adam', num_epochs=100, reduce_on_plateau=False,
                  topic_prior_mean=0.0, topic_prior_variance=None,
                  num_samples=10, num_data_loader_workers=0, verbose=True):
-
         """
         Sets the main attributes to create a specific AVITM.
 
@@ -75,12 +74,11 @@ class AVITM(object):
             "input_size must by type int > 0."
         assert isinstance(n_components, int) and input_size > 0, \
             "n_components must by type int > 0."
-        assert model_type in ['LDA', 'ProdLDA'], \
+        assert model_type.lower() in ['lda', 'prodlda'], \
             "model must be 'LDA' or 'ProdLDA'."
         assert isinstance(hidden_sizes, tuple), \
             "hidden_sizes must be type tuple."
-        assert activation in ['softplus', 'relu', 'sigmoid', 'swish', 'tanh', 'leakyrelu',
-                              'rrelu', 'elu', 'selu'], \
+        assert activation in ['softplus', 'relu', 'sigmoid', 'swish', 'tanh', 'leakyrelu','rrelu', 'elu', 'selu'], \
             "activation must be 'softplus', 'relu', 'sigmoid', 'swish', 'leakyrelu'," \
             " 'rrelu', 'elu', 'selu' or 'tanh'."
         assert dropout >= 0, "dropout must be >= 0."
@@ -143,15 +141,18 @@ class AVITM(object):
 
         # Initialize optimizer
         if self.solver == 'adam':
-            self.optimizer = optim.Adam(self.model.parameters(), lr=lr, betas=(self.momentum, 0.99))
+            self.optimizer = optim.Adam(
+                self.model.parameters(), lr=lr, betas=(self.momentum, 0.99))
         elif self.solver == 'sgd':
-            self.optimizer = optim.SGD(self.model.parameters(), lr=lr, momentum=self.momentum)
+            self.optimizer = optim.SGD(
+                self.model.parameters(), lr=lr, momentum=self.momentum)
         elif self.solver == 'adagrad':
             self.optimizer = optim.Adagrad(self.model.parameters(), lr=lr)
         elif self.solver == 'adadelta':
             self.optimizer = optim.Adadelta(self.model.parameters(), lr=lr)
         elif self.solver == 'rmsprop':
-            self.optimizer = optim.RMSprop(self.model.parameters(), lr=lr, momentum=self.momentum)
+            self.optimizer = optim.RMSprop(
+                self.model.parameters(), lr=lr, momentum=self.momentum)
 
         # Initialize lr scheduler
         if self.reduce_on_plateau:
@@ -192,7 +193,7 @@ class AVITM(object):
             torch.Tensor [self.batch_size, self.n_components]
             Output of the encoder network that defines the covariance parameter (Σ1) of the logistic normal distribution
              used to approximate the Dirichlet prior ((p(θ|α))according to the Laplace approximation
-        
+
         Returns
         -------
         loss.sum(): torch.Tensor
@@ -216,7 +217,7 @@ class AVITM(object):
 
         # Combine terms
         KL = 0.5 * (
-                var_division + diff_term - self.n_components + logvar_det_division)
+            var_division + diff_term - self.n_components + logvar_det_division)
 
         #######################
         # Reconstruction term #
@@ -259,7 +260,7 @@ class AVITM(object):
             # forward pass
             self.model.zero_grad()
             prior_mean, prior_var, posterior_mean, posterior_var, posterior_log_var, \
-            word_dists = self.model(X)
+                word_dists = self.model(X)
 
             # backward pass
             loss = self._loss(X, word_dists, prior_mean, prior_var,
@@ -283,7 +284,7 @@ class AVITM(object):
         ----------
         loader: DataLoader
             Python iterable over the validation dataset with which the epoch is going to be evaluated.
-            
+
         Returns
         -------
         samples_processed: int
@@ -306,7 +307,7 @@ class AVITM(object):
             # forward pass
             self.model.zero_grad()
             prior_mean, prior_var, posterior_mean, posterior_var, posterior_log_var, \
-            word_dists = self.model(x)
+                word_dists = self.model(x)
 
             loss = self._loss(x, word_dists, prior_mean, prior_var,
                               posterior_mean, posterior_var, posterior_log_var)
@@ -364,7 +365,8 @@ class AVITM(object):
         self.validation_data = validation_dataset
 
         if self.validation_data is not None:
-            self.early_stopping = EarlyStopping(patience=patience, verbose=self.verbose, path=save_dir, delta=delta)
+            self.early_stopping = EarlyStopping(
+                patience=patience, verbose=self.verbose, path=save_dir, delta=delta)
 
         train_loader = DataLoader(
             self.train_data, batch_size=self.batch_size, shuffle=True,
@@ -393,7 +395,8 @@ class AVITM(object):
 
                 # train epoch
                 s = datetime.datetime.now()
-                val_samples_processed, val_loss = self._validate_epoch(validation_loader)
+                val_samples_processed, val_loss = self._validate_epoch(
+                    validation_loader)
                 e = datetime.datetime.now()
 
                 # report
@@ -404,8 +407,10 @@ class AVITM(object):
 
                 pbar.set_description(
                     "Epoch: [{}/{}]\t Seen Samples: [{}/{}]\tTrain Loss: {}\tValid Loss: {}\tTime: {}".format(
-                        epoch + 1, self.num_epochs, samples_processed, len(self.train_data) * self.num_epochs,
-                        train_loss, val_loss,e - s))
+                        epoch +
+                        1, self.num_epochs, samples_processed, len(
+                            self.train_data) * self.num_epochs,
+                        train_loss, val_loss, e - s))
 
                 self.early_stopping(val_loss, self)
                 if self.early_stopping.early_stop:
@@ -418,23 +423,26 @@ class AVITM(object):
                     self.save(save_dir)
             pbar.set_description(
                 "Epoch: [{}/{}]\t Seen Samples: [{}/{}]\tTrain Loss: {}\tTime: {}".format(
-                    epoch + 1, self.num_epochs, samples_processed, len(self.train_data) * self.num_epochs,
+                    epoch +
+                    1, self.num_epochs, samples_processed, len(
+                        self.train_data) * self.num_epochs,
                     train_loss, e - s))
 
         pbar.close()
-        self.training_doc_topic_distributions = self.get_doc_topic_distribution(train_dataset, n_samples)
+        self.training_doc_topic_distributions = self.get_doc_topic_distribution(
+            train_dataset, n_samples)
 
     def get_predicted_topics(self, dataset, n_samples):
         """
         Returns the a list containing the predicted topic for each document (length: number of documents).
-        
+
         Parameters
         ----------
         dataset: BOWDataset 
             Dataset to infer topics
         n_samples: int 
             Number of sampling of theta
-        
+
         Returns
         -------
         predicted_topics: List
@@ -490,10 +498,12 @@ class AVITM(object):
 
                     # forward pass
                     self.model.zero_grad()
-                    collect_theta.extend(self.model.get_theta(x).cpu().numpy().tolist())
+                    collect_theta.extend(
+                        self.model.get_theta(x).cpu().numpy().tolist())
 
                 pbar.update(1)
-                pbar.set_description("Sampling: [{}/{}]".format(sample_index + 1, n_samples))
+                pbar.set_description(
+                    "Sampling: [{}/{}]".format(sample_index + 1, n_samples))
 
                 final_thetas.append(np.array(collect_theta))
         pbar.close()

@@ -125,8 +125,6 @@ class ITMTTaskManager(BaseTaskManager):
         the option 'listDownloaded'.
         """
 
-        # @TODO: Check whether it is better to utilized subprocess.pipe to invoke this and following functions' cmds.
-
         cmd = 'python src/manageCorpus/manageCorpus.py --listDownloaded --parquet '
         cmd = cmd + self.p2parquet.resolve().as_posix()
         printred(cmd)
@@ -138,6 +136,7 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("Downloaded datasets loaded")
+
         return
 
     def load_listTrDtsets(self):
@@ -162,6 +161,7 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("Logical datasets loaded")
+
         return
 
     def load_listWdLists(self):
@@ -186,6 +186,7 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("All available wordlists were loaded")
+
         return
 
     def load_listTMmodels(self):
@@ -206,6 +207,7 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("Logical datasets loaded")
+
         return
 
     def save_TrDtset(self, dt_set):
@@ -405,7 +407,7 @@ class ITMTTaskManager(BaseTaskManager):
             "trainer": trainer,
             "TrDtSet": TrDtSet,
             "Preproc": Preproc,
-            "LDAparam": training_params,
+            "TMparam": training_params,
             "creation_date": DT.datetime.now(),
             "hierarchy-level": 0,
             "htm-version": None,
@@ -545,7 +547,7 @@ class ITMTTaskManager(BaseTaskManager):
             "trainer": trainer,
             "expansion_tpc": expansion_tpc,
             "thr": thr,
-            "LDAparam": training_params,
+            "TMparam": training_params,
             "creation_date": DT.datetime.now(),
             "hierarchy-level": 1,
             "htm-version": htm_version,
@@ -1089,19 +1091,23 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         for TMmodel in allTMmodels.keys():
             if allTMmodels[TMmodel]['hierarchy-level'] == 1:
                 sep = "\t\t"
-                printmag('\n\t2nd level Topic Model ' + allTMmodels[TMmodel]['name'])
+                printmag('\n\t2nd level Topic Model ' +
+                         allTMmodels[TMmodel]['name'])
             else:
                 sep = "\t"
                 printmag('\nTopic Model ' + allTMmodels[TMmodel]['name'])
-            
+
             print(sep + 'Description:', allTMmodels[TMmodel]['description'])
             print(sep + 'Training Dataset:', allTMmodels[TMmodel]['TrDtSet'])
             print(sep + 'Trainer:', allTMmodels[TMmodel]['trainer'])
-            print(sep + 'Creation date:', allTMmodels[TMmodel]['creation_date'])
+            print(sep + 'Creation date:',
+                  allTMmodels[TMmodel]['creation_date'])
             print(sep + 'Visibility:', allTMmodels[TMmodel]['visibility'])
-            print(sep + 'Hierarchy-level:', allTMmodels[TMmodel]['hierarchy-level'])
+            print(sep + 'Hierarchy-level:',
+                  allTMmodels[TMmodel]['hierarchy-level'])
             if allTMmodels[TMmodel]['hierarchy-level'] == 1:
-                print(sep + 'Hierarchical-version:', allTMmodels[TMmodel]['hierarchy-level'])
+                print(sep + 'Hierarchical-version:',
+                      allTMmodels[TMmodel]['hierarchy-level'])
 
         return
 
@@ -1138,6 +1144,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                          allTrDtsets[dts]['description'] for dts in dtSets]
         selection = query_options(displaydtSets, "Select Training Dataset")
         TrDtSet = dtSets[selection]
+        ndocs = allTrDtsets[TrDtSet]['records']
         self.logger.info(
             f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
 
@@ -1222,7 +1229,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         """
         printgr(displaytext)
 
-        LDAparam = self.get_training_params(trainer)
+        TMparam = self.get_training_params(trainer, ndocs)
 
         displaytext = """
         *************************************************************************************
@@ -1246,7 +1253,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # Actual training of the topic model takes place
         super().trainTM(modelname, ModelDesc, privacy, trainer,
-                        TrDtSet, Preproc, LDAparam)
+                        TrDtSet, Preproc, TMparam)
 
         return
 
@@ -1297,13 +1304,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         htm_version = str(self.cf.get('Hierarchical', 'htm_version'))
         thr = float(self.cf.get('Hierarchical', 'thr'))
 
+        # TODO: Implement this when new TMmodel available
         tmModel_father_path = self.p2p / "TMmodels" / fathermodel / "model.npz"
-        vocabFile_father = self.p2p / "TMmodels" / fathermodel / "modelFiles/vocab_freq.txt"
-
-        #tmmodel = TMmodel(vocabfreq_file=vocabFile_father,
+        vocabFile_father = self.p2p / "TMmodels" / \
+            fathermodel / "modelFiles/vocab_freq.txt"
+        # tmmodel = TMmodel(vocabfreq_file=vocabFile_father,
         #                  from_file=tmModel_father_path)
-        #tmmodel.muestra_descriptions()
-        
+        # tmmodel.muestra_descriptions()
+
         expansion_tpc = var_num_keyboard('int', expansion_tpc,
                                          "Father model's topic from which the submdodel's corpus will be generated. Select one of the above listed:")
 
@@ -1324,7 +1332,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         """
         printgr(displaytext)
 
-        LDAparam = self.get_training_params(trainer)
+        TMparam = self.get_training_params(trainer)
 
         displaytext = """
         *************************************************************************************
@@ -1348,11 +1356,11 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # Actual training of the topic model takes place
         super().train2ndTM(submodelname, submodelDesc, fathermodel,
-                           expansion_tpc, htm_version, thr, privacy, trainer, LDAparam)
+                           expansion_tpc, htm_version, thr, privacy, trainer, TMparam)
 
         return
 
-    def get_training_params(self, trainer):
+    def get_training_params(self, trainer, ndocs=None):
         """
         Gets input from the user about the training parameters to be used for the training of each topic modeling method.
 
@@ -1399,7 +1407,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                                                  'Threshold for topic activation in a doc (mallet training)')
                 thetas_thr = var_num_keyboard('float', thetas_thr,
                                               'Threshold for topic activation in a doc (sparsification)')
-            LDAparam = {
+            TMparam = {
                 "mallet_path": mallet_path,
                 "ntopics": ntopics,
                 "alpha": alpha,
@@ -1412,7 +1420,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             }
 
         elif trainer == "sparkLDA":
-            LDAparam = {}
+            TMparam = {}
         elif trainer == "prodLDA":
             model_type = str(self.cf.get('ProdLDA', 'model_type'))
             hidden_sizes = tuple(
@@ -1438,7 +1446,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
             # Basic settings
             model_type = var_string_keyboard(
-                'str', model_type, "Type of the model that is going to be trained, 'ProdLDA' or 'LDA'")
+                'str', model_type, "Type of the model that is going to be trained, 'prodLDA' or 'LDA'")
             num_epochs = var_num_keyboard(
                 'int', num_epochs, 'Number of epochs to train the model for')
             batch_size = var_num_keyboard(
@@ -1450,7 +1458,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             if Y_or_N.upper() == "Y":
                 hidden_sizes = var_string_keyboard(
                     'comma_separated', hidden_sizes, 'Size of the hidden layer')
-                # TODO: Revise if is getting correctly
                 activation = var_num_keyboard(
                     'int', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
                 dropout = var_num_keyboard(
@@ -1476,7 +1483,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 thetas_thr = var_num_keyboard(
                     'float', thetas_thr, 'Threshold for topic activation in a doc (sparsification)')
 
-            LDAparam = {
+            TMparam = {
                 "ntopics": ntopics,
                 "model_type": model_type,
                 "hidden_sizes": hidden_sizes,
@@ -1527,12 +1534,32 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             # Basic settings
             model_type = var_string_keyboard(
                 'str', model_type, "Type of the model that is going to be trained, 'prodLDA' or 'LDA'")
-            ctm_model_type = var_string_keyboard(
-                'str', ctm_model_type, "CTM model to use: 'CombinedTM', 'ZeroShotTM', 'SuperCTM', 'BetaCTM'")
+            if ndocs is not None:
+                ctm_model_type = var_string_keyboard(
+                    'str', ctm_model_type, "CTM model to use: 'CombinedTM', 'ZeroShotTM', 'SuperCTM', 'BetaCTM'")
+            else:
+                # TODO: See another way of passing the number of documents for the submodels
+                ctm_model_type = var_string_keyboard(
+                    'str', ctm_model_type, "CTM model to use: 'CombinedTM', 'ZeroShotTM', 'BetaCTM'")
+
             num_epochs = var_num_keyboard(
                 'int', num_epochs, 'Number of epochs to train the model for')
             batch_size = var_num_keyboard(
                 'int', batch_size, 'Size of the batch to use for training')
+
+            # Additional checking if the selected ctm type is either SuperCTM or BetaCTM
+            if ndocs is not None:
+                if ctm_model_type.lower == "superctm":
+                    while label_size != int(ndocs):
+                        printred(
+                            "The number of labels must be equal to the number of documents in the training dataset.")
+                        label_size = var_num_keyboard(
+                            'int', label_size, 'Number of total labels')
+            if ctm_model_type.lower() == "betactm":
+                loss_weights = var_string_keyboard(
+                    'dict', loss_weights, 'Dictionary with the name of the weight parameter (key) and the weight (value) for each loss. E.g. {"beta" : 1}')
+                printred(
+                    "No weights provided for the training of a BetaCTM model. Generating a CombinedTM model instead...")
 
             # Advanced settings
             Y_or_N = input(
@@ -1562,20 +1589,15 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                     'float', topic_prior_variance, 'Variance parameter for the prior')
                 num_data_loader_workers = var_num_keyboard(
                     'int', num_data_loader_workers, 'Number of subprocesses to use for data loading')
-                # @TODO: Check that it has the same size as the training corpus if SuperCTM selected; exit otherwise
-                label_size = var_num_keyboard(
-                    'int', label_size, 'Number of total labels')
-                # @TODO: Check that this actually works
-                # @TODO: Check that is not None if BetaCTM selected; exit otherwise
-                loss_weights = var_string_keyboard(
-                    'dict', loss_weights, 'Dictionary with the name of the weight parameter (key) and the weight (value) for each loss')
+
+                # TODO: Add condition for not showing this parameter when embeddings are provided from file
                 sbert_model_to_load = var_string_keyboard(
                     'str', sbert_model_to_load, "Model to be used for calculating the embeddings. Available models can be checked here: 'https://huggingface.co/models?library=sentence-transformers'.")
 
                 thetas_thr = var_num_keyboard(
                     'float', thetas_thr, 'Threshold for topic activation in a doc (sparsification)')
 
-            LDAparam = {
+            TMparam = {
                 "ntopics": ntopics,
                 "model_type": model_type,
                 "ctm_model_type": ctm_model_type,
@@ -1599,7 +1621,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "sbert_model_to_load": sbert_model_to_load
             }
 
-        return LDAparam
+        return TMparam
 
     def corpus2JSON(self):
         """
@@ -2720,7 +2742,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         if self.allTMmodels:
             all_models = self.p2p.joinpath(
-                self._dir_struct['TMmodels']).resolve().as_posix()  
+                self._dir_struct['TMmodels']).resolve().as_posix()
 
             # Create XML structure of the models for visualization purposes
             if pathlib.Path(all_models).is_dir():

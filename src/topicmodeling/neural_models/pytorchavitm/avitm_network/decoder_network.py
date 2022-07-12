@@ -43,12 +43,11 @@ class DecoderNetwork(nn.Module):
         assert isinstance(input_size, int), "input_size must by type int."
         assert isinstance(n_components, int) and n_components > 0, \
             "n_components must be type int > 0."
-        assert model_type in ['ProdLDA', 'LDA'], \
+        assert model_type.lower() in ['lda', 'prodlda'], \
             "model type must be 'ProdLDA' or 'LDA'"
         assert isinstance(hidden_sizes, tuple), \
             "hidden_sizes must be type tuple."
-        assert activation in ['softplus', 'relu', 'sigmoid', 'tanh', 'leakyrelu',
-                              'rrelu', 'elu', 'selu'], \
+        assert activation in ['softplus', 'relu', 'sigmoid', 'tanh', 'leakyrelu', 'rrelu', 'elu', 'selu'], \
             "activation must be 'softplus', 'relu', 'sigmoid', 'leakyrelu'," \
             " 'rrelu', 'elu', 'selu' or 'tanh'."
         assert dropout >= 0, "dropout must be >= 0."
@@ -135,7 +134,7 @@ class DecoderNetwork(nn.Module):
             # word_dist: batch_size x input_size
 
         return self.prior_mean, self.prior_variance, posterior_mu, \
-               posterior_sigma, posterior_log_sigma, word_dist
+            posterior_sigma, posterior_log_sigma, word_dist
 
     def get_theta(self, x):
         with torch.no_grad():
