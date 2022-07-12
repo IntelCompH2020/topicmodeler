@@ -119,7 +119,7 @@ class DecoderNetwork(nn.Module):
         theta = self.drop_theta(theta)
 
         # prodLDA vs LDA
-        if self.model_type == 'ProdLDA':
+        if self.model_type == 'prodLDA':
             # in: batch_size x input_size x n_components
             word_dist = F.softmax(
                 self.beta_batchnorm(torch.matmul(theta, self.beta)), dim=1)
