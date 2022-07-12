@@ -2451,10 +2451,10 @@ if __name__ == "__main__":
                         thetas_thr=train_config['LDAparam']['thetas_thr'],
                         sbert_model_to_load=train_config['LDAparam']['sbert_model_to_load'])
 
-                    if Path(train_config['embeddings_file']).is_file():
+                    if Path(train_config['embeddings']).is_file():
                         CTMr.fit(
                             corpusFile=configFile.parent.joinpath('corpus.parquet'),
-                            embeddingsFile=Path(train_config['embeddings_file']))
+                            embeddingsFile=Path(train_config['embeddings']))
                     else:
                         CTMr.fit(
                             corpusFile=configFile.parent.joinpath('corpus.parquet'))
