@@ -95,7 +95,7 @@ class ITMTTaskManager(BaseTaskManager):
         # This is a dictionary that contains a list to all subdirectories
         # that should exist in the project folder
         self._dir_struct = {'datasets': 'datasets',
-                            'LDAmodels': 'LDAmodels'}
+                            'TMmodels': 'TMmodels'}
 
         return
 
@@ -195,7 +195,7 @@ class ITMTTaskManager(BaseTaskManager):
         cmd = 'python src/topicmodeling/topicmodeling.py --listTMmodels --path_models '
         cmd = cmd + \
             self.p2p.joinpath(
-                self._dir_struct['LDAmodels']).resolve().as_posix()
+                self._dir_struct['TMmodels']).resolve().as_posix()
         printred(cmd)
         try:
             self.logger.info(f'-- -- Running command {cmd}')
@@ -380,7 +380,7 @@ class ITMTTaskManager(BaseTaskManager):
 
         # 1. Create model directory
         modeldir = self.p2p.joinpath(
-            self._dir_struct['LDAmodels']).joinpath(modelname)
+            self._dir_struct['TMmodels']).joinpath(modelname)
         if modeldir.exists():
 
             # Remove current backup folder, if it exists
@@ -513,7 +513,7 @@ class ITMTTaskManager(BaseTaskManager):
 
         # 1. Get fathermodel's directory
         fatherdir = self.p2p.joinpath(
-            self._dir_struct['LDAmodels']).joinpath(fathername)
+            self._dir_struct['TMmodels']).joinpath(fathername)
 
         # 2. Create submodel directory
         submodeldir = fatherdir.joinpath(submodelname)
@@ -2709,7 +2709,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         if self.allTMmodels:
             all_models = self.p2p.joinpath(
-                self._dir_struct['LDAmodels']).resolve().as_posix()  # @TODO: Change LDAmodels to TMmodels
+                self._dir_struct['TMmodels']).resolve().as_posix()  
 
             # Create XML structure of the models for visualization purposes
             if pathlib.Path(all_models).is_dir():

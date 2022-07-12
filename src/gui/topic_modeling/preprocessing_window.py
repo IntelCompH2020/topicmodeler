@@ -58,6 +58,7 @@ class PreprocessingWindow(QtWidgets.QDialog):
             checkbox.hide()
 
         self.set_settings()
+        self.tabWidget_preproc.tabBar().setExpanding(True)
 
         ########################################################################
         # Connect buttons

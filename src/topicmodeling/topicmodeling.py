@@ -1438,7 +1438,7 @@ class MalletTrainer(Trainer):
                 f'-- -- Provided corpus Path does not exist -- Stop')
             sys.exit()
 
-        modelFolder = corpusFile.parent.joinpath('malletModel')
+        modelFolder = corpusFile.parent.joinpath('modelFiles')
         modelFolder.mkdir()
 
         ##################################################
@@ -1672,7 +1672,7 @@ class ProdLDATrainer(Trainer):
                 f'-- -- Provided corpus Path does not exist -- Stop')
             sys.exit()
 
-        modelFolder = corpusFile.parent.joinpath('prodLDAModel')
+        modelFolder = corpusFile.parent.joinpath('modelFiles')
         modelFolder.mkdir()
 
         # Generating the corpus in the input format required by ProdLDA
@@ -1884,7 +1884,7 @@ class CTMTrainer(Trainer):
                 f'-- -- Provided corpus Path does not exist -- Stop')
             sys.exit()
 
-        modelFolder = corpusFile.parent.joinpath('ctmModel')
+        modelFolder = corpusFile.parent.joinpath('modelFiles')
         modelFolder.mkdir()
 
         # Generating the corpus in the input format required by ProdLDA

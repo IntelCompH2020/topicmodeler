@@ -366,7 +366,7 @@ QToolTip {
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QTabWidget" name="tabWidget">
+             <widget class="QTabWidget" name="tabWidget_preproc">
               <property name="styleSheet">
                <string notr="true">QTabWidget::pane {
     background: transparent;
@@ -384,10 +384,12 @@ QTabBar::tab {
               <property name="currentIndex">
                <number>0</number>
               </property>
+              <property name="documentMode">
+               <bool>true</bool>
+              </property>
               <widget class="QWidget" name="tab_preproc_settings">
                <property name="styleSheet">
-                <string notr="true">background:white;
-</string>
+                <string notr="true">background-color: #F2F2F2;</string>
                </property>
                <attribute name="title">
                 <string>Preprocessing</string>
@@ -1017,8 +1019,7 @@ border:none;</string>
               </widget>
               <widget class="QWidget" name="tab_stopwords_settings">
                <property name="styleSheet">
-                <string notr="true">background:white;
-</string>
+                <string notr="true">background-color: #F2F2F2;</string>
                </property>
                <attribute name="title">
                 <string>Stopwords</string>
@@ -1122,8 +1123,7 @@ QHeaderView::section:horizontal
               </widget>
               <widget class="QWidget" name="tab_equivalences_settings">
                <property name="styleSheet">
-                <string notr="true">background:white;
-</string>
+                <string notr="true">background-color: #F2F2F2;</string>
                </property>
                <attribute name="title">
                 <string>Equivalences</string>
