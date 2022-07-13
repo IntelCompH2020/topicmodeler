@@ -34,7 +34,7 @@ ntopics=25
 
 [MalletTM]
 #Path to mallet binary
-mallet_path=/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/src/topicmodeling/mallet-2.0.8/bin/mallet
+mallet_path=/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/mallet-2.0.8/bin/mallet
 #Regular expression for token identification
 token_regexp=[\p{L}\p{N}][\p{L}\p{N}\p{P}]*\p{L}
 #Settings for mallet training and doctopics postprocessing
