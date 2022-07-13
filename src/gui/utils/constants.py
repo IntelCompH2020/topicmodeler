@@ -28,6 +28,7 @@ class Constants:
     CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",
                                "tableWidget_fields_to_include_raw",
                                "tableWidget_available_fields_lemmas", "tableWidget_fields_to_include_lemmas"]
+    CREATE_TR_DST_NOT_SELECTED_MSG = "One or more local datasets must be selected to create a training dataset."
 
     # Wordlists management-related constants
     WORDLIST_CREATION_MSG_STATUS_0 = "The wordlist could not be created."
@@ -101,7 +102,7 @@ class Constants:
     WRONG_TOPIC_PRIOR_MEAN_MSG = ""
     WRONG_TOPIC_PRIOR_VAR_MSG = ""
     WRONG_NR_SAMPLES = "The number of samples must be a positive integer larger than 0."
-    WRONG_NR_WORKERS = "The number of data loader workers must be a positive integer larger than 0."
+    WRONG_NR_WORKERS = "The number of data loader workers must be a positive integer."
     WRONG_LABEL_SIZE = "The label size must be equals to the number of documents."
     WRONG_LABEL_SIZE_FOR_SUPERCTM = "The label size cannot be 0 if SuperCTM is being used. It must be equal to the number of documents in the training corpus."
     WRONG_LOSS_WEIGTHS_FOR_BETACTM = "The weight loss cannot be None for a BetaCTM model."

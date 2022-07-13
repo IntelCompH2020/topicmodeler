@@ -5272,7 +5272,7 @@ QScrollBar:horizontal {
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>800</width>
+                                <width>266</width>
                                 <height>734</height>
                                </rect>
                               </property>
@@ -6035,7 +6035,7 @@ padding-left: 10px;</string>
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>776</width>
+                                   <width>412</width>
                                    <height>1097</height>
                                   </rect>
                                  </property>
@@ -7111,7 +7111,7 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>776</width>
+                                   <width>324</width>
                                    <height>1944</height>
                                   </rect>
                                  </property>
@@ -9055,7 +9055,7 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>776</width>
+                                   <width>351</width>
                                    <height>2428</height>
                                   </rect>
                                  </property>
@@ -12108,8 +12108,8 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>780</width>
-                                   <height>570</height>
+                                   <width>288</width>
+                                   <height>492</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_67">

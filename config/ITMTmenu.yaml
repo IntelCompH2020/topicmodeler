@@ -88,6 +88,7 @@ TMoptions:
   options:
     - listTM
     - trainTM
+    - train2ndTM
     - editTM
     - inference
 
@@ -103,10 +104,14 @@ trainTM:
         prodLDA: ProdLDA Topic Modeling (deep learning)
         ctm: Contextualized Topic Model (deep learning)
 
-
-
-
-
+train2ndTM:
+  title: Train a second level Topic Model
+  options:
+    - parameters:
+        mallet: Mallet Topic Modeling
+        sparkLDA: Spark MLLIB Topic Modeling
+        prodLDA: ProdLDA Topic Modeling (deep learning)
+        ctm: Contextualized Topic Model (deep learning)
 
 
 extractPipe:

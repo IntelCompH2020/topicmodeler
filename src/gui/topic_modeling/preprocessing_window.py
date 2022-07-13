@@ -8,7 +8,7 @@ Class that defines the subwindow for the Interactive Topic Model Trainer App for
 import configparser
 
 import numpy as np
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtWidgets import QLabel
 from PyQt6.uic import loadUi
 from src.gui.utils import utils
@@ -29,19 +29,19 @@ class PreprocessingWindow(QtWidgets.QDialog):
 
         super(PreprocessingWindow, self).__init__()
 
-        # Load UI and configure default geometry of the window
+        # Load UI
         # #####################################################################
         loadUi("src/gui/uis/select_preproc_settings.ui", self)
 
-        #####################################################################################
+        ########################################################################
         # ATTRIBUTES
-        #####################################################################################
+        ########################################################################
         self.tm = tm
         self.preproc_settings = None
 
-        #####################################################################################
+        ########################################################################
         # Widgets initial configuration
-        #####################################################################################
+        ########################################################################
         # Configure tables
         utils.configure_table_header(Constants.PREPROC_TABLES, self)
 
@@ -58,23 +58,17 @@ class PreprocessingWindow(QtWidgets.QDialog):
             checkbox.hide()
 
         self.set_settings()
+        self.tabWidget_preproc.tabBar().setExpanding(True)
 
-        #####################################################################################
+        ########################################################################
         # Connect buttons
-        #####################################################################################
+        ########################################################################
         self.pushButton_select_params.clicked.connect(
             self.clicked_pushButton_select_params)
 
-    def init_ui(self):
-        """Configures the elements of the GUI window that are not configured in the UI, i.e., icon of the application, the application's title, and the position of the window at its opening.
-        """
-
-        self.setWindowIcon(QtGui.QIcon(
-            'src/gui/resources/images/fuzzy_training.png'))
-        self.setWindowTitle(Constants.SMOOTH_SPOON_TITLE)
-        self.center()
-
     def set_settings(self):
+        """Sets the value of the default preprocessing settings in the corresponding widgets.
+        """
         # Get config object
         cf = configparser.ConfigParser()
         cf.read(self.tm.p2config_dft)
@@ -87,18 +81,23 @@ class PreprocessingWindow(QtWidgets.QDialog):
 
         # Fill table of stopwords with the available lists of stopwords
         self.tm.listWdListsByType(self.table_available_stopwords, "stopwords")
+
         # Add checkboxes in the first column so the user can select the stopwords to use
         utils.add_checkboxes_to_table(self.table_available_stopwords, 0)
 
         # Fill table of stopwords with the available lists of equivalences
         self.tm.listWdListsByType(
             self.table_available_equivalences, "equivalences")
+
         # Add checkboxes in the first column so the user can select the stopwords to use
         utils.add_checkboxes_to_table(self.table_available_equivalences, 0)
 
         return
 
     def clicked_pushButton_select_params(self):
+        """It controls the clicking of the 'pushButton_select_params'. Once the button is clicked, each of the parameters chosen is read from the window's widget and saved in a dictionary structure. After the preprocessing parameter selection completion, the window is closed.
+        """
+
         min_lemas = int(self.lineEdit_min_lemas.text())
         no_below = int(self.lineEdit_no_below.text())
         no_above = float(self.lineEdit_no_above.text())

@@ -31,6 +31,7 @@ import pyarrow.parquet as pt
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QMessageBox
 from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
+#from src.topicmodeling.topicmodeling import TMmodel
 from src.utils.misc import (printgr, printmag, printred, query_options,
                             request_confirmation, var_num_keyboard, var_string_keyboard)
 
@@ -95,7 +96,7 @@ class ITMTTaskManager(BaseTaskManager):
         # This is a dictionary that contains a list to all subdirectories
         # that should exist in the project folder
         self._dir_struct = {'datasets': 'datasets',
-                            'LDAmodels': 'LDAmodels'}
+                            'TMmodels': 'TMmodels'}
 
         return
 
@@ -124,8 +125,6 @@ class ITMTTaskManager(BaseTaskManager):
         the option 'listDownloaded'.
         """
 
-        # @TODO: Check whether it is better to utilized subprocess.pipe to invoke this and following functions' cmds.
-
         cmd = 'python src/manageCorpus/manageCorpus.py --listDownloaded --parquet '
         cmd = cmd + self.p2parquet.resolve().as_posix()
         printred(cmd)
@@ -137,6 +136,7 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("Downloaded datasets loaded")
+
         return
 
     def load_listTrDtsets(self):
@@ -161,6 +161,7 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("Logical datasets loaded")
+
         return
 
     def load_listWdLists(self):
@@ -185,6 +186,7 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("All available wordlists were loaded")
+
         return
 
     def load_listTMmodels(self):
@@ -195,7 +197,7 @@ class ITMTTaskManager(BaseTaskManager):
         cmd = 'python src/topicmodeling/topicmodeling.py --listTMmodels --path_models '
         cmd = cmd + \
             self.p2p.joinpath(
-                self._dir_struct['LDAmodels']).resolve().as_posix()
+                self._dir_struct['TMmodels']).resolve().as_posix()
         printred(cmd)
         try:
             self.logger.info(f'-- -- Running command {cmd}')
@@ -205,6 +207,7 @@ class ITMTTaskManager(BaseTaskManager):
             return
 
         self.logger.info("Logical datasets loaded")
+
         return
 
     def save_TrDtset(self, dt_set):
@@ -360,14 +363,27 @@ class ITMTTaskManager(BaseTaskManager):
 
         Parameters
         ----------
-        trainer : string
+        modelname: str
+            Name of the model to be created
+        ModelDesc: str
+            Description of the model to be created
+        privacy: str
+            Visibility level of the to be trained submodel
+            Possible values are public|private
+        trainer : str
             Optimizer to use for training the topic model
             Possible values are mallet|sparkLDA|prodLDA|ctm
+        TrDtSet: str
+            Name of the training dataset
+        Preproc: dict
+            Dictionary with the corpus's prepreocessing parameters
+        training_params: dict
+            Dictionary with the parameters to be used for the training of the submodel
         """
 
         # 1. Create model directory
         modeldir = self.p2p.joinpath(
-            self._dir_struct['LDAmodels']).joinpath(modelname)
+            self._dir_struct['TMmodels']).joinpath(modelname)
         if modeldir.exists():
 
             # Remove current backup folder, if it exists
@@ -391,8 +407,10 @@ class ITMTTaskManager(BaseTaskManager):
             "trainer": trainer,
             "TrDtSet": TrDtSet,
             "Preproc": Preproc,
-            "LDAparam": training_params,
-            "creation_date": DT.datetime.now()
+            "TMparam": training_params,
+            "creation_date": DT.datetime.now(),
+            "hierarchy-level": 0,
+            "htm-version": None,
         }
 
         with configFile.open('w', encoding='utf-8') as outfile:
@@ -467,10 +485,128 @@ class ITMTTaskManager(BaseTaskManager):
 
         return
 
+    def train2ndTM(self, submodelname, submodelDesc, fathername, expansion_tpc, htm_version, thr, privacy, trainer, training_params):
+        """
+        Topic modeling second-level trainer
+
+        Parameters
+        ----------
+        submodelname: str
+            Name of the submodel to be created
+        submodelDesc: str
+            Description of the submodel to be created
+        fathername: str
+            Name of the father topic model from which the submodel is generated
+        expansion_tpc: int
+            Father model's topic from which the submodel's corpus is generated
+        htm_version: str
+            Hierarhical topic model algorithm according to which the submodel's corpus is generated.
+            Possible values are htm-ws|htm-ds
+        thr: float
+            Document-topic threshold that document in the father model's corpys must have to be kept in the submodel's corpus
+        privacy: str
+            Visibility level of the to be trained submodel
+            Possible values are public|private
+        trainer : str
+            Optimizer to use for training the topic model
+            Possible values are mallet|sparkLDA|prodLDA|ctm
+        training_params: dict
+            Dictionary with the parameters to be used for the training of the submodel
+        """
+
+        # 1. Get fathermodel's directory
+        fatherdir = self.p2p.joinpath(
+            self._dir_struct['TMmodels']).joinpath(fathername)
+
+        # 2. Create submodel directory
+        submodeldir = fatherdir.joinpath(submodelname)
+        if submodeldir.exists():
+
+            # Remove current backup folder, if it exists
+            old_model_dir = Path(str(submodeldir) + '_old/')
+            if old_model_dir.exists():
+                shutil.rmtree(old_model_dir)
+
+            # Copy current project folder to the backup folder.
+            shutil.move(submodeldir, old_model_dir)
+            self.logger.info(
+                f'-- -- Creating backup of existing submodel in {old_model_dir}')
+        submodeldir.mkdir()
+
+        # 5. Get father model's training configuration and create submodel's trianing configuration
+        configFile_f = fatherdir.joinpath('trainconfig.json')
+
+        configFile_c = submodeldir.joinpath('trainconfig.json')
+
+        embeddings_file = configFile_c.parent.joinpath('embeddings.npy')
+
+        train_config = {
+            "name": submodelname,
+            "description": submodelDesc,
+            "visibility": privacy,
+            "trainer": trainer,
+            "expansion_tpc": expansion_tpc,
+            "thr": thr,
+            "TMparam": training_params,
+            "creation_date": DT.datetime.now(),
+            "hierarchy-level": 1,
+            "htm-version": htm_version,
+            "embeddings": embeddings_file.as_posix()
+        }
+
+        with configFile_c.open('w', encoding='utf-8') as outfile:
+            json.dump(train_config, outfile,
+                      ensure_ascii=False, indent=2, default=str)
+
+        # 6. Create submodel training corpus
+        cmd = f'python src/topicmodeling/topicmodeling.py --hierarchical --config {configFile_f.as_posix()} --config_child {configFile_c.as_posix()}'
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            output = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Command execution failed')
+
+        # 7. Train submodel
+        if trainer == "sparkLDA":
+            if not self.cf.get('Spark', 'spark_available') == 'True':
+                self.logger.error(
+                    "-- -- sparkLDA requires access to a Spark cluster")
+            else:
+                script_spark = self.cf.get('Spark', 'script_spark')
+                token_spark = self.cf.get('Spark', 'token_spark')
+                script_path = './src/topicmodeling/topicmodeling.py'
+                options = '"--spark --train --config ' + \
+                    configFile_c.resolve().as_posix() + '"'
+                cmd = script_spark + ' -C ' + token_spark + \
+                    ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+                printred(cmd)
+                try:
+                    self.logger.info(f'-- -- Running command {cmd}')
+                    check_output(args=cmd, shell=True)
+                except:
+                    self.logger.error('-- -- Execution of script failed')
+
+        else:
+            # Other models do not require Spark
+            cmd = f'python src/topicmodeling/topicmodeling.py --train --config {configFile_c.as_posix()}'
+            printred(cmd)
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                output = check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Command execution failed')
+
+        # Reload the list of topic models to consider the one created in the current execution
+        self.load_listTMmodels()
+
+        return
 
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
 ##############################################################################
+
+
 class ITMTTaskManagerCMD(ITMTTaskManager):
     """
     Provides extra functionality to the task manager, requesting parameters
@@ -953,12 +1089,25 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         allTMmodels = json.loads(self.allTMmodels)
         for TMmodel in allTMmodels.keys():
-            printmag('\nTraining Dataset ' + allTMmodels[TMmodel]['name'])
-            print('\tDescription:', allTMmodels[TMmodel]['description'])
-            print('\tTraining Dataset:', allTMmodels[TMmodel]['TrDtSet'])
-            print('\tTrainer:', allTMmodels[TMmodel]['trainer'])
-            print('\tCreation date:', allTMmodels[TMmodel]['creation_date'])
-            print('\tVisibility:', allTMmodels[TMmodel]['visibility'])
+            if allTMmodels[TMmodel]['hierarchy-level'] == 1:
+                sep = "\t\t"
+                printmag('\n\t2nd level Topic Model ' +
+                         allTMmodels[TMmodel]['name'])
+            else:
+                sep = "\t"
+                printmag('\nTopic Model ' + allTMmodels[TMmodel]['name'])
+
+            print(sep + 'Description:', allTMmodels[TMmodel]['description'])
+            print(sep + 'Training Dataset:', allTMmodels[TMmodel]['TrDtSet'])
+            print(sep + 'Trainer:', allTMmodels[TMmodel]['trainer'])
+            print(sep + 'Creation date:',
+                  allTMmodels[TMmodel]['creation_date'])
+            print(sep + 'Visibility:', allTMmodels[TMmodel]['visibility'])
+            print(sep + 'Hierarchy-level:',
+                  allTMmodels[TMmodel]['hierarchy-level'])
+            if allTMmodels[TMmodel]['hierarchy-level'] == 1:
+                print(sep + 'Hierarchical-version:',
+                      allTMmodels[TMmodel]['hierarchy-level'])
 
         return
 
@@ -995,6 +1144,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                          allTrDtsets[dts]['description'] for dts in dtSets]
         selection = query_options(displaydtSets, "Select Training Dataset")
         TrDtSet = dtSets[selection]
+        #ndocs = allTrDtsets[TrDtSet]['records']
         self.logger.info(
             f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
 
@@ -1079,13 +1229,158 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         """
         printgr(displaytext)
 
-        # We also need the user to select/confirm number of topics
+        # TODO: Get nr docs
+        TMparam = self.get_training_params(trainer, ndocs=None)
+
+        displaytext = """
+        *************************************************************************************
+        We will finally request other general information, modelname, description, etc
+        *************************************************************************************
+        """
+        printgr(displaytext)
+        modelname = ''
+        while not len(modelname):
+            modelname = input('Enter a name to save the new model: ')
+
+        # Introduce a description for the model
+        ModelDesc = ""
+        while not len(ModelDesc):
+            ModelDesc = input('Introduce a description for the model: ')
+
+        # Define privacy level of dataset
+        privacy = ['Public', 'Private']
+        opt = query_options(privacy, 'Define visibility for the model')
+        privacy = privacy[opt]
+
+        # Actual training of the topic model takes place
+        super().trainTM(modelname, ModelDesc, privacy, trainer,
+                        TrDtSet, Preproc, TMparam)
+
+        return
+
+    def train2ndTM(self, trainer):
+        """
+        Second-level topic modeling trainer.
+
+        Parameters
+        ----------
+        trainer : string
+            Optimizer to use for training the topic model
+            Possible values are mallet|sparkLDA|prodLDA|ctm
+        """
+
+        self.logger.info(f'-- Second-level Topic Model Training')
+
+        displaytext = """
+        *************************************************************************************
+        We will retrieve all parameters needed for training the second-lelve topic model.
+        We start with common settings independent of the method used for the training
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        # First thing to do is to the model from which the submodel is going to be generated
+
+        # Ask user which first-level model should be used for the generation of the new submodel's corpus
+        # Only first-level models are available for expansion
+        allTMmodels = json.loads(self.allTMmodels)
+        models = [model for model in allTMmodels.keys()]
+        displayModels = [allTMmodels[id_model]['name'] + ': ' +
+                         allTMmodels[id_model]['description'] for id_model in models if allTMmodels[id_model]['hierarchy-level'] == 0]
+        selection = query_options(
+            displayModels, "Select model from which a second-level submodel will be generated")
+        fathermodel = models[selection]
+        self.logger.info(
+            f'-- -- Selected father model is {allTMmodels[fathermodel]["name"]}')
+
+        displaytext = """
+        *************************************************************************************
+        We will retrieve all parameters needed for the generation of the second-level submodel's corpus
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        # Default values are read from config file
+        expansion_tpc = int(self.cf.get('Hierarchical', 'expansion_tpc'))
+        htm_version = str(self.cf.get('Hierarchical', 'htm_version'))
+        thr = float(self.cf.get('Hierarchical', 'thr'))
+
+        # TODO: Implement this when new TMmodel available
+        tmModel_father_path = self.p2p / "TMmodels" / fathermodel / "model.npz"
+        vocabFile_father = self.p2p / "TMmodels" / \
+            fathermodel / "modelFiles/vocab_freq.txt"
+        # tmmodel = TMmodel(vocabfreq_file=vocabFile_father,
+        #                  from_file=tmModel_father_path)
+        # tmmodel.muestra_descriptions()
+
+        expansion_tpc = var_num_keyboard('int', expansion_tpc,
+                                         "Father model's topic from which the submdodel's corpus will be generated. Select one of the above listed:")
+
+        htm_version = var_string_keyboard('str', htm_version,
+                                          "Hierarhical topic model algorithm according to which the submodel's corpus is generated. Possible values are htm-ws|htm-ds")
+        if htm_version == "htm-ds":
+            thr = var_num_keyboard('float', thr,
+                                   "Document-topic threshold that document in the father model's corpys must have to be kept in the submodel's corpus")
+        else:
+            thr = -1
+
+        displaytext = """
+        *************************************************************************************
+        We will retrieve all parameters needed for the topic modeling itself
+
+        Most of these settings may be for advanced users. We will need to check with the users which parameters are basic and which ones should only appear for the advanced
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        TMparam = self.get_training_params(trainer)
+
+        displaytext = """
+        *************************************************************************************
+        We will finally request other general information, modelname, description, etc
+        *************************************************************************************
+        """
+        printgr(displaytext)
+        submodelname = ''
+        while not len(submodelname):
+            submodelname = input('Enter a name to save the new submodel: ')
+
+        # Introduce a description for the model
+        submodelDesc = ""
+        while not len(submodelDesc):
+            submodelDesc = input('Introduce a description for the submodel: ')
+
+        # Define privacy level of dataset
+        privacy = ['Public', 'Private']
+        opt = query_options(privacy, 'Define visibility for the submodel')
+        privacy = privacy[opt]
+
+        # Actual training of the topic model takes place
+        super().train2ndTM(submodelname, submodelDesc, fathermodel,
+                           expansion_tpc, htm_version, thr, privacy, trainer, TMparam)
+
+        return
+
+    def get_training_params(self, trainer, ndocs=None):
+        """
+        Gets input from the user about the training parameters to be used for the training of each topic modeling method.
+
+        Parameters
+        ----------
+        trainer : string
+            Optimizer to use for training the topic model
+            Possible values are mallet|sparkLDA|prodLDA|ctm
+        """
+
+        # First the user must select/confirm number of topics
         ntopics = int(self.cf.get('TM', 'ntopics'))
         ntopics = var_num_keyboard('int', ntopics,
                                    'Please, select the number of topics')
 
-        # Retrieve parameters for training. These are dependent on the training algorithm
+        # Retrieve parameters for training.
+        # These are dependent on the training algorithm
         if trainer == "mallet":
+
             # Default values are read from config file
             mallet_path = self.cf.get('MalletTM', 'mallet_path')
             alpha = float(self.cf.get('MalletTM', 'alpha'))
@@ -1113,7 +1408,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                                                  'Threshold for topic activation in a doc (mallet training)')
                 thetas_thr = var_num_keyboard('float', thetas_thr,
                                               'Threshold for topic activation in a doc (sparsification)')
-            LDAparam = {
+            TMparam = {
                 "mallet_path": mallet_path,
                 "ntopics": ntopics,
                 "alpha": alpha,
@@ -1126,7 +1421,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             }
 
         elif trainer == "sparkLDA":
-            LDAparam = {}
+            TMparam = {}
         elif trainer == "prodLDA":
             model_type = str(self.cf.get('ProdLDA', 'model_type'))
             hidden_sizes = tuple(
@@ -1148,7 +1443,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             num_data_loader_workers = int(self.cf.get(
                 'ProdLDA', 'num_data_loader_workers'))
             thetas_thr = float(self.cf.get(
-                'ProdLDA', 'lineEdit_thetas_thr_prod'))
+                'ProdLDA', 'thetas_thr'))
 
             # Basic settings
             model_type = var_string_keyboard(
@@ -1157,15 +1452,15 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 'int', num_epochs, 'Number of epochs to train the model for')
             batch_size = var_num_keyboard(
                 'int', batch_size, 'Size of the batch to use for training')
-            
+
             # Advanced settings
             Y_or_N = input(
                 f"Do you wish to access the advanced settings panel [Y/N]?:")
             if Y_or_N.upper() == "Y":
                 hidden_sizes = var_string_keyboard(
                     'comma_separated', hidden_sizes, 'Size of the hidden layer')
-                activation = var_num_keyboard(
-                    'int', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
+                activation = var_string_keyboard(
+                    'str', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
                 dropout = var_num_keyboard(
                     'float', dropout, 'Percent of neurons to drop out')
                 learn_priors = var_string_keyboard(
@@ -1189,7 +1484,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 thetas_thr = var_num_keyboard(
                     'float', thetas_thr, 'Threshold for topic activation in a doc (sparsification)')
 
-            LDAparam = {
+            TMparam = {
                 "ntopics": ntopics,
                 "model_type": model_type,
                 "hidden_sizes": hidden_sizes,
@@ -1230,30 +1525,51 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 float(self.cf['CTM']['topic_prior_variance'])
             num_data_loader_workers = int(
                 self.cf['CTM']['num_data_loader_workers'])
-            label_size= float(self.cf['CTM']['label_size'])
-            loss_weights = None if self.cf['CTM']['loss_weights'] == "None" else json.loads(self.cf['CTM']['loss_weights'])
+            label_size = int(self.cf['CTM']['label_size'])
+            loss_weights = None if self.cf['CTM']['loss_weights'] == "None" else json.loads(
+                self.cf['CTM']['loss_weights'])
             thetas_thr = float(self.cf['CTM']['thetas_thr'])
             sbert_model_to_load = str(
                 self.cf['CTM']['sbert_model_to_load'])
-            
+
             # Basic settings
             model_type = var_string_keyboard(
                 'str', model_type, "Type of the model that is going to be trained, 'prodLDA' or 'LDA'")
-            ctm_model_type = var_string_keyboard(
-                'str', ctm_model_type, "CTM model to use: 'CombinedTM', 'ZeroShotTM', 'SuperCTM', 'BetaCTM'")
+            if ndocs is not None:
+                ctm_model_type = var_string_keyboard(
+                    'str', ctm_model_type, "CTM model to use: 'CombinedTM', 'ZeroShotTM', 'SuperCTM', 'BetaCTM'")
+            else:
+                # TODO: See another way of passing the number of documents for the submodels
+                ctm_model_type = var_string_keyboard(
+                    'str', ctm_model_type, "CTM model to use: 'CombinedTM', 'ZeroShotTM', 'BetaCTM'")
+
             num_epochs = var_num_keyboard(
                 'int', num_epochs, 'Number of epochs to train the model for')
             batch_size = var_num_keyboard(
                 'int', batch_size, 'Size of the batch to use for training')
-            
+
+            # Additional checking if the selected ctm type is either SuperCTM or BetaCTM
+            if ndocs is not None:
+                if ctm_model_type.lower == "superctm":
+                    while label_size != int(ndocs):
+                        printred(
+                            "The number of labels must be equal to the number of documents in the training dataset.")
+                        label_size = var_num_keyboard(
+                            'int', label_size, 'Number of total labels')
+            if ctm_model_type.lower() == "betactm":
+                loss_weights = var_string_keyboard(
+                    'dict', loss_weights, 'Dictionary with the name of the weight parameter (key) and the weight (value) for each loss. E.g. {"beta" : 1}')
+                printred(
+                    "No weights provided for the training of a BetaCTM model. Generating a CombinedTM model instead...")
+
             # Advanced settings
             Y_or_N = input(
                 f"Do you wish to access the advanced settings panel [Y/N]?:")
             if Y_or_N.upper() == "Y":
                 hidden_sizes = var_string_keyboard(
                     'comma_separated', hidden_sizes, 'Size of the hidden layer')
-                activation = var_num_keyboard(
-                    'int', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
+                activation = var_string_keyboard(
+                    'str', activation, "Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'")
                 dropout = var_num_keyboard(
                     'float', dropout, 'Percent of neurons to drop out')
                 learn_priors = var_string_keyboard(
@@ -1274,20 +1590,15 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                     'float', topic_prior_variance, 'Variance parameter for the prior')
                 num_data_loader_workers = var_num_keyboard(
                     'int', num_data_loader_workers, 'Number of subprocesses to use for data loading')
-                # @TODO: Check that it has the same size as the training corpus if SuperCTM selected; exit otherwise
-                label_size = var_num_keyboard(
-                    'int', label_size, 'Number of total labels')
-                # @TODO: Check that this actually works
-                # @TODO: Check that is not None if BetaCTM selected; exit otherwise
-                loss_weights = var_string_keyboard(
-                    'dict', loss_weights, 'Dictionary with the name of the weight parameter (key) and the weight (value) for each loss')
+
+                # TODO: Add condition for not showing this parameter when embeddings are provided from file
                 sbert_model_to_load = var_string_keyboard(
-                'str', sbert_model_to_load, "Model to be used for calculating the embeddings. Available models can be checked here: 'https://huggingface.co/models?library=sentence-transformers'.")
+                    'str', sbert_model_to_load, "Model to be used for calculating the embeddings. Available models can be checked here: 'https://huggingface.co/models?library=sentence-transformers'.")
 
                 thetas_thr = var_num_keyboard(
                     'float', thetas_thr, 'Threshold for topic activation in a doc (sparsification)')
 
-            LDAparam = {
+            TMparam = {
                 "ntopics": ntopics,
                 "model_type": model_type,
                 "ctm_model_type": ctm_model_type,
@@ -1311,31 +1622,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "sbert_model_to_load": sbert_model_to_load
             }
 
-        displaytext = """
-        *************************************************************************************
-        We will finally request other general information, modelname, description, etc
-        *************************************************************************************
-        """
-        printgr(displaytext)
-        modelname = ''
-        while not len(modelname):
-            modelname = input('Enter a name to save the new model: ')
-
-        # Introduce a description for the model
-        ModelDesc = ""
-        while not len(ModelDesc):
-            ModelDesc = input('Introduce a description for the model: ')
-
-        # Define privacy level of dataset
-        privacy = ['Public', 'Private']
-        opt = query_options(privacy, 'Define visibility for the model')
-        privacy = privacy[opt]
-
-        # Actual training of the topic model takes place
-        super().trainTM(modelname, ModelDesc, privacy, trainer,
-                        TrDtSet, Preproc, LDAparam)
-
-        return
+        return TMparam
 
     def corpus2JSON(self):
         """
@@ -2434,6 +2721,19 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         return
 
+    def train2ndTM(self, trainer):
+        """
+        Second-level topic modeling trainer.
+
+        Parameters
+        ----------
+        trainer : string
+            Optimizer to use for training the topic model
+            Possible values are mallet|sparkLDA|prodLDA|ctm
+        """
+        # TODO
+        return
+
     def load_listTMmodels(self):
         """
         Extends the load_listTMmodels method from the parent class to load into execution time an XML structure of all the available TM models that are going to be used for visualization purposes in the GUI.
@@ -2443,7 +2743,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         if self.allTMmodels:
             all_models = self.p2p.joinpath(
-                self._dir_struct['LDAmodels']).resolve().as_posix()  # @TODO: Change LDAmodels to TMmodels
+                self._dir_struct['TMmodels']).resolve().as_posix()
 
             # Create XML structure of the models for visualization purposes
             if pathlib.Path(all_models).is_dir():
@@ -2461,8 +2761,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             QMainWindow object associated which the GUI
         """
 
-        print(self.allTMmodels)
-        print(self.models_xml)
         if self.allTMmodels:
             if self.models_xml:
                 clearQTreeWidget(gui.treeView_trained_models)

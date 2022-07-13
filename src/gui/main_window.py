@@ -548,6 +548,11 @@ class MainWindow(QMainWindow):
                 i, 0)
             if item.checkState() == QtCore.Qt.CheckState.Checked:
                 checked_list.append(i)
+        
+        if len(checked_list) == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.CREATE_TR_DST_NOT_SELECTED_MSG)
+            return
 
         self.create_tm_corpus_subwindow = GenerateTMCorpus(
             checked_list, self.tm)
@@ -700,7 +705,7 @@ class MainWindow(QMainWindow):
         r = self.table_available_tr_datasets.currentRow()
 
         # If no training dataset is selected for before clicking the 'train_dataset' button, a warning message is shown to the user
-        if not r:
+        if r == -1:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_TR_CORPUS)
             return
@@ -711,11 +716,10 @@ class MainWindow(QMainWindow):
         self.preprocessing_subwindow = PreprocessingWindow(tm=self.tm)
         self.preprocessing_subwindow.exec()
 
-        #self.train_model_subwindow = TrainModelWindow(
-        #    tm=self.tm, thread_pool=self.thread_pool, stdout=self.stdout, #stderr=self.stderr, training_corpus=training_corpus, #preproc_settings=self.preprocessing_subwindow.preproc_settings)
-
         self.train_model_subwindow.TrDts_name = training_corpus
         self.train_model_subwindow.preproc_settings = self.preprocessing_subwindow.preproc_settings
+        self.train_model_subwindow.hierarchy_level = 0
+        self.train_model_subwindow.initialize_hierarchical_level_settings()
         self.train_model_subwindow.exec()
 
         # @TODO: Reload models

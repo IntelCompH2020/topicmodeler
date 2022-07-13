@@ -77,7 +77,6 @@ def var_num_keyboard(vartype,default,question):
             print('The value you provided is not valid. Using default value.')
             return default
             
-#@TODO: Revise this method
 def var_string_keyboard(option, default, question):
     """Read a string variable from the keyboard
 
@@ -97,27 +96,38 @@ def var_string_keyboard(option, default, question):
     """
     
     aux = input(question + ' [' + str(default) + ']: ')
-    if option == 'comma_separated':
+    if option == "comma_separated":
         aux2 = [el.strip() for el in aux.split(',') if len(el)]
-        if len(aux) <= 1:
+        if aux2 is not None and len(aux2) <= 1:
             print('The value you provided is not valid. Using default value.')
-        return default
-    elif option == "bool":
-        if aux != "True" and aux != "False":
-            print('The value you provided is not valid. Using default value.')
-        return default
-    elif option == 'dict':
-        if aux == "None":
             return default
         else:
-            try:
-                aux2 = json.loads(aux)
-            except:
-                print('The value you provided is not valid. Using default value.')
+            aux2 = tuple(map(int, aux[1:-1].split(',')))
+    elif option == "bool":
+        if aux is not None and aux != "True" and aux != "False":
+            print('The value you provided is not valid. Using default value.')
+            aux2 = None
+            return default
+        else:
+            aux2 = True if aux == "True" else False
+    elif option == "dict":
+        if aux != '':
+            if aux == "None":
                 return default
-            return aux2
+            else:
+                try:
+                    aux2 = json.loads(aux)
+                except:
+                    print('The value you provided is not valid. Using default value.')
+                    return default
     elif option == "str":
-        return aux
+        aux2 = str(aux) if aux != '' else None
+    if aux2 is None:
+        if aux != '':
+            print('The value you provided is not valid. Using default value.')
+        return default
+    else:
+        return aux2
 
 def request_confirmation(msg="     Are you sure?"):
 
@@ -171,3 +181,22 @@ def format_title(tgt_str):
     capitalized_title = tgt_str
     #Quitamos " y retornos de carro
     return capitalized_title.replace('"','').replace('\n','')
+
+def file_lines(fname):
+    """Counts the number of lines in a file
+
+    Parameters
+    ----------      
+    fname: pathlib.Path
+        Path to the file whose lines are being count
+    
+    Returns
+    -------
+    :
+        The number of lines in the given file
+    """    
+    # Count number of lines in file
+    with fname.open('r', encoding='utf8') as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
