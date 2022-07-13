@@ -509,8 +509,8 @@ class TMmodel(object):
     #
     # The TM can be trained with Blei's LDA, Mallet, or any other toolbox that produces a model according to this representation
 
-    # Estas variables guardarán los valores originales de las alphas, betas, thetas
-    # servirán para resetear el modelo después de su optimización
+    # The following variables will store original values of matrices alphas, betas, thetas
+    # They will be used to reset the model to original values
     _betas_orig = None
     _thetas_orig = None
     _alphas_orig = None
@@ -523,18 +523,19 @@ class TMmodel(object):
     _betas_ds = None
     _topic_entropy = None
     _descriptions = None
-    _vocab_w2id = None
-    _vocab_id2w = None
-    _vocabfreq = None
+    _vocab = None
     _size_vocab = None
-    _vocabfreq_file = None
 
     def __init__(self, betas=None, thetas=None, alphas=None,
-                 vocabfreq_file=None, from_file=None, logger=None):
-        """Inicializacion del model de topicos a partir de las matrices que lo caracterizan
+                 vocab=None, from_file=None, logger=None):
+        """Topic model inititalization
+
+        Inicializacion del model de topicos a partir de las matrices que lo caracterizan
         Ademas de inicializar las correspondientes variables del objeto, se recalcula el Vector
         beta con downscoring (palabras comunes son penalizadas), y se calculan las
         entropias de cada topico.
+
+
 
         Parameters
         ----------
@@ -544,40 +545,23 @@ class TMmodel(object):
             Matriz numpy de tamaño n_docs x n_topics (composición documental)
         alphas:
             Vector de longitud n_topics, con la importancia de cada perfil
-        vocabfreq_file:
-            Ruta a un fichero con el vocabulario correspondiente al modelo. Contiene también la frecuencia de cada términos del vocabulario
+        vocab:
+            Vocabulary. List of words sorted according to betas matrix
         from_file:
             If not None, contains the name of a file from which the object can be initialized
+        logger:
+            External logger to use. If None, a logger will be created for the object
         """
         if logger:
-            self.logger = logger
+            self._logger = logger
         else:
             import logging
             logging.basicConfig(level='INFO')
-            self.logger = logging.getLogger('TMmodel')
+            self._logger = logging.getLogger('TMmodel')
 
         # Convert strings to Paths if necessary
-        if vocabfreq_file:
-            vocabfreq_file = Path(vocabfreq_file)
         if from_file:
             from_file = Path(from_file)
-
-        # Locate vocabfile for the model
-        if not vocabfreq_file and from_file:
-            # If not vocabfile was indicated, try to recover from same directory where model is
-            vocabfreq_file = from_file.parent.joinpath('vocab_freq.txt')
-
-        if not vocabfreq_file.is_file():
-            self.logger.error(
-                '-- -- -- It was not possible to locate a valid vocabulary file.')
-            self.logger.error('-- -- -- The TMmodel could not be created')
-            return
-
-        # Load vocabulary variables from file
-        self._vocab_w2id, self._vocab_id2w, self._vocabfreq = self.lee_vocabfreq(
-            vocabfreq_file)
-        self._size_vocab = len(self._vocabfreq)
-        self._vocabfreq_file = vocabfreq_file
 
         # Create model from given data, or recover model from file
         if from_file:
@@ -733,35 +717,6 @@ class TMmodel(object):
         else:
             self._descriptions[tpc] = desc_tpc
         return
-
-    def lee_vocabfreq(self, vocabfreq_path):
-        """Lee el vocabulario del modelo que se encuentra en el fichero indicado
-        Devuelve dos diccionarios, uno usando las palabras como llave, y el otro
-        utilizando el id de la palabra como clave
-        Devuelve también la lista de frequencias de cada término del vocabulario
-
-        Parameters
-        ----------
-        vocabfreq_path: pathlib.Path
-            Path con la ruta al vocabulario
-
-        Returns
-        -------
-        : tuple(vocab_w2id,vocab_id2w)
-            * vocab_w2id         : Diccionario {pal_i : id_pal_i}
-            * vocab_id2w         : Diccionario {i     : pal_i}
-        """
-        vocab_w2id = {}
-        vocab_id2w = {}
-        vocabfreq = []
-        with vocabfreq_path.open('r', encoding='utf-8') as f:
-            for i, line in enumerate(f):
-                wd, freq = line.strip().split('\t')
-                vocab_w2id[wd] = i
-                vocab_id2w[str(i)] = wd
-                vocabfreq.append(int(freq))
-
-        return (vocab_w2id, vocab_id2w, vocabfreq)
 
     def save_npz(self, npzfile):
         """Salva las matrices que caracterizan el modelo de tópicos en un fichero npz de numpy
@@ -2226,6 +2181,7 @@ if __name__ == "__main__":
                                            token_regexp=train_config['LDAparam']['token_regexp'])
                     MallTr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.txt'))
+
                 elif train_config['trainer'] == 'sparkLDA':
                     if not args.spark:
                         sys.stodout.write(
@@ -2235,6 +2191,7 @@ if __name__ == "__main__":
                     sparkLDATr = sparkLDATrainer()
                     sparkLDATr.fit(
                         configFile.parent.joinpath('corpus.parquet'))
+
                 elif train_config['trainer'] == 'prodLDA':
                     ProdLDATr = ProdLDATrainer(
                         n_components=train_config['PRODparam']['n_components'],
@@ -2255,6 +2212,7 @@ if __name__ == "__main__":
                         num_data_loader_workers=train_config['PRODparam']['num_data_loader_workers'],
                         thetas_thr=train_config['PRODparam']['thetas_thr'])
                     ProdLDATr.fit()
+
                 elif train_config['trainer'] == 'ctm':
                     CTMr = CTMTrainer(
                         n_components=train_config['CTMparam']['n_components'],
