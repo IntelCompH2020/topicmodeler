@@ -194,7 +194,7 @@ class ITMTTaskManager(BaseTaskManager):
         This method loads all the available Topic Models previously created by the user ITMTTaskManager's 'allTMmodels' attribute as a dictionary object, which is characterized by one dictionary entry per Topic Model, the key and the value being the absolute path to the model and a dictionary with the corresponding metadata, respectively. To do so, it invokes the script from the folder 'src topicmodeling' with the option 'listTMmodels'.
         """
 
-        cmd = 'python src/topicmodeling/topicmodeling.py --listTMmodels --path_models '
+        cmd = 'python src/topicmodeling/manageModels.py --listTMmodels --path_models '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -206,7 +206,7 @@ class ITMTTaskManager(BaseTaskManager):
             self.logger.error('-- -- Execution of script failed')
             return
 
-        self.logger.info("Logical datasets loaded")
+        self.logger.info("List of topic models loaded")
 
         return
 
