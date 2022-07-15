@@ -8,10 +8,168 @@ Provides a series of functions for Topic Model representation and curation
 import argparse
 import json
 import sys
+import shutil
 
 from pathlib import Path
 import numpy as np
 import scipy.sparse as sparse
+
+
+class TMManager(object):
+    """
+    Main class to manage functionality for the management of topic models
+    """
+
+    def listTMmodels(self, path_TMmodels: Path):
+        """
+        Returns a dictionary with all topic models
+
+        Parameters
+        ----------
+        path_TMmodels : pathlib.Path
+            Path to the folder hosting the topic models
+
+        Returns
+        -------
+        allTMmodels : Dictionary (path -> dictionary)
+            One dictionary entry per wordlist
+            key is the topic model name
+            value is a dictionary with metadata
+        """
+        allTMmodels = {}
+        modelFolders = [el for el in path_TMmodels.iterdir()]
+
+        for TMf in modelFolders:
+            modelConfig = TMf.joinpath('trainconfig.json')
+            if modelConfig.is_file():
+                with modelConfig.open('r', encoding='utf8') as fin:
+                    modelInfo = json.load(fin)
+                    allTMmodels[modelInfo['name']] = {
+                        "name": modelInfo['name'],
+                        "description": modelInfo['description'],
+                        "visibility": modelInfo['visibility'],
+                        "trainer": modelInfo['trainer'],
+                        "TrDtSet": modelInfo['TrDtSet'],
+                        "creation_date": modelInfo['creation_date'],
+                        "hierarchy-level": modelInfo['hierarchy-level'],
+                        "htm-version": modelInfo['htm-version']
+                    }
+                submodelFolders = [el for el in TMf.iterdir() if not el.as_posix().endswith("modelFiles") and not el.as_posix().endswith("corpus.parquet") and not el.as_posix().endswith("_old")]
+                for sub_TMf in submodelFolders:
+                    submodelConfig = sub_TMf.joinpath('trainconfig.json')
+                    if submodelConfig.is_file():
+                        with submodelConfig.open('r', encoding='utf8') as fin:
+                            submodelInfo = json.load(fin)
+                            corpus = "Subcorpus created from " + str(modelInfo['name'])
+                            allTMmodels[submodelInfo['name']] = {
+                                "name": submodelInfo['name'],
+                                "description": submodelInfo['description'],
+                                "visibility": submodelInfo['visibility'],
+                                "trainer": submodelInfo['trainer'],
+                                "TrDtSet": corpus,
+                                "creation_date": submodelInfo['creation_date'],
+                                "hierarchy-level": submodelInfo['hierarchy-level'],
+                                "htm-version": submodelInfo['htm-version']
+                            }
+        return allTMmodels
+
+    def deleteTMmodel(self, path_TMmodel: Path):
+        """
+        Deletes a Topic Model
+
+        Parameters
+        ----------
+        path_TMmodel : pathlib.Path
+            Path to the folder containing the Topic Model
+
+        Returns
+        -------
+        status : int
+            - 0 if the Topic Model could not be deleted
+            - 1 if the Topic Model was deleted successfully
+        """
+
+        if not path_TMmodel.is_dir():
+            print(f"File '{path_TMmodel.as_posix()}' does not exist.")
+            return 0
+        else:
+            try:
+                shutil.rmtree(path_TMmodel)
+                return 1
+            except:
+                return 0
+
+    def renameTMmodel(self, name: Path, new_name: Path):
+        """
+        Renames a topic model
+
+        Parameters
+        ----------
+        name : pathlib.Path
+            Path to the model to be renamed
+        
+        new_name : pathlib.Path
+            Path to the new name for the topic model
+
+        Returns
+        -------
+        status : int
+            - 0 if the model could not be renamed
+            - 1 if the model was renamed successfully
+        
+        """
+        if not name.is_dir():
+            print(f"Model '{name.as_posix()}' does not exist.")
+            return 0
+        if new_name.is_file():
+            print(f"Model '{new_name.as_posix()}' already exists. Rename or delete it first.")
+            return 0
+        try:
+            with name.joinpath('trainconfig.json').open("r", encoding="utf8") as fin:
+                TMmodel = json.load(fin)
+            TMmodel["name"] = new_name.stem
+            with name.joinpath('trainconfig.json').open("w", encoding="utf-8") as fout:
+                json.dump(TMmodel, fout, ensure_ascii=False, indent=2, default=str)
+            shutil.move(name, new_name)
+            return 1
+        except:
+            return 0
+
+    def copyTMmodel(self, name: Path, new_name: Path):
+        """
+        Makes a copy of an existing topic model
+
+        Parameters
+        ----------
+        name : pathlib.Path
+            Path to the model to be copied
+        
+        new_name : pathlib.Path
+            Path to the new name for the topic model
+
+        Returns
+        -------
+        status : int
+            - 0 if the model could not be copied
+            - 1 if the model was copied successfully
+        
+        """
+        if not name.is_dir():
+            print(f"Model '{name.as_posix()}' does not exist.")
+            return 0
+        if new_name.is_file():
+            print(f"Model '{new_name.as_posix()}' already exists. Rename or delete it first.")
+            return 0
+        try:
+            shutil.copytree(name, new_name)
+            with new_name.joinpath('trainconfig.json').open("r", encoding="utf8") as fin:
+                TMmodel = json.load(fin)
+            TMmodel["name"] = new_name.stem
+            with new_name.joinpath('trainconfig.json').open("w", encoding="utf-8") as fout:
+                json.dump(TMmodel, fout, ensure_ascii=False, indent=2, default=str)
+            return 1
+        except:
+            return 0
 
 
 class TMmodel(object):
@@ -220,51 +378,46 @@ class TMmodel(object):
 ##############################################################################
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Management of Topic Models')
-    parser.add_argument('--listTMmodels', action='store_true', default=False,
-                        help='List available Topic Models')
-    parser.add_argument('--path_models', type=str, default=None,
+    parser = argparse.ArgumentParser(description="Scripts for Topic Modeling Service")
+    parser.add_argument("--path_TMmodels", type=str, default=None, required=True,
+                        metavar=("path_to_TMs"),
                         help="path to topic models folder")
+    parser.add_argument("--listTMmodels", action="store_true", default=False,
+                        help="List Available Topic Models")
+    parser.add_argument("--deleteTMmodel", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Delete Topic Model with selected name")
+    parser.add_argument("--renameTM", type=str, default=None, nargs=2,
+                        metavar=("modelName", "new_modelName"),
+                        help="Rename Topic Model with selected name to new name")
+    parser.add_argument("--copyTM", type=str, default=None, nargs=2,
+                        metavar=("modelName", "new_modelName"),
+                        help="Make a copy of Topic Model")
+
     args = parser.parse_args()
 
-    # Listing of topic models
+    tmm = TMManager()
+
+    tm_path = Path(args.path_TMmodels)
+
     if args.listTMmodels:
-        if not args.path_models:
-            sys.exit('You need to indicate the location of training datasets')
-
-        allTMmodels = {}
-        modelFolders = [el for el in Path(args.path_models).iterdir()]
-
-        for TMf in modelFolders:
-            modelConfig = TMf.joinpath('trainconfig.json')
-            if modelConfig.is_file():
-                with modelConfig.open('r', encoding='utf8') as fin:
-                    modelInfo = json.load(fin)
-                    allTMmodels[modelInfo['name']] = {
-                        "name": modelInfo['name'],
-                        "description": modelInfo['description'],
-                        "visibility": modelInfo['visibility'],
-                        "trainer": modelInfo['trainer'],
-                        "TrDtSet": modelInfo['TrDtSet'],
-                        "creation_date": modelInfo['creation_date'],
-                        "hierarchy-level": modelInfo['hierarchy-level'],
-                        "htm-version": modelInfo['htm-version']
-                    }
-                submodelFolders = [el for el in TMf.iterdir() if not el.as_posix().endswith("modelFiles") and not el.as_posix().endswith("corpus.parquet") and not el.as_posix().endswith("_old")]
-                for sub_TMf in submodelFolders:
-                    submodelConfig = sub_TMf.joinpath('trainconfig.json')
-                    if submodelConfig.is_file():
-                        with submodelConfig.open('r', encoding='utf8') as fin:
-                            submodelInfo = json.load(fin)
-                            corpus = "Subcorpus created from " + str(modelInfo['name'])
-                            allTMmodels[submodelInfo['name']] = {
-                                "name": submodelInfo['name'],
-                                "description": submodelInfo['description'],
-                                "visibility": submodelInfo['visibility'],
-                                "trainer": submodelInfo['trainer'],
-                                "TrDtSet": corpus,
-                                "creation_date": submodelInfo['creation_date'],
-                                "hierarchy-level": submodelInfo['hierarchy-level'],
-                                "htm-version": submodelInfo['htm-version']
-                            }
+        allTMmodels = tmm.listTMmodels(tm_path)
         sys.stdout.write(json.dumps(allTMmodels))
+
+    if args.deleteTMmodel:
+        status = tmm.deleteTMmodel(tm_path.joinpath(f"{args.deleteTMmodel}"))
+        sys.stdout.write(str(status))
+
+    if args.renameTM:
+        status = tmm.renameTMmodel(
+            tm_path.joinpath(f"{args.renameTM[0]}"),
+            tm_path.joinpath(f"{args.renameTM[1]}"),
+        )
+        sys.stdout.write(str(status))
+
+    if args.copyTM:
+        status = tmm.copyTMmodel(
+            tm_path.joinpath(f"{args.copyTM[0]}"),
+            tm_path.joinpath(f"{args.copyTM[1]}"),
+        )
+        sys.stdout.write(str(status))

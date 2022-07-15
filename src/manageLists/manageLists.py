@@ -152,7 +152,7 @@ class ListManager(object):
     
     def copyWordList(self, name: Path):
         """
-        Renames a wordlist
+        Creates a copy of a wordlist
 
         Parameters
         ----------

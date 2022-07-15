@@ -287,6 +287,9 @@ class textPreproc(object):
                         .drop(df.id)
                         .withColumnRenamed("collect_list(col)", "final_tokens")
                         )
+            else:
+                # We need to create a copy of the tokens with the new name
+                trDF = trDF.withColumn("final_tokens", trDF["clean_tokens"])
 
             if not self._cntVecModel:
                 cntVec = CountVectorizer(inputCol="final_tokens",
