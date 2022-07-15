@@ -60,8 +60,6 @@ def check_max_local_length(max_seq_length, texts):
         warnings.warn(f"the longest document in your collection has {max_local_length} words, the model instead "
                       f"truncates to {max_seq_length} tokens.")
 
-
-
 def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=None, sbert_model_to_load='paraphrase-distilroberta-base-v1',val_size=0.25, max_seq_length=512):
 
     """It prepares the training data in the format that is asked as input in a CTM model.

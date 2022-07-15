@@ -104,13 +104,14 @@ class TrainModelWindow(QtWidgets.QDialog):
             checkbox.hide()
 
         self.ctm_checkboxes_params = []
-        for id_check in np.arange(Constants.NR_PARAMS_TRAIN_CTM):
-            checkbox_name = "checkBox_ctm_" + str(id_check + 1) + "_good"
-            checkbox_widget = self.findChild(QLabel, checkbox_name)
-            self.ctm_checkboxes_params.append(checkbox_widget)
-            checkbox_name = "checkBox_ctm_" + str(id_check + 1) + "_bad"
-            checkbox_widget = self.findChild(QLabel, checkbox_name)
-            self.ctm_checkboxes_params.append(checkbox_widget)
+        for id_check in np.arange(Constants.NR_PARAMS_TRAIN_CTM + 1):
+            if id_check != 4:
+                checkbox_name = "checkBox_ctm_" + str(id_check) + "_good"
+                checkbox_widget = self.findChild(QLabel, checkbox_name)
+                self.ctm_checkboxes_params.append(checkbox_widget)
+                checkbox_name = "checkBox_ctm_" + str(id_check) + "_bad"
+                checkbox_widget = self.findChild(QLabel, checkbox_name)
+                self.ctm_checkboxes_params.append(checkbox_widget)
         for checkbox in self.ctm_checkboxes_params:
             checkbox.hide()
 
@@ -536,12 +537,10 @@ class TrainModelWindow(QtWidgets.QDialog):
         """
 
         # Read values and set them in the correponding widget
-        self.comboBox_ctm_model_type.setCurrentText(
-            str(self.cf.get('CTM', 'ctm_model_type')))
         self.lineEdit_nr_topics_ctm.setText(str(self.cf.get('TM', 'ntopics')))
         self.lineEdit_nr_epochs_ctm.setText(
             str(self.cf.get('CTM', 'num_epochs')))
-        self.lineEdit_batch_size_ctm.setText(
+        self.lineEdit_batchsize_ctm.setText(
             str(self.cf.get('CTM', 'batch_size')))
         self.lineEdit_ctm_hidden_sizes.setText(
             self.cf.get('CTM', 'hidden_sizes'))
@@ -562,10 +561,6 @@ class TrainModelWindow(QtWidgets.QDialog):
             str(self.cf.get('CTM', 'topic_prior_variance')))
         self.lineEdit_ctm_workers.setText(
             str(self.cf.get('CTM', 'num_data_loader_workers')))
-        self.lineEdit_ctm_label_size.setText(
-            str(self.cf.get('CTM', 'label_size')))
-        self.lineEdit_ctm_loss_weigths.setText(
-            str(self.cf.get('CTM', 'loss_weights')))
         self.lineEdit_ctm_sbert_model.setText(
             str(self.cf.get('CTM', 'thetas_thr')))
         self.lineEdit_ctm_sbert_model.setText(
@@ -587,21 +582,13 @@ class TrainModelWindow(QtWidgets.QDialog):
         messages = ""
 
         # TODO: Add conversions
-        ctm_model_type = self.comboBox_ctm_model_type.currentText()
-        if ctm_model_type.lower != "combinedtm" and "zeroshottm" and "superctm" and "betactm":
-            self.checkBox_ctm_1_bad.show()
-            messages += Constants.WRONG_MODEL_TYPE_MSG + "\n"
-        else:
-            self.checkBox_ctm_1_good.show()
-            self.training_params['ctm_model_type'] = ctm_model_type
-
         ctm_prod_type = self.comboBox_model_type_ctm.currentText()
         if ctm_prod_type.lower() not in \
                 ['prodLDA', 'lda']:
-            self.checkBox_ctm_21_bad.show()
+            self.checkBox_ctm_1_bad.show()
             messages += Constants.WRONG_UNDERLYING_MODEL_TYPE_MSG + "\n"
         else:
-            self.checkBox_ctm_21_good.show()
+            self.checkBox_ctm_1_good.show()
             self.training_params['model_type'] = ctm_prod_type
 
         nr_topics = int(self.lineEdit_nr_topics_ctm.text())
@@ -620,7 +607,7 @@ class TrainModelWindow(QtWidgets.QDialog):
             self.checkBox_ctm_3_good.show()
             self.training_params['num_epochs'] = num_epochs
 
-        batch_size = int(self.lineEdit_batch_size_ctm.text())
+        batch_size = int(self.lineEdit_batchsize_ctm.text())
         if batch_size < 0:
             self.checkBox_ctm_4_bad.show()
             messages += Constants.WRONG_BATCH_SIZE_MSG + "\n"
@@ -672,25 +659,25 @@ class TrainModelWindow(QtWidgets.QDialog):
 
         momentum = float(self.lineEdit_ctm_momentum.text())
         if momentum < 0 or float(self.lineEdit_ctm_momentum.text()) > 1:
-            self.checkBox_ctm_10_bad.show()
+            self.checkBox_ctm_14_bad.show()
             messages += Constants.WRONG_MOMENTUM_MSG + "\n"
         else:
-            self.checkBox_ctm_10_good.show()
+            self.checkBox_ctm_14_good.show()
             self.training_params['momentum'] = momentum
 
         solver = self.comboBox_ctm_solver.currentText()
         if solver not in ['adagrad', 'adam', 'sgd', 'adadelta', 'rmsprop']:
-            self.checkBox_ctm_11_bad.show()
+            self.checkBox_ctm_15_bad.show()
             messages += Constants.WRONG_SOLVER_MSG + "\n"
         else:
-            self.checkBox_ctm_11_good.show()
+            self.checkBox_ctm_15_good.show()
             self.training_params['solver'] = solver
 
         if self.comboBox_ctm_reduce_on_plateau.currentText() != "True" and self.comboBox_ctm_reduce_on_plateau.currentText() != "False":
-            self.checkBox_ctm_12_bad.show()
+            self.checkBox_ctm_16_bad.show()
             messages += Constants.WRONG_REDUCE_ON_PLATEAU_MSG + "\n"
         else:
-            self.checkBox_ctm_12_good.show()
+            self.checkBox_ctm_16_good.show()
             self.training_params['reduce_on_plateau'] = True if self.comboBox_ctm_reduce_on_plateau.currentText(
             ) == "True" else False
 
@@ -706,57 +693,36 @@ class TrainModelWindow(QtWidgets.QDialog):
         #    self.checkBox_ctm_14_bad.show()
         #    messages += Constants.WRONG_TOPIC_PRIOR_VAR_MSG + "\n"
         # else:
-        self.checkBox_ctm_14_good.show()
+        self.checkBox_ctm_12_good.show()
         self.training_params['topic_prior_variance'] = None if self.lineEdit_ctm_topic_prior_variance.text() == "None" else \
             float(self.lineEdit_ctm_topic_prior_variance.text())
 
         nr_samples = int(self.lineEdit_ctm_nr_samples.text())
         if not self.lineEdit_ctm_nr_samples.text().isdigit() or nr_samples < 0 or nr_samples == 0:
-            self.checkBox_ctm_15_bad.show()
+            self.checkBox_ctm_10_bad.show()
             messages += Constants.WRONG_NR_SAMPLES + "\n"
         else:
-            self.checkBox_ctm_15_good.show()
+            self.checkBox_ctm_10_good.show()
             self.training_params['num_samples'] = nr_samples
 
         nr_workers = int(self.lineEdit_ctm_workers.text())
         if not self.lineEdit_ctm_workers.text().isdigit() or nr_workers < 0:
-            self.checkBox_prod_16_bad.show()
+            self.checkBox_prod_11_bad.show()
             messages += Constants.WRONG_NR_WORKERS + "\n"
         else:
-            self.checkBox_prod_16_good.show()
+            self.checkBox_prod_11_good.show()
             self.training_params['num_data_loader_workers'] = nr_workers
 
         thetas_thr = float(self.lineEdit_ctm_thetas_thr.text())
         if thetas_thr > 1:
-            self.checkBox_prod_20_bad.show()
+            self.checkBox_prod_18_bad.show()
             messages += Constants.WRONG_THETAS_THR_LDA_MSG + "\n"
         else:
-            self.checkBox_prod_20_good.show()
+            self.checkBox_prod_18_good.show()
             self.training_params['thetas_thr'] = thetas_thr
 
-        len_trdtset = 0  # TODO: TO BE COMPLETED
-        label_size = int(self.lineEdit_ctm_label_size.text())
-        if label_size != 0 and len(self.lineEdit_ctm_label_size.text()) != len_trdtset:
-            self.checkBox_ctm_17_bad.show()
-            messages += Constants.WRONG_LABEL_SIZE + "\n"
-        elif self.comboBox_ctm_model_type.currentText == "SuperCTM" and (int(self.lineEdit_ctm_label_size.split()) < 0 or int(self.lineEdit_ctm_label_size.split()) == 0):
-            self.checkBox_ctm_17_bad.show()
-            messages += Constants.WRONG_LABEL_SIZE_FOR_SUPERCTM + "\n"
-        else:
-            self.checkBox_ctm_17_good.show()
-            self.training_params['label_size'] = label_size
-
-        # TODO: Add control for loss weights
-        if self.comboBox_ctm_model_type.currentText == "BetaCTM" and self.lineEdit_ctm_loss_weigths.text() == "None":
-            self.checkBox_ctm_18_bad.show()
-            messages += Constants.WRONG_LOSS_WEIGTHS_FOR_BETACTM + "\n"
-        else:
-            self.checkBox_ctm_18_good.show()
-            self.training_params['loss_weights'] = None if self.lineEdit_ctm_loss_weigths.text() == "None" else json.loads(
-                self.lineEdit_ctm_loss_weigths.text())
-
         # TODO: Add check for if sbert is available in hf
-        self.checkBox_ctm_19_good.show()
+        self.checkBox_ctm_17_good.show()
         self.training_params['sbert_model_to_load'] = self.lineEdit_ctm_sbert_model.text(
         )
 

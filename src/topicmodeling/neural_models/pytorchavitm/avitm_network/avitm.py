@@ -78,7 +78,7 @@ class AVITM(object):
             "model must be 'LDA' or 'prodLDA'."
         assert isinstance(hidden_sizes, tuple), \
             "hidden_sizes must be type tuple."
-        assert activation in ['softplus', 'relu', 'sigmoid', 'swish', 'tanh', 'leakyrelu','rrelu', 'elu', 'selu'], \
+        assert activation in ['softplus', 'relu', 'sigmoid', 'swish', 'tanh', 'leakyrelu', 'rrelu', 'elu', 'selu'], \
             "activation must be 'softplus', 'relu', 'sigmoid', 'swish', 'leakyrelu'," \
             " 'rrelu', 'elu', 'selu' or 'tanh'."
         assert dropout >= 0, "dropout must be >= 0."
@@ -179,20 +179,15 @@ class AVITM(object):
         word_dists: torch.nn.parameter.Parameter, [self.batch_size, self.input_size]
             Mixture of multinomials for each word
         prior_mean: torch.nn.parameter.Parameter, [self.n_components]
-            Learnable parameter from the decoder network that defines the mean of the approximate variational posterior
-             (q(θ)) defined as a logistic normal
+            Learnable parameter from the decoder network that defines the mean of the approximate variational posterior (q(θ)) defined as a logistic normal
         prior_variance: torch.Tensor [self.n_components]
-             Learnable parameter from the decoder network that defines the covariance of the approximate variational
-              posterior (q(θ)) defined as a logistic normal
+            Learnable parameter from the decoder network that defines the covariance of the approximate variational posterior (q(θ)) defined as a logistic normal
         posterior_mean: torch.Tensor [self.batch_size, self.n_components]
-            Output of the encoder network that defines the mean parameter (μ1) of the logistic normal distribution used
-             to approximate the Dirichlet prior ((p(θ|α)) according to the Laplace approximation
+            Output of the encoder network that defines the mean parameter (μ1) of the logistic normal distribution used to approximate the Dirichlet prior ((p(θ|α)) according to the Laplace approximation
         posterior_variance: torch.Tensor [self.batch_size, self.n_components]
-            Exponential of the posterior_log_variance
+            Exponential of the posterior_log_variance 
         posterior_log_variance: torch.Tensor [self.batch_size, self.n_components]
-            torch.Tensor [self.batch_size, self.n_components]
-            Output of the encoder network that defines the covariance parameter (Σ1) of the logistic normal distribution
-             used to approximate the Dirichlet prior ((p(θ|α))according to the Laplace approximation
+            Output of the encoder network that defines the covariance parameter (Σ1) of the logistic normal distribution used to approximate the Dirichlet prior ((p(θ|α)) according to the Laplace approximation
 
         Returns
         -------
