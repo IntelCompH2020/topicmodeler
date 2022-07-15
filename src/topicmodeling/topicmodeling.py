@@ -36,6 +36,8 @@ from neural_models.contextualized_topic_models.utils.data_preparation import pre
 from neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
 from neural_models.pytorchavitm.avitm_network.avitm import AVITM
 
+from manageModels import TMmodel as newTMmodel
+
 """
 # from scipy.spatial.distance import jensenshannon
 # import pyLDAvis
@@ -1368,8 +1370,9 @@ class MalletTrainer(Trainer):
              for el in zip(vocab, term_freq)]
         self._logger.debug('-- -- Mallet training: Vocabulary file generated')
 
-        tm = TMmodel(betas=betas, thetas=thetas32, alphas=alphas,
-                     vocabfreq_file=vocabfreq_file)
+        tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
+        tm.create(betas=betas, thetas=thetas32, alphas=alphas,
+                     vocab=vocab)
 
         # Remove doc-topics file. It is no longer needed and takes a lot of space
         thetas_file.unlink()
@@ -1393,7 +1396,7 @@ class MalletTrainer(Trainer):
                 f'-- -- Provided corpus Path does not exist -- Stop')
             sys.exit()
 
-        modelFolder = corpusFile.parent.joinpath('modelFiles')
+        modelFolder = corpusFile.parent.joinpath('MalletFiles')
         modelFolder.mkdir()
 
         ##################################################
@@ -1462,7 +1465,6 @@ class MalletTrainer(Trainer):
         # Create TMmodel object
 
         tm = self._createTMmodel(modelFolder)
-        tm.save_npz(corpusFile.parent.joinpath('model.npz'))
 
         return
 
