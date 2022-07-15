@@ -1345,8 +1345,7 @@ class MalletTrainer(Trainer):
         alphas = np.asarray(np.mean(thetas32, axis=0)).ravel()
 
         # Create vocabulary files and calculate beta matrix
-        # A vocabulary is available with words provided by the Count Vectorizer object,
-        # but the new files need the order used by mallet
+        # A vocabulary is available with words provided by the Count Vectorizer object, but the new files need the order used by mallet
         wtcFile = modelFolder.joinpath('word-topic-counts.txt')
         vocab_size = file_lines(wtcFile)
         betas = np.zeros((self._ntopics, vocab_size))
@@ -1372,7 +1371,7 @@ class MalletTrainer(Trainer):
 
         tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
-                     vocab=vocab)
+                  vocab=vocab)
 
         # Remove doc-topics file. It is no longer needed and takes a lot of space
         thetas_file.unlink()

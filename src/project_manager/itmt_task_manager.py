@@ -1229,8 +1229,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         """
         printgr(displaytext)
 
-        # TODO: Get nr docs
-        TMparam = self.get_training_params(trainer, ndocs=None)
+        TMparam = self.get_training_params(trainer)
 
         displaytext = """
         *************************************************************************************
@@ -1281,12 +1280,19 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # First thing to do is to the model from which the submodel is going to be generated
 
-        # Ask user which first-level model should be used for the generation of the new submodel's corpus
-        # Only first-level models are available for expansion
+        # Get first-level models are available for expansion
         allTMmodels = json.loads(self.allTMmodels)
         models = [model for model in allTMmodels.keys()]
         displayModels = [allTMmodels[id_model]['name'] + ': ' +
                          allTMmodels[id_model]['description'] for id_model in models if allTMmodels[id_model]['hierarchy-level'] == 0]
+
+        # Return error meassage for creating Level 2 submodel when there are no models available
+        if len(displayModels) == 0:
+            self.logger.error(
+                    "-- -- To create a second-level submodel a model must have been created first.")
+            return
+        
+        # Ask user which first-level model should be used for the generation of the new submodel's corpus
         selection = query_options(
             displayModels, "Select model from which a second-level submodel will be generated")
         fathermodel = models[selection]
@@ -1361,7 +1367,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         return
 
-    def get_training_params(self, trainer, ndocs=None):
+    def get_training_params(self, trainer):
         """
         Gets input from the user about the training parameters to be used for the training of each topic modeling method.
 
@@ -1506,7 +1512,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         elif trainer == "ctm":
             model_type = str(self.cf['CTM']['model_type'])
-            ctm_model_type = str(self.cf['CTM']['ctm_model_type'])
             hidden_sizes = tuple(
                 map(int, self.cf['CTM']['hidden_sizes'][1:-1].split(',')))
             activation = str(self.cf['CTM']['activation'])
@@ -1535,32 +1540,10 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             # Basic settings
             model_type = var_string_keyboard(
                 'str', model_type, "Type of the model that is going to be trained, 'prodLDA' or 'LDA'")
-            if ndocs is not None:
-                ctm_model_type = var_string_keyboard(
-                    'str', ctm_model_type, "CTM model to use: 'CombinedTM', 'ZeroShotTM', 'SuperCTM', 'BetaCTM'")
-            else:
-                # TODO: See another way of passing the number of documents for the submodels
-                ctm_model_type = var_string_keyboard(
-                    'str', ctm_model_type, "CTM model to use: 'CombinedTM', 'ZeroShotTM', 'BetaCTM'")
-
             num_epochs = var_num_keyboard(
                 'int', num_epochs, 'Number of epochs to train the model for')
             batch_size = var_num_keyboard(
                 'int', batch_size, 'Size of the batch to use for training')
-
-            # Additional checking if the selected ctm type is either SuperCTM or BetaCTM
-            if ndocs is not None:
-                if ctm_model_type.lower == "superctm":
-                    while label_size != int(ndocs):
-                        printred(
-                            "The number of labels must be equal to the number of documents in the training dataset.")
-                        label_size = var_num_keyboard(
-                            'int', label_size, 'Number of total labels')
-            if ctm_model_type.lower() == "betactm":
-                loss_weights = var_string_keyboard(
-                    'dict', loss_weights, 'Dictionary with the name of the weight parameter (key) and the weight (value) for each loss. E.g. {"beta" : 1}')
-                printred(
-                    "No weights provided for the training of a BetaCTM model. Generating a CombinedTM model instead...")
 
             # Advanced settings
             Y_or_N = input(
