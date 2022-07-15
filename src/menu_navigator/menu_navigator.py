@@ -245,6 +245,8 @@ class MenuNavigator(object):
 
             else:
 
+                zero_opt = 'exit'
+
                 # Default dictionary of arguments is the empty dictionary
                 if 'options' in menu[option]:
                     opts = menu[option]['options']
@@ -318,6 +320,7 @@ class MenuNavigator(object):
                     # Update list of active menu options
                     if 'post_opts' in menu[option]:
                         active_options = menu[option]['post_opts']
+                        zero_opt = 'up'
                     else:
                         active_options = copy.copy(default_opt)
 
@@ -325,5 +328,4 @@ class MenuNavigator(object):
                     # Activate flag to exit the application
                     active_options = copy.copy(default_opt)
 
-                zero_opt = 'exit'
 

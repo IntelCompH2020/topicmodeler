@@ -89,8 +89,11 @@ TMoptions:
     - listTM
     - trainTM
     - train2ndTM
+    - renameTM
+    - copyTM
     - editTM
-    - inference
+    - deleteTM
+    #- inference
 
 listTM:
   title: List available topic models
@@ -113,6 +116,104 @@ train2ndTM:
         prodLDA: ProdLDA Topic Modeling (deep learning)
         ctm: Contextualized Topic Model (deep learning)
 
+renameTM:
+  title: Rename a Topic Model and edit Metadata
+
+copyTM:
+  title: Make a copy of an existing Topic Model
+
+editTM:
+  title: Edit a Static Topic Model
+  post_opts:
+    - showTopics
+    - deleteTopic
+    - showSimilar
+    - fuseTopics
+    - sortTopics
+    - undoLast
+    - resetTM
+
+showTopics:
+  title: Display Topics Composition
+  post_opts: 
+    - showTopics
+    - deleteTopic
+    - showSimilar
+    - fuseTopics
+    - sortTopics
+    - undoLast
+    - resetTM
+
+deleteTopic:
+  title: Remove Topics from Model
+  post_opts: 
+    - showTopics
+    - deleteTopic
+    - showSimilar
+    - fuseTopics
+    - sortTopics
+    - undoLast
+    - resetTM
+
+showSimilar:
+  title: Suggest Similar Topics
+  post_opts: 
+    - showTopics
+    - deleteTopic
+    - showSimilar
+    - fuseTopics
+    - sortTopics
+    - undoLast
+    - resetTM
+
+fuseTopics:
+  title: Merge Topics
+  post_opts: 
+    - showTopics
+    - deleteTopic
+    - showSimilar
+    - fuseTopics
+    - sortTopics
+    - undoLast
+    - resetTM
+
+sortTopics:
+  title: Sort Topics according to their size
+  post_opts: 
+    - showTopics
+    - deleteTopic
+    - showSimilar
+    - fuseTopics
+    - sortTopics
+    - undoLast
+    - resetTM
+
+undoLast:
+  title: Undo last modification of TM
+  post_opts: 
+    - showTopics
+    - deleteTopic
+    - showSimilar
+    - fuseTopics
+    - sortTopics
+    - undoLast
+    - resetTM
+
+resetTM:
+  title: Reset Topic Model
+  post_opts: 
+    - showTopics
+    - deleteTopic
+    - showSimilar
+    - fuseTopics
+    - sortTopics
+    - undoLast
+    - resetTM
+
+deleteTM:
+  title: Delete an Existing Topic Model
+
+
 
 extractPipe:
   title: Extracción del pipeline para importación de datos con Mallet (previo a inferencia)
@@ -127,13 +228,6 @@ inference:
     - parameters:
         S24Ever: Usar modelos de Semantic Scholar (Computer Science)
         Crunch4Ever: Usar modelos de CrunchBase
-
-editTM:
-  title: Editar un modelo de tópicos estático
-  options:
-    - parameters:
-        S24Ever: Editar modelos de Semantic Scholar (Computer Science)
-        Crunch4Ever: Editar modelos de CrunchBase
 
 scalability:
   title: Validación de modelos de tópicos

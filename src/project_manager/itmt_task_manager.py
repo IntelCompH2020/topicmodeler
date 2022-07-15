@@ -90,6 +90,10 @@ class ITMTTaskManager(BaseTaskManager):
         self.allWdLists = None
         self.allTMmodels = None
 
+        # State variable, necessary to keep track for the curation of a
+        # particular Topic Model
+        self.selectedTM = None
+
         super().__init__(p2p, p2parquet, p2wdlist, config_fname=config_fname,
                          metadata_fname=metadata_fname)
 
@@ -194,7 +198,7 @@ class ITMTTaskManager(BaseTaskManager):
         This method loads all the available Topic Models previously created by the user ITMTTaskManager's 'allTMmodels' attribute as a dictionary object, which is characterized by one dictionary entry per Topic Model, the key and the value being the absolute path to the model and a dictionary with the corresponding metadata, respectively. To do so, it invokes the script from the folder 'src topicmodeling' with the option 'listTMmodels'.
         """
 
-        cmd = 'python src/topicmodeling/manageModels.py --listTMmodels --path_models '
+        cmd = 'python src/topicmodeling/manageModels.py --listTMmodels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -601,6 +605,130 @@ class ITMTTaskManager(BaseTaskManager):
         self.load_listTMmodels()
 
         return
+
+    def delete_TMmodel(self, TMmodel):
+        """
+        This method deletes the topic model 'TMmodel' from the Topic Model folder.
+
+        To do so, it invokes the script from the folder 'src/manageModels' with the option
+        'deleteTMmodel'.
+
+        Parameters
+        ----------
+        TMmodel : str
+            Name of the model that will be deleted
+
+        Returns
+        -------
+        status : int
+            - 0 if the topic model could not be deleted
+            - 1 if the topic model was deleted successfully
+        """
+        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --deleteTMmodel ' + TMmodel
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+            if status.decode('utf8') == '1':
+                print('The topic model was deleted')
+            else:
+                print('Deletion failed')
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            print('Deletion failed')
+
+        # Reload the list of word lists to consider the one deleted during the current execution
+        self.load_listTMmodels()
+
+        return status
+
+    def rename_TMmodel(self, oldModel, newModel):
+        """
+        This method renames the topic model 'oldModel' into newModel
+
+        To do so, it invokes the script from the folder 'src/manageModels' with the option
+        'renameTM'.
+
+        Parameters
+        ----------
+        oldModel : str
+            Name of the model that will be renamed
+        newModel : str
+            New name for the topic model
+
+        Returns
+        -------
+        status : int
+            - 0 if the topic model could not be renamed
+            - 1 if the topic model was renamed successfully
+        """
+        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --renameTM ' + oldModel + ' ' + newModel
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+            if status.decode('utf8') == '1':
+                print('The topic model was renamed')
+            else:
+                print('Renaming of the topic model failed')
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            print('Renaming of the topic model failed')
+
+        # Reload the list of word lists to consider the one deleted during the current execution
+        self.load_listTMmodels()
+
+        return status
+
+    def copy_TMmodel(self, oldModel, newModel):
+        """
+        This method makes a copy of an existing topic model 'oldModel' into newModel
+
+        To do so, it invokes the script from the folder 'src/manageModels' with the option
+        'copyTM'.
+
+        Parameters
+        ----------
+        oldModel : str
+            Name of the model that will be copied
+        newModel : str
+            Name for the copy
+
+        Returns
+        -------
+        status : int
+            - 0 if the topic model could not be copied
+            - 1 if the topic model was copied successfully
+        """
+        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --copyTM ' + oldModel + ' ' + newModel
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+            if status.decode('utf8') == '1':
+                print('The topic model was copied')
+            else:
+                print('Copy of the topic model failed')
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            print('Copy of the topic model failed')
+
+        # Reload the list of word lists to consider the one deleted during the current execution
+        self.load_listTMmodels()
+
+        return status
 
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
@@ -1111,6 +1239,66 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         return
 
+    def deleteTM(self):
+        """
+        Delete an Existing Topic Model
+        """
+
+        # Show available topic models
+        self.listTM()
+
+        allTMmodels = json.loads(self.allTMmodels)
+        for TMmodel in allTMmodels.keys():
+            Y_or_N = input(
+                f"\nRemove Topic Model {allTMmodels[TMmodel]['name']} [Y/N]?: ")
+            if Y_or_N.upper() == "Y":
+                if request_confirmation(
+                        msg='Topic Model ' + allTMmodels[TMmodel]['name'] + ' will be deleted. Proceed?'):
+                    self.delete_TMmodel(TMmodel)
+        return
+
+    def renameTM(self):
+        """
+        Rename an Existing Topic Model
+        """
+
+        # Show available topic models
+        self.listTM()
+
+        allTMmodels = json.loads(self.allTMmodels)
+        allTMmodels = [el for el in allTMmodels.keys()]
+        opt = query_options(allTMmodels, 'Select the topic model to rename')
+        oldModel = allTMmodels[opt]
+
+        newModel = ''
+        while not len(newModel):
+            newModel = input('Enter the new model name: ')
+
+        self.rename_TMmodel(oldModel, newModel)
+
+        return
+
+    def copyTM(self):
+        """
+        Make a copy of an Existing Topic Model
+        """
+
+        # Show available topic models
+        self.listTM()
+
+        allTMmodels = json.loads(self.allTMmodels)
+        allTMmodels = [el for el in allTMmodels.keys()]
+        opt = query_options(allTMmodels, 'Select the topic model that you wish to copy')
+        oldModel = allTMmodels[opt]
+
+        newModel = ''
+        while not len(newModel):
+            newModel = input('Enter the name of the copy: ')
+
+        self.copy_TMmodel(oldModel, newModel)
+
+        return
+
     def trainTM(self, trainer):
         """
         Topic modeling trainer. Initial training of a topic model
@@ -1607,251 +1795,32 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         return TMparam
 
-    def corpus2JSON(self):
-        """
-        This is linked to the ITMTrainer only tentatively, since it should
-        be part of WP4 tools
+    def editTM(self):
+        print('select_method')
 
-        Right now, it only runs the generation of the JSON files that are
-        needed for ingestion of the corpus in Solr
-        """
+    def showTopics(self):
+        print('showTopics')
 
-        print('corpus2JSON')
+    def deleteTopic(self):
+        print('deleteTopics')
 
-        cmd = '/export/usuarios_ml4ds/jarenas/script-spark/script-spark ' + \
-              '-C /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json ' + \
-              '-c 4 -N 10 -S "corpus2JSON.py"'
-        try:
-            self.logger.info(f'-- -- Running command {cmd}')
-            check_output(args=cmd, shell=True)
-        except:
-            self.logger.error('-- -- Execution of script failed')
+    def showSimilar(self):
+        print('showSimilar')
 
-        return
+    def fuseTopics(self):
+        print('fuseTopics')
 
-    def extractPipe(self, corpus):
+    def sortTopics(self):
+        print('sortTopics')
 
-        # A proper corpus with BoW, vocabulary, etc .. should exist
-        path_corpus = self.p2p.joinpath(
-            corpus).joinpath(self._dir_struct['corpus'])
-        path_corpus = path_corpus.joinpath(
-            corpus).joinpath(corpus + '_corpus.mallet')
-        if not path_corpus.is_file():
-            self.logger.error(
-                '-- Pipe extraction: Could not locate corpus file')
-            return
+    def undoLast(self):
+        print('undoLast')
 
-        # Create auxiliary file with only first line from the original corpus file
-        path_txt = self.p2p.joinpath(corpus).joinpath(
-            self._dir_struct['corpus'])
-        path_txt = path_txt.joinpath(corpus).joinpath(corpus + '_corpus.txt')
-        with path_txt.open('r', encoding='utf8') as f:
-            first_line = f.readline()
+    def resetTM(self):
+        print('resetTM')
 
-        path_aux = self.p2p.joinpath(corpus).joinpath(
-            self._dir_struct['corpus'])
-        path_aux = path_aux.joinpath(corpus).joinpath('corpus_aux.txt')
-        with path_aux.open('w', encoding='utf8') as fout:
-            fout.write(first_line + '\n')
 
-        ##################################################
-        # We perform the import with the only goal to keep a small
-        # file containing the pipe
-        self.logger.info('-- Extracting pipeline')
-        mallet_path = Path(self.cf.get('TM', 'mallet_path'))
-        path_pipe = self.p2p.joinpath(corpus).joinpath(
-            self._dir_struct['corpus'])
-        path_pipe = path_pipe.joinpath(corpus).joinpath('import.pipe')
-        cmd = str(mallet_path) + \
-            ' import-file --use-pipe-from %s --input %s --output %s'
-        cmd = cmd % (path_corpus, path_aux, path_pipe)
-
-        try:
-            self.logger.info(f'-- Running command {cmd}')
-            check_output(args=cmd, shell=True)
-        except:
-            self.logger.error('-- Failed to extract pipeline. Revise command')
-
-        # Remove auxiliary file
-        path_aux.unlink()
-
-        return
-
-    def inference(self, corpus):
-
-        # A proper corpus should exist with the corresponding ipmortation pipe
-        path_pipe = self.p2p.joinpath(corpus).joinpath(
-            self._dir_struct['corpus'])
-        path_pipe = path_pipe.joinpath(corpus).joinpath('import.pipe')
-        if not path_pipe.is_file():
-            self.logger.error(
-                '-- Inference error. Importation pipeline not found')
-            return
-
-        # Ask user which model should be used for inference
-        # Final models are enumerated as corpus_givenName
-        path_model = self.p2p.joinpath(
-            corpus).joinpath(self._dir_struct['modtm'])
-        models = sorted([d for d in path_model.iterdir() if d.is_dir()])
-        display_models = [' '.join(d.name.split('_')) for d in models]
-        selection = query_options(
-            display_models, 'Select model for the inference')
-        path_model = models[selection]
-        inferencer = path_model.joinpath('inferencer.mallet')
-
-        # Ask user to provide a valid text file for performing inference
-        # Format of the text will be one document per line, only text
-        # Note all created files will be hosted in same directory, so a good idea
-        # would be to put the file into an empty directory for this purpose
-        while True:
-            txt_file = input(
-                'Introduce complete path to file with texts for the inference: ')
-            txt_file = Path(txt_file)
-            if not txt_file.is_file():
-                print('Please provide a valid file name')
-                continue
-            else:
-                break
-
-        # The following files will be generated in the same folder
-        corpus_file = Path(str(txt_file) + '_corpus.txt')  # lemmatized texts
-        corpus_mallet_inf = Path(
-            str(txt_file) + '_corpus.mallet')  # mallet serialized
-        doc_topics_file = Path(
-            str(txt_file) + '_doc-topics.txt')  # Topic proportions
-        # Reorder topic proportions in numpy format
-        doc_topics_file_npy = Path(str(txt_file) + '_doc-topics.npy')
-
-        # Start processing pipeline
-
-        # ========================
-        # 1. Lemmatization
-        # ========================
-        self.logger.info('-- Inference: Lemmatizing Titles and Abstracts ...')
-        lemmas_server = self.cf.get('Lemmatizer', 'server')
-        stw_file = Path(self.cf.get('Lemmatizer', 'default_stw_file'))
-        dict_eq_file = Path(self.cf.get('Lemmatizer', 'default_dict_eq_file'))
-        POS = self.cf.get('Lemmatizer', 'POS')
-        concurrent_posts = int(self.cf.get('Lemmatizer', 'concurrent_posts'))
-        removenumbers = self.cf.get('Lemmatizer', 'removenumbers') == 'True'
-        keepSentence = self.cf.get('Lemmatizer', 'keepSentence') == 'True'
-
-        # Initialize lemmatizer
-        ENLM = ENLemmatizer(lemmas_server=lemmas_server, stw_file=stw_file,
-                            dict_eq_file=dict_eq_file, POS=POS, removenumbers=removenumbers,
-                            keepSentence=keepSentence, logger=self.logger)
-        with txt_file.open('r', encoding='utf8') as fin:
-            docs = fin.readlines()
-        docs = [[el.split()[0], ' '.join(el.split()[1:])] for el in docs]
-        docs = [[el[0], clean_utf8(el[1])] for el in docs]
-        lemasBatch = ENLM.lemmatizeBatch(docs, processes=concurrent_posts)
-        # Remove entries that where not lemmatized correctly
-        lemasBatch = [[el[0], clean_utf8(el[1])]
-                      for el in lemasBatch if len(el[1])]
-
-        # ========================
-        # 2. Tokenization and application of specific stopwords
-        #    and equivalences for the corpus
-        # ========================
-        self.logger.info(
-            '-- Inference: Applying corpus specific stopwords and equivalences')
-        token_regexp = javare.compile(
-            self.cf.get('CorpusGeneration', 'token_regexp'))
-        corpus_stw = Path(self.cf.get(corpus, 'stw_file'))
-        corpus_eqs = Path(self.cf.get(corpus, 'eq_file'))
-
-        # Initialize Cleaner
-        stwEQ = stwEQcleaner(stw_files=[stw_file, corpus_stw], dict_eq_file=corpus_eqs,
-                             logger=self.logger)
-        # tokenization with regular expression
-        id_lemas = [[el[0], ' '.join(token_regexp.findall(el[1]))]
-                    for el in lemasBatch]
-        # stopwords and equivalences
-        id_lemas = [[el[0], stwEQ.cleanstr(el[1])] for el in id_lemas]
-        # No need to apply other transformations, because only known words
-        # in the vocabulary will be used by Mallet for the topic-inference
-        with corpus_file.open('w', encoding='utf8') as fout:
-            [fout.write(el[0] + ' 0 ' + el[1] + '\n') for el in id_lemas]
-
-        # ========================
-        # 3. Importing Data to mallet
-        # ========================
-        self.logger.info('-- Inference: Mallet Data Import')
-        mallet_path = Path(self.cf.get('TM', 'mallet_path'))
-
-        cmd = str(mallet_path) + \
-            ' import-file --use-pipe-from %s --input %s --output %s'
-        cmd = cmd % (path_pipe, corpus_file, corpus_mallet_inf)
-
-        try:
-            self.logger.info(f'-- Running command {cmd}')
-            check_output(args=cmd, shell=True)
-        except:
-            self.logger.error(
-                '-- Mallet failed to import data. Revise command')
-            return
-
-        # ========================
-        # 4. Get topic proportions
-        # ========================
-        self.logger.info('-- Inference: Inferring Topic Proportions')
-        num_iterations = int(self.cf.get('TM', 'num_iterations_inf'))
-        doc_topic_thr = float(self.cf.get('TM', 'doc_topic_thr'))
-
-        cmd = str(mallet_path) + \
-            ' infer-topics --inferencer %s --input %s --output-doc-topics %s ' + \
-            ' --doc-topics-threshold ' + str(doc_topic_thr) + \
-            ' --num-iterations ' + str(num_iterations)
-        cmd = cmd % (inferencer, corpus_mallet_inf, doc_topics_file)
-
-        try:
-            self.logger.info(f'-- Running command {cmd}')
-            check_output(args=cmd, shell=True)
-        except:
-            self.logger.error('-- Mallet inference failed. Revise command')
-            return
-
-        # ========================
-        # 5. Apply model editions
-        # ========================
-        self.logger.info(
-            '-- Inference: Applying model edition transformations')
-        # Load thetas file, apply model edition actions, and save as a numpy array
-        # We need to read the number of topics, e.g. from train_config file
-        train_config = path_model.joinpath('train.config')
-        with train_config.open('r', encoding='utf8') as fin:
-            num_topics = [el for el in fin.readlines(
-            ) if el.startswith('num-topics')][0]
-            num_topics = int(num_topics.strip().split(' = ')[1])
-        cols = [k for k in np.arange(2, num_topics + 2)]
-        thetas32 = np.loadtxt(doc_topics_file, delimiter='\t',
-                              dtype=np.float32, usecols=cols)
-        model_edits = path_model.joinpath('model_edits.txt')
-        if model_edits.is_file():
-            with model_edits.open('r', encoding='utf8') as fin:
-                for line in fin:
-                    line_els = line.strip().split()
-                    if line_els[0] == 's':
-                        idx = [int(el) for el in line_els[1:]]
-                        thetas32 = thetas32[:, idx]
-                    elif line_els[0] == 'd':
-                        tpc = int(line_els[1])
-                        ntopics = thetas32.shape[1]
-                        tpc_keep = [k for k in range(ntopics) if k != tpc]
-                        thetas32 = thetas32[:, tpc_keep]
-                        thetas32 = normalize(thetas32, axis=1, norm='l1')
-                    elif line_els[0] == 'f':
-                        tpcs = [int(el) for el in line_els[1:]]
-                        thet = np.sum(thetas32[:, tpcs], axis=1)
-                        thetas32[:, tpcs[0]] = thet
-                        thetas32 = np.delete(thetas32, tpcs[1:], 1)
-
-        thetas32 = normalize(thetas32, axis=1, norm='l1')
-        np.save(doc_topics_file_npy, thetas32)
-
-        return
-
-    def editTM(self, corpus):
+    def oldeditTM(self, corpus):
 
         # Select model for edition
         # Final models are enumerated as corpus_givenName
@@ -2107,6 +2076,250 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         if modified:
             if request_confirmation(msg='Save modified model?'):
                 tm.save_npz(path_model.joinpath('modelo.npz'))
+
+        return
+
+    def corpus2JSON(self):
+        """
+        This is linked to the ITMTrainer only tentatively, since it should
+        be part of WP4 tools
+
+        Right now, it only runs the generation of the JSON files that are
+        needed for ingestion of the corpus in Solr
+        """
+
+        print('corpus2JSON')
+
+        cmd = '/export/usuarios_ml4ds/jarenas/script-spark/script-spark ' + \
+              '-C /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json ' + \
+              '-c 4 -N 10 -S "corpus2JSON.py"'
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+
+        return
+
+    def extractPipe(self, corpus):
+
+        # A proper corpus with BoW, vocabulary, etc .. should exist
+        path_corpus = self.p2p.joinpath(
+            corpus).joinpath(self._dir_struct['corpus'])
+        path_corpus = path_corpus.joinpath(
+            corpus).joinpath(corpus + '_corpus.mallet')
+        if not path_corpus.is_file():
+            self.logger.error(
+                '-- Pipe extraction: Could not locate corpus file')
+            return
+
+        # Create auxiliary file with only first line from the original corpus file
+        path_txt = self.p2p.joinpath(corpus).joinpath(
+            self._dir_struct['corpus'])
+        path_txt = path_txt.joinpath(corpus).joinpath(corpus + '_corpus.txt')
+        with path_txt.open('r', encoding='utf8') as f:
+            first_line = f.readline()
+
+        path_aux = self.p2p.joinpath(corpus).joinpath(
+            self._dir_struct['corpus'])
+        path_aux = path_aux.joinpath(corpus).joinpath('corpus_aux.txt')
+        with path_aux.open('w', encoding='utf8') as fout:
+            fout.write(first_line + '\n')
+
+        ##################################################
+        # We perform the import with the only goal to keep a small
+        # file containing the pipe
+        self.logger.info('-- Extracting pipeline')
+        mallet_path = Path(self.cf.get('TM', 'mallet_path'))
+        path_pipe = self.p2p.joinpath(corpus).joinpath(
+            self._dir_struct['corpus'])
+        path_pipe = path_pipe.joinpath(corpus).joinpath('import.pipe')
+        cmd = str(mallet_path) + \
+            ' import-file --use-pipe-from %s --input %s --output %s'
+        cmd = cmd % (path_corpus, path_aux, path_pipe)
+
+        try:
+            self.logger.info(f'-- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- Failed to extract pipeline. Revise command')
+
+        # Remove auxiliary file
+        path_aux.unlink()
+
+        return
+
+    def inference(self, corpus):
+
+        # A proper corpus should exist with the corresponding ipmortation pipe
+        path_pipe = self.p2p.joinpath(corpus).joinpath(
+            self._dir_struct['corpus'])
+        path_pipe = path_pipe.joinpath(corpus).joinpath('import.pipe')
+        if not path_pipe.is_file():
+            self.logger.error(
+                '-- Inference error. Importation pipeline not found')
+            return
+
+        # Ask user which model should be used for inference
+        # Final models are enumerated as corpus_givenName
+        path_model = self.p2p.joinpath(
+            corpus).joinpath(self._dir_struct['modtm'])
+        models = sorted([d for d in path_model.iterdir() if d.is_dir()])
+        display_models = [' '.join(d.name.split('_')) for d in models]
+        selection = query_options(
+            display_models, 'Select model for the inference')
+        path_model = models[selection]
+        inferencer = path_model.joinpath('inferencer.mallet')
+
+        # Ask user to provide a valid text file for performing inference
+        # Format of the text will be one document per line, only text
+        # Note all created files will be hosted in same directory, so a good idea
+        # would be to put the file into an empty directory for this purpose
+        while True:
+            txt_file = input(
+                'Introduce complete path to file with texts for the inference: ')
+            txt_file = Path(txt_file)
+            if not txt_file.is_file():
+                print('Please provide a valid file name')
+                continue
+            else:
+                break
+
+        # The following files will be generated in the same folder
+        corpus_file = Path(str(txt_file) + '_corpus.txt')  # lemmatized texts
+        corpus_mallet_inf = Path(
+            str(txt_file) + '_corpus.mallet')  # mallet serialized
+        doc_topics_file = Path(
+            str(txt_file) + '_doc-topics.txt')  # Topic proportions
+        # Reorder topic proportions in numpy format
+        doc_topics_file_npy = Path(str(txt_file) + '_doc-topics.npy')
+
+        # Start processing pipeline
+
+        # ========================
+        # 1. Lemmatization
+        # ========================
+        self.logger.info('-- Inference: Lemmatizing Titles and Abstracts ...')
+        lemmas_server = self.cf.get('Lemmatizer', 'server')
+        stw_file = Path(self.cf.get('Lemmatizer', 'default_stw_file'))
+        dict_eq_file = Path(self.cf.get('Lemmatizer', 'default_dict_eq_file'))
+        POS = self.cf.get('Lemmatizer', 'POS')
+        concurrent_posts = int(self.cf.get('Lemmatizer', 'concurrent_posts'))
+        removenumbers = self.cf.get('Lemmatizer', 'removenumbers') == 'True'
+        keepSentence = self.cf.get('Lemmatizer', 'keepSentence') == 'True'
+
+        # Initialize lemmatizer
+        ENLM = ENLemmatizer(lemmas_server=lemmas_server, stw_file=stw_file,
+                            dict_eq_file=dict_eq_file, POS=POS, removenumbers=removenumbers,
+                            keepSentence=keepSentence, logger=self.logger)
+        with txt_file.open('r', encoding='utf8') as fin:
+            docs = fin.readlines()
+        docs = [[el.split()[0], ' '.join(el.split()[1:])] for el in docs]
+        docs = [[el[0], clean_utf8(el[1])] for el in docs]
+        lemasBatch = ENLM.lemmatizeBatch(docs, processes=concurrent_posts)
+        # Remove entries that where not lemmatized correctly
+        lemasBatch = [[el[0], clean_utf8(el[1])]
+                      for el in lemasBatch if len(el[1])]
+
+        # ========================
+        # 2. Tokenization and application of specific stopwords
+        #    and equivalences for the corpus
+        # ========================
+        self.logger.info(
+            '-- Inference: Applying corpus specific stopwords and equivalences')
+        token_regexp = javare.compile(
+            self.cf.get('CorpusGeneration', 'token_regexp'))
+        corpus_stw = Path(self.cf.get(corpus, 'stw_file'))
+        corpus_eqs = Path(self.cf.get(corpus, 'eq_file'))
+
+        # Initialize Cleaner
+        stwEQ = stwEQcleaner(stw_files=[stw_file, corpus_stw], dict_eq_file=corpus_eqs,
+                             logger=self.logger)
+        # tokenization with regular expression
+        id_lemas = [[el[0], ' '.join(token_regexp.findall(el[1]))]
+                    for el in lemasBatch]
+        # stopwords and equivalences
+        id_lemas = [[el[0], stwEQ.cleanstr(el[1])] for el in id_lemas]
+        # No need to apply other transformations, because only known words
+        # in the vocabulary will be used by Mallet for the topic-inference
+        with corpus_file.open('w', encoding='utf8') as fout:
+            [fout.write(el[0] + ' 0 ' + el[1] + '\n') for el in id_lemas]
+
+        # ========================
+        # 3. Importing Data to mallet
+        # ========================
+        self.logger.info('-- Inference: Mallet Data Import')
+        mallet_path = Path(self.cf.get('TM', 'mallet_path'))
+
+        cmd = str(mallet_path) + \
+            ' import-file --use-pipe-from %s --input %s --output %s'
+        cmd = cmd % (path_pipe, corpus_file, corpus_mallet_inf)
+
+        try:
+            self.logger.info(f'-- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self.logger.error(
+                '-- Mallet failed to import data. Revise command')
+            return
+
+        # ========================
+        # 4. Get topic proportions
+        # ========================
+        self.logger.info('-- Inference: Inferring Topic Proportions')
+        num_iterations = int(self.cf.get('TM', 'num_iterations_inf'))
+        doc_topic_thr = float(self.cf.get('TM', 'doc_topic_thr'))
+
+        cmd = str(mallet_path) + \
+            ' infer-topics --inferencer %s --input %s --output-doc-topics %s ' + \
+            ' --doc-topics-threshold ' + str(doc_topic_thr) + \
+            ' --num-iterations ' + str(num_iterations)
+        cmd = cmd % (inferencer, corpus_mallet_inf, doc_topics_file)
+
+        try:
+            self.logger.info(f'-- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- Mallet inference failed. Revise command')
+            return
+
+        # ========================
+        # 5. Apply model editions
+        # ========================
+        self.logger.info(
+            '-- Inference: Applying model edition transformations')
+        # Load thetas file, apply model edition actions, and save as a numpy array
+        # We need to read the number of topics, e.g. from train_config file
+        train_config = path_model.joinpath('train.config')
+        with train_config.open('r', encoding='utf8') as fin:
+            num_topics = [el for el in fin.readlines(
+            ) if el.startswith('num-topics')][0]
+            num_topics = int(num_topics.strip().split(' = ')[1])
+        cols = [k for k in np.arange(2, num_topics + 2)]
+        thetas32 = np.loadtxt(doc_topics_file, delimiter='\t',
+                              dtype=np.float32, usecols=cols)
+        model_edits = path_model.joinpath('model_edits.txt')
+        if model_edits.is_file():
+            with model_edits.open('r', encoding='utf8') as fin:
+                for line in fin:
+                    line_els = line.strip().split()
+                    if line_els[0] == 's':
+                        idx = [int(el) for el in line_els[1:]]
+                        thetas32 = thetas32[:, idx]
+                    elif line_els[0] == 'd':
+                        tpc = int(line_els[1])
+                        ntopics = thetas32.shape[1]
+                        tpc_keep = [k for k in range(ntopics) if k != tpc]
+                        thetas32 = thetas32[:, tpc_keep]
+                        thetas32 = normalize(thetas32, axis=1, norm='l1')
+                    elif line_els[0] == 'f':
+                        tpcs = [int(el) for el in line_els[1:]]
+                        thet = np.sum(thetas32[:, tpcs], axis=1)
+                        thetas32[:, tpcs[0]] = thet
+                        thetas32 = np.delete(thetas32, tpcs[1:], 1)
+
+        thetas32 = normalize(thetas32, axis=1, norm='l1')
+        np.save(doc_topics_file_npy, thetas32)
 
         return
 
