@@ -1590,16 +1590,12 @@ class ProdLDATrainer(Trainer):
 
         # Calculate beta matrix
         betas = avitm.get_topic_word_distribution()
-        self._logger.info(betas.shape)
 
         # Create vocabulary list and calculate beta matrix
         betas = avitm.get_topic_word_distribution()
         vocab = self._train_dataset.idx2token
-        #for top in np.arange(self._n_components):
-        #    for idx, word in self._id2token.items():
-        #        vocab.append(word)
-        self._logger.info(len(vocab))
-            
+
+        # Create TMmodel
         tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab)
@@ -1793,28 +1789,14 @@ class CTMTrainer(Trainer):
         # Recalculate topic weights to avoid errors due to sparsification
         alphas = np.asarray(np.mean(thetas32, axis=0)).ravel()
 
-        # Calculate beta matrix
+        # Calculate beta matrix and vocab list
         betas = ctm.get_topic_word_distribution()
-
-        # Create vocabulary files and calculate beta matrix
-        vocab_size = betas.shape[1]
-        vocab = []
-        term_freq = np.zeros((vocab_size,))
-
-        for top in np.arange(self._n_components):
-            for idx, word in self._id2token.items():
-                vocab.append(word)
-                cnt = betas[top][idx]
-                term_freq[idx] += cnt  # Cuántas veces aparece una palabra
-
-        vocabfreq_file = modelFolder.joinpath('vocab_freq.txt')
-        with vocabfreq_file.open('w', encoding='utf8') as fout:
-            [fout.write(el[0] + '\t' + str(int(el[1])) + '\n')
-             for el in zip(vocab, term_freq)]
-        self._logger.debug('-- -- CTM training: Vocabulary file generated')
-
-        tm = TMmodel(betas=betas, thetas=thetas32, alphas=alphas,
-                     vocabfreq_file=vocabfreq_file)
+        vocab = self._train_dts.idx2token
+        
+        # Create TMmodel
+        tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
+        tm.create(betas=betas, thetas=thetas32, alphas=alphas,
+                  vocab=vocab)
 
         return tm
 

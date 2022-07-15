@@ -351,11 +351,7 @@ class TMmodel(object):
             self._betas_ds += 1e-12
         deno = np.reshape((sum(np.log(self._betas_ds)) /
                           self._ntopics), (self._size_vocab, 1))
-        self._logger.info(self._ntopics)
-        self._logger.info(deno.shape)
         deno = np.ones((self._ntopics, 1)).dot(deno.T)
-        self._logger.info(deno.shape)
-        self._logger.info(self._betas_ds.shape)
         self._betas_ds = self._betas_ds * (np.log(self._betas_ds) - deno)
 
     def _calculate_topic_entropy(self):
