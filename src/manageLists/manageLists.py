@@ -173,6 +173,11 @@ class ListManager(object):
         try:
             path_copy = name.with_name(f"{name.stem}-copy.json")
             shutil.copy(name, path_copy)
+            with path_copy.open("r", encoding="utf8") as fin:
+                WdList = json.load(fin)
+            WdList["name"] = path_copy.stem
+            with path_copy.open("w", encoding="utf-8") as fout:
+                json.dump(WdList, fout, ensure_ascii=False, indent=2, default=str)
             return 1
         except:
             return 0

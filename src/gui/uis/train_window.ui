@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Smooth Spoon</string>
+   <string>UTLIT/TM</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -6382,181 +6382,6 @@ QTabBar::tab {
                                    <number>0</number>
                                   </property>
                                   <item>
-                                   <widget class="QFrame" name="frame_alpha_9">
-                                    <property name="styleSheet">
-                                     <string notr="true">border-bottom: 0.5px solid #FFFFFF;
-border-right: 0.5px solid #FFFFFF;
-border-top: 1px solid #FFFFFF;
-</string>
-                                    </property>
-                                    <property name="frameShape">
-                                     <enum>QFrame::NoFrame</enum>
-                                    </property>
-                                    <property name="frameShadow">
-                                     <enum>QFrame::Plain</enum>
-                                    </property>
-                                    <layout class="QHBoxLayout" name="horizontalLayout_106">
-                                     <item>
-                                      <widget class="QLabel" name="label_alpha_9">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>16777215</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="font">
-                                        <font>
-                                         <family>Avenir</family>
-                                         <pointsize>13</pointsize>
-                                         <weight>75</weight>
-                                         <italic>false</italic>
-                                         <bold>true</bold>
-                                        </font>
-                                       </property>
-                                       <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;'CombinedTM', 'ZeroShotTM', 'SuperCTM' or 'BetaCTM'&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-border:None;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string>CTM model type:</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QComboBox" name="comboBox_ctm_model_type">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="minimumSize">
-                                        <size>
-                                         <width>119</width>
-                                         <height>0</height>
-                                        </size>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>100</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">/*COMBO BOX*/
-QComboBox {
-    border: 1px solid black;
-    border-radius: 3px;
-    padding: 1px 18px 1px 3px;
-    min-width: 6em;
-    background-color:#FFFFFF;
-	color:black;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-}
-
-
-QComboBox:on { /* shift the text when the popup opens */
-    padding-top: 3px;
-    padding-left: 4px;
-}
-
-</string>
-                                       </property>
-                                       <item>
-                                        <property name="text">
-                                         <string>CombinedTM</string>
-                                        </property>
-                                       </item>
-                                       <item>
-                                        <property name="text">
-                                         <string>ZeroShotTM</string>
-                                        </property>
-                                       </item>
-                                       <item>
-                                        <property name="text">
-                                         <string>SuperCTM</string>
-                                        </property>
-                                       </item>
-                                       <item>
-                                        <property name="text">
-                                         <string>BetaCTM</string>
-                                        </property>
-                                       </item>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_1_good">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_1_bad">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                    </layout>
-                                   </widget>
-                                  </item>
-                                  <item>
                                    <widget class="QFrame" name="frame_alpha_11">
                                     <property name="styleSheet">
                                      <string notr="true">border-bottom: 0.5px solid #FFFFFF;
@@ -6661,7 +6486,7 @@ QComboBox:on { /* shift the text when the popup opens */
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_21_good">
+                                      <widget class="QLabel" name="checkBox_ctm_1_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -6690,7 +6515,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_21_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_1_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -7009,157 +6834,6 @@ border:none;</string>
                                     </layout>
                                    </widget>
                                   </item>
-                                 </layout>
-                                </item>
-                                <item>
-                                 <layout class="QVBoxLayout" name="layout_right_settings_ctm">
-                                  <property name="spacing">
-                                   <number>0</number>
-                                  </property>
-                                  <item>
-                                   <widget class="QFrame" name="frame_nr_iterations_13">
-                                    <property name="styleSheet">
-                                     <string notr="true">border-bottom: 0.5px solid #FFFFFF;
-border-left: 0.5px solid #FFFFFF;
-border-top: 1px solid #FFFFFF;
-</string>
-                                    </property>
-                                    <property name="frameShape">
-                                     <enum>QFrame::NoFrame</enum>
-                                    </property>
-                                    <property name="frameShadow">
-                                     <enum>QFrame::Plain</enum>
-                                    </property>
-                                    <layout class="QHBoxLayout" name="horizontalLayout_130">
-                                     <item>
-                                      <widget class="QLabel" name="label_nr_iterations_14">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>16777215</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="font">
-                                        <font>
-                                         <family>Avenir</family>
-                                         <pointsize>13</pointsize>
-                                         <weight>75</weight>
-                                         <italic>false</italic>
-                                         <bold>true</bold>
-                                        </font>
-                                       </property>
-                                       <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Number of total labels.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-border:None;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string>Label size:</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLineEdit" name="lineEdit_ctm_label_size">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="minimumSize">
-                                        <size>
-                                         <width>0</width>
-                                         <height>0</height>
-                                        </size>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>60</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_17_good">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_17_bad">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                    </layout>
-                                   </widget>
-                                  </item>
                                   <item>
                                    <widget class="QFrame" name="frame_nr_threads_9">
                                     <property name="styleSheet">
@@ -7174,9 +6848,9 @@ border-top: 0.5px solid #FFFFFF;
                                     <property name="frameShadow">
                                      <enum>QFrame::Plain</enum>
                                     </property>
-                                    <layout class="QHBoxLayout" name="horizontalLayout_109">
+                                    <layout class="QHBoxLayout" name="horizontalLayout_130">
                                      <item>
-                                      <widget class="QLabel" name="label_nr_threads_9">
+                                      <widget class="QLabel" name="label_nr_threads_11">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                                          <horstretch>0</horstretch>
@@ -7213,7 +6887,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLineEdit" name="lineEdit_batch_size_ctm">
+                                      <widget class="QLineEdit" name="lineEdit_batchsize_ctm">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -7244,7 +6918,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_4_good">
+                                      <widget class="QLabel" name="checkBox_ctm_0_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -7273,151 +6947,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_4_bad">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                    </layout>
-                                   </widget>
-                                  </item>
-                                  <item>
-                                   <widget class="QFrame" name="frame_nr_iterations_14">
-                                    <property name="styleSheet">
-                                     <string notr="true">border-bottom: 0.5px solid #FFFFFF;
-border-left: 0.5px solid #FFFFFF;
-border-top: 1px solid #FFFFFF;
-</string>
-                                    </property>
-                                    <property name="frameShape">
-                                     <enum>QFrame::NoFrame</enum>
-                                    </property>
-                                    <property name="frameShadow">
-                                     <enum>QFrame::Plain</enum>
-                                    </property>
-                                    <layout class="QHBoxLayout" name="horizontalLayout_133">
-                                     <item>
-                                      <widget class="QLabel" name="label_nr_iterations_15">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>16777215</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="font">
-                                        <font>
-                                         <family>Avenir</family>
-                                         <pointsize>13</pointsize>
-                                         <weight>75</weight>
-                                         <italic>false</italic>
-                                         <bold>true</bold>
-                                        </font>
-                                       </property>
-                                       <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Dictionary with the name of the weight parameter (key) and the weight (value) for each loss.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-border:None;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string>Loss weights:</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLineEdit" name="lineEdit_ctm_loss_weigths">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="minimumSize">
-                                        <size>
-                                         <width>0</width>
-                                         <height>0</height>
-                                        </size>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>60</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_18_good">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_18_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_0_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -8392,7 +7922,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_15_good">
+                                      <widget class="QLabel" name="checkBox_ctm_10_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -8421,7 +7951,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_15_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_10_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -8536,7 +8066,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_16_good">
+                                      <widget class="QLabel" name="checkBox_ctm_11_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -8565,7 +8095,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_16_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_11_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -8687,7 +8217,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_14_good">
+                                      <widget class="QLabel" name="checkBox_ctm_12_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -8716,7 +8246,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_14_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_12_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -8975,7 +8505,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_10_good">
+                                      <widget class="QLabel" name="checkBox_ctm_14_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -9004,7 +8534,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_10_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_14_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -9156,7 +8686,7 @@ QComboBox:on { /* shift the text when the popup opens */
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_11_good">
+                                      <widget class="QLabel" name="checkBox_ctm_15_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -9185,7 +8715,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_11_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_15_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -9321,7 +8851,7 @@ QComboBox:on { /* shift the text when the popup opens */
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_12_good">
+                                      <widget class="QLabel" name="checkBox_ctm_16_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -9350,7 +8880,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_12_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_16_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -9466,7 +8996,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_19_good">
+                                      <widget class="QLabel" name="checkBox_ctm_17_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -9495,7 +9025,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_19_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_17_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -9610,7 +9140,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_20_good">
+                                      <widget class="QLabel" name="checkBox_ctm_18_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -9639,7 +9169,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_20_bad">
+                                      <widget class="QLabel" name="checkBox_ctm_18_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>

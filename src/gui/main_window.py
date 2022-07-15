@@ -53,7 +53,7 @@ class MainWindow(QMainWindow):
         ########################################################################
         # Load UI
         ########################################################################
-        loadUi("src/gui/uis/main_window copy.ui", self)
+        loadUi("src/gui/uis/main_window.ui", self)
         self.setWindowIcon(QtGui.QIcon(
             'src/gui/resources/images/fuzzy_training.png'))
         self.setWindowTitle(Constants.SMOOTH_SPOON_TITLE)
