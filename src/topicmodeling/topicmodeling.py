@@ -1587,27 +1587,19 @@ class ProdLDATrainer(Trainer):
 
         # Calculate beta matrix
         betas = avitm.get_topic_word_distribution()
+        self._logger.info(betas.shape)
 
-        # Create vocabulary files and calculate beta matrix
+        # Create vocabulary list and calculate beta matrix
         betas = avitm.get_topic_word_distribution()
-        vocab_size = betas.shape[1]
-        vocab = []
-        term_freq = np.zeros((vocab_size,))
-
-        for top in np.arange(self._n_components):
-            for idx, word in self._id2token.items():
-                vocab.append(word)
-                cnt = betas[top][idx]
-                term_freq[idx] += cnt  # TODO: This is not the freq
-        # Save vocabulary and frequencies
-        vocabfreq_file = modelFolder.joinpath('vocab_freq.txt')
-        with vocabfreq_file.open('w', encoding='utf8') as fout:
-            [fout.write(el[0] + '\t' + str(int(el[1])) + '\n')
-             for el in zip(vocab, term_freq)]
-        self._logger.debug('-- -- ProdLDA training: Vocabulary file generated')
-
-        tm = TMmodel(betas=betas, thetas=thetas32, alphas=alphas,
-                     vocabfreq_file=vocabfreq_file)
+        vocab = self._train_dataset.idx2token
+        #for top in np.arange(self._n_components):
+        #    for idx, word in self._id2token.items():
+        #        vocab.append(word)
+        self._logger.info(len(vocab))
+            
+        tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
+        tm.create(betas=betas, thetas=thetas32, alphas=alphas,
+                  vocab=vocab)
 
         return tm
 
@@ -1882,7 +1874,6 @@ class CTMTrainer(Trainer):
                 fout.write(str(id) + ' 0 ' + ' '.join(el) + '\n')
                 id += 1
 
-        # TODO: Maybe is better to add another parameter to ask for inference type for beta and super
         if self._ctm_model_type == 'ZeroShotTM':
             ctm = ZeroShotTM(
                 logger=self._logger,
@@ -2163,8 +2154,6 @@ if __name__ == "__main__":
     parser.add_argument('--spark', action='store_true', default=False,
                         help='Indicate that spark cluster is available',
                         required=False)
-    parser.add_argument('--listTMmodels', action='store_true', default=False,
-                        help='List available Topic Models')
     parser.add_argument('--path_models', type=str, default=None,
                         help="path to topic models folder")
     parser.add_argument('--preproc', action='store_true', default=False,
@@ -2180,7 +2169,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.spark:
-
         # Spark imports and session generation
         import pyspark.sql.functions as F
         from pyspark.ml.feature import (CountVectorizer, StopWordsRemover,
@@ -2194,48 +2182,6 @@ if __name__ == "__main__":
 
     else:
         spark = None
-
-    # Listing of topic models
-    if args.listTMmodels:
-        if not args.path_models:
-            sys.exit('You need to indicate the location of training datasets')
-
-        allTMmodels = {}
-        modelFolders = [el for el in Path(args.path_models).iterdir()]
-
-        for TMf in modelFolders:
-            modelConfig = TMf.joinpath('trainconfig.json')
-            if modelConfig.is_file():
-                with modelConfig.open('r', encoding='utf8') as fin:
-                    modelInfo = json.load(fin)
-                    allTMmodels[modelInfo['name']] = {
-                        "name": modelInfo['name'],
-                        "description": modelInfo['description'],
-                        "visibility": modelInfo['visibility'],
-                        "trainer": modelInfo['trainer'],
-                        "TrDtSet": modelInfo['TrDtSet'],
-                        "creation_date": modelInfo['creation_date'],
-                        "hierarchy-level": modelInfo['hierarchy-level'],
-                        "htm-version": modelInfo['htm-version']
-                    }
-                submodelFolders = [el for el in TMf.iterdir() if not el.as_posix().endswith("modelFiles") and not el.as_posix().endswith("corpus.parquet") and not el.as_posix().endswith("_old")]
-                for sub_TMf in submodelFolders:
-                    submodelConfig = sub_TMf.joinpath('trainconfig.json')
-                    if submodelConfig.is_file():
-                        with submodelConfig.open('r', encoding='utf8') as fin:
-                            submodelInfo = json.load(fin)
-                            corpus = "Subcorpus created from " + str(modelInfo['name'])
-                            allTMmodels[submodelInfo['name']] = {
-                                "name": submodelInfo['name'],
-                                "description": submodelInfo['description'],
-                                "visibility": submodelInfo['visibility'],
-                                "trainer": submodelInfo['trainer'],
-                                "TrDtSet": corpus,
-                                "creation_date": submodelInfo['creation_date'],
-                                "hierarchy-level": submodelInfo['hierarchy-level'],
-                                "htm-version": submodelInfo['htm-version']
-                            }
-        sys.stdout.write(json.dumps(allTMmodels))
 
     # If the preprocessing flag is activated, we need to check availability of
     # configuration file, and run the preprocessing of the training data using

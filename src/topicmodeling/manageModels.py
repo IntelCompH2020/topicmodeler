@@ -86,24 +86,18 @@ class TMmodel(object):
             '-- -- -- Topic model object (TMmodel) successfully created')
 
     def create(self, betas=None, thetas=None, alphas=None, vocab=None):
-        """Create model from the relevant matrices
-
-        Inicializacion del model de topicos a partir de las matrices que lo caracterizan
-
-        Ademas de inicializar las correspondientes variables del objeto, se van a calcular
-        todas las variables asociadas y visualizaciones cuyo cómputo requiere tiempo
-        para que estén disponibles para el resto de métodos
+        """Creates the topic model from the relevant matrices that characterize it. In addition to the initialization of the corresponding object's variables, all the associated variables and visualizations which are computationally costly are calculated so they are available for the other methods.
 
         Parameters
         ----------
         betas:
-            Matriz numpy de tamaño n_topics x n_words (vocab de cada tópico)
+            Matrix of size n_topics x n_words (vocab of each topic)
         thetas:
-            Matriz numpy de tamaño n_docs x n_topics (composición documental)
-        alphas:
-            Vector de longitud n_topics, con la importancia de cada perfil
-        vocab:
-            Vocabulary. List of words sorted according to betas matrix
+            Matrix of size  n_docs x n_topics (document composition)
+        alphas: 
+            Vector of length n_topics containing the importance of each topic
+        vocab: list
+            List of words sorted according to betas matrix
         """
 
         # If folder already exists no further action is needed
@@ -199,7 +193,11 @@ class TMmodel(object):
             self._betas_ds += 1e-12
         deno = np.reshape((sum(np.log(self._betas_ds)) /
                           self._ntopics), (self._size_vocab, 1))
+        self._logger.info(self._ntopics)
+        self._logger.info(deno.shape)
         deno = np.ones((self._ntopics, 1)).dot(deno.T)
+        self._logger.info(deno.shape)
+        self._logger.info(self._betas_ds.shape)
         self._betas_ds = self._betas_ds * (np.log(self._betas_ds) - deno)
 
     def _calculate_topic_entropy(self):
@@ -213,6 +211,32 @@ class TMmodel(object):
         self._topic_entropy = - \
             np.sum(self._betas * np.log(self._betas), axis=1)
         self._topic_entropy = self._topic_entropy / np.log(self._size_vocab)
+    
+    def save_npz(self, npzfile):
+        """Saves the matrices that characterizes the topic model inot numpy npz file.
+
+        Parameters
+        ----------
+        npzfile: str
+            Name of the file in which the model will be saved
+        """
+
+        if isinstance(self._thetas, sparse.csr_matrix):
+            np.savez(npzfile, alphas=self._alphas, betas=self._betas,
+                     thetas_data=self._thetas.data, thetas_indices=self._thetas.indices,
+                     thetas_indptr=self._thetas.indptr, thetas_shape=self._thetas.shape,
+                     alphas_orig=self._alphas_orig, betas_orig=self._betas_orig,
+                     thetas_orig_data=self._thetas_orig.data, thetas_orig_indices=self._thetas_orig.indices,
+                     thetas_orig_indptr=self._thetas_orig.indptr, thetas_orig_shape=self._thetas_orig.shape,
+                     ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy,
+                     descriptions=self._descriptions, edits=self._edits)
+        else:
+            np.savez(npzfile, alphas=self._alphas, betas=self._betas, thetas=self._thetas, alphas_orig=self._alphas_orig, betas_orig=self._betas_orig, thetas_orig=self._thetas_orig, ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy,descriptions=self._descriptions, edits=self._edits)
+
+        if len(self._edits):
+            edits_file = Path(npzfile).parent.joinpath('model_edits.txt')
+            with edits_file.open('w', encoding='utf8') as fout:
+                [fout.write(el + '\n') for el in self._edits]
 
 
 ##############################################################################
