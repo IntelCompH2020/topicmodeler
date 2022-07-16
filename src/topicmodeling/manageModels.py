@@ -296,12 +296,12 @@ class TMmodel(object):
         np.save(self._TMfolder.joinpath('betas_ds.npy'), self._betas_ds)
         self._calculate_topic_entropy()
         np.save(self._TMfolder.joinpath('topic_entropy.npy'), self._topic_entropy)
-        self._tpc_descriptions = self.get_tpc_word_descriptions()
+        self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
         with self._TMfolder.joinpath('tpc_descriptions.txt').open('w', encoding='utf8') as fout:
-            fout.write('\n'.join([el[1] for el in self._tpc_descriptions]))
-        self._tpc_labels = self.get_tpc_labels()
+            fout.write('\n'.join(self._tpc_descriptions))
+        self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
         with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
-            fout.write('\n'.join([el[1] for el in self._tpc_labels]))
+            fout.write('\n'.join(self._tpc_labels))
 
         self._logger.info(
             '-- -- Topic model variables saved to file')
@@ -330,6 +330,7 @@ class TMmodel(object):
     def _load_alphas(self):
         if self._alphas is None:
             self._alphas = np.load(self._TMfolder.joinpath('alphas.npy'))
+            self._ntopics = self._alphas.shape[0]
 
     def _load_betas(self):
         if self._betas is None:
@@ -428,7 +429,7 @@ class TMmodel(object):
     def load_tpc_descriptions(self):
         if self._tpc_descriptions is None:
             with self._TMfolder.joinpath('tpc_descriptions.txt').open('r', encoding='utf8') as fin:
-                self._tpc_descriptions = fin.readlines()
+                self._tpc_descriptions = [el.strip() for el in fin.readlines()]
 
     def get_tpc_labels(self):
         """returns the labels of the topics in the model
@@ -447,15 +448,26 @@ class TMmodel(object):
     def load_tpc_labels(self):
         if self._tpc_labels is None:
             with self._TMfolder.joinpath('tpc_labels.txt').open('r', encoding='utf8') as fin:
-                self._tpc_labels = fin.readlines()
+                self._tpc_labels = [el.strip() for el in fin.readlines()]
 
     def showTopics(self):
         self._load_alphas()
         self.load_tpc_descriptions()
         self.load_tpc_labels()
-        alp_lab_desc = [(str(round(el[0],4)), el[1], el[2])
+        alp_lab_desc = [(str(round(el[0],4)), el[1].strip(), el[2].strip())
                             for el in zip(self._alphas, self._tpc_labels, self._tpc_descriptions)]
         return alp_lab_desc
+
+    def setTpcLabels(self, TpcLabels):
+        self._tpc_labels = [el.strip() for el in TpcLabels]
+        self._load_alphas()
+        #Check that the number of labels is consistent with model
+        if len(TpcLabels)==self._ntopics:
+            with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
+                fout.write('\n'.join(self._tpc_labels))
+            return
+        else:
+            return 0
 
     def save_npz(self, npzfile):
         """Saves the matrices that characterizes the topic model inot numpy npz file.
@@ -507,6 +519,9 @@ if __name__ == "__main__":
     parser.add_argument("--showTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Retrieve topic labels and word composition for selected model")
+    parser.add_argument("--setTpcLabels", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Set Topics Labels for selected model")
 
     args = parser.parse_args()
 
@@ -539,3 +554,12 @@ if __name__ == "__main__":
     if args.showTopics:
         tm = TMmodel(tm_path.joinpath(f"{args.showTopics}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.showTopics()))
+
+    if args.setTpcLabels:
+        # Labels should come from standard input
+        TpcLabels = "".join([line for line in sys.stdin])
+        TpcLabels = json.loads(TpcLabels.replace('\\"', '"'))
+        tm = TMmodel(tm_path.joinpath(f"{args.setTpcLabels}").joinpath('TMmodel'))
+        status = tm.setTpcLabels(TpcLabels)
+        sys.stdout.write(str(status))
+

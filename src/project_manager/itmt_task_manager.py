@@ -93,6 +93,7 @@ class ITMTTaskManager(BaseTaskManager):
         # State variable, necessary to keep track for the curation of a
         # particular Topic Model
         self.selectedTM = None
+        self.TopicsDesc = None
 
         super().__init__(p2p, p2parquet, p2wdlist, config_fname=config_fname,
                          metadata_fname=metadata_fname)
@@ -730,15 +731,11 @@ class ITMTTaskManager(BaseTaskManager):
 
         return status
 
-    def showTopics(self):
+    def loadTopicsDesc(self):
         """
         This method retrieves the topics proportions, labels, and
         word descriptions for the selected topic model
 
-        Return
-        ------
-        TopicInfo: list of tuples
-            [(size, label, descr), ... for topic in selected model]
         """
 
         cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
@@ -750,13 +747,45 @@ class ITMTTaskManager(BaseTaskManager):
         
         try:
             self.logger.info(f'-- -- Running command {cmd}')
-            TopicInfo = check_output(args=cmd, shell=True)
+            self.TopicsDesc = check_output(args=cmd, shell=True)
         except:
             self.logger.error('-- -- Execution of script failed')
             return
 
         self.logger.info("Description of topics calculated")
-        return TopicInfo
+
+        return
+
+    def setTpcLabels(self, TpcLabels):
+        """
+        This method persists the Labels of the Topics
+
+        Parameters
+        ----------
+        TpcLabels: list of str
+            Each element of the list contains the label of one topic
+        """
+
+        cmd = 'echo "' + json.dumps(TpcLabels).replace('"', '\\"') + '"'
+        cmd = cmd + '| python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --setTpcLabels ' + self.selectedTM
+        printred(cmd)
+        
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        self.logger.info("Labels have been saved to Model")
+        self.loadTopicsDesc()
+
+        return
+
 
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
@@ -1847,12 +1876,47 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         allTMmodels = [el for el in allTMmodels.keys()]
         opt = query_options(allTMmodels, 'Select a topic model to carry out curation tasks')
         self.selectedTM = allTMmodels[opt]
+        self.loadTopicsDesc()
         return
 
     def showTopics(self):
-        TopicInfo = json.loads(super().showTopics())
+        self.logger.info(f'-- Displaying Topic Information for Model {self.selectedTM}')
+        TopicInfo = json.loads(self.TopicsDesc)
         df = pd.DataFrame(TopicInfo, columns = ['Size', 'Label', 'Word Description'])
         print(df)
+        return
+
+    def manualLabel(self):
+        self.logger.info(f'-- Manualing labeling of topics for Model {self.selectedTM}')
+        TopicInfo = json.loads(self.TopicsDesc)
+        NewLabels = []
+
+        displaytext = """
+        *************************************************************************************
+        This function allows to manually provide labels for the topics in the model
+
+        For each topic you will be requested a label:
+        - You can write 'chem' to use the chemical description of the topic.
+        - You can press enter to keep the current label  
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        for tpc, tpc_info in enumerate(TopicInfo):
+            print('=' * 5)
+            print('Topic ID:', tpc)
+            print('Current label:', tpc_info[1])
+            print('Chemical description:', tpc_info[2])
+            tag = input('New label: ')
+            if tag == 'chem':
+                NewLabels.append(tpc_info[2])
+            elif tag != '':
+                NewLabels.append(tag)
+            else:
+                NewLabels.append(tpc_info[1])
+
+        self.setTpcLabels(NewLabels)
+        return
 
     def deleteTopic(self):
         print('deleteTopics')
@@ -1894,14 +1958,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         print('You are editing topic model:', path_model)
         print('---------\n')
 
-        options = ['Salir',
-                   'Visualizar tópicos',
-                   'Visualizar las palabras de los tópicos',
+        options = ['**Salir',
+                   '**Visualizar tópicos',
+                   '**Visualizar las palabras de los tópicos',
                    'Visualizar palabras de tópicos "basura" vs otros tópicos',
                    'Exportar Visualización pyLDAvis',
                    'Anotación de Stopwords y Equivalencias',
                    'Etiquetado automático de los tópicos del modelo',
-                   'Etiquetado manual de tópicos',
+                   '**Etiquetado manual de tópicos',
                    'Eliminar un tópico del modelo',
                    'Tópicos similares por coocurrencia',
                    'Tópicos similares por palabras',
