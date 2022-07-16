@@ -25,7 +25,7 @@ import shutil
 from pathlib import Path
 from subprocess import check_output
 
-# import pandas as pd
+import pandas as pd
 import pyarrow.parquet as pt
 # from sklearn.preprocessing import normalize
 from PyQt6 import QtWidgets
@@ -729,6 +729,34 @@ class ITMTTaskManager(BaseTaskManager):
         self.load_listTMmodels()
 
         return status
+
+    def showTopics(self):
+        """
+        This method retrieves the topics proportions, labels, and
+        word descriptions for the selected topic model
+
+        Return
+        ------
+        TopicInfo: list of tuples
+            [(size, label, descr), ... for topic in selected model]
+        """
+
+        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --showTopics ' + self.selectedTM
+        printred(cmd)
+        
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            TopicInfo = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        self.logger.info("Description of topics calculated")
+        return TopicInfo
 
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
@@ -1796,10 +1824,35 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         return TMparam
 
     def editTM(self):
-        print('select_method')
+        """
+        Select an Existing Topic Model for Curation
+        """
+
+        # Show available topic models
+        self.listTM()
+
+        self.logger.info(f'-- Topic Model Curation')
+
+        displaytext = """
+        *************************************************************************************
+        This function will ask the user for a certain Topic Model for the curation tasks
+
+        Once the Topic Model has been selected, its value is stored into a front-end variable
+        so that all curation tasks take place in the selected model
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        allTMmodels = json.loads(self.allTMmodels)
+        allTMmodels = [el for el in allTMmodels.keys()]
+        opt = query_options(allTMmodels, 'Select a topic model to carry out curation tasks')
+        self.selectedTM = allTMmodels[opt]
+        return
 
     def showTopics(self):
-        print('showTopics')
+        TopicInfo = json.loads(super().showTopics())
+        df = pd.DataFrame(TopicInfo, columns = ['Size', 'Label', 'Word Description'])
+        print(df)
 
     def deleteTopic(self):
         print('deleteTopics')

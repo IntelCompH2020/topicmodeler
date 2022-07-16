@@ -134,7 +134,7 @@ editTM:
     - resetTM
 
 showTopics:
-  title: Display Topics Composition
+  title: Display Topics Labels and Word Composition
   post_opts: 
     - showTopics
     - deleteTopic

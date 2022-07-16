@@ -201,7 +201,8 @@ class TMmodel(object):
     _ntopics = None
     _betas_ds = None
     _topic_entropy = None
-    _descriptions = None
+    _tpc_descriptions = None
+    _tpc_labels = None
     _vocab_w2id = None
     _vocab_id2w = None
     _vocab = None
@@ -295,6 +296,12 @@ class TMmodel(object):
         np.save(self._TMfolder.joinpath('betas_ds.npy'), self._betas_ds)
         self._calculate_topic_entropy()
         np.save(self._TMfolder.joinpath('topic_entropy.npy'), self._topic_entropy)
+        self._tpc_descriptions = self.get_tpc_word_descriptions()
+        with self._TMfolder.joinpath('tpc_descriptions.txt').open('w', encoding='utf8') as fout:
+            fout.write('\n'.join([el[1] for el in self._tpc_descriptions]))
+        self._tpc_labels = self.get_tpc_labels()
+        with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
+            fout.write('\n'.join([el[1] for el in self._tpc_labels]))
 
         self._logger.info(
             '-- -- Topic model variables saved to file')
@@ -354,6 +361,17 @@ class TMmodel(object):
         deno = np.ones((self._ntopics, 1)).dot(deno.T)
         self._betas_ds = self._betas_ds * (np.log(self._betas_ds) - deno)
 
+    def _load_betas_ds(self):
+        if self._betas_ds is None:
+            self._betas_ds = np.load(self._TMfolder.joinpath('betas_ds.npy'))
+            self._ntopics = self._betas_ds.shape[0]
+            self._size_vocab = self._betas_ds.shape[1]
+
+    def _load_vocab(self):
+        if self._vocab is None:
+            with self._TMfolder.joinpath('vocab.txt').open('r', encoding='utf8') as fin:
+                self._vocab = fin.readlines()
+
     def _calculate_topic_entropy(self):
         """Calculates the entropy of all topics in model
         """
@@ -366,6 +384,79 @@ class TMmodel(object):
             np.sum(self._betas * np.log(self._betas), axis=1)
         self._topic_entropy = self._topic_entropy / np.log(self._size_vocab)
     
+    def get_tpc_word_descriptions(self, n_words=15, tfidf=True, tpc=None):
+        """returns the chemical description of topics
+
+        Parameters
+        ----------
+        n_words:
+            Number of terms for each topic that will be included
+        tfidf:
+            If true, downscale the importance of words that appear
+            in several topics, according to beta_ds (Blei and Lafferty, 2009)
+        tpc:
+            Topics for which the descriptions will be computed, e.g.: tpc = [0,3,4]
+            If None, it will compute the descriptions for all topics  
+
+        Returns
+        -------
+        tpc_descs: list of tuples
+            Each element is a a term (topic_id, "word0, word1, ...")                      
+        """
+
+        # Load betas (including n_topics) and vocabulary 
+        if tfidf:
+            self._load_betas_ds()
+        else:
+            self._load_betas()
+        self._load_vocab()
+        
+        if not tpc:
+            tpc = range(self._ntopics)
+        
+        tpc_descs = []
+        for i in tpc:
+            if tfidf:
+                words = [self._vocab[idx2]
+                         for idx2 in np.argsort(self._betas_ds[i])[::-1][0:n_words]]
+            else:
+                words = [self._vocab[idx2]
+                         for idx2 in np.argsort(self._betas[i])[::-1][0:n_words]]
+            tpc_descs.append((i, ', '.join(words)))
+        return tpc_descs
+
+    def load_tpc_descriptions(self):
+        if self._tpc_descriptions is None:
+            with self._TMfolder.joinpath('tpc_descriptions.txt').open('r', encoding='utf8') as fin:
+                self._tpc_descriptions = fin.readlines()
+
+    def get_tpc_labels(self):
+        """returns the labels of the topics in the model
+
+        Returns
+        -------
+        tpc_labels: list of tuples
+            Each element is a a term (topic_id, "label for topic topic_id")
+
+        -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+        This functions needs to be implemented by JAEM
+        -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*                      
+        """
+        return self.get_tpc_word_descriptions()
+
+    def load_tpc_labels(self):
+        if self._tpc_labels is None:
+            with self._TMfolder.joinpath('tpc_labels.txt').open('r', encoding='utf8') as fin:
+                self._tpc_labels = fin.readlines()
+
+    def showTopics(self):
+        self._load_alphas()
+        self.load_tpc_descriptions()
+        self.load_tpc_labels()
+        alp_lab_desc = [(str(round(el[0],4)), el[1], el[2])
+                            for el in zip(self._alphas, self._tpc_labels, self._tpc_descriptions)]
+        return alp_lab_desc
+
     def save_npz(self, npzfile):
         """Saves the matrices that characterizes the topic model inot numpy npz file.
 
@@ -413,6 +504,9 @@ if __name__ == "__main__":
     parser.add_argument("--copyTM", type=str, default=None, nargs=2,
                         metavar=("modelName", "new_modelName"),
                         help="Make a copy of Topic Model")
+    parser.add_argument("--showTopics", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Retrieve topic labels and word composition for selected model")
 
     args = parser.parse_args()
 
@@ -441,3 +535,7 @@ if __name__ == "__main__":
             tm_path.joinpath(f"{args.copyTM[1]}"),
         )
         sys.stdout.write(str(status))
+
+    if args.showTopics:
+        tm = TMmodel(tm_path.joinpath(f"{args.showTopics}").joinpath('TMmodel'))
+        sys.stdout.write(json.dumps(tm.showTopics()))
