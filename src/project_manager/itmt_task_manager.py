@@ -733,8 +733,9 @@ class ITMTTaskManager(BaseTaskManager):
 
     def loadTopicsDesc(self):
         """
-        This method retrieves the topics proportions, labels, and
-        word descriptions for the selected topic model
+        This method retrieves the topics proportions, labels, 
+        word descriptions and number of documents where the topics are active
+        for the selected topic model
 
         """
 
@@ -786,6 +787,35 @@ class ITMTTaskManager(BaseTaskManager):
 
         return
 
+    def deleteTopics(self, tpcs):
+        """
+        This method deletes the topics provided in the list as input parameter
+
+        Parameters
+        ----------
+        tpcs: list of int
+            List containing the ids of the topics that will be removed from model
+        """
+
+        cmd = 'echo "' + json.dumps(tpcs).replace('"', '\\"') + '"'
+        cmd = cmd + '| python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --deleteTopics ' + self.selectedTM
+        printred(cmd)
+        
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        self.logger.info("Selected topics have been removed from model")
+        self.loadTopicsDesc()
+
+        return
 
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
@@ -1882,8 +1912,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
     def showTopics(self):
         self.logger.info(f'-- Displaying Topic Information for Model {self.selectedTM}')
         TopicInfo = json.loads(self.TopicsDesc)
-        df = pd.DataFrame(TopicInfo, columns = ['Size', 'Label', 'Word Description'])
-        print(df)
+        df = pd.DataFrame(TopicInfo, columns = ['Size', 'Label', 'Word Description', 'Ndocs Active'])
+        df.index.name = 'Topid ID'
+        print(df[['Size', 'Label', 'Word Description']])
         return
 
     def manualLabel(self):
@@ -1918,8 +1949,39 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         self.setTpcLabels(NewLabels)
         return
 
-    def deleteTopic(self):
-        print('deleteTopics')
+    def deleteTopics(self):
+        self.logger.info(f'-- Displaying Topic Information for Model {self.selectedTM}')
+        TopicInfo = json.loads(self.TopicsDesc)
+        df = pd.DataFrame(TopicInfo, columns = ['Size', 'Label', 'Word Description', 'Ndocs Active'])
+        df.index.name = 'Topid ID'
+        print(df[['Size', 'Ndocs Active', 'Word Description']].sort_values(by=['Ndocs Active'], ascending=False))
+
+        displaytext = """
+        *************************************************************************************
+        The previous table displays information about the number of documents where each 
+        topic is active. You can expect that topics including a lot of meaningless words
+        will become active in many documents ... 
+
+        So, topics likely to be "garbage" and less discriminative across documents will
+        appear in the first positions in the table
+
+        Provide a list of the topics you want to delete from the model (e.g., [5,2,3])
+        If you do not wish to remove any topic, just press ENTER
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        r = input('Provide list of topics to remove separated by commas: ')
+        if len(r):
+            try:
+                tpcs = [int(n) for n in r.split(',')]
+                print('The following topics will be removed:', tpcs)
+                if request_confirmation(msg='Do you wish to continue?'):
+                    super().deleteTopics(tpcs)
+                return
+            except:
+                print('You need to provide a list of integer numbers')
+                return
 
     def showSimilar(self):
         print('showSimilar')
@@ -1964,9 +2026,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                    'Visualizar palabras de tópicos "basura" vs otros tópicos',
                    'Exportar Visualización pyLDAvis',
                    'Anotación de Stopwords y Equivalencias',
-                   'Etiquetado automático de los tópicos del modelo',
+                   '**Etiquetado automático de los tópicos del modelo',
                    '**Etiquetado manual de tópicos',
-                   'Eliminar un tópico del modelo',
+                   '**Eliminar un tópico del modelo',
                    'Tópicos similares por coocurrencia',
                    'Tópicos similares por palabras',
                    'Fusionar dos tópicos del modelo',

@@ -127,7 +127,7 @@ editTM:
   post_opts:
     - showTopics
     - manualLabel
-    - deleteTopic
+    - deleteTopics
     - showSimilar
     - fuseTopics
     - sortTopics
@@ -139,7 +139,7 @@ showTopics:
   post_opts: 
     - showTopics
     - manualLabel
-    - deleteTopic
+    - deleteTopics
     - showSimilar
     - fuseTopics
     - sortTopics
@@ -151,19 +151,19 @@ manualLabel:
   post_opts: 
     - showTopics
     - manualLabel
-    - deleteTopic
+    - deleteTopics
     - showSimilar
     - fuseTopics
     - sortTopics
     - undoLast
     - resetTM
 
-deleteTopic:
+deleteTopics:
   title: Remove Topics from Model
   post_opts: 
     - showTopics
     - manualLabel
-    - deleteTopic
+    - deleteTopics
     - showSimilar
     - fuseTopics
     - sortTopics
@@ -175,7 +175,7 @@ showSimilar:
   post_opts: 
     - showTopics
     - manualLabel
-    - deleteTopic
+    - deleteTopics
     - showSimilar
     - fuseTopics
     - sortTopics
@@ -187,7 +187,7 @@ fuseTopics:
   post_opts: 
     - showTopics
     - manualLabel
-    - deleteTopic
+    - deleteTopics
     - showSimilar
     - fuseTopics
     - sortTopics
@@ -199,7 +199,7 @@ sortTopics:
   post_opts: 
     - showTopics
     - manualLabel
-    - deleteTopic
+    - deleteTopics
     - showSimilar
     - fuseTopics
     - sortTopics
@@ -211,7 +211,7 @@ undoLast:
   post_opts: 
     - showTopics
     - manualLabel
-    - deleteTopic
+    - deleteTopics
     - showSimilar
     - fuseTopics
     - sortTopics
@@ -223,7 +223,7 @@ resetTM:
   post_opts: 
     - showTopics
     - manualLabel
-    - deleteTopic
+    - deleteTopics
     - showSimilar
     - fuseTopics
     - sortTopics

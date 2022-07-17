@@ -13,6 +13,7 @@ import shutil
 from pathlib import Path
 import numpy as np
 import scipy.sparse as sparse
+from sklearn.preprocessing import normalize
 
 
 class TMManager(object):
@@ -201,6 +202,7 @@ class TMmodel(object):
     _ntopics = None
     _betas_ds = None
     _topic_entropy = None
+    _ndocs_active = None
     _tpc_descriptions = None
     _tpc_labels = None
     _vocab_w2id = None
@@ -283,28 +285,43 @@ class TMmodel(object):
         with self._TMfolder.joinpath('vocab.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(vocab))
 
-        # Initial sort of topics according to size. Save rearranged matrices
+        # Initial sort of topics according to size. Calculate other variables
         self._sort_topics()
+        self._calculate_beta_ds()
+        self._calculate_topic_entropy()
+        self._ndocs_active = np.array((self._thetas != 0).sum(0).tolist()[0])
+        self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
+        self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
+        
+        # We are ready to save all variables in the model
+        self._save_all()
+
+        self._logger.info(
+            '-- -- Topic model variables were computed and saved to file')
+        return
+
+    def _save_all(self):
+        """Saves all variables in Topic Model
+        * alphas, betas, thetas
+        * edits
+        * betas_ds, topic_entropy, ndocs_active
+        * tpc_descriptions, tpc_labels
+        This function should only be called after making sure all these
+        variables exist and are not None
+        """
         np.save(self._TMfolder.joinpath('alphas.npy'), self._alphas)
         np.save(self._TMfolder.joinpath('betas.npy'), self._betas)
         sparse.save_npz(self._TMfolder.joinpath('thetas.npz'), self._thetas)
         with self._TMfolder.joinpath('edits.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._edits))
-
-        # Calculate and save additional related variables
-        self._calculate_beta_ds()
         np.save(self._TMfolder.joinpath('betas_ds.npy'), self._betas_ds)
-        self._calculate_topic_entropy()
         np.save(self._TMfolder.joinpath('topic_entropy.npy'), self._topic_entropy)
-        self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
+        np.save(self._TMfolder.joinpath('ndocs_active.npy'), self._ndocs_active)
         with self._TMfolder.joinpath('tpc_descriptions.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._tpc_descriptions))
-        self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
         with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._tpc_labels))
 
-        self._logger.info(
-            '-- -- Topic model variables saved to file')
         return
 
     def _sort_topics(self):
@@ -341,6 +358,13 @@ class TMmodel(object):
     def _load_thetas(self):
         if self._thetas is None:
             self._thetas = sparse.load_npz(self._TMfolder.joinpath('thetas.npz'))
+            self._ntopics = self._thetas.shape[1]
+            #self._ndocs_active = np.array((self._thetas != 0).sum(0).tolist()[0])
+
+    def _load_ndocs_active(self):
+        if self._ndocs_active is None:
+            self._ndocs_active = np.load(self._TMfolder.joinpath('ndocs_active.npy'))
+            self._ntopics = self._ndocs_active.shape[0]
 
     def _load_edits(self):
         if self._edits is None:
@@ -385,6 +409,10 @@ class TMmodel(object):
             np.sum(self._betas * np.log(self._betas), axis=1)
         self._topic_entropy = self._topic_entropy / np.log(self._size_vocab)
     
+    def _load_topic_entropy(self):
+        if self._topic_entropy is None:
+            self._topic_entropy = np.load(self._TMfolder.joinpath('topic_entropy.npy'))
+
     def get_tpc_word_descriptions(self, n_words=15, tfidf=True, tpc=None):
         """returns the chemical description of topics
 
@@ -452,11 +480,13 @@ class TMmodel(object):
 
     def showTopics(self):
         self._load_alphas()
+        self._load_ndocs_active()
         self.load_tpc_descriptions()
         self.load_tpc_labels()
-        alp_lab_desc = [(str(round(el[0],4)), el[1].strip(), el[2].strip())
-                            for el in zip(self._alphas, self._tpc_labels, self._tpc_descriptions)]
-        return alp_lab_desc
+        TpcsInfo = [(str(round(el[0],4)), el[1].strip(), el[2].strip(), str(el[3]))
+                            for el in zip(self._alphas, self._tpc_labels,
+                                self._tpc_descriptions, self._ndocs_active)]
+        return TpcsInfo
 
     def setTpcLabels(self, TpcLabels):
         self._tpc_labels = [el.strip() for el in TpcLabels]
@@ -467,6 +497,48 @@ class TMmodel(object):
                 fout.write('\n'.join(self._tpc_labels))
             return
         else:
+            return 0
+
+    def deleteTopics(self, tpcs):
+        """This is a costly operation, almost everything
+        needs to get modified"""
+        self._load_alphas()
+        self._load_betas()
+        self._load_thetas()
+        self._load_betas_ds()
+        self._load_topic_entropy()
+        self.load_tpc_descriptions()
+        self.load_tpc_labels()
+        self._load_ndocs_active()
+        self._load_edits()
+
+        try:
+            # Get a list of the topics that should be kept
+            tpc_keep = [k for k in range(self._ntopics) if k not in tpcs]
+            tpc_keep = [k for k in tpc_keep if k < self._ntopics]
+
+            # Calculate new variables
+            self._thetas = self._thetas[:, tpc_keep]
+            self._thetas = normalize(self._thetas, axis=1, norm='l1')
+            self._alphas = np.asarray(np.mean(self._thetas, axis=0)).ravel()
+            self._ntopics = self._thetas.shape[1]
+            self._betas = self._betas[tpc_keep, :]
+            self._betas_ds = self._betas_ds[tpc_keep, :]
+            self._ndocs_active = self._ndocs_active[tpc_keep]
+            self._topic_entropy = self._topic_entropy[tpc_keep]
+            self._tpc_labels = [self._tpc_labels[i] for i in tpc_keep]
+            self._tpc_descriptions = [self._tpc_descriptions[i] for i in tpc_keep]
+            self._edits.append('d ' + ' '.join([str(k) for k in tpcs]))
+
+            # We are ready to save all variables in the model
+            self._save_all()
+
+            self._logger.info(
+                '-- -- Topics deletion successful. All variables saved to file')
+            return 1
+        except:
+            self._logger.info(
+                '-- -- Topics deletion generated an error. Operation failed')
             return 0
 
     def save_npz(self, npzfile):
@@ -522,6 +594,9 @@ if __name__ == "__main__":
     parser.add_argument("--setTpcLabels", type=str, default=None,
                         metavar=("modelName"),
                         help="Set Topics Labels for selected model")
+    parser.add_argument("--deleteTopics", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Remove topics from selected model")
 
     args = parser.parse_args()
 
@@ -563,3 +638,10 @@ if __name__ == "__main__":
         status = tm.setTpcLabels(TpcLabels)
         sys.stdout.write(str(status))
 
+    if args.deleteTopics:
+        # List of topics to remove should come from standard input
+        tpcs = "".join([line for line in sys.stdin])
+        tpcs = json.loads(tpcs.replace('\\"', '"'))
+        tm = TMmodel(tm_path.joinpath(f"{args.deleteTopics}").joinpath('TMmodel'))
+        status = tm.deleteTopics(tpcs)
+        sys.stdout.write(str(status))
