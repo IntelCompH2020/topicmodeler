@@ -195,7 +195,7 @@ fuseTopics:
     - resetTM
 
 sortTopics:
-  title: Sort Topics according to their size
+  title: Sort Topics in descending size order
   post_opts: 
     - showTopics
     - manualLabel

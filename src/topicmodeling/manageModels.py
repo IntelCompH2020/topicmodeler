@@ -541,6 +541,46 @@ class TMmodel(object):
                 '-- -- Topics deletion generated an error. Operation failed')
             return 0
 
+    def sortTopics(self):
+        """This is a costly operation, almost everything
+        needs to get modified"""
+        self._load_alphas()
+        self._load_betas()
+        self._load_thetas()
+        self._load_betas_ds()
+        self._load_topic_entropy()
+        self.load_tpc_descriptions()
+        self.load_tpc_labels()
+        self._load_ndocs_active()
+        self._load_edits()
+
+        try:
+            # Calculate order for the topics
+            idx = np.argsort(self._alphas)[::-1]
+            self._edits.append('s ' + ' '.join([str(el) for el in idx]))
+
+            # Calculate new variables
+            self._thetas = self._thetas[:, idx]
+            self._alphas = self._alphas[idx]
+            self._betas = self._betas[idx, :]
+            self._betas_ds = self._betas_ds[idx, :]
+            self._ndocs_active = self._ndocs_active[idx]
+            self._topic_entropy = self._topic_entropy[idx]
+            self._tpc_labels = [self._tpc_labels[i] for i in idx]
+            self._tpc_descriptions = [self._tpc_descriptions[i] for i in idx]
+            self._edits.append('s ' + ' '.join([str(el) for el in idx]))
+
+            # We are ready to save all variables in the model
+            self._save_all()
+
+            self._logger.info(
+                '-- -- Topics reordering successful. All variables saved to file')
+            return 1
+        except:
+            self._logger.info(
+                '-- -- Topics reordering generated an error. Operation failed')
+            return 0
+
     def resetTM(self):
         self._alphas_orig = np.load(self._TMfolder.joinpath('alphas_orig.npy'))
         self._betas_orig = np.load(self._TMfolder.joinpath('betas_orig.npy'))
@@ -610,6 +650,9 @@ if __name__ == "__main__":
     parser.add_argument("--deleteTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Remove topics from selected model")
+    parser.add_argument("--sortTopics", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Sort topics according to size")
     parser.add_argument("--resetTM", type=str, default=None,
                         metavar=("modelName"),
                         help="Reset Topic Model to its initial values after training")
@@ -660,6 +703,11 @@ if __name__ == "__main__":
         tpcs = json.loads(tpcs.replace('\\"', '"'))
         tm = TMmodel(tm_path.joinpath(f"{args.deleteTopics}").joinpath('TMmodel'))
         status = tm.deleteTopics(tpcs)
+        sys.stdout.write(str(status))
+
+    if args.sortTopics:
+        tm = TMmodel(tm_path.joinpath(f"{args.sortTopics}").joinpath('TMmodel'))
+        status = tm.sortTopics()
         sys.stdout.write(str(status))
 
     if args.resetTM:

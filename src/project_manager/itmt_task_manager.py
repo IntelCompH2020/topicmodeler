@@ -842,7 +842,31 @@ class ITMTTaskManager(BaseTaskManager):
         self.loadTopicsDesc()
 
         return
+
+    def sortTopics(self):
+        """
+        Sort topics according to decreasing value of topic size
+        """
+
+        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --sortTopics ' + self.selectedTM
+        printred(cmd)
         
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        self.logger.info("Topics reordering has been executed")
+        self.loadTopicsDesc()
+
+        return
+                
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
 ##############################################################################
@@ -2016,8 +2040,17 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         print('fuseTopics')
 
     def sortTopics(self):
-        print('sortTopics')
-
+        displaytext = """
+        *************************************************************************************
+        Topics will be sorted according to descending topic size order
+        No information will be lost. Topic labels will be kept as well
+        *************************************************************************************
+        """
+        printmag(displaytext)
+        if request_confirmation(msg='Do you wish to continue?'):
+            super().sortTopics()
+        return
+        
     def resetTM(self):
         displaytext = """
         *************************************************************************************
@@ -2029,6 +2062,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         printmag(displaytext)
         if request_confirmation(msg='Do you wish to continue?'):
             super().resetTM()
+        return
 
 
     def oldeditTM(self, corpus):
@@ -2064,7 +2098,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                    'Tópicos similares por coocurrencia',
                    'Tópicos similares por palabras',
                    'Fusionar dos tópicos del modelo',
-                   'Ordenar tópicos por importancia',
+                   '**Ordenar tópicos por importancia',
                    '**Resetear al modelo original']
 
         while not var_exit2:
