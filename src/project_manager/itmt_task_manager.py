@@ -817,6 +817,32 @@ class ITMTTaskManager(BaseTaskManager):
 
         return
 
+    def resetTM(self):
+        """
+        This method resets the topic model to its original configuration
+        after training. All curation operations will be lost, including
+        manual annotation of topics
+        """
+
+        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --resetTM ' + self.selectedTM
+        printred(cmd)
+        
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        self.logger.info("The topic model has been restored to its initial values")
+        self.loadTopicsDesc()
+
+        return
+        
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
 ##############################################################################
@@ -1992,11 +2018,17 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
     def sortTopics(self):
         print('sortTopics')
 
-    def undoLast(self):
-        print('undoLast')
-
     def resetTM(self):
-        print('resetTM')
+        displaytext = """
+        *************************************************************************************
+        This operation will restore the model to its original configuration after training
+
+        All curation changes will be lost, including manual labeling of topics
+        *************************************************************************************
+        """
+        printmag(displaytext)
+        if request_confirmation(msg='Do you wish to continue?'):
+            super().resetTM()
 
 
     def oldeditTM(self, corpus):
@@ -2033,7 +2065,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                    'Tópicos similares por palabras',
                    'Fusionar dos tópicos del modelo',
                    'Ordenar tópicos por importancia',
-                   'Resetear al modelo original']
+                   '**Resetear al modelo original']
 
         while not var_exit2:
 

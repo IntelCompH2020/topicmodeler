@@ -395,7 +395,7 @@ class TMmodel(object):
     def _load_vocab(self):
         if self._vocab is None:
             with self._TMfolder.joinpath('vocab.txt').open('r', encoding='utf8') as fin:
-                self._vocab = fin.readlines()
+                self._vocab = [el.strip() for el in fin.readlines()]
 
     def _calculate_topic_entropy(self):
         """Calculates the entropy of all topics in model
@@ -541,6 +541,19 @@ class TMmodel(object):
                 '-- -- Topics deletion generated an error. Operation failed')
             return 0
 
+    def resetTM(self):
+        self._alphas_orig = np.load(self._TMfolder.joinpath('alphas_orig.npy'))
+        self._betas_orig = np.load(self._TMfolder.joinpath('betas_orig.npy'))
+        self._thetas_orig = sparse.load_npz(self._TMfolder.joinpath('thetas_orig.npz'))
+        self._load_vocab()
+
+        try:
+            self.create(betas=self._betas_orig, thetas=self._thetas_orig,
+                        alphas=self._alphas_orig, vocab=self._vocab)
+            return 1
+        except:
+            return 0
+
     def save_npz(self, npzfile):
         """Saves the matrices that characterizes the topic model inot numpy npz file.
 
@@ -597,6 +610,9 @@ if __name__ == "__main__":
     parser.add_argument("--deleteTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Remove topics from selected model")
+    parser.add_argument("--resetTM", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Reset Topic Model to its initial values after training")
 
     args = parser.parse_args()
 
@@ -645,3 +661,9 @@ if __name__ == "__main__":
         tm = TMmodel(tm_path.joinpath(f"{args.deleteTopics}").joinpath('TMmodel'))
         status = tm.deleteTopics(tpcs)
         sys.stdout.write(str(status))
+
+    if args.resetTM:
+        tm = TMmodel(tm_path.joinpath(f"{args.resetTM}").joinpath('TMmodel'))
+        status = tm.resetTM()
+        sys.stdout.write(str(status))
+

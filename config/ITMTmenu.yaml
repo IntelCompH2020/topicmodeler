@@ -131,7 +131,7 @@ editTM:
     - showSimilar
     - fuseTopics
     - sortTopics
-    - undoLast
+    #- undoLast
     - resetTM
 
 showTopics:
@@ -143,7 +143,7 @@ showTopics:
     - showSimilar
     - fuseTopics
     - sortTopics
-    - undoLast
+    #- undoLast
     - resetTM
 
 manualLabel:
@@ -155,7 +155,7 @@ manualLabel:
     - showSimilar
     - fuseTopics
     - sortTopics
-    - undoLast
+    #- undoLast
     - resetTM
 
 deleteTopics:
@@ -167,7 +167,7 @@ deleteTopics:
     - showSimilar
     - fuseTopics
     - sortTopics
-    - undoLast
+    #- undoLast
     - resetTM
 
 showSimilar:
@@ -179,7 +179,7 @@ showSimilar:
     - showSimilar
     - fuseTopics
     - sortTopics
-    - undoLast
+    #- undoLast
     - resetTM
 
 fuseTopics:
@@ -191,7 +191,7 @@ fuseTopics:
     - showSimilar
     - fuseTopics
     - sortTopics
-    - undoLast
+    #- undoLast
     - resetTM
 
 sortTopics:
@@ -203,20 +203,20 @@ sortTopics:
     - showSimilar
     - fuseTopics
     - sortTopics
-    - undoLast
+    #- undoLast
     - resetTM
 
-undoLast:
-  title: Undo last modification of TM
-  post_opts: 
-    - showTopics
-    - manualLabel
-    - deleteTopics
-    - showSimilar
-    - fuseTopics
-    - sortTopics
-    - undoLast
-    - resetTM
+#undoLast:
+#  title: Undo last modification of TM
+#  post_opts: 
+#    - showTopics
+#    - manualLabel
+#    - deleteTopics
+#    - showSimilar
+#    - fuseTopics
+#    - sortTopics
+#    #- undoLast
+#    - resetTM
 
 resetTM:
   title: Reset Topic Model
@@ -227,7 +227,7 @@ resetTM:
     - showSimilar
     - fuseTopics
     - sortTopics
-    - undoLast
+    #- undoLast
     - resetTM
 
 deleteTM:
