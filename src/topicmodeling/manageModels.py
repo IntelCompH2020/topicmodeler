@@ -14,6 +14,7 @@ from pathlib import Path
 import numpy as np
 import scipy.sparse as sparse
 from sklearn.preprocessing import normalize
+import pyLDAvis
 
 
 class TMManager(object):
@@ -322,6 +323,20 @@ class TMmodel(object):
         with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._tpc_labels))
 
+        # Generate also pyLDAvisualization
+        # We will compute the visualization using ndocs random documents
+        ndocs = 10000
+        if ndocs > self._thetas.shape[0]:
+            ndocs = self._thetas.shape[0]
+        perm = np.sort(np.random.permutation(self._thetas.shape[0])[:ndocs])
+        # We consider all documents are equally important
+        doc_len = ndocs * [1]
+        vocabfreq = np.round(ndocs*(self._alphas.dot(self._betas))).astype(int)
+        vis_data = pyLDAvis.prepare(self._betas, self._thetas[perm, ].toarray(),
+                                    doc_len, self._vocab, vocabfreq, lambda_step=0.05,
+                                    sort_topics=False, n_jobs=-1)
+        pyLDAvis.save_html(vis_data, self._TMfolder.joinpath('pyLDAvis.html').as_posix())
+        
         return
 
     def _sort_topics(self):
