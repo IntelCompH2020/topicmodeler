@@ -29,11 +29,15 @@ import pandas as pd
 import pyarrow.parquet as pt
 # from sklearn.preprocessing import normalize
 from PyQt6 import QtWidgets
-from PyQt6.QtWidgets import QMessageBox
-from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
 #from src.topicmodeling.topicmodeling import TMmodel
+from PyQt6.QtCore import QUrl
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWidgets import QMessageBox
+from src.gui.utils import utils
+from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
 from src.utils.misc import (printgr, printmag, printred, query_options,
-                            request_confirmation, var_num_keyboard, var_string_keyboard)
+                            request_confirmation, var_num_keyboard,
+                            var_string_keyboard)
 
 from ..gui.utils.constants import Constants
 from .base_task_manager import BaseTaskManager
@@ -815,7 +819,7 @@ class ITMTTaskManager(BaseTaskManager):
         self.logger.info("Selected topics have been removed from model")
         self.loadTopicsDesc()
 
-        return
+        return status
 
     def resetTM(self):
         """
@@ -841,7 +845,7 @@ class ITMTTaskManager(BaseTaskManager):
         self.logger.info("The topic model has been restored to its initial values")
         self.loadTopicsDesc()
 
-        return
+        return status
 
     def sortTopics(self):
         """
@@ -865,7 +869,7 @@ class ITMTTaskManager(BaseTaskManager):
         self.logger.info("Topics reordering has been executed")
         self.loadTopicsDesc()
 
-        return
+        return status
                 
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
@@ -3091,7 +3095,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                                                  QMessageBox.StandardButton.No)
                     if reply == QMessageBox.StandardButton.Yes:
                         status = self.delete_WdLst(WdLst)
-                        # @TODO: Revise. Status is being returned as a byte object (b'1')
                         if int(status.decode('utf8')) == 0:
                             QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Wordlist ' +
                                                 allWdLists[WdLst]['name'] + ' could not be deleted.')
@@ -3236,29 +3239,40 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                     table.setItem(0, 4, QtWidgets.QTableWidgetItem(
                         allTMmodels[TMmodel]['TrDtSet']))
                     table.setItem(0, 5, QtWidgets.QTableWidgetItem(
-                        ""))
-                    table.setItem(0, 6, QtWidgets.QTableWidgetItem(
-                        ""))
+                        str(allTMmodels[TMmodel]['hierarchy-level'])))
+                    if  str(allTMmodels[TMmodel]['htm-version']) == "null":
+                        table.setItem(0, 6, QtWidgets.QTableWidgetItem(
+                            "Does not apply"))
+                    else:
+                        table.setItem(0, 6, QtWidgets.QTableWidgetItem(
+                            str(allTMmodels[TMmodel]['htm-version'])))
                     table.setItem(0, 7, QtWidgets.QTableWidgetItem(
-                        allTMmodels[TMmodel]['creation_date']))
+                        str(allTMmodels[TMmodel]['creation_date'])))
 
                     table.resizeColumnsToContents()
                     table.resizeRowsToContents()
             
                     self.selectedTM = model_name
+                    gui.label_available_model_being_curated.setText(model_name)
+
                     self.loadTopicsDesc()
                     self.showTopics(gui)
+
+                    model_path = self.p2p.joinpath(self._dir_struct['TMmodels']).joinpath(model_name).joinpath('TMmodel').resolve().as_posix()
+                    self.render_pyldavis(model_path,gui)
 
         return
     
     def showTopics(self, gui):
-        
+
         # Get table where TMmodel topics information is going to be displayed
         table = gui.tableWidget_trained_models_topics
+        table2 = gui.tableWidget_trained_models_topics_curation
 
         if self.TopicsDesc:
             TopicInfo = json.loads(self.TopicsDesc)
             table.setRowCount(len(TopicInfo))
+            table2.setRowCount(len(TopicInfo))
             df = pd.DataFrame(TopicInfo, columns=['Size', 'Label', 'Word Description', 'Ndocs Active'])
             for tp in range(len(TopicInfo)):
                 df2 = df.iloc[[tp]]
@@ -3272,8 +3286,45 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                         df2['Ndocs Active'].item()))
                 table.setItem(tp, 4, QtWidgets.QTableWidgetItem(
                         df2['Word Description'].item()))
+                
+                table2.setItem(tp, 1, QtWidgets.QTableWidgetItem(
+                        str(tp)))
+                table2.setItem(tp, 2, QtWidgets.QTableWidgetItem(
+                        df2['Size'].item()))
+                table2.setItem(tp, 3, QtWidgets.QTableWidgetItem(
+                        df2['Label'].item()))
+                table2.setItem(tp, 4, QtWidgets.QTableWidgetItem(
+                        df2['Ndocs Active'].item()))
+                table2.setItem(tp, 5, QtWidgets.QTableWidgetItem(
+                        df2['Word Description'].item()))
+            
+            utils.add_checkboxes_to_table(table2, 0)
             table.resizeColumnsToContents()
             table.resizeRowsToContents()
+            table2.resizeColumnsToContents()
+            table2.resizeRowsToContents()
+        return
+    
+    def render_pyldavis(self, model_path, gui):
+        # if gui.web:
+        #     gui.web.setParent(None)
+        # gui.web = QWebEngineView()
+        # gui.web.setZoomFactor(0.3)
+        # url = QUrl.fromLocalFile(pathlib.Path(
+        #     model_path, "pyLDAvis.html").as_posix())
+        # gui.web.load(url)
+        # gui.layout_plot_pyldavis_small.addWidget(gui.web)
+        # gui.web.show()
+        if gui.web_expand:
+            gui.web_expand.setParent(None)
+        gui.web_expand = QWebEngineView()
+        gui.web_expand.setZoomFactor(0.75)
+        url = QUrl.fromLocalFile(pathlib.Path(
+            model_path, "pyLDAvis.html").as_posix())
+        gui.web_expand.load(url)
+        gui.layout_plot_pyldavis.addWidget(gui.web_expand)
+        gui.web_expand.show()
+
         return
     
     def deleteTM(self, model_to_delete, gui):
@@ -3359,3 +3410,89 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                         QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'A copy of the topic todel ' + allTMmodels[TMmodel]['name'] + ' was created with the name ' + new_name)
 
         return
+
+    def manualLabel(self):
+        # TODO
+        self.logger.info(f'-- Manualing labeling of topics for Model {self.selectedTM}')
+        TopicInfo = json.loads(self.TopicsDesc)
+        NewLabels = []
+
+        displaytext = """
+        *************************************************************************************
+        This function allows to manually provide labels for the topics in the model
+
+        For each topic you will be requested a label:
+        - You can write 'chem' to use the chemical description of the topic.
+        - You can press enter to keep the current label  
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        for tpc, tpc_info in enumerate(TopicInfo):
+            print('=' * 5)
+            print('Topic ID:', tpc)
+            print('Current label:', tpc_info[1])
+            print('Chemical description:', tpc_info[2])
+            tag = input('New label: ')
+            if tag == 'chem':
+                NewLabels.append(tpc_info[2])
+            elif tag != '':
+                NewLabels.append(tag)
+            else:
+                NewLabels.append(tpc_info[1])
+
+        self.setTpcLabels(NewLabels)
+        return
+
+    def deleteTopics(self, tpcs_to_delete, gui):
+
+        reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(tpcs_to_delete) + ' will be deleted. Proceed?',
+                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                QMessageBox.StandardButton.No)
+        if reply == QMessageBox.StandardButton.Yes:
+            status = super().deleteTopics(tpcs_to_delete)
+            if int(status.decode('utf8')) == 0:
+                QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(tpcs_to_delete) + ' could not deleted.')
+            elif int(status.decode('utf8')) == 1:
+                QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(tpcs_to_delete) + ' were deleted succesfully.')
+
+        self.showTopics(gui)
+        
+        return
+
+    def showSimilar(self):
+        # TODO
+        print('showSimilar')
+
+    def fuseTopics(self):
+        # TODO
+        print('fuseTopics')
+
+    def sortTopics(self, gui):
+
+        reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, Constants.SORT_TM_MSG, QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,QMessageBox.StandardButton.No)
+        if reply == QMessageBox.StandardButton.Yes:
+            status = super().sortTopics()
+            if int(status.decode('utf8')) == 0:
+                QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'The topics could not be sorted')
+            elif int(status.decode('utf8')) == 1:
+                QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'The topics were sorted according to descending topic size order..')
+        
+        self.showTopics(gui)
+
+        return
+        
+    def resetTM(self, gui):
+
+        reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, Constants.RESET_TM_MSG,QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,QMessageBox.StandardButton.No)
+        if reply == QMessageBox.StandardButton.Yes:
+            status = super().resetTM()
+            if int(status.decode('utf8')) == 0:
+                QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'The model could not be restored to its initial configuration.')
+            elif int(status.decode('utf8')) == 1:
+                QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'The was resored to its original configuration succesfully.')
+
+        self.showTopics(gui)
+
+        return
+

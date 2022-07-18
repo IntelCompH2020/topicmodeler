@@ -15,6 +15,7 @@ import numpy as np
 import scipy.sparse as sparse
 from sklearn.preprocessing import normalize
 import pyLDAvis
+from src.gui.utils import utils
 
 
 class TMManager(object):
@@ -336,6 +337,7 @@ class TMmodel(object):
                                     doc_len, self._vocab, vocabfreq, lambda_step=0.05,
                                     sort_topics=False, n_jobs=-1)
         pyLDAvis.save_html(vis_data, self._TMfolder.joinpath('pyLDAvis.html').as_posix())
+        utils.modify_pyldavis_html(self._TMfolder.as_posix())
         
         return
 
@@ -626,9 +628,9 @@ class TMmodel(object):
                      thetas_orig_data=self._thetas_orig.data, thetas_orig_indices=self._thetas_orig.indices,
                      thetas_orig_indptr=self._thetas_orig.indptr, thetas_orig_shape=self._thetas_orig.shape,
                      ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy,
-                     descriptions=self._descriptions, edits=self._edits)
+                     descriptions=self._tpc_descriptions, edits=self._edits)
         else:
-            np.savez(npzfile, alphas=self._alphas, betas=self._betas, thetas=self._thetas, alphas_orig=self._alphas_orig, betas_orig=self._betas_orig, thetas_orig=self._thetas_orig, ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy,descriptions=self._descriptions, edits=self._edits)
+            np.savez(npzfile, alphas=self._alphas, betas=self._betas, thetas=self._thetas, alphas_orig=self._alphas_orig, betas_orig=self._betas_orig, thetas_orig=self._thetas_orig, ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy,descriptions=self._tpc_descriptions, edits=self._edits)
 
         if len(self._edits):
             edits_file = Path(npzfile).parent.joinpath('model_edits.txt')

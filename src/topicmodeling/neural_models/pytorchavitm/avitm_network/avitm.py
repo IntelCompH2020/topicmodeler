@@ -95,6 +95,7 @@ class AVITM(object):
         assert isinstance(topic_prior_mean, float), \
             "topic_prior_mean must be type float"
 
+
         # General attributes
         self.logger = logger
         self.input_size = input_size

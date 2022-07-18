@@ -78,6 +78,7 @@ class MainWindow(QMainWindow):
 
         # Attributes for displaying PyLDAvis in home page
         self.web = None
+        self.web_expand = None
 
         # Other attributes
         self.previous_page_button = self.findChild(
@@ -98,6 +99,10 @@ class MainWindow(QMainWindow):
         self.create_stopwords_list_subwindow = None
         self.edit_stopwords_list_subwindow = None
         self.preprocessing_subwindow = None
+
+        # Attributes for displaying PyLDAvis in home page
+        self.web = None
+        self.web_expand = None
 
         # Threads for executing in parallel
         self.thread_pool = QThreadPool()
@@ -296,20 +301,28 @@ class MainWindow(QMainWindow):
 
         self.treeView_trained_models.clicked.connect(
             self.clicked_treeView_trained_models)
-        # self.pushButton_models_pyldavis.clicked.connect(
-        #    self.clicked_pushButton_models_pyldavis)
+        self.pushButton_show_pyldavis.clicked.connect(
+            self.clicked_pushButton_show_pyldavis)
         self.pushButton_return_pyldavis.clicked.connect(
             self.clicked_pushButton_return_pyldavis)
+        self.pushButton_return_curation.clicked.connect(
+            self.clicked_pushButton_return_curation)
         self.pushButton_train_submodel.clicked.connect(
             self.clicked_pushButton_train_submodel)
         self.pushButton_delete_model.clicked.connect(
             self.clicked_pushButton_delete_model)
         self.pushButton_copy_model.clicked.connect(
-            self.clicked_pushButton_copy_model
-        )
+            self.clicked_pushButton_copy_model)
         self.pushButton_rename_model.clicked.connect(
-            self.clicked_pushButton_rename_model
-        )
+            self.clicked_pushButton_rename_model)
+        self.pushButton_curate_model.clicked.connect(
+            self.clicked_pushButton_curate_model)
+        self.pushButton_delete_topic.clicked.connect(
+            self.clicked_pushButton_delete_topic)
+        self.pushButton_sort_topics.clicked.connect(
+            self.clicked_pushButton_sort_topics)
+        self.pushButton_reset_changes_tm.clicked.connect(
+            self.clicked_pushButton_reset_changes_tm)
         self.pushButton_apply_changes_gui_settings.clicked.connect(
             self.clicked_pushButton_apply_changes_gui_settings)
         self.pushButton_apply_changes_log_settings.clicked.connect(
@@ -728,7 +741,8 @@ class MainWindow(QMainWindow):
         self.train_model_subwindow.initialize_hierarchical_level_settings()
         self.train_model_subwindow.exec()
 
-        # @TODO: Reload models
+        # Update data in modes table
+        self.tm.listAllTMmodels(self)
 
         return
 
@@ -742,29 +756,8 @@ class MainWindow(QMainWindow):
             return
         else:
             model_selected = self.treeView_trained_models.currentItem().text(0)
+
             self.tm.listTMmodel(self, model_selected)
-
-        return
-
-    def clicked_pushButton_models_pyldavis(self):
-        """Method to control the change within the Models' page to the PyLDAvis view. 
-        """
-
-        self.models_tabs.setCurrentWidget(self.page_models_pyldavis)
-
-        return
-
-    def clicked_pushButton_return_pyldavis(self):
-        """Method to control the change from the PyLDAvis view back to the Models' page main view. 
-        """
-
-        self.models_tabs.setCurrentWidget(self.page_models_main)
-
-        return
-
-    def clicked_pushButton_train_submodel(self):
-        """Method to control the clicking of the button 'pushButton_train_submodel', which is in charge of starting the training of a submodel.
-        """
 
         return
 
@@ -821,6 +814,71 @@ class MainWindow(QMainWindow):
             # Update data in wordlists table
             self.tm.listAllTMmodels(self)
 
+
+        return
+    
+    def clicked_pushButton_curate_model(self):
+
+        self.models_tabs.setCurrentWidget(self.page_edit)
+
+
+        return
+    
+    def clicked_pushButton_delete_topic(self):
+
+        # Get ids of the topics to be deleted
+        checked_list = []
+        for i in range(self.tableWidget_trained_models_topics_curation.rowCount()):
+            item = self.tableWidget_trained_models_topics_curation.item(
+                i, 0)
+            if item.checkState() == QtCore.Qt.CheckState.Checked:
+                checked_list.append(i)
+
+        if len(checked_list) == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.TOPICS_DELETE_NO_SELECTED)
+            return
+        
+        self.tm.deleteTopics(checked_list, self)
+
+        return
+    
+    def clicked_pushButton_sort_topics(self):
+
+        self.tm.sortTopics(self)
+
+        return
+
+    def clicked_pushButton_show_pyldavis(self):
+
+        self.models_tabs.setCurrentWidget(self.page_models_pyldavis)
+
+        return
+
+    def clicked_pushButton_return_pyldavis(self):
+        """Method to control the change from the PyLDAvis view back to the Curation page main view. 
+        """
+
+        self.models_tabs.setCurrentWidget(self.page_edit)
+
+        return
+
+    def clicked_pushButton_return_curation(self):
+        
+        self.models_tabs.setCurrentWidget(self.page_edit)
+
+        return
+
+
+    def clicked_pushButton_reset_changes_tm(self):
+
+        self.tm.resetTM(self)
+
+        return
+
+    def clicked_pushButton_train_submodel(self):
+        """Method to control the clicking of the button 'pushButton_train_submodel', which is in charge of starting the training of a submodel.
+        """
 
         return
 
