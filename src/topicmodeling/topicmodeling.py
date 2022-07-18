@@ -2324,7 +2324,6 @@ if __name__ == "__main__":
                     CTMr = CTMTrainer(
                         n_components=train_config['TMparam']['ntopics'],
                         model_type=train_config['TMparam']['model_type'],
-                        ctm_model_type=train_config['TMparam']['ctm_model_type'],
                         hidden_sizes=tuple(
                             train_config['TMparam']['hidden_sizes']),
                         activation=train_config['TMparam']['activation'],
@@ -2340,8 +2339,6 @@ if __name__ == "__main__":
                         topic_prior_mean=train_config['TMparam']['topic_prior_mean'],
                         topic_prior_variance=train_config['TMparam']['topic_prior_variance'],
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
-                        label_size=train_config['TMparam']['label_size'],
-                        loss_weights=train_config['TMparam']['loss_weights'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
                         sbert_model_to_load=train_config['TMparam']['sbert_model_to_load'])
 

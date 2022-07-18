@@ -49,6 +49,7 @@ class Constants:
     # Models management-related constants
     MODELS_TABLES = ["table_available_trained_models_desc",
                      "tableWidget_trained_models_topics"]
+    NEW_TM_NAME_NOT_SELECTED_MSG = "A new name for the models must be selected to continue."
 
     # Settings management-realated constants
     RESTORE_DFT_GUI_SETTINGS = "GUI settings were restored to its default value"

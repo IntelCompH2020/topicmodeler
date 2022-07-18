@@ -25,6 +25,7 @@ from PyQt6.uic import loadUi
 from src.gui.manage_corpus.generate_tm_corpus_window import GenerateTMCorpus
 from src.gui.manage_lists.create_sw_lst_window import CreateSwLstWindow
 from src.gui.manage_lists.edit_sw_lst_window import EditSwLstWindow
+from src.gui.manage_models.copy_rename_window import CopyRenameWindow
 from src.gui.topic_modeling.preprocessing_window import PreprocessingWindow
 from src.gui.topic_modeling.train_model_window import TrainModelWindow
 from src.gui.utils import utils
@@ -112,7 +113,7 @@ class MainWindow(QMainWindow):
             menu_button_widget = self.findChild(QPushButton, menu_button_name)
             self.menu_buttons.append(menu_button_widget)
         self.extra_menu_buttons = [self.pushButton_corpus_home,
-                                   self.pushButton_wordlists_home, 
+                                   self.pushButton_wordlists_home,
                                    self.pushButton_models_home]
 
         for menu_button in self.menu_buttons:
@@ -295,15 +296,20 @@ class MainWindow(QMainWindow):
 
         self.treeView_trained_models.clicked.connect(
             self.clicked_treeView_trained_models)
-        self.pushButton_models_pyldavis.clicked.connect(
-            self.clicked_pushButton_models_pyldavis)
+        # self.pushButton_models_pyldavis.clicked.connect(
+        #    self.clicked_pushButton_models_pyldavis)
         self.pushButton_return_pyldavis.clicked.connect(
             self.clicked_pushButton_return_pyldavis)
         self.pushButton_train_submodel.clicked.connect(
             self.clicked_pushButton_train_submodel)
         self.pushButton_delete_model.clicked.connect(
             self.clicked_pushButton_delete_model)
-
+        self.pushButton_copy_model.clicked.connect(
+            self.clicked_pushButton_copy_model
+        )
+        self.pushButton_rename_model.clicked.connect(
+            self.clicked_pushButton_rename_model
+        )
         self.pushButton_apply_changes_gui_settings.clicked.connect(
             self.clicked_pushButton_apply_changes_gui_settings)
         self.pushButton_apply_changes_log_settings.clicked.connect(
@@ -548,7 +554,7 @@ class MainWindow(QMainWindow):
                 i, 0)
             if item.checkState() == QtCore.Qt.CheckState.Checked:
                 checked_list.append(i)
-        
+
         if len(checked_list) == 0:
             QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
                                 Constants.CREATE_TR_DST_NOT_SELECTED_MSG)
@@ -732,43 +738,11 @@ class MainWindow(QMainWindow):
         """
 
         if self.treeView_trained_models.currentItem() is None or \
-                self.treeView_trained_models.currentItem().text(0).lower().startswith("models"):
+                self.treeView_trained_models.currentItem().text(0).lower().startswith("TMmodels"):
             return
         else:
             model_selected = self.treeView_trained_models.currentItem().text(0)
             self.tm.listTMmodel(self, model_selected)
-
-            # Show topics in table
-            # self.tableWidget_trained_models_topics.clearContents()
-            # self.tableWidget_trained_models_topics.setRowCount(
-            #     int(model.num_topics))
-            # self.tableWidget_trained_models_topics.setColumnCount(2)
-
-            # list_description = []
-            # for i in np.arange(0, len(model.topics_models), 1):
-            #     if str(type(model.topics_models[i])) == "<class 'src.htms.topic.Topic'>":
-            #         description = ' '.join(
-            #             str(x) for x in model.topics_models[i].description)
-            #         list_description.append(description)
-            # for i in np.arange(0, len(list_description), 1):
-            #     item_topic_nr = QtWidgets.QTableWidgetItem(str(i))
-            #     self.tableWidget_trained_models_topics.setItem(
-            #         i, 0, item_topic_nr)
-            #     item_topic_description = QtWidgets.QTableWidgetItem(
-            #         str(list_description[i]))
-            #     self.tableWidget_trained_models_topics.setItem(
-            #         i, 1, item_topic_description)
-
-            # Show PyLDAvis
-            # if self.web:
-            #     self.web.setParent(None)
-            # self.web = QWebEngineView()
-            # # self.web.setZoomFactor(0.25)
-            # url = QUrl.fromLocalFile(pathlib.Path(
-            #     model.model_path, "pyLDAvis.html").as_posix())
-            # self.web.load(url)
-            # self.layout_plot_pyldavis.addWidget(self.web)
-            # self.web.show()
 
         return
 
@@ -794,9 +768,59 @@ class MainWindow(QMainWindow):
 
         return
 
+    def clicked_pushButton_copy_model(self):
+        """Method to control the clicking of the button 'pushButton_copy_model', which is in charge of making a copy of a model.
+        """
+        if self.treeView_trained_models.currentItem() is None or \
+                self.treeView_trained_models.currentItem().text(0).lower().startswith("TMmodels"):
+            return
+        else:
+            model_selected = self.treeView_trained_models.currentItem().text(0)
+
+            # Invoke window
+            self.copy_rename_subwindow = CopyRenameWindow(
+                self.tm, "copy", model_selected)
+            self.copy_rename_subwindow.exec()
+
+            # Update data in wordlists table
+            self.tm.listAllTMmodels(self)
+
+        return
+
+    def clicked_pushButton_rename_model(self):
+        """Method to control the clicking of the button 'pushButton_rename_model', which is in charge of renaming a model.
+        """
+
+        if self.treeView_trained_models.currentItem() is None or \
+                self.treeView_trained_models.currentItem().text(0).lower().startswith("TMmodels"):
+            return
+        else:
+            model_selected = self.treeView_trained_models.currentItem().text(0)
+
+            # Invoke window
+            self.copy_rename_subwindow = CopyRenameWindow(
+                self.tm, "rename", model_selected)
+            self.copy_rename_subwindow.exec()
+
+            # Update data in wordlists table
+            self.tm.listAllTMmodels(self)
+
+        return
+
     def clicked_pushButton_delete_model(self):
         """Method to control the clicking of the button 'pushButton_train_submodel', which is in charge of starting the deletion of a model.
         """
+
+        if self.treeView_trained_models.currentItem() is None or \
+                self.treeView_trained_models.currentItem().text(0).lower().startswith("TMmodels"):
+            return
+        else:
+            model_selected = self.treeView_trained_models.currentItem().text(0)
+            self.tm.deleteTM(model_selected, self)
+
+            # Update data in wordlists table
+            self.tm.listAllTMmodels(self)
+
 
         return
 
@@ -1037,7 +1061,7 @@ class MainWindow(QMainWindow):
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
         self.tm.cf.read(self.tm.p2config)
-        
+
         return
 
     def clicked_pushButton_apply_changes_gui_settings(self):
@@ -1053,7 +1077,7 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_GUI_SETTINGS)
-        
+
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
         self.tm.cf.read(self.tm.p2config)
@@ -1083,7 +1107,7 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_LOG_SETTINGS)
-        
+
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
         self.tm.cf.read(self.tm.p2config)
@@ -1176,7 +1200,7 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_PRODLDA_SETTINGS)
-        
+
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
         self.tm.cf.read(self.tm.p2config)
@@ -1189,7 +1213,7 @@ class MainWindow(QMainWindow):
         Method for controling the clicking of the button 'pushButton_apply_changes_sparklda_settings' that controls the actualization of the Topic Modeler's SparkLDA settings.
         """
 
-        #@TODO
+        # @TODO
 
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
@@ -1250,7 +1274,7 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_CTM_SETTINGS)
-        
+
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
         self.tm.cf.read(self.tm.p2config)
@@ -1318,7 +1342,7 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_SPARK_SETTINGS)
-        
+
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
         self.tm.cf.read(self.tm.p2config)
@@ -1348,7 +1372,7 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_PREPROC_SETTINGS)
-        
+
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
         self.tm.cf.read(self.tm.p2config)

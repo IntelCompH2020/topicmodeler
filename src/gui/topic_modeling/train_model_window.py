@@ -807,6 +807,9 @@ class TrainModelWindow(QtWidgets.QDialog):
         # Show messages in pop up window
         QtWidgets.QMessageBox.information(
             self, Constants.SMOOTH_SPOON_MSG, "'The model " + self.modelname + "' was trained.")
+        
+        # Hide window
+        self.hide()
 
         return
 

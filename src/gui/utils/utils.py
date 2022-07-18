@@ -315,7 +315,7 @@ def xml_dir(pth, et_element=None):
         et_element = ET.SubElement(et_element, pth.name)
 
     for directory in (fle for fle in pth.iterdir() if fle.is_dir()):
-        if not directory.as_posix().endswith("modelFiles") and not directory.as_posix().endswith("corpus.parquet") and not directory.as_posix().endswith("_old"):
+        if not directory.as_posix().endswith("modelFiles") and not directory.as_posix().endswith("corpus.parquet") and not directory.as_posix().endswith("_old") and not directory.as_posix().endswith("TMmodel"):
             xml_dir(directory, et_element)
 
     return et_element

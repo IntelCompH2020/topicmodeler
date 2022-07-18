@@ -1855,9 +1855,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 float(self.cf['CTM']['topic_prior_variance'])
             num_data_loader_workers = int(
                 self.cf['CTM']['num_data_loader_workers'])
-            label_size = int(self.cf['CTM']['label_size'])
-            loss_weights = None if self.cf['CTM']['loss_weights'] == "None" else json.loads(
-                self.cf['CTM']['loss_weights'])
             thetas_thr = float(self.cf['CTM']['thetas_thr'])
             sbert_model_to_load = str(
                 self.cf['CTM']['sbert_model_to_load'])
@@ -1909,7 +1906,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             TMparam = {
                 "ntopics": ntopics,
                 "model_type": model_type,
-                "ctm_model_type": ctm_model_type,
                 "hidden_sizes": hidden_sizes,
                 "activation": activation,
                 "dropout": dropout,
@@ -1924,8 +1920,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "topic_prior_mean": topic_prior_mean,
                 "topic_prior_variance": topic_prior_variance,
                 "num_data_loader_workers": num_data_loader_workers,
-                "label_size": label_size,
-                "loss_weights": loss_weights,
                 "thetas_thr": thetas_thr,
                 "sbert_model_to_load": sbert_model_to_load
             }
@@ -1956,6 +1950,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         allTMmodels = [el for el in allTMmodels.keys()]
         opt = query_options(allTMmodels, 'Select a topic model to carry out curation tasks')
         self.selectedTM = allTMmodels[opt]
+        print(self.selectedTM)
         self.loadTopicsDesc()
         return
 
@@ -2964,7 +2959,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                                                  allTrDtsets[TrDts]['name'] + ' will be deleted. Proceed?',  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
                     if reply == QMessageBox.StandardButton.Yes:
                         status = self.delete_TrDtset(TrDts)
-                        # @TODO: Revise. Status is being returned as a byte object (b'1')
                         if int(status.decode('utf8')) == 0:
                             QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Training Dataset ' +
                                                 allTrDtsets[TrDts]['name'] + ' could not be deleted.')
@@ -3003,7 +2997,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                     allWdLists[TrDts]['visibility']))
                 row += 1
         return
-    #table.setItem(row, 5, QtWidgets.QTableWidgetItem(', '.join([el for el in allWdLists[TrDts]['wordlist']])))
 
     def listWdListsByType(self, table, type):
         """
@@ -3248,5 +3241,121 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                         ""))
                     table.setItem(0, 7, QtWidgets.QTableWidgetItem(
                         allTMmodels[TMmodel]['creation_date']))
+
+                    table.resizeColumnsToContents()
+                    table.resizeRowsToContents()
+            
+                    self.selectedTM = model_name
+                    self.loadTopicsDesc()
+                    self.showTopics(gui)
+
+        return
+    
+    def showTopics(self, gui):
+        
+        # Get table where TMmodel topics information is going to be displayed
+        table = gui.tableWidget_trained_models_topics
+
+        if self.TopicsDesc:
+            TopicInfo = json.loads(self.TopicsDesc)
+            table.setRowCount(len(TopicInfo))
+            df = pd.DataFrame(TopicInfo, columns=['Size', 'Label', 'Word Description', 'Ndocs Active'])
+            for tp in range(len(TopicInfo)):
+                df2 = df.iloc[[tp]]
+                table.setItem(tp, 0, QtWidgets.QTableWidgetItem(
+                        str(tp)))
+                table.setItem(tp, 1, QtWidgets.QTableWidgetItem(
+                        df2['Size'].item()))
+                table.setItem(tp, 2, QtWidgets.QTableWidgetItem(
+                        df2['Label'].item()))
+                table.setItem(tp, 3, QtWidgets.QTableWidgetItem(
+                        df2['Ndocs Active'].item()))
+                table.setItem(tp, 4, QtWidgets.QTableWidgetItem(
+                        df2['Word Description'].item()))
+            table.resizeColumnsToContents()
+            table.resizeRowsToContents()
+        return
+    
+    def deleteTM(self, model_to_delete, gui):
+        """
+        Delete an Existing Topic Model
+
+        Parameters
+        ----------
+        model_to_delete : str
+            Name of the topic model selected by the user in the GUI to be deleted
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+        """
+
+        if self.allTMmodels:
+            # Get dictionary with the information of all models
+            allTMmodels = json.loads(self.allTMmodels)
+            for TMmodel in allTMmodels.keys():
+                if allTMmodels[TMmodel]['name'] == model_to_delete:
+                    reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' +
+                                                 allTMmodels[TMmodel]['name'] +
+                                                 ' will be deleted. Proceed?',
+                                                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                                 QMessageBox.StandardButton.No)
+                    if reply == QMessageBox.StandardButton.Yes:
+                        status = self.delete_TMmodel(TMmodel)
+                        if int(status.decode('utf8')) == 0:
+                            QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' + allTMmodels[TMmodel]['name'] + ' could not be deleted.')
+                        elif int(status.decode('utf8')) == 1:
+                            QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' + allTMmodels[TMmodel]['name'] + ' was deleted successfully.')
+
+        return
+
+    def renameTM(self, model_to_rename, new_name, gui):
+        """
+        Rename an Existing Topic Model
+
+        Parameters
+        ----------
+        model_to_rename : str
+            Name of the topic model selected by the user in the GUI to be renamed
+        new_name: str
+            New name for the topic model
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+        """
+
+        if self.allTMmodels:
+            # Get dictionary with the information of all models
+            allTMmodels = json.loads(self.allTMmodels)
+            for TMmodel in allTMmodels.keys():
+                if allTMmodels[TMmodel]['name'] == model_to_rename:
+                    status = self.rename_TMmodel(model_to_rename, new_name)
+                    if int(status.decode('utf8')) == 0:
+                            QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' + allTMmodels[TMmodel]['name'] + ' could not be renamed.')
+                    elif int(status.decode('utf8')) == 1:
+                        QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' + allTMmodels[TMmodel]['name'] + ' was deleted successfully renamed to ' + new_name)
+        return
+
+    def copyTM(self, model_to_copy, new_name, gui):
+        """
+        Make a copy of an Existing Topic Model
+
+        Parameters
+        ----------
+        model_to_copy : str
+            Name of the topic model selected by the user in the GUI to be copied
+        new_name: str
+            New name for the copy 
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+        """
+
+        if self.allTMmodels:
+            # Get dictionary with the information of all models
+            allTMmodels = json.loads(self.allTMmodels)
+            for TMmodel in allTMmodels.keys():
+                if allTMmodels[TMmodel]['name'] == model_to_copy:
+                    status = self.copy_TMmodel(model_to_copy, new_name)
+                    if int(status.decode('utf8')) == 0:
+                            QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'The copy of the topic model ' + allTMmodels[TMmodel]['name'] + ' could not be created.')
+                    elif int(status.decode('utf8')) == 1:
+                        QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'A copy of the topic todel ' + allTMmodels[TMmodel]['name'] + ' was created with the name ' + new_name)
 
         return
