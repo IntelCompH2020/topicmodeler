@@ -86,16 +86,6 @@ loss_weights=None
 thetas_thr=3e-3
 sbert_model_to_load=paraphrase-distilroberta-base-v1
 
-[TMold]
-pathlabeling=./topicmodeler/NETL-topic-labeler/
-
-[TMedit]
-n_palabras=20
-round_size=6
-NETLworkers=3
-LDAvis_ndocs=25000
-LDAvis_njobs=15
-
 [Hierarchical]
 expansion_tpc=0
 htm_version=htm-ds

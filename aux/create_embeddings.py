@@ -3,9 +3,12 @@ import warnings
 from pathlib import Path
 from typing import List
 import pandas as pd
+import dask.dataframe as dd
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
+from nltk.tokenize import sent_tokenize
+from dask.diagnostics import ProgressBar
 
 
 class EmbeddingsManager(object):
@@ -58,22 +61,46 @@ class EmbeddingsManager(object):
         self._check_max_local_length(max_seq_length, texts)
 
         embeddings = np.array(model.encode(texts, show_progress_bar=True, batch_size=batch_size))
-
+     
         return embeddings
 
     def add_embeddins_to_parquet(self, parquet_file: Path, embeddins_model: str, max_seq_length: int) -> Path:
 
-        df = pd.read_parquet(parquet_file).fillna("")
-        print(df.columns)
-        df_raw = df[["rawtext"]].values.tolist()
-        df_raw = [doc[0] for doc in df_raw]
-        e = self.bert_embeddings_from_list(texts=df_raw, 
-                                           sbert_model_to_load=embeddins_model, 
-                                           max_seq_length=max_seq_length)
-        df['embeddings'] = pd.Series(e)
-        print(df.head)
-        new_name = parquet_file.as_posix() + "_embeddings"
-        df.to_parquet(new_name)
+        df = dd.read_parquet(parquet_file).fillna("").dropna()
+        
+        def calculate_embeddings_doc(row):
+            """Function to calculate embeddings for a doc.
+
+            Parameters
+            ----------
+            row: pandas.Series
+                ndarray representation of the document
+           
+            Returns
+            -------
+            embeddings_doc: ndarray
+                
+            """
+            
+            docs = sent_tokenize(row["rawtext"]) # list of sentences
+            e = self.bert_embeddings_from_list(
+                    texts=docs, 
+                    sbert_model_to_load=embeddins_model, 
+                    max_seq_length=max_seq_length)
+            return e
+
+        df['embeddings'] = df.apply(
+                calculate_embeddings_doc, axis=1, meta=df)
+
+
+        outFile = parquet_file.parent.joinpath(
+            '_embeddings')
+
+        with ProgressBar():
+            df.to_parquet(
+                outFile, write_index=False,
+                compute_kwargs={'scheduler': 'processes'})
+        print(outFile)
 
         return
 

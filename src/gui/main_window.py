@@ -865,7 +865,7 @@ class MainWindow(QMainWindow):
 
     def clicked_pushButton_return_curation(self):
         
-        self.models_tabs.setCurrentWidget(self.page_edit)
+        self.models_tabs.setCurrentWidget(self.page_models_main)
 
         return
 
