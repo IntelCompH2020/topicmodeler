@@ -452,10 +452,11 @@ class textPreproc(object):
                     outFile.unlink()
 
                 with ProgressBar():
-                    DFparquet = trDF[['id', 'cleantext', 'all_rawtext']].rename(
-                        columns={"cleantext": "bow_text"})
-                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
-                                         'scheduler': 'processes'})
+                    #DFparquet = trDF[['id', 'cleantext', 'all_rawtext']].rename(
+                    #    columns={"cleantext": "bow_text"})
+                    DFparquet = trDF[['id', 'cleantext', 'embeddings']].rename(
+                                            columns={"cleantext": "bow_text"})
+                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={'scheduler': 'processes'})
 
         else:
             # Spark dataframe
@@ -1828,10 +1829,14 @@ class CTMTrainer(Trainer):
         self._corpus = [el for el in df_lemas]
 
         if embeddingsFile is None:
-            df_raw = df[["all_rawtext"]].values.tolist()
-            df_raw = [doc[0].split() for doc in df_raw]
-            self._unpreprocessed_corpus = [el for el in df_raw]
-            self._embeddings = None
+            if not "embeddings" in list(df.columns.values):
+                df_raw = df[["all_rawtext"]].values.tolist()
+                df_raw = [doc[0].split() for doc in df_raw]
+                self._unpreprocessed_corpus = [el for el in df_raw]
+                self._embeddings = None
+            else:
+                self._embeddings = df.embeddings.values
+                self._unpreprocessed_corpus = None
         else:
             if not embeddingsFile.is_file():
                 self._logger.error(

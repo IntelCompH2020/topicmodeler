@@ -8,8 +8,8 @@ import dask.dataframe as dd
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from nltk.tokenize import sent_tokenize
-from dask.diagnostics import ProgressBar
-
+from tqdm import tqdm
+from time import gmtime, strftime
 
 class EmbeddingsManager(object):
 
@@ -60,47 +60,34 @@ class EmbeddingsManager(object):
 
         self._check_max_local_length(max_seq_length, texts)
 
-        embeddings = np.array(model.encode(texts, show_progress_bar=True, batch_size=batch_size))
+        embeddings = model.encode(texts, show_progress_bar=True, batch_size=batch_size).tolist()
      
         return embeddings
 
-    def add_embeddins_to_parquet(self, parquet_file: Path, embeddins_model: str, max_seq_length: int) -> Path:
+    def add_embeddins_to_parquet(self, parquet_file: Path, parquet_new: Path, embeddins_model: str, max_seq_length: int) -> Path:
 
-        df = dd.read_parquet(parquet_file).fillna("").dropna()
-        
-        def calculate_embeddings_doc(row):
-            """Function to calculate embeddings for a doc.
+        path_parquet = Path(parquet_file)
 
-            Parameters
-            ----------
-            row: pandas.Series
-                ndarray representation of the document
-           
-            Returns
-            -------
-            embeddings_doc: ndarray
-                
-            """
-            
-            docs = sent_tokenize(row["rawtext"]) # list of sentences
-            e = self.bert_embeddings_from_list(
-                    texts=docs, 
+        res = []
+        for entry in path_parquet.iterdir():
+            # check if it a file
+            if entry.as_posix().endswith("parquet"):
+                res.append(entry)
+
+        for f in tqdm(res):
+            df = pd.read_parquet(res[0]).fillna("").dropna().drop("euroSciVocCode", axis=1)
+            df = df[df.rawtext != ""]
+            raw = df.rawtext.values.tolist()
+            embeddings = self.bert_embeddings_from_list(
+                    texts=raw, 
                     sbert_model_to_load=embeddins_model, 
                     max_seq_length=max_seq_length)
-            return e
-
-        df['embeddings'] = df.apply(
-                calculate_embeddings_doc, axis=1, meta=df)
-
-
-        outFile = parquet_file.parent.joinpath(
-            '_embeddings')
-
-        with ProgressBar():
-            df.to_parquet(
-                outFile, write_index=False,
-                compute_kwargs={'scheduler': 'processes'})
-        print(outFile)
+            df['embeddings'] = embeddings
+            time = strftime("_%Y-%m-%d-%-S", gmtime())
+            new_name = "parquet_embeddings" + time + ".parquet"
+            outFile = parquet_new.joinpath(new_name)
+            df.to_parquet(outFile)
+            print(outFile)
 
         return
 
@@ -108,6 +95,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Scripts for Embeddings Service")
     parser.add_argument("--path_parquet", type=str, default=None, required=True, metavar=("path_to_parquet"), help="path to parquet file to caclulate embeddings of")
+    parser.add_argument("--path_new", type=str, default=None, required=True, metavar=("path_new"), help="path to parquet folder to locate embeddings")
     parser.add_argument("--embeddings_model", type=str, default="all-mpnet-base-v2", required=False, metavar=("embeddings_model"), help="Model to be used for calculating the embeddings")
     parser.add_argument("--max_sequence_length", type=int, default=384, required=False, metavar=("max_sequence_length"), help="Maximum number of tokens that the model can look at a time simultaneously")
 
@@ -116,4 +104,5 @@ if __name__ == "__main__":
     em = EmbeddingsManager()
 
     parquet_path = Path(args.path_parquet)
-    em.add_embeddins_to_parquet(parquet_path, args.embeddings_model, args.max_sequence_length)
+    parquet_new = Path(args.path_new)
+    em.add_embeddins_to_parquet(parquet_path, parquet_new, args.embeddings_model, args.max_sequence_length)
