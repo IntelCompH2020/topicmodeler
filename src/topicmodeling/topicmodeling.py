@@ -20,6 +20,7 @@ import sys
 from abc import abstractmethod
 from pathlib import Path
 from subprocess import check_output
+import pyarrow as pa
 
 import dask.array as da
 import dask.dataframe as dd
@@ -443,7 +444,12 @@ class textPreproc(object):
                     #    columns={"cleantext": "bow_text"})
                     DFparquet = trDF[['id', 'cleantext', 'embeddings']].rename(
                         columns={"cleantext": "bow_text"})
-                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
+                    schema = pa.schema([
+                                ('id', pa.int64()),
+                                ('bow_text', pa.string()),
+                                ('embeddings', pa.list_(pa.float64()))
+                            ])
+                    DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
                                          'scheduler': 'processes'})
 
         else:
