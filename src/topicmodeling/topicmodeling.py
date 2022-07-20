@@ -2245,7 +2245,7 @@ if __name__ == "__main__":
                         else:
                             df["all_lemmas"] += " " + df[col]
                     df["source"] = DtSet["source"]
-                    df = df[["id", "source", "all_lemmas"]]
+                    df = df[["id", "source", "all_lemmas", "embeddings"]]
 
                     # Concatenate dataframes
                     if idx == 0:
@@ -2258,19 +2258,23 @@ if __name__ == "__main__":
                 trDF = tPreproc.preprocBOW(trDF)
                 tPreproc.saveGensimDict(configFile.parent.resolve())
 
-                if train_config['trainer'] == "ctm":
-                    for idx, DtSet in enumerate(trDtSet['Dtsets']):
-                        df = dd.read_parquet(DtSet['parquet']).fillna("")
-                        df = df[["id", "embeddings"]]
+                # if train_config['trainer'] == "ctm":
+                #     sys.stdout.write("entra")
+                #     for idx, DtSet in enumerate(trDtSet['Dtsets']):
+                #         df = dd.read_parquet(DtSet['parquet']).fillna("")
+                #         df = df[["id", "embeddings"]]
 
-                        # Concatenate dataframes
-                        if idx == 0:
-                            eDF = df
-                        else:
-                            eDF = dd.concat([trDF, df])
+                #         # Concatenate dataframes
+                #         if idx == 0:
+                #             eDF = df
+                #         else:
+                #             eDF = dd.concat([trDF, df])
 
-                    # We perform a left join to keep the embeddings of only those documents kept after preprocessing
-                    trDF.join(eDF, on='id', how='left', lsuffix='_caller', rsuffix='_other')  
+                #     # We perform a left join to keep the embeddings of only those documents kept after preprocessing
+                #     trDF = trDF.join(eDF, on='id', how='left', lsuffix='_caller', rsuffix='_other')  
+
+                #     trDF = trDF.merge(eDF, how="left", on=["id"])
+                #     sys.stdout.write(trDF.head)
 
                 trDataFile = tPreproc.exportTrData(trDF=trDF,
                                                    dirpath=configFile.parent.resolve(),
