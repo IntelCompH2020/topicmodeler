@@ -2270,7 +2270,7 @@ if __name__ == "__main__":
                             eDF = dd.concat([trDF, df])
 
                     # We perform a left join to keep the embeddings of only those documents kept after preprocessing
-                    trDF.join(eDF, on='id', how='left')  
+                    trDF.join(eDF, on='id', how='left', lsuffix='_caller', rsuffix='_other')  
 
                 trDataFile = tPreproc.exportTrData(trDF=trDF,
                                                    dirpath=configFile.parent.resolve(),
