@@ -1129,16 +1129,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 #                      if el in allDtsets[Dtset_loc]['schema']]
                 # print('Selected:', ', '.join(Dtset_rawtext_fld))
 
-                # embeddings fields
-                Dtset_embeddings_fld = input(
-                    'Select fields for embeddings (separated by commas): ')
-                Dtset_embeddings_fld = [el.strip()
-                                     for el in Dtset_embeddings_fld.split(',')]
-                Dtset_embeddings_fld = [el for el in Dtset_embeddings_fld
-                                     if el in allDtsets[Dtset_loc]['schema']]
-                print('Selected:', ', '.join(Dtset_embeddings_fld))
-
-
                 # Spark clause for filtering (advanced users only)
                 Dtset_filter = input(
                     'Introduce a filtering condition for Spark clause (advanced users): ')
@@ -1147,7 +1137,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                                  'source': Dtset_source,
                                  'idfld': Dtset_idfld,
                                  'lemmasfld': Dtset_lemmas_fld,
-                                 'embeddingsfld': Dtset_embeddings_fld,
                                  'filter': Dtset_filter
                                  })
 
@@ -2897,9 +2886,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             Dtset_lemmas_fld = dict_to_tm_corpus[dict_tm_corpus_loc]['fields_for_lemmas']
             print('Selected lemmas:', ', '.join(Dtset_lemmas_fld))
 
-            # rawtext fields
-            Dtset_rawtext_fld = dict_to_tm_corpus[dict_tm_corpus_loc]['fields_for_raw']
-
             # Spark clause for filtering (advanced users only)
             Dtset_filter = dict_to_tm_corpus[dict_tm_corpus_loc]['filtering_condition']
 
@@ -2907,7 +2893,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                              'source': Dtset_source,
                              'idfld': Dtset_idfld,
                              'lemmasfld': Dtset_lemmas_fld,
-                             'rawtxtfld': Dtset_rawtext_fld,
                              'filter': Dtset_filter
                              })
 

@@ -2256,6 +2256,7 @@ if __name__ == "__main__":
                 trDF = tPreproc.preprocBOW(trDF)
                 tPreproc.saveCntVecModel(configFile.parent.resolve())
 
+                # If the trainer is CTM, we also need the embeddings
                 if train_config['trainer'] == "ctm":
                     # We get full df containing the embeddings
                     for idx, DtSet in enumerate(trDtSet['Dtsets']):
@@ -2266,7 +2267,9 @@ if __name__ == "__main__":
                         else:
                             eDF = eDF.union(df).distinct()
                     # We perform a left join to keep the embeddings of only those documents kept after preprocessing
-                    trDF = pd.merge(trDF, eDF, on='id', how='left')
+                    # TODO: Check that this done properly in Spark
+                    trDF = (trDF.join(eDF, trDF.id == eDF.id, "left")
+                        .drop(df.id))
 
                 trDataFile = tPreproc.exportTrData(trDF=trDF,
                                                    dirpath=configFile.parent.resolve(),
@@ -2289,7 +2292,7 @@ if __name__ == "__main__":
                         else:
                             df["all_lemmas"] += " " + df[col]
                     df["source"] = DtSet["source"]
-                    df = df[["id", "source", "all_lemmas", "embeddings"]]
+                    df = df[["id", "source", "all_lemmas"]]
 
                     # Concatenate dataframes
                     if idx == 0:
@@ -2302,23 +2305,21 @@ if __name__ == "__main__":
                 trDF = tPreproc.preprocBOW(trDF)
                 tPreproc.saveGensimDict(configFile.parent.resolve())
 
-                # if train_config['trainer'] == "ctm":
-                #     sys.stdout.write("entra")
-                #     for idx, DtSet in enumerate(trDtSet['Dtsets']):
-                #         df = dd.read_parquet(DtSet['parquet']).fillna("")
-                #         df = df[["id", "embeddings"]]
+                # If the trainer is CTM, we also need the embeddings
+                if train_config['trainer'] == "ctm":
+                    # We get full df containing the embeddings
+                    for idx, DtSet in enumerate(trDtSet['Dtsets']):
+                        df = dd.read_parquet(DtSet['parquet']).fillna("")
+                        df = df[["id", "embeddings"]]
 
-                #         # Concatenate dataframes
-                #         if idx == 0:
-                #             eDF = df
-                #         else:
-                #             eDF = dd.concat([trDF, df])
+                        # Concatenate dataframes
+                        if idx == 0:
+                            eDF = df
+                        else:
+                            eDF = dd.concat([trDF, df])
 
-                #     # We perform a left join to keep the embeddings of only those documents kept after preprocessing
-                #     trDF = trDF.join(eDF, on='id', how='left', lsuffix='_caller', rsuffix='_other')  
-
-                #     trDF = trDF.merge(eDF, how="left", on=["id"])
-                #     sys.stdout.write(trDF.head)
+                    # We perform a left join to keep the embeddings of only those documents kept after preprocessing
+                    trDF = trDF.merge(eDF, how="left", on=["id"])
 
                 trDataFile = tPreproc.exportTrData(trDF=trDF,
                                                    dirpath=configFile.parent.resolve(),
