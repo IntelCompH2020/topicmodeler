@@ -9,12 +9,14 @@ import argparse
 import json
 import shutil
 import sys
+import torch
 from pathlib import Path
 
 import numpy as np
 import pyLDAvis
 import scipy.sparse as sparse
 from sklearn.preprocessing import normalize
+from transformers import pipeline
 
 
 class TMManager(object):
@@ -254,7 +256,7 @@ class TMmodel(object):
         self._logger.info(
             '-- -- -- Topic model object (TMmodel) successfully created')
 
-    def create(self, betas=None, thetas=None, alphas=None, vocab=None):
+    def create(self, betas=None, thetas=None, alphas=None, vocab=None, labels=None):
         """Creates the topic model from the relevant matrices that characterize it. In addition to the initialization of the corresponding object's variables, all the associated variables and visualizations which are computationally costly are calculated so they are available for the other methods.
 
         Parameters
@@ -267,6 +269,8 @@ class TMmodel(object):
             Vector of length n_topics containing the importance of each topic
         vocab: list
             List of words sorted according to betas matrix
+        labels: list
+            List of  labels for automatic topic labeling
         """
 
         # If folder already exists no further action is needed
@@ -299,9 +303,8 @@ class TMmodel(object):
         self._calculate_beta_ds()
         self._calculate_topic_entropy()
         self._ndocs_active = np.array((self._thetas != 0).sum(0).tolist()[0])
-        self._tpc_descriptions = [el[1]
-                                  for el in self.get_tpc_word_descriptions()]
-        self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
+        self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
+        self._tpc_labels = [el[1] for el in self.get_tpc_labels(labels)]
 
         # We are ready to save all variables in the model
         self._save_all()
@@ -325,10 +328,8 @@ class TMmodel(object):
         with self._TMfolder.joinpath('edits.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._edits))
         np.save(self._TMfolder.joinpath('betas_ds.npy'), self._betas_ds)
-        np.save(self._TMfolder.joinpath(
-            'topic_entropy.npy'), self._topic_entropy)
-        np.save(self._TMfolder.joinpath(
-            'ndocs_active.npy'), self._ndocs_active)
+        np.save(self._TMfolder.joinpath('topic_entropy.npy'), self._topic_entropy)
+        np.save(self._TMfolder.joinpath('ndocs_active.npy'), self._ndocs_active)
         with self._TMfolder.joinpath('tpc_descriptions.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._tpc_descriptions))
         with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
@@ -346,8 +347,7 @@ class TMmodel(object):
         vis_data = pyLDAvis.prepare(self._betas, self._thetas[perm, ].toarray(),
                                     doc_len, self._vocab, vocabfreq, lambda_step=0.05,
                                     sort_topics=False, n_jobs=-1)
-        pyLDAvis.save_html(vis_data, self._TMfolder.joinpath(
-            'pyLDAvis.html').as_posix())
+        pyLDAvis.save_html(vis_data, self._TMfolder.joinpath('pyLDAvis.html').as_posix())
         self._modify_pyldavis_html(self._TMfolder.as_posix())
 
         return
@@ -525,19 +525,44 @@ class TMmodel(object):
             with self._TMfolder.joinpath('tpc_descriptions.txt').open('r', encoding='utf8') as fin:
                 self._tpc_descriptions = [el.strip() for el in fin.readlines()]
 
-    def get_tpc_labels(self):
+    def get_tpc_labels(self, labels=None, use_cuda=True):
         """returns the labels of the topics in the model
+
+        Parameters
+        ----------
+        labels: list
+            List of labels for automatic topic labeling
+        use_cuda: bool
+            If True, use cuda.
 
         Returns
         -------
         tpc_labels: list of tuples
-            Each element is a a term (topic_id, "label for topic topic_id")
-
-        -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-        This functions needs to be implemented by JAEM
-        -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*                      
+            Each element is a a term (topic_id, "label for topic topic_id")                    
         """
-        return self.get_tpc_word_descriptions()
+        if not labels:
+            return []
+        if use_cuda:
+            if torch.cuda.is_available():
+                device = 0
+                self._logger.info("-- -- CUDA available: GPU will be used")
+            else:
+                device = -1
+                self._logger.warning(
+                    "-- -- 'use_cuda' set to True when cuda is unavailable."
+                    "Make sure CUDA is available or set 'use_cuda=False'"
+                )
+                self._logger.info("-- -- CUDA unavailable: GPU will not be used")
+        else:
+            device = -1
+            self._logger.info("-- -- CUDA unavailable: GPU will not be used")
+        
+        classifier = pipeline("zero-shot-classification",
+                              model="facebook/bart-large-mnli",
+                              device=device)
+        predictions = classifier(self._tpc_descriptions, labels)
+        predictions = [(i, p["labels"][0]) for i, p in enumerate(predictions)]
+        return predictions
 
     def load_tpc_labels(self):
         if self._tpc_labels is None:

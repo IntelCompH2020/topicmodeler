@@ -1252,7 +1252,7 @@ class MalletTrainer(Trainer):
 
     """
 
-    def __init__(self, mallet_path, ntopics=25, alpha=5.0, optimize_interval=10, num_threads=4, num_iterations=1000, doc_topic_thr=0.0, thetas_thr=0.003, token_regexp=None, logger=None):
+    def __init__(self, mallet_path, ntopics=25, alpha=5.0, optimize_interval=10, num_threads=4, num_iterations=1000, doc_topic_thr=0.0, thetas_thr=0.003, token_regexp=None, labels=None, logger=None):
         """
         Initilization Method
 
@@ -1276,6 +1276,8 @@ class MalletTrainer(Trainer):
             Min value for sparsification of topic proportions after training
         token_regexp: str
             Regular expression for mallet topic model trainer (java type)
+        labels: list(str)
+            Lists of labels to assign to topics
         logger: Logger object
             To log object activity
         """
@@ -1291,6 +1293,7 @@ class MalletTrainer(Trainer):
         self._doc_topic_thr = doc_topic_thr
         self._thetas_thr = thetas_thr
         self._token_regexp = token_regexp
+        self._labels = labels
 
         if not self._mallet_path.is_file():
             self._logger.error(
@@ -1361,9 +1364,16 @@ class MalletTrainer(Trainer):
              for el in zip(vocab, term_freq)]
         self._logger.debug('-- -- Mallet training: Vocabulary file generated')
 
+        # Load labels for AutoTM
+        lblFile = Path(self._labels)
+        labels = []
+        if lblFile.is_file():
+            with Path(lblFile).open('r', encoding='utf8') as fin:
+                labels += json.load(fin)['wordlist']
+
         tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
-                  vocab=vocab)
+                  vocab=vocab, labels=labels)
 
         # Remove doc-topics file. It is no longer needed and takes a lot of space
         thetas_file.unlink()
@@ -1475,7 +1485,9 @@ class ProdLDATrainer(Trainer):
                  hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
                  learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99,
                  solver='adam', num_epochs=100, reduce_on_plateau=False,
-                 topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10, num_data_loader_workers=mp.cpu_count(), thetas_thr=0.003, logger=None):
+                 topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10,
+                 num_data_loader_workers=mp.cpu_count(), thetas_thr=0.003,
+                 labels=None, logger=None):
         """
         Initilization Method
 
@@ -1518,6 +1530,8 @@ class ProdLDATrainer(Trainer):
             If True, additional logs are displayed
         thetas_thr: float
             Min value for sparsification of topic proportions after training
+        labels: list(str)
+            Lists of labels to assign to topics
         logger: Logger object
             To log object activity
         """
@@ -1541,6 +1555,7 @@ class ProdLDATrainer(Trainer):
         self._num_samples = num_samples
         self._num_data_loader_workers = num_data_loader_workers
         self._thetas_thr = thetas_thr
+        self._labels = labels
 
         return
 
@@ -1584,10 +1599,17 @@ class ProdLDATrainer(Trainer):
         betas = avitm.get_topic_word_distribution()
         vocab = self._train_dataset.idx2token
 
+        # Load labels for AutoTM
+        lblFile = Path(self._labels)
+        labels = []
+        if lblFile.is_file():
+            with Path(lblFile).open('r', encoding='utf8') as fin:
+                labels += json.load(fin)['wordlist']
+
         # Create TMmodel
         tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
-                  vocab=vocab)
+                  vocab=vocab, labels=labels)
 
         return tm
 
@@ -1669,7 +1691,13 @@ class CTMTrainer(Trainer):
 
     """
 
-    def __init__(self, n_components=10, ctm_model_type='CombinedTM', model_type='prodLDA', hidden_sizes=(100, 100), activation='softplus', dropout=0.2, learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, solver='adam', num_epochs=100, num_samples=10, reduce_on_plateau=False, topic_prior_mean=0.0, topic_prior_variance=None, num_data_loader_workers=mp.cpu_count(), label_size=0, loss_weights=None, thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1', logger=None):
+    def __init__(self, n_components=10, ctm_model_type='CombinedTM', model_type='prodLDA',
+                 hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
+                 learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, solver='adam',
+                 num_epochs=100, num_samples=10, reduce_on_plateau=False, topic_prior_mean=0.0,
+                 topic_prior_variance=None, num_data_loader_workers=mp.cpu_count(), label_size=0,
+                 loss_weights=None, thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1',
+                 labels=None, logger=None):
         """
         Initilization Method
 
@@ -1717,6 +1745,8 @@ class CTMTrainer(Trainer):
             Min value for sparsification of topic proportions after training
         sbert_model_to_load: str (default='paraphrase-distilroberta-base-v1')
             Model to be used for calculating the embeddings
+        labels: list(str)
+            Lists of labels to assign to topics
         logger: Logger object
             To log object activity
         """
@@ -1744,6 +1774,7 @@ class CTMTrainer(Trainer):
         self._sbert_model_to_load = sbert_model_to_load
         self._loss_weights = loss_weights
         self._thetas_thr = thetas_thr
+        self._labels = labels
 
         return
 
@@ -1782,10 +1813,17 @@ class CTMTrainer(Trainer):
         betas = ctm.get_topic_word_distribution()
         vocab = self._train_dts.idx2token
 
+        # Load labels for AutoTM
+        lblFile = Path(self._labels)
+        labels = []
+        if lblFile.is_file():
+            with Path(lblFile).open('r', encoding='utf8') as fin:
+                labels += json.load(fin)['wordlist']
+
         # Create TMmodel
         tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
-                  vocab=vocab)
+                  vocab=vocab, labels=labels)
 
         return tm
 
@@ -2298,7 +2336,8 @@ if __name__ == "__main__":
                         num_iterations=train_config['TMparam']['num_iterations'],
                         doc_topic_thr=train_config['TMparam']['doc_topic_thr'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        token_regexp=train_config['TMparam']['token_regexp'])
+                        token_regexp=train_config['TMparam']['token_regexp'],
+                        labels=train_config['TMparam']['labels'])
                     MallTr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.txt'))
 
@@ -2331,7 +2370,8 @@ if __name__ == "__main__":
                         topic_prior_variance=train_config['TMparam']['topic_prior_variance'],
                         num_samples=train_config['TMparam']['num_samples'],
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
-                        thetas_thr=train_config['TMparam']['thetas_thr'])
+                        thetas_thr=train_config['TMparam']['thetas_thr'],
+                        labels=train_config['TMparam']['labels'])
                     ProdLDATr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.parquet'))
 
@@ -2355,12 +2395,12 @@ if __name__ == "__main__":
                         topic_prior_variance=train_config['TMparam']['topic_prior_variance'],
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        sbert_model_to_load=train_config['TMparam']['sbert_model_to_load'])
+                        sbert_model_to_load=train_config['TMparam']['sbert_model_to_load'],
+                        labels=train_config['TMparam']['labels'])
 
                     if Path(train_config['embeddings']).is_file():
                         CTMr.fit(
-                            corpusFile=configFile.parent.joinpath(
-                                'corpus.parquet'),
+                            corpusFile=configFile.parent.joinpath('corpus.parquet'),
                             embeddingsFile=Path(train_config['embeddings']))
                     else:
                         CTMr.fit(
@@ -2375,18 +2415,15 @@ if __name__ == "__main__":
         else:
             configFile_f = Path(args.config)
             if not configFile_f.is_file():
-                sys.exit(
-                    'You need to provide a valid configuration file for the father model.')
+                sys.exit('You need to provide a valid configuration file for the father model.')
             else:
                 configFile_c = Path(args.config_child)
                 if not configFile_c.is_file():
-                    sys.exit(
-                        'You need to provide a valid configuration file for the submodel.')
+                    sys.exit('You need to provide a valid configuration file for the submodel.')
                 else:
                     tMmodel_path = configFile_f.parent.joinpath('model.npz')
                     if not tMmodel_path.is_file():
-                        sys.exit(
-                            'There must exist a valid TMmodel file for the parent corpus')
+                        sys.exit('There must exist a valid TMmodel file for the parent corpus')
 
                     # Create hierarhicalTMManager object
                     hierarchicalTMManager = HierarchicalTMManager()
