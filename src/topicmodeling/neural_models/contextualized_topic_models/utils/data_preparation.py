@@ -123,7 +123,7 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
     train_bow = cv.fit_transform(docs_train_conv)
 
     # Array mapping from feature integer indices to feature name.
-    idx2token = cv.get_feature_names()
+    idx2token = cv.cv.get_feature_names_out()
     input_size = len(idx2token)
     id2token = {k: v for k, v in zip(range(0, len(idx2token)), idx2token)}
 

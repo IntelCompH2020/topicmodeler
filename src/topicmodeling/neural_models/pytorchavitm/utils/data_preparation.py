@@ -47,7 +47,7 @@ def prepare_dataset(corpus, val_size=0.25):
     train_bow = cv.fit_transform(docs_train_conv).toarray()
 
     # Array mapping from feature integer indices to feature name.
-    idx2token = cv. get_feature_names_out()
+    idx2token = cv.get_feature_names_out()
     input_size = len(idx2token)
     id2token = {k: v for k, v in zip(range(0, len(idx2token)), idx2token)}
 

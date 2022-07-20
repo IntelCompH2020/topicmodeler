@@ -352,7 +352,7 @@ class TMmodel(object):
 
         return
 
-    def _modify_pyldavis_html(model_dir):
+    def _modify_pyldavis_html(self, model_dir):
         """
         Modifies the PyLDAvis HTML file returned by the Gensim library to include the direct paths of the 'd3.js' and 'ldavis.v3.0.0.js', which are copied into the model/submodel directory.
 

@@ -1817,7 +1817,7 @@ class CTMTrainer(Trainer):
 
         # Calculate beta matrix and vocab list
         betas = ctm.get_topic_word_distribution()
-        vocab = self._train_dts.idx2token
+        vocab = self._qt.vocab
 
         # Load labels for AutoTM
         lblFile = Path(self._labels)
@@ -1878,7 +1878,7 @@ class CTMTrainer(Trainer):
             self._unpreprocessed_corpus = None
 
         # Generate the corpus in the input format required by CTM
-        self._train_dts, self._val_dts, self._input_size, self._id2token, _, self._embeddings_train, _, self._docs_train = \
+        self._train_dts, self._val_dts, self._input_size, self._id2token, self._qt, self._embeddings_train, _, self._docs_train = \
             prepare_ctm_dataset(corpus=self._corpus,
                                 unpreprocessed_corpus=self._unpreprocessed_corpus,
                                 custom_embeddings=self._embeddings,
@@ -2409,13 +2409,14 @@ if __name__ == "__main__":
                         sbert_model_to_load=train_config['TMparam']['sbert_model_to_load'],
                         labels=train_config['TMparam']['labels'])
 
-                    if Path(train_config['embeddings']).is_file():
-                        CTMr.fit(
-                            corpusFile=configFile.parent.joinpath('corpus.parquet'),
-                            embeddingsFile=Path(train_config['embeddings']))
-                    else:
-                        CTMr.fit(
-                            corpusFile=configFile.parent.joinpath('corpus.parquet'))
+                    # TODO: Approch differently for 2-level
+                    #if Path(train_config['embeddings']).is_file():
+                    #    CTMr.fit(
+                    #        corpusFile=configFile.parent.joinpath('corpus.parquet'),
+                    #        embeddingsFile=Path(train_config['embeddings']))
+                    #else:
+                    CTMr.fit(
+                        corpusFile=configFile.parent.joinpath('corpus.parquet'))
 
         else:
             sys.exit('You need to provide a valid configuration file')
