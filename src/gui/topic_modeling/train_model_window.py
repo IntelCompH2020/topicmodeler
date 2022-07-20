@@ -253,8 +253,8 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.training_params = {}
         messages = ""
 
-        ntopics = self.lineEdit_nr_topics_lda.text()
-        if int(self.lineEdit_nr_topics_lda.text()) < 0 or int(self.lineEdit_nr_topics_lda.text()) == 0:
+        ntopics = int(self.lineEdit_nr_topics_lda.text())
+        if ntopics < 0 or ntopics == 0:
             self.checkBox_lda_1_bad.show()
             messages += Constants.WRONG_NR_TOPICS_LDA_MSG + "\n"
         else:

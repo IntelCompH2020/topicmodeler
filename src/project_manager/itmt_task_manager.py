@@ -107,16 +107,35 @@ class ITMTTaskManager(BaseTaskManager):
         self._dir_struct = {'datasets': 'datasets',
                             'TMmodels': 'TMmodels'}
 
+
         return
 
     def load(self):
         """
-        Extends the load method from the parent class to load into execution time the datasets that have been
-        retrieved from HDFS and are available in the p2parquet provided by the user, as well as all the (logical)
-        Datasets available for the training of topic models which were created in previous executions.
+        Extends the load method from the parent class to load into execution time necessary entities required for the execution of the application.
         """
-
         super().load()
+        self.load_lists()
+
+        return
+    
+    def create(self):
+        """
+        Extends the create method from the parent class to load into execution time necessary entities required for the execution of the application.
+        """
+        super().create()
+        self.load_lists()
+
+        return 
+    
+    def load_lists(self):
+        """
+        It loads into execution time all the necessary entities used during the execution of the application, namely:
+        1) the datasets that have been retrieved from HDFS and are available in the p2parquet provided by the user
+        2) the (logical) datasets available for the training of topic models which were created in previous executions.
+        3) the available wordlists
+        4) the available trained models
+        """
 
         self.load_listDownloaded()
         self.load_listTrDtsets()
@@ -906,8 +925,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             p2p, p2parquet, p2wdlist, config_fname=config_fname,
             metadata_fname=metadata_fname)
 
-        # super().load()
-
+        
     def fromHDFS(self):
         """
         This method simulates the download of a corpus from the IntelComp data space
