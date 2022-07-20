@@ -21,38 +21,25 @@ from abc import abstractmethod
 from pathlib import Path
 from subprocess import check_output
 
+import dask.array as da
+import dask.dataframe as dd
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import dask.dataframe as dd
-import dask.array as da
 from dask.diagnostics import ProgressBar
+from gensim import corpora
 from scipy import sparse
 from sklearn.preprocessing import normalize
-from gensim import corpora
-
-from neural_models.contextualized_topic_models.ctm_network.ctm import CombinedTM, ZeroShotTM
-from neural_models.contextualized_topic_models.utils.data_preparation import prepare_ctm_dataset
-from neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
-from neural_models.pytorchavitm.avitm_network.avitm import AVITM
 
 from manageModels import TMmodel as newTMmodel
+from neural_models.contextualized_topic_models.ctm_network.ctm import (
+    CombinedTM, ZeroShotTM)
+from neural_models.contextualized_topic_models.utils.data_preparation import \
+    prepare_ctm_dataset
+from neural_models.pytorchavitm.avitm_network.avitm import AVITM
+from neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
 
-"""
-# from scipy.spatial.distance import jensenshannon
-# import pyLDAvis
-import logging
-import regex as javare
-import re
-from tqdm import tqdm
-import ipdb
-from gensim.utils import check_output, tokenize
-import pickle
-
-logging.getLogger("gensim").setLevel(logging.WARNING)
-"""
-
-
+# TODO: This function is also in utils/misc
 def file_lines(fname):
     """
     Count number of lines in file
@@ -443,8 +430,7 @@ class textPreproc(object):
                 with ProgressBar():
                     DFparquet = trDF[['id', 'cleantext']].rename(
                         columns={"cleantext": "bow_text"})
-                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
-                                         'scheduler': 'processes'})
+                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={'scheduler': 'processes'})
 
             elif tmTrainer == "ctm":
                 outFile = dirpath.joinpath('corpus.parquet')
@@ -452,10 +438,10 @@ class textPreproc(object):
                     outFile.unlink()
 
                 with ProgressBar():
-                    #DFparquet = trDF[['id', 'cleantext', 'all_rawtext']].rename(
+                    # DFparquet = trDF[['id', 'cleantext', 'all_rawtext']].rename(
                     #    columns={"cleantext": "bow_text"})
                     DFparquet = trDF[['id', 'cleantext', 'embeddings']].rename(
-                                            columns={"cleantext": "bow_text"})
+                        columns={"cleantext": "bow_text"})
                     DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={'scheduler': 'processes'})
 
         else:
@@ -507,7 +493,7 @@ class textPreproc(object):
             elif tmTrainer == "ctm":
                 outFile = dirpath.joinpath('corpus.parquet')
                 lemas_raw_df = (trDF.withColumn("bow_text", back2textUDF(
-                    F.col("bow"))).select("id", "bow_text", "all_raw_text"))
+                    F.col("bow"))).select("id", "bow_text", "embeddings"))
                 lemas_raw_df.write.parquet(
                     f"file://{outFile.as_posix()}", mode="overwrite")
 
@@ -1793,7 +1779,7 @@ class CTMTrainer(Trainer):
         # Calculate beta matrix and vocab list
         betas = ctm.get_topic_word_distribution()
         vocab = self._train_dts.idx2token
-        
+
         # Create TMmodel
         tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
@@ -1968,7 +1954,7 @@ class HierarchicalTMManager(object):
             tr_config_c = json.load(fin)
 
         # Get father model's training corpus as dask dataframe
-        if tr_config_f['trainer'] == "ctm" or  tr_config_f['trainer'] == "prodLDA":
+        if tr_config_f['trainer'] == "ctm" or tr_config_f['trainer'] == "prodLDA":
             corpusFile = configFile_f.parent.joinpath('modelFiles/corpus.txt')
             self._logger.info(corpusFile)
         else:
@@ -1981,7 +1967,8 @@ class HierarchicalTMManager(object):
 
         # Get embeddings if the trainer is CTM
         if tr_config_f['trainer'] == "ctm":
-            embeddingsFile = configFile_f.parent.joinpath('modelFiles/embeddings.npy')
+            embeddingsFile = configFile_f.parent.joinpath(
+                'modelFiles/embeddings.npy')
             embeddings = np.load(embeddingsFile, allow_pickle=True)
 
         # Get father model's thetas and betas and expansion topic
@@ -2029,7 +2016,7 @@ class HierarchicalTMManager(object):
                 words_exp_idx = [idx_w for idx_w in words_doc_idx if np.argmax(
                     np.multiply(thetas_d, betas[:, idx_w])) == exp_tpc]
 
-                #words_exp_idx = [idx_w for idx_w in range(betas.shape[1]) if #np.nonzero(np.random.multinomial(len(betas), np.multiply#(thetas_d, betas[:, idx_w])))[0][0] == exp_tpc]
+                # words_exp_idx = [idx_w for idx_w in range(betas.shape[1]) if #np.nonzero(np.random.multinomial(len(betas), np.multiply#(thetas_d, betas[:, idx_w])))[0][0] == exp_tpc]
 
                 # Only words generated by exp_tpc are kept
                 reduced_doc = [vocab_id2w[str(id_word)]
@@ -2123,15 +2110,14 @@ class HierarchicalTMManager(object):
         else:
             self._logger.error(
                 '-- -- -- The specified HTM version is not available.')
-        
-                # If the trainer is CTM, keep embeddings related to the selected documents t
-        
+
+            # If the trainer is CTM, keep embeddings related to the selected documents t
+
         if tr_config_c['trainer'] == "ctm":
             # Save embeddings
             embeddings_file = configFile_c.parent.joinpath('embeddings.npy')
             np.save(embeddings_file, embeddings)
 
-        
         return
 
 
@@ -2212,9 +2198,8 @@ if __name__ == "__main__":
                     df = (
                         df.withColumn("all_lemmas", F.concat_ws(
                             ' ', *DtSet['lemmasfld']))
-                          .withColumn("all_rawtext", F.concat_ws(' ', *DtSet['rawtxtfld']))
                           .withColumn("source", F.lit(DtSet["source"]))
-                          .select("id", "source", "all_lemmas", "all_rawtext")
+                          .select("id", "source", "all_lemmas")
                     )
                     if idx == 0:
                         trDF = df
@@ -2224,6 +2209,23 @@ if __name__ == "__main__":
                 # We preprocess the data and save the CountVectorizer Model used to obtain the BoW
                 trDF = tPreproc.preprocBOW(trDF)
                 tPreproc.saveCntVecModel(configFile.parent.resolve())
+
+                if train_config['trainer'] == "ctm":
+                    # We get full df containing the embeddings
+                    for idx, DtSet in enumerate(trDtSet['Dtsets']):
+                        df = spark.read.parquet(f"file://{DtSet['parquet']}")
+                        df = (
+                        df.withColumn("embeddings", F.concat_ws(' ', *DtSet['embeddingsfld']))
+                          .withColumn("source", F.lit(DtSet["source"]))
+                          .select("id", "embeddings")
+                        )   
+                        if idx == 0:
+                            eDF = df
+                        else:
+                            eDF = eDF.union(df).distinct()
+                    # We perform a left join to keep the embeddings of only those documents kept after preprocessing
+                    trDF = pd.merge(trDF, eDF, on='id', how='left')
+
                 trDataFile = tPreproc.exportTrData(trDF=trDF,
                                                    dirpath=configFile.parent.resolve(),
                                                    tmTrainer=train_config['trainer'])
@@ -2244,13 +2246,8 @@ if __name__ == "__main__":
                             df["all_lemmas"] = df[col]
                         else:
                             df["all_lemmas"] += " " + df[col]
-                    for idx2, col in enumerate(DtSet['rawtxtfld']):
-                        if idx2 == 0:
-                            df["all_rawtext"] = df[col]
-                        else:
-                            df["all_rawtext"] += " " + df[col]
-                    df["source"] = DtSet["source"]
-                    df = df[["id", "source", "all_lemmas", "all_rawtext"]]
+                    df["source"] = df["embeddingsfld"]
+                    df = df[["id", "source", "all_lemmas"]]
 
                     # Concatenate dataframes
                     if idx == 0:
@@ -2262,6 +2259,22 @@ if __name__ == "__main__":
                 # We preprocess the data and save the Gensim Model used to obtain the BoW
                 trDF = tPreproc.preprocBOW(trDF)
                 tPreproc.saveGensimDict(configFile.parent.resolve())
+
+                if train_config['trainer'] == "ctm":
+                    # We get full df containing the embeddings
+                    for idx, DtSet in enumerate(trDtSet['Dtsets']):
+                        df = dd.read_parquet(DtSet['parquet']).fillna("")
+                        df["embeddings"] = df["embeddingsfld"]
+                        df = df[["id", "embeddings"]]
+
+                        # Concatenate dataframes
+                        if idx == 0:
+                            eDF = df
+                        else:
+                            eDF = dd.concat([trDF, df])
+                    # We perform a left join to keep the embeddings of only those documents kept after preprocessing
+                    trDF = pd.merge(trDF, eDF, on='id', how='left')
+
                 trDataFile = tPreproc.exportTrData(trDF=trDF,
                                                    dirpath=configFile.parent.resolve(),
                                                    tmTrainer=train_config['trainer'])
@@ -2349,7 +2362,8 @@ if __name__ == "__main__":
 
                     if Path(train_config['embeddings']).is_file():
                         CTMr.fit(
-                            corpusFile=configFile.parent.joinpath('corpus.parquet'),
+                            corpusFile=configFile.parent.joinpath(
+                                'corpus.parquet'),
                             embeddingsFile=Path(train_config['embeddings']))
                     else:
                         CTMr.fit(
@@ -2364,19 +2378,22 @@ if __name__ == "__main__":
         else:
             configFile_f = Path(args.config)
             if not configFile_f.is_file():
-                sys.exit('You need to provide a valid configuration file for the father model.')
+                sys.exit(
+                    'You need to provide a valid configuration file for the father model.')
             else:
                 configFile_c = Path(args.config_child)
                 if not configFile_c.is_file():
-                    sys.exit('You need to provide a valid configuration file for the submodel.')
+                    sys.exit(
+                        'You need to provide a valid configuration file for the submodel.')
                 else:
                     tMmodel_path = configFile_f.parent.joinpath('model.npz')
                     if not tMmodel_path.is_file():
-                        sys.exit('There must exist a valid TMmodel file for the parent corpus')
-                    
+                        sys.exit(
+                            'There must exist a valid TMmodel file for the parent corpus')
+
                     # Create hierarhicalTMManager object
                     hierarchicalTMManager = HierarchicalTMManager()
-                    
+
                     # Create corpus
                     hierarchicalTMManager.create_submodel_tr_corpus(
                         tMmodel_path, args.config, args.config_child)

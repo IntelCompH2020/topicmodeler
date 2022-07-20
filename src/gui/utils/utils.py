@@ -354,39 +354,3 @@ def indent(elem, level=0):
             elem.tail = i
 
     return
-
-
-def modify_pyldavis_html(model_dir):
-    """
-    Modifies the PyLDAvis HTML file returned by the Gensim library to include the direct paths of the 'd3.js' and 'ldavis.v3.0.0.js', which are copied into the model/submodel directory.
-
-    Parameters
-    ----------
-    model_dir: str
-        String representation of the path wwhere the model/submodel is located
-    """
-
-    # Copy necessary files in model / submodel folder for PyLDAvis visualization
-    d3 = pathlib.Path("src/gui/resources/d3.js")
-    v3 = pathlib.Path("src/gui/resources/ldavis.v3.0.0.js")
-    shutil.copyfile(d3, pathlib.Path(model_dir, "d3.js"))
-    shutil.copyfile(v3, pathlib.Path(model_dir, "ldavis.v3.0.0.js"))
-
-    # Update d3 and v3 paths in pyldavis.html
-    fin = open(pathlib.Path(model_dir, "pyLDAvis.html").as_posix(),
-               "rt")  # read input file
-    data = fin.read()  # read file contents to string
-    # Replace all occurrences of the required string
-    data = data.replace(
-        "https://d3js.org/d3.v5.js", "d3.js")
-    data = data.replace(
-        "https://d3js.org/d3.v5", "d3.js")
-    data = data.replace(
-        "https://cdn.jsdelivr.net/gh/bmabey/pyLDAvis@3.3.1/pyLDAvis/js/ldavis.v3.0.0.js", "ldavis.v3.0.0.js")
-    fin.close()  # close the input file
-    fin = open(pathlib.Path(model_dir, "pyLDAvis.html").as_posix(),
-               "wt")  # open the input file in write mode
-    fin.write(data)  # overrite the input file with the resulting data
-    fin.close()  # close the file
-
-    return

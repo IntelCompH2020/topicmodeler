@@ -1121,13 +1121,23 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 print('Selected:', ', '.join(Dtset_lemmas_fld))
 
                 # rawtext fields
-                Dtset_rawtext_fld = input(
-                    'Select fields for rawtext (separated by commas): ')
-                Dtset_rawtext_fld = [el.strip()
-                                     for el in Dtset_rawtext_fld.split(',')]
-                Dtset_rawtext_fld = [el for el in Dtset_rawtext_fld
+                # Dtset_rawtext_fld = input(
+                #     'Select fields for rawtext (separated by commas): ')
+                # Dtset_rawtext_fld = [el.strip()
+                #                      for el in Dtset_rawtext_fld.split(',')]
+                # Dtset_rawtext_fld = [el for el in Dtset_rawtext_fld
+                #                      if el in allDtsets[Dtset_loc]['schema']]
+                # print('Selected:', ', '.join(Dtset_rawtext_fld))
+
+                # embeddings fields
+                Dtset_embeddings_fld = input(
+                    'Select fields for embeddings (separated by commas): ')
+                Dtset_embeddings_fld = [el.strip()
+                                     for el in Dtset_embeddings_fld.split(',')]
+                Dtset_embeddings_fld = [el for el in Dtset_embeddings_fld
                                      if el in allDtsets[Dtset_loc]['schema']]
-                print('Selected:', ', '.join(Dtset_rawtext_fld))
+                print('Selected:', ', '.join(Dtset_embeddings_fld))
+
 
                 # Spark clause for filtering (advanced users only)
                 Dtset_filter = input(
@@ -1137,7 +1147,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                                  'source': Dtset_source,
                                  'idfld': Dtset_idfld,
                                  'lemmasfld': Dtset_lemmas_fld,
-                                 'rawtxtfld': Dtset_rawtext_fld,
+                                 'embeddingsfld': Dtset_embeddings_fld,
                                  'filter': Dtset_filter
                                  })
 

@@ -15,19 +15,13 @@ class EmbeddingsManager(object):
 
     def _check_max_local_length(self, max_seq_length: int, texts: List[str]):
         """
-        Returns a dictionary with all wordlists available in the folder 
+        Checks the context of the bert model vs maximum length of the documents
 
         Parameters
         ----------
-        max_seq_length : 
-        texts:
+        max_seq_length : Context of the models
+        texts: Documents to calculate the embeddings from
 
-        Returns
-        -------
-        allWdLists : Dictionary (path -> dictionary)
-            One dictionary entry per wordlist
-            key is the absolute path to the wordlist
-            value is a dictionary with metadata
         """        
 
         max_local_length = np.max([len(t.split()) for t in texts])
@@ -75,7 +69,7 @@ class EmbeddingsManager(object):
                 res.append(entry)
 
         for f in tqdm(res):
-            df = pd.read_parquet(res[0]).fillna("").dropna().drop("euroSciVocCode", axis=1)
+            df = pd.read_parquet(f).fillna("").dropna().drop("euroSciVocCode", axis=1)
             df = df[df.rawtext != ""]
             raw = df.rawtext.values.tolist()
             embeddings = self.bert_embeddings_from_list(

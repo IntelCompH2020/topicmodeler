@@ -7,15 +7,14 @@ Provides a series of functions for Topic Model representation and curation
 
 import argparse
 import json
-import sys
 import shutil
-
+import sys
 from pathlib import Path
+
 import numpy as np
+import pyLDAvis
 import scipy.sparse as sparse
 from sklearn.preprocessing import normalize
-import pyLDAvis
-from src.gui.utils import utils
 
 
 class TMManager(object):
@@ -57,13 +56,15 @@ class TMManager(object):
                         "hierarchy-level": modelInfo['hierarchy-level'],
                         "htm-version": modelInfo['htm-version']
                     }
-                submodelFolders = [el for el in TMf.iterdir() if not el.as_posix().endswith("modelFiles") and not el.as_posix().endswith("corpus.parquet") and not el.as_posix().endswith("_old")]
+                submodelFolders = [el for el in TMf.iterdir() if not el.as_posix().endswith(
+                    "modelFiles") and not el.as_posix().endswith("corpus.parquet") and not el.as_posix().endswith("_old")]
                 for sub_TMf in submodelFolders:
                     submodelConfig = sub_TMf.joinpath('trainconfig.json')
                     if submodelConfig.is_file():
                         with submodelConfig.open('r', encoding='utf8') as fin:
                             submodelInfo = json.load(fin)
-                            corpus = "Subcorpus created from " + str(modelInfo['name'])
+                            corpus = "Subcorpus created from " + \
+                                str(modelInfo['name'])
                             allTMmodels[submodelInfo['name']] = {
                                 "name": submodelInfo['name'],
                                 "description": submodelInfo['description'],
@@ -110,7 +111,7 @@ class TMManager(object):
         ----------
         name : pathlib.Path
             Path to the model to be renamed
-        
+
         new_name : pathlib.Path
             Path to the new name for the topic model
 
@@ -119,20 +120,22 @@ class TMManager(object):
         status : int
             - 0 if the model could not be renamed
             - 1 if the model was renamed successfully
-        
+
         """
         if not name.is_dir():
             print(f"Model '{name.as_posix()}' does not exist.")
             return 0
         if new_name.is_file():
-            print(f"Model '{new_name.as_posix()}' already exists. Rename or delete it first.")
+            print(
+                f"Model '{new_name.as_posix()}' already exists. Rename or delete it first.")
             return 0
         try:
             with name.joinpath('trainconfig.json').open("r", encoding="utf8") as fin:
                 TMmodel = json.load(fin)
             TMmodel["name"] = new_name.stem
             with name.joinpath('trainconfig.json').open("w", encoding="utf-8") as fout:
-                json.dump(TMmodel, fout, ensure_ascii=False, indent=2, default=str)
+                json.dump(TMmodel, fout, ensure_ascii=False,
+                          indent=2, default=str)
             shutil.move(name, new_name)
             return 1
         except:
@@ -146,7 +149,7 @@ class TMManager(object):
         ----------
         name : pathlib.Path
             Path to the model to be copied
-        
+
         new_name : pathlib.Path
             Path to the new name for the topic model
 
@@ -155,13 +158,14 @@ class TMManager(object):
         status : int
             - 0 if the model could not be copied
             - 1 if the model was copied successfully
-        
+
         """
         if not name.is_dir():
             print(f"Model '{name.as_posix()}' does not exist.")
             return 0
         if new_name.is_file():
-            print(f"Model '{new_name.as_posix()}' already exists. Rename or delete it first.")
+            print(
+                f"Model '{new_name.as_posix()}' already exists. Rename or delete it first.")
             return 0
         try:
             shutil.copytree(name, new_name)
@@ -169,7 +173,8 @@ class TMManager(object):
                 TMmodel = json.load(fin)
             TMmodel["name"] = new_name.stem
             with new_name.joinpath('trainconfig.json').open("w", encoding="utf-8") as fout:
-                json.dump(TMmodel, fout, ensure_ascii=False, indent=2, default=str)
+                json.dump(TMmodel, fout, ensure_ascii=False,
+                          indent=2, default=str)
             return 1
         except:
             return 0
@@ -243,7 +248,8 @@ class TMmodel(object):
             try:
                 self._TMfolder.mkdir(parents=True)
             except:
-                self._logger.error('-- -- Topic model object (TMmodel) could not be created')
+                self._logger.error(
+                    '-- -- Topic model object (TMmodel) could not be created')
 
         self._logger.info(
             '-- -- -- Topic model object (TMmodel) successfully created')
@@ -266,12 +272,13 @@ class TMmodel(object):
         # If folder already exists no further action is needed
         # in other case, the folder is created
         if not self._TMfolder.is_dir():
-            self._logger.error('-- -- Topic model object (TMmodel) folder not ready')
+            self._logger.error(
+                '-- -- Topic model object (TMmodel) folder not ready')
             return
 
         self._alphas_orig = alphas
         self._betas_orig = betas
-        self._thetas_orig  = thetas
+        self._thetas_orig = thetas
         self._alphas = alphas
         self._betas = betas
         self._thetas = thetas
@@ -292,9 +299,10 @@ class TMmodel(object):
         self._calculate_beta_ds()
         self._calculate_topic_entropy()
         self._ndocs_active = np.array((self._thetas != 0).sum(0).tolist()[0])
-        self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
+        self._tpc_descriptions = [el[1]
+                                  for el in self.get_tpc_word_descriptions()]
         self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
-        
+
         # We are ready to save all variables in the model
         self._save_all()
 
@@ -317,8 +325,10 @@ class TMmodel(object):
         with self._TMfolder.joinpath('edits.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._edits))
         np.save(self._TMfolder.joinpath('betas_ds.npy'), self._betas_ds)
-        np.save(self._TMfolder.joinpath('topic_entropy.npy'), self._topic_entropy)
-        np.save(self._TMfolder.joinpath('ndocs_active.npy'), self._ndocs_active)
+        np.save(self._TMfolder.joinpath(
+            'topic_entropy.npy'), self._topic_entropy)
+        np.save(self._TMfolder.joinpath(
+            'ndocs_active.npy'), self._ndocs_active)
         with self._TMfolder.joinpath('tpc_descriptions.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._tpc_descriptions))
         with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
@@ -336,9 +346,45 @@ class TMmodel(object):
         vis_data = pyLDAvis.prepare(self._betas, self._thetas[perm, ].toarray(),
                                     doc_len, self._vocab, vocabfreq, lambda_step=0.05,
                                     sort_topics=False, n_jobs=-1)
-        pyLDAvis.save_html(vis_data, self._TMfolder.joinpath('pyLDAvis.html').as_posix())
-        utils.modify_pyldavis_html(self._TMfolder.as_posix())
-        
+        pyLDAvis.save_html(vis_data, self._TMfolder.joinpath(
+            'pyLDAvis.html').as_posix())
+        self._modify_pyldavis_html(self._TMfolder.as_posix())
+
+        return
+
+    def _modify_pyldavis_html(model_dir):
+        """
+        Modifies the PyLDAvis HTML file returned by the Gensim library to include the direct paths of the 'd3.js' and 'ldavis.v3.0.0.js', which are copied into the model/submodel directory.
+
+        Parameters
+        ----------
+        model_dir: str
+            String representation of the path wwhere the model/submodel is located
+        """
+
+        # Copy necessary files in model / submodel folder for PyLDAvis visualization
+        d3 = Path("src/gui/resources/d3.js")
+        v3 = Path("src/gui/resources/ldavis.v3.0.0.js")
+        shutil.copyfile(d3, Path(model_dir, "d3.js"))
+        shutil.copyfile(v3, Path(model_dir, "ldavis.v3.0.0.js"))
+
+        # Update d3 and v3 paths in pyldavis.html
+        fin = open(Path(model_dir, "pyLDAvis.html").as_posix(),
+                   "rt")  # read input file
+        data = fin.read()  # read file contents to string
+        # Replace all occurrences of the required string
+        data = data.replace(
+            "https://d3js.org/d3.v5.js", "d3.js")
+        data = data.replace(
+            "https://d3js.org/d3.v5", "d3.js")
+        data = data.replace(
+            "https://cdn.jsdelivr.net/gh/bmabey/pyLDAvis@3.3.1/pyLDAvis/js/ldavis.v3.0.0.js", "ldavis.v3.0.0.js")
+        fin.close()  # close the input file
+        fin = open(Path(model_dir, "pyLDAvis.html").as_posix(),
+                   "wt")  # open the input file in write mode
+        fin.write(data)  # overrite the input file with the resulting data
+        fin.close()  # close the file
+
         return
 
     def _sort_topics(self):
@@ -348,7 +394,7 @@ class TMmodel(object):
         self._load_alphas()
         self._load_betas()
         self._load_thetas()
-        self._load_edits() 
+        self._load_edits()
 
         # Indexes for topics reordering
         idx = np.argsort(self._alphas)[::-1]
@@ -374,13 +420,15 @@ class TMmodel(object):
 
     def _load_thetas(self):
         if self._thetas is None:
-            self._thetas = sparse.load_npz(self._TMfolder.joinpath('thetas.npz'))
+            self._thetas = sparse.load_npz(
+                self._TMfolder.joinpath('thetas.npz'))
             self._ntopics = self._thetas.shape[1]
             #self._ndocs_active = np.array((self._thetas != 0).sum(0).tolist()[0])
 
     def _load_ndocs_active(self):
         if self._ndocs_active is None:
-            self._ndocs_active = np.load(self._TMfolder.joinpath('ndocs_active.npy'))
+            self._ndocs_active = np.load(
+                self._TMfolder.joinpath('ndocs_active.npy'))
             self._ntopics = self._ndocs_active.shape[0]
 
     def _load_edits(self):
@@ -394,7 +442,7 @@ class TMmodel(object):
         """
         # Load information if necessary
         self._load_betas()
-        
+
         self._betas_ds = np.copy(self._betas)
         if np.min(self._betas_ds) < 1e-12:
             self._betas_ds += 1e-12
@@ -425,10 +473,11 @@ class TMmodel(object):
         self._topic_entropy = - \
             np.sum(self._betas * np.log(self._betas), axis=1)
         self._topic_entropy = self._topic_entropy / np.log(self._size_vocab)
-    
+
     def _load_topic_entropy(self):
         if self._topic_entropy is None:
-            self._topic_entropy = np.load(self._TMfolder.joinpath('topic_entropy.npy'))
+            self._topic_entropy = np.load(
+                self._TMfolder.joinpath('topic_entropy.npy'))
 
     def get_tpc_word_descriptions(self, n_words=15, tfidf=True, tpc=None):
         """returns the chemical description of topics
@@ -450,16 +499,16 @@ class TMmodel(object):
             Each element is a a term (topic_id, "word0, word1, ...")                      
         """
 
-        # Load betas (including n_topics) and vocabulary 
+        # Load betas (including n_topics) and vocabulary
         if tfidf:
             self._load_betas_ds()
         else:
             self._load_betas()
         self._load_vocab()
-        
+
         if not tpc:
             tpc = range(self._ntopics)
-        
+
         tpc_descs = []
         for i in tpc:
             if tfidf:
@@ -500,16 +549,16 @@ class TMmodel(object):
         self._load_ndocs_active()
         self.load_tpc_descriptions()
         self.load_tpc_labels()
-        TpcsInfo = [(str(round(el[0],4)), el[1].strip(), el[2].strip(), str(el[3]))
-                            for el in zip(self._alphas, self._tpc_labels,
-                                self._tpc_descriptions, self._ndocs_active)]
+        TpcsInfo = [(str(round(el[0], 4)), el[1].strip(), el[2].strip(), str(el[3]))
+                    for el in zip(self._alphas, self._tpc_labels,
+                                  self._tpc_descriptions, self._ndocs_active)]
         return TpcsInfo
 
     def setTpcLabels(self, TpcLabels):
         self._tpc_labels = [el.strip() for el in TpcLabels]
         self._load_alphas()
-        #Check that the number of labels is consistent with model
-        if len(TpcLabels)==self._ntopics:
+        # Check that the number of labels is consistent with model
+        if len(TpcLabels) == self._ntopics:
             with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
                 fout.write('\n'.join(self._tpc_labels))
             return
@@ -544,7 +593,8 @@ class TMmodel(object):
             self._ndocs_active = self._ndocs_active[tpc_keep]
             self._topic_entropy = self._topic_entropy[tpc_keep]
             self._tpc_labels = [self._tpc_labels[i] for i in tpc_keep]
-            self._tpc_descriptions = [self._tpc_descriptions[i] for i in tpc_keep]
+            self._tpc_descriptions = [
+                self._tpc_descriptions[i] for i in tpc_keep]
             self._edits.append('d ' + ' '.join([str(k) for k in tpcs]))
 
             # We are ready to save all variables in the model
@@ -601,7 +651,8 @@ class TMmodel(object):
     def resetTM(self):
         self._alphas_orig = np.load(self._TMfolder.joinpath('alphas_orig.npy'))
         self._betas_orig = np.load(self._TMfolder.joinpath('betas_orig.npy'))
-        self._thetas_orig = sparse.load_npz(self._TMfolder.joinpath('thetas_orig.npz'))
+        self._thetas_orig = sparse.load_npz(
+            self._TMfolder.joinpath('thetas_orig.npz'))
         self._load_vocab()
 
         try:
@@ -630,7 +681,8 @@ class TMmodel(object):
                      ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy,
                      descriptions=self._tpc_descriptions, edits=self._edits)
         else:
-            np.savez(npzfile, alphas=self._alphas, betas=self._betas, thetas=self._thetas, alphas_orig=self._alphas_orig, betas_orig=self._betas_orig, thetas_orig=self._thetas_orig, ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy,descriptions=self._tpc_descriptions, edits=self._edits)
+            np.savez(npzfile, alphas=self._alphas, betas=self._betas, thetas=self._thetas, alphas_orig=self._alphas_orig, betas_orig=self._betas_orig, thetas_orig=self._thetas_orig,
+                     ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy, descriptions=self._tpc_descriptions, edits=self._edits)
 
         if len(self._edits):
             edits_file = Path(npzfile).parent.joinpath('model_edits.txt')
@@ -643,7 +695,8 @@ class TMmodel(object):
 ##############################################################################
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description="Scripts for Topic Modeling Service")
+    parser = argparse.ArgumentParser(
+        description="Scripts for Topic Modeling Service")
     parser.add_argument("--path_TMmodels", type=str, default=None, required=True,
                         metavar=("path_to_TMs"),
                         help="path to topic models folder")
@@ -703,14 +756,16 @@ if __name__ == "__main__":
         sys.stdout.write(str(status))
 
     if args.showTopics:
-        tm = TMmodel(tm_path.joinpath(f"{args.showTopics}").joinpath('TMmodel'))
+        tm = TMmodel(tm_path.joinpath(
+            f"{args.showTopics}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.showTopics()))
 
     if args.setTpcLabels:
         # Labels should come from standard input
         TpcLabels = "".join([line for line in sys.stdin])
         TpcLabels = json.loads(TpcLabels.replace('\\"', '"'))
-        tm = TMmodel(tm_path.joinpath(f"{args.setTpcLabels}").joinpath('TMmodel'))
+        tm = TMmodel(tm_path.joinpath(
+            f"{args.setTpcLabels}").joinpath('TMmodel'))
         status = tm.setTpcLabels(TpcLabels)
         sys.stdout.write(str(status))
 
@@ -718,12 +773,14 @@ if __name__ == "__main__":
         # List of topics to remove should come from standard input
         tpcs = "".join([line for line in sys.stdin])
         tpcs = json.loads(tpcs.replace('\\"', '"'))
-        tm = TMmodel(tm_path.joinpath(f"{args.deleteTopics}").joinpath('TMmodel'))
+        tm = TMmodel(tm_path.joinpath(
+            f"{args.deleteTopics}").joinpath('TMmodel'))
         status = tm.deleteTopics(tpcs)
         sys.stdout.write(str(status))
 
     if args.sortTopics:
-        tm = TMmodel(tm_path.joinpath(f"{args.sortTopics}").joinpath('TMmodel'))
+        tm = TMmodel(tm_path.joinpath(
+            f"{args.sortTopics}").joinpath('TMmodel'))
         status = tm.sortTopics()
         sys.stdout.write(str(status))
 
@@ -731,4 +788,3 @@ if __name__ == "__main__":
         tm = TMmodel(tm_path.joinpath(f"{args.resetTM}").joinpath('TMmodel'))
         status = tm.resetTM()
         sys.stdout.write(str(status))
-
