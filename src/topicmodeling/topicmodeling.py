@@ -430,7 +430,8 @@ class textPreproc(object):
                 with ProgressBar():
                     DFparquet = trDF[['id', 'cleantext']].rename(
                         columns={"cleantext": "bow_text"})
-                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={'scheduler': 'processes'})
+                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
+                                         'scheduler': 'processes'})
 
             elif tmTrainer == "ctm":
                 outFile = dirpath.joinpath('corpus.parquet')
@@ -442,7 +443,8 @@ class textPreproc(object):
                     #    columns={"cleantext": "bow_text"})
                     DFparquet = trDF[['id', 'cleantext', 'embeddings']].rename(
                         columns={"cleantext": "bow_text"})
-                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={'scheduler': 'processes'})
+                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
+                                         'scheduler': 'processes'})
 
         else:
             # Spark dataframe
@@ -2214,11 +2216,7 @@ if __name__ == "__main__":
                     # We get full df containing the embeddings
                     for idx, DtSet in enumerate(trDtSet['Dtsets']):
                         df = spark.read.parquet(f"file://{DtSet['parquet']}")
-                        df = (
-                        df.withColumn("embeddings", F.concat_ws(' ', *DtSet['embeddingsfld']))
-                          .withColumn("source", F.lit(DtSet["source"]))
-                          .select("id", "embeddings")
-                        )   
+                        df = df.select("id", "embeddings")
                         if idx == 0:
                             eDF = df
                         else:
@@ -2246,7 +2244,7 @@ if __name__ == "__main__":
                             df["all_lemmas"] = df[col]
                         else:
                             df["all_lemmas"] += " " + df[col]
-                    df["source"] = df["embeddingsfld"]
+                    df["source"] = DtSet["source"]
                     df = df[["id", "source", "all_lemmas"]]
 
                     # Concatenate dataframes
@@ -2261,10 +2259,8 @@ if __name__ == "__main__":
                 tPreproc.saveGensimDict(configFile.parent.resolve())
 
                 if train_config['trainer'] == "ctm":
-                    # We get full df containing the embeddings
                     for idx, DtSet in enumerate(trDtSet['Dtsets']):
                         df = dd.read_parquet(DtSet['parquet']).fillna("")
-                        df["embeddings"] = df["embeddingsfld"]
                         df = df[["id", "embeddings"]]
 
                         # Concatenate dataframes
@@ -2272,6 +2268,7 @@ if __name__ == "__main__":
                             eDF = df
                         else:
                             eDF = dd.concat([trDF, df])
+
                     # We perform a left join to keep the embeddings of only those documents kept after preprocessing
                     trDF = pd.merge(trDF, eDF, on='id', how='left')
 
