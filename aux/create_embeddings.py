@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List
 import pandas as pd
 import dask.dataframe as dd
-
+from langdetect import detect
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from nltk.tokenize import sent_tokenize
@@ -15,13 +15,19 @@ class EmbeddingsManager(object):
 
     def _check_max_local_length(self, max_seq_length: int, texts: List[str]):
         """
-        Checks the context of the bert model vs maximum length of the documents
+        Returns a dictionary with all wordlists available in the folder 
 
         Parameters
         ----------
-        max_seq_length : Context of the models
-        texts: Documents to calculate the embeddings from
+        max_seq_length : 
+        texts:
 
+        Returns
+        -------
+        allWdLists : Dictionary (path -> dictionary)
+            One dictionary entry per wordlist
+            key is the absolute path to the wordlist
+            value is a dictionary with metadata
         """        
 
         max_local_length = np.max([len(t.split()) for t in texts])
@@ -53,7 +59,6 @@ class EmbeddingsManager(object):
             model.max_seq_length = max_seq_length
 
         self._check_max_local_length(max_seq_length, texts)
-
         embeddings = model.encode(texts, show_progress_bar=True, batch_size=batch_size).tolist()
      
         return embeddings
@@ -68,14 +73,25 @@ class EmbeddingsManager(object):
             if entry.as_posix().endswith("parquet"):
                 res.append(entry)
 
+        def det(x):
+            try:
+                lang = detect(x)
+            except:
+                lang = 'Other'
+            return lang
+
         for f in tqdm(res):
-            df = pd.read_parquet(f).fillna("").dropna().drop("euroSciVocCode", axis=1)
-            df = df[df.rawtext != ""]
-            raw = df.rawtext.values.tolist()
+            df = pd.read_parquet(f)
+            df = df[df.paperAbstract != ""]
+            df['langue'] = df['paperAbstract'].apply(det)
+            df = df[df.langue == 'en']
+            df['title_abstract'] = df[["title", "paperAbstract"]].apply(" ".join, axis=1)
+            raw = df.title_abstract.values.tolist()
             embeddings = self.bert_embeddings_from_list(
                     texts=raw, 
                     sbert_model_to_load=embeddins_model, 
                     max_seq_length=max_seq_length)
+            df.drop('title_abstract', inplace=True, axis=1)
             df['embeddings'] = embeddings
             time = strftime("_%Y-%m-%d-%-S", gmtime())
             new_name = "parquet_embeddings" + time + ".parquet"
@@ -91,7 +107,7 @@ if __name__ == "__main__":
     parser.add_argument("--path_parquet", type=str, default=None, required=True, metavar=("path_to_parquet"), help="path to parquet file to caclulate embeddings of")
     parser.add_argument("--path_new", type=str, default=None, required=True, metavar=("path_new"), help="path to parquet folder to locate embeddings")
     parser.add_argument("--embeddings_model", type=str, default="all-mpnet-base-v2", required=False, metavar=("embeddings_model"), help="Model to be used for calculating the embeddings")
-    parser.add_argument("--max_sequence_length", type=int, default=384, required=False, metavar=("max_sequence_length"), help="Maximum number of tokens that the model can look at a time simultaneously")
+    parser.add_argument("--max_sequence_length", type=int, default=384, required=False, metavar=("max_sequence_length"), help="Model's context")
 
     args = parser.parse_args()
 
@@ -100,3 +116,4 @@ if __name__ == "__main__":
     parquet_path = Path(args.path_parquet)
     parquet_new = Path(args.path_new)
     em.add_embeddins_to_parquet(parquet_path, parquet_new, args.embeddings_model, args.max_sequence_length)
+

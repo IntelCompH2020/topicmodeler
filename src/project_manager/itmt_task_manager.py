@@ -1728,6 +1728,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         ntopics = int(self.cf.get('TM', 'ntopics'))
         ntopics = var_num_keyboard('int', ntopics,
                                    'Please, select the number of topics')
+        
+        # We get the default path to the labels for the atl
+        path_labels = ""#"wordlists/wiki_categories.json"
 
         # Retrieve parameters for training.
         # These are dependent on the training algorithm
@@ -1769,7 +1772,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "num_iterations": num_iterations,
                 "doc_topic_thr": doc_topic_thr,
                 "thetas_thr": thetas_thr,
-                "token_regexp": token_regexp
+                "token_regexp": token_regexp,
+                "labels": path_labels
             }
 
         elif trainer == "sparkLDA":
@@ -1854,6 +1858,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "num_samples": num_samples,
                 "num_data_loader_workers": num_data_loader_workers,
                 "thetas_thr": thetas_thr,
+                "labels": path_labels
             }
 
         elif trainer == "ctm":
@@ -1942,7 +1947,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "topic_prior_variance": topic_prior_variance,
                 "num_data_loader_workers": num_data_loader_workers,
                 "thetas_thr": thetas_thr,
-                "sbert_model_to_load": sbert_model_to_load
+                "sbert_model_to_load": sbert_model_to_load,
+                "labels": path_labels
             }
 
         return TMparam

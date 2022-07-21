@@ -461,6 +461,18 @@ class TMmodel(object):
         if self._vocab is None:
             with self._TMfolder.joinpath('vocab.txt').open('r', encoding='utf8') as fin:
                 self._vocab = [el.strip() for el in fin.readlines()]
+    
+    def _load_vocab_dicts(self):
+        """Creates two vocabulary dictionaries, one that utilizes the words as key, and a second one with the words' id as key. 
+        """
+        if self._vocab_w2id is None and self._vocab_w2id is None:
+            self._vocab_w2id = {}
+            self._vocab_id2w = {}
+            with self._TMfolder.joinpath('vocab.txt').open('r', encoding='utf8') as fin:
+                for i,line in enumerate(fin):
+                    wd = line.strip()
+                    self._vocab_w2id[wd] = i
+                    self._vocab_id2w[str(i)] = wd
 
     def _calculate_topic_entropy(self):
         """Calculates the entropy of all topics in model
@@ -478,6 +490,15 @@ class TMmodel(object):
         if self._topic_entropy is None:
             self._topic_entropy = np.load(
                 self._TMfolder.joinpath('topic_entropy.npy'))
+    
+    def get_model_info_for_hierarchical(self):
+        """Returns the objects necessary for the creation of a level-2 topic model.
+        """
+        self._load_betas()
+        self._load_thetas()
+        self._load_vocab_dicts()
+
+        return self._betas, self._thetas, self._vocab_w2id, self._vocab_id2w
 
     def get_tpc_word_descriptions(self, n_words=15, tfidf=True, tpc=None):
         """returns the chemical description of topics
