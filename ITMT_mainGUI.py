@@ -25,6 +25,9 @@ import sys
 # Local imports
 from src.gui.main_window import MainWindow
 
+if not sys.warnoptions:
+    import warnings
+    warnings.simplefilter("ignore")
 
 def main():
     # ####################

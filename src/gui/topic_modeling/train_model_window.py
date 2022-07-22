@@ -319,6 +319,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.training_params["mallet_path"] = cf.get('MalletTM', 'mallet_path')
         self.training_params["token_regexp"] = cf.get(
             'MalletTM', 'token_regexp')
+        self.training_params["labels"] = ""#"wordlists/wiki_categories.json"
 
         # Hide checkboxes
         for checkbox in self.lda_mallet_checkboxes_params:
@@ -524,6 +525,8 @@ class TrainModelWindow(QtWidgets.QDialog):
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, messages)
             return False
+        
+        self.training_params["labels"] = ""#"wordlists/wiki_categories.json"
 
         # Hide checkboxes
         for checkbox in self.prodlda_checkboxes_params:
@@ -730,6 +733,8 @@ class TrainModelWindow(QtWidgets.QDialog):
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, messages)
             return False
+        
+        self.training_params["labels"] = ""#"wordlists/wiki_categories.json"
 
         # Hide checkboxes
         for checkbox in self.ctm_checkboxes_params:

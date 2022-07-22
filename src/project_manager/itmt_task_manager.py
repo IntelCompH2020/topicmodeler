@@ -766,7 +766,11 @@ class ITMTTaskManager(BaseTaskManager):
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
-        cmd = cmd + ' --showTopics ' + self.selectedTM
+        
+        if self.__class__.__name__ == "ITMTTaskManagerCMD":
+            cmd = cmd + ' --showTopics ' + self.selectedTM
+        elif self.__class__.__name__ == "ITMTTaskManagerGUI":
+            cmd = cmd + ' --showTopicsAdvanced ' + self.selectedTM
         printred(cmd)
         
         try:
@@ -3292,7 +3296,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             TopicInfo = json.loads(self.TopicsDesc)
             table.setRowCount(len(TopicInfo))
             table2.setRowCount(len(TopicInfo))
-            df = pd.DataFrame(TopicInfo, columns=['Size', 'Label', 'Word Description', 'Ndocs Active'])
+            df = pd.DataFrame(TopicInfo, columns=['Size', 'Label', 'Word Description', 'Ndocs Active', 'Topics entropy', 'Topics coherence'])
+            printred(df)
             for tp in range(len(TopicInfo)):
                 df2 = df.iloc[[tp]]
                 table.setItem(tp, 0, QtWidgets.QTableWidgetItem(
@@ -3300,10 +3305,14 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                 table.setItem(tp, 1, QtWidgets.QTableWidgetItem(
                         df2['Size'].item()))
                 table.setItem(tp, 2, QtWidgets.QTableWidgetItem(
-                        df2['Label'].item()))
-                table.setItem(tp, 3, QtWidgets.QTableWidgetItem(
                         df2['Ndocs Active'].item()))
+                table.setItem(tp, 3, QtWidgets.QTableWidgetItem(
+                        df2['Topics entropy'].item()))
                 table.setItem(tp, 4, QtWidgets.QTableWidgetItem(
+                        df2['Topics coherence'].item()))
+                table.setItem(tp, 5, QtWidgets.QTableWidgetItem(
+                        df2['Label'].item()))
+                table.setItem(tp, 6, QtWidgets.QTableWidgetItem(
                         df2['Word Description'].item()))
                 
                 table2.setItem(tp, 1, QtWidgets.QTableWidgetItem(
@@ -3325,15 +3334,15 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         return
     
     def render_pyldavis(self, model_path, gui):
-        # if gui.web:
-        #     gui.web.setParent(None)
-        # gui.web = QWebEngineView()
-        # gui.web.setZoomFactor(0.3)
-        # url = QUrl.fromLocalFile(pathlib.Path(
-        #     model_path, "pyLDAvis.html").as_posix())
-        # gui.web.load(url)
-        # gui.layout_plot_pyldavis_small.addWidget(gui.web)
-        # gui.web.show()
+        if gui.web:
+             gui.web.setParent(None)
+        gui.web = QWebEngineView()
+        gui.web.setZoomFactor(0.3)
+        url = QUrl.fromLocalFile(pathlib.Path(
+             model_path, "pyLDAvis.html").as_posix())
+        gui.web.load(url)
+        gui.layout_plot_pyldavis_small.addWidget(gui.web)
+        gui.web.show()
         if gui.web_expand:
             gui.web_expand.setParent(None)
         gui.web_expand = QWebEngineView()

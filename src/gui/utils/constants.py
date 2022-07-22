@@ -1,8 +1,8 @@
 class Constants:
 
     # GUI constants
-    SMOOTH_SPOON_TITLE = 'UTLIT/TM'
-    SMOOTH_SPOON_MSG = 'UTLIT/TM message'
+    SMOOTH_SPOON_TITLE = 'ITMT'
+    SMOOTH_SPOON_MSG = 'ITMT message'
     LONG_TIME_SHOW_SB = 10000
 
     # Buttons-related constants
@@ -12,7 +12,7 @@ class Constants:
     MAX_RECENT_PROJECTS = 2
     MAX_RECENT_PARQUETS = 2
     MAX_RECENT_WORDLISTS = 2
-    MAX_SETTINGS_BUTTONS = 5
+    MAX_SETTINGS_BUTTONS = 4
     MAX_TM_SETTINGS_SUBBUTTONS = 6
 
     # Corpus management-related constants

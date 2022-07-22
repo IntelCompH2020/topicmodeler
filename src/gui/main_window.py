@@ -209,7 +209,7 @@ class MainWindow(QMainWindow):
 
         self.tm_settings_buttons = []
         for id_button in np.arange(Constants.MAX_TM_SETTINGS_SUBBUTTONS):
-            tm_settings_button_name = "settings_button_5_" + str(id_button + 1)
+            tm_settings_button_name = "settings_button_4_" + str(id_button + 1)
             tm_settings_button_widget = self.findChild(
                 QPushButton, tm_settings_button_name)
             self.tm_settings_buttons.append(tm_settings_button_widget)
@@ -220,26 +220,24 @@ class MainWindow(QMainWindow):
             tm_settings_button.hide()
 
         self.settings_button_1.clicked.connect(
-            lambda: self.settings_tabs.setCurrentWidget(self.page_gui_settings))
-        self.settings_button_2.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_log_format))
-        self.settings_button_3.clicked.connect(
+        self.settings_button_2.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_spark))
-        self.settings_button_4.clicked.connect(
+        self.settings_button_3.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_preprocessing))
-        self.settings_button_5.clicked.connect(
+        self.settings_button_4.clicked.connect(
             self.select_tm_settings_suboption)
-        self.settings_button_5_1.clicked.connect(
+        self.settings_button_4_1.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_tm_general))
-        self.settings_button_5_2.clicked.connect(
+        self.settings_button_4_2.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_tm_mallet))
-        self.settings_button_5_3.clicked.connect(
+        self.settings_button_4_3.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_tm_prod))
-        self.settings_button_5_4.clicked.connect(
+        self.settings_button_4_4.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_tm_CTM))
-        self.settings_button_5_5.clicked.connect(
+        self.settings_button_4_5.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_tm_spark_lda))
-        self.settings_button_5_6.clicked.connect(
+        self.settings_button_4_6.clicked.connect(
             lambda: self.settings_tabs.setCurrentWidget(self.page_tm_hierarchical))
 
         ########################################################################
@@ -323,8 +321,6 @@ class MainWindow(QMainWindow):
             self.clicked_pushButton_sort_topics)
         self.pushButton_reset_changes_tm.clicked.connect(
             self.clicked_pushButton_reset_changes_tm)
-        self.pushButton_apply_changes_gui_settings.clicked.connect(
-            self.clicked_pushButton_apply_changes_gui_settings)
         self.pushButton_apply_changes_log_settings.clicked.connect(
             self.clicked_pushButton_apply_changes_log_settings)
         self.pushButton_apply_changes_mallet_settings.clicked.connect(
@@ -344,8 +340,6 @@ class MainWindow(QMainWindow):
         self.pushButton_apply_preprocessing_settings.clicked.connect(
             self.clicked_pushButton_apply_preprocessing_settings)
 
-        self.pushButton_restore_gui_settings.clicked.connect(
-            self.clicked_pushButton_restore_gui_settings)
         self.pushButton_restore_log_settings.clicked.connect(
             self.clicked_pushButton_restore_log_settings)
         self.pushButton_restore_mallet_settings.clicked.connect(
@@ -943,13 +937,7 @@ class MainWindow(QMainWindow):
         cf = configparser.ConfigParser()
         cf.read(self.tm.p2config_dft)
 
-        if option == "gui":
-            # GUI settings
-            self.lineEdit_font_size.setText(str(14))
-            self.fontComboBox.setCurrentText("Arial")
-            if save:
-                self.clicked_pushButton_apply_changes_gui_settings()
-        elif option == "log":
+        if option == "log":
             # LOG SETTINGS
             self.lineEdit_file_name.setText(
                 str(cf.get('logformat', 'filename')))
@@ -1115,26 +1103,6 @@ class MainWindow(QMainWindow):
             id_msg = Constants.SETTINGS_OPTIONS.index(option)
             QMessageBox.information(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.RESTORE_DFT_MSGS[id_msg])
-
-        # Reload config in task manager
-        self.tm.cf = configparser.ConfigParser()
-        self.tm.cf.read(self.tm.p2config)
-
-        return
-
-    def clicked_pushButton_apply_changes_gui_settings(self):
-        """
-        Method for controling the clicking of the button 'pushButton_apply_changes_gui_settings' that controls the actualization of the GUI' settings.
-        """
-
-        font_size = self.lineEdit_font_size.text()
-        font_type = self.fontComboBox.currentText()
-        font_size_type = font_size + ' "' + font_type + '" '
-        stylesheet = "QWidget { font: %s}" % font_size_type
-        self.centralwidget.setStyleSheet(stylesheet)
-
-        QMessageBox.information(
-            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_GUI_SETTINGS)
 
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
@@ -1434,15 +1402,6 @@ class MainWindow(QMainWindow):
         # Reload config in task manager
         self.tm.cf = configparser.ConfigParser()
         self.tm.cf.read(self.tm.p2config)
-
-        return
-
-    def clicked_pushButton_restore_gui_settings(self):
-        """
-        Method for controlling the clicking of the button 'pushButton_restore_tm_gui_settings' that manages the setting of the GUI settings' default values.
-        """
-
-        self.set_default_settings("gui", True, True)
 
         return
 

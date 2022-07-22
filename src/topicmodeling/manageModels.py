@@ -17,6 +17,8 @@ import pyLDAvis
 import scipy.sparse as sparse
 from sklearn.preprocessing import normalize
 from transformers import pipeline
+from gensim.models.coherencemodel import CoherenceModel
+from gensim.corpora import Dictionary
 
 
 class TMManager(object):
@@ -211,6 +213,7 @@ class TMmodel(object):
     _ntopics = None
     _betas_ds = None
     _topic_entropy = None
+    _topic_coherence = None
     _ndocs_active = None
     _tpc_descriptions = None
     _tpc_labels = None
@@ -303,7 +306,9 @@ class TMmodel(object):
         self._calculate_beta_ds()
         self._calculate_topic_entropy()
         self._ndocs_active = np.array((self._thetas != 0).sum(0).tolist()[0])
-        self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
+        self._tpc_descriptions = [el[1]
+                                  for el in self.get_tpc_word_descriptions()]
+        self._calculate_topic_coherence()
         self._tpc_labels = [el[1] for el in self.get_tpc_labels(labels)]
 
         # We are ready to save all variables in the model
@@ -328,8 +333,12 @@ class TMmodel(object):
         with self._TMfolder.joinpath('edits.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._edits))
         np.save(self._TMfolder.joinpath('betas_ds.npy'), self._betas_ds)
-        np.save(self._TMfolder.joinpath('topic_entropy.npy'), self._topic_entropy)
-        np.save(self._TMfolder.joinpath('ndocs_active.npy'), self._ndocs_active)
+        np.save(self._TMfolder.joinpath(
+            'topic_entropy.npy'), self._topic_entropy)
+        np.save(self._TMfolder.joinpath(
+            'topic_coherence.npy'), self._topic_coherence)
+        np.save(self._TMfolder.joinpath(
+            'ndocs_active.npy'), self._ndocs_active)
         with self._TMfolder.joinpath('tpc_descriptions.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._tpc_descriptions))
         with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
@@ -347,7 +356,8 @@ class TMmodel(object):
         vis_data = pyLDAvis.prepare(self._betas, self._thetas[perm, ].toarray(),
                                     doc_len, self._vocab, vocabfreq, lambda_step=0.05,
                                     sort_topics=False, n_jobs=-1)
-        pyLDAvis.save_html(vis_data, self._TMfolder.joinpath('pyLDAvis.html').as_posix())
+        pyLDAvis.save_html(vis_data, self._TMfolder.joinpath(
+            'pyLDAvis.html').as_posix())
         self._modify_pyldavis_html(self._TMfolder.as_posix())
 
         return
@@ -461,7 +471,7 @@ class TMmodel(object):
         if self._vocab is None:
             with self._TMfolder.joinpath('vocab.txt').open('r', encoding='utf8') as fin:
                 self._vocab = [el.strip() for el in fin.readlines()]
-    
+
     def _load_vocab_dicts(self):
         """Creates two vocabulary dictionaries, one that utilizes the words as key, and a second one with the words' id as key. 
         """
@@ -469,7 +479,7 @@ class TMmodel(object):
             self._vocab_w2id = {}
             self._vocab_id2w = {}
             with self._TMfolder.joinpath('vocab.txt').open('r', encoding='utf8') as fin:
-                for i,line in enumerate(fin):
+                for i, line in enumerate(fin):
                     wd = line.strip()
                     self._vocab_w2id[wd] = i
                     self._vocab_id2w[str(i)] = wd
@@ -490,7 +500,54 @@ class TMmodel(object):
         if self._topic_entropy is None:
             self._topic_entropy = np.load(
                 self._TMfolder.joinpath('topic_entropy.npy'))
-    
+
+    def _calculate_topic_coherence(self, metric="c_npmi", n_words=15):
+
+        # Load topic information
+        if self._tpc_descriptions is None:
+            self._load_tpc_descriptions()
+        # Convert topic information into list of lists
+        tpc_descriptions_ = \
+            [tpc.split(', ') for tpc in self._tpc_descriptions]
+
+        # Get texts to calculate coherence
+        if self._TMfolder.parent.joinpath('modelFiles/corpus.txt').is_file():
+            corpusFile = self._TMfolder.parent.joinpath(
+                'modelFiles/corpus.txt')
+        else:
+            corpusFile = self._TMfolder.parent.joinpath('corpus.txt')
+        corpus = [line.rsplit(' 0 ')[1].strip().split() for line in open(
+            corpusFile, encoding="utf-8").readlines()]
+
+        # Get Gensim dictionary
+        if self._TMfolder.parent.joinpath('dictionary.gensim').is_file():
+            try:
+                dictionary = Dictionary.load_from_text(
+                    self._TMfolder.parent.joinpath('dictionary.gensim').as_posix())
+            except:
+                self._logger.warning(
+                    "Gensim dictionary could not be load from vocabulary file.")
+        else:
+            if dictionary is None:
+                dictionary = Dictionary(corpus)
+
+        if n_words > len(tpc_descriptions_[0]):
+            self.logger.error(
+                '-- -- -- Coherence calculation failed: The number of words per topic must be equal to n_words.')
+        else:
+            if metric in ["c_npmi", "u_mass"]:
+                cm = CoherenceModel(topics=tpc_descriptions_, texts=corpus,
+                                    dictionary=dictionary, coherence=metric, topn=n_words)
+                self._topic_coherence = cm.get_coherence_per_topic()
+            else:
+                self.logger.error(
+                    '-- -- -- Coherence metric provided is not available.')
+
+    def _load_topic_coherence(self):
+        if self._topic_coherence is None:
+            self._topic_coherence = np.load(
+                self._TMfolder.joinpath('topic_coherence.npy'))
+
     def get_model_info_for_hierarchical(self):
         """Returns the objects necessary for the creation of a level-2 topic model.
         """
@@ -562,7 +619,8 @@ class TMmodel(object):
             Each element is a a term (topic_id, "label for topic topic_id")                    
         """
         if not labels:
-            return []
+            # TODO: Ask J.A. list of "" or dft to topc_desc
+            return [(i, p) for i, p in enumerate(self._tpc_descriptions)]#[]
         if use_cuda:
             if torch.cuda.is_available():
                 device = 0
@@ -573,11 +631,12 @@ class TMmodel(object):
                     "-- -- 'use_cuda' set to True when cuda is unavailable."
                     "Make sure CUDA is available or set 'use_cuda=False'"
                 )
-                self._logger.info("-- -- CUDA unavailable: GPU will not be used")
+                self._logger.info(
+                    "-- -- CUDA unavailable: GPU will not be used")
         else:
             device = -1
             self._logger.info("-- -- CUDA unavailable: GPU will not be used")
-        
+
         classifier = pipeline("zero-shot-classification",
                               model="facebook/bart-large-mnli",
                               device=device)
@@ -595,9 +654,21 @@ class TMmodel(object):
         self._load_ndocs_active()
         self.load_tpc_descriptions()
         self.load_tpc_labels()
-        TpcsInfo = [(str(round(el[0], 4)), el[1].strip(), el[2].strip(), str(el[3]))
-                    for el in zip(self._alphas, self._tpc_labels,
-                                  self._tpc_descriptions, self._ndocs_active)]
+        TpcsInfo = [(str(round(el[0], 4)), el[1].strip(), el[2].strip(), str(el[3])) for el in zip(
+            self._alphas, self._tpc_labels, self._tpc_descriptions, self._ndocs_active)]
+
+        return TpcsInfo
+
+    def showTopicsAdvanced(self):
+        self._load_alphas()
+        self._load_ndocs_active()
+        self.load_tpc_descriptions()
+        self.load_tpc_labels()
+        self._load_topic_entropy()
+        self._load_topic_coherence()
+        TpcsInfo = [(str(round(el[0], 4)), el[1].strip(), el[2].strip(), str(el[3]), str(round(el[4], 4)), str(round(el[5], 4))) for el in zip(
+            self._alphas, self._tpc_labels, self._tpc_descriptions, self._ndocs_active, self._topic_entropy, self._topic_coherence)]
+
         return TpcsInfo
 
     def setTpcLabels(self, TpcLabels):
@@ -619,6 +690,7 @@ class TMmodel(object):
         self._load_thetas()
         self._load_betas_ds()
         self._load_topic_entropy()
+        self._load_topic_coherence()
         self.load_tpc_descriptions()
         self.load_tpc_labels()
         self._load_ndocs_active()
@@ -638,6 +710,7 @@ class TMmodel(object):
             self._betas_ds = self._betas_ds[tpc_keep, :]
             self._ndocs_active = self._ndocs_active[tpc_keep]
             self._topic_entropy = self._topic_entropy[tpc_keep]
+            self._topic_coherence = self._topic_coherence[tpc_keep]
             self._tpc_labels = [self._tpc_labels[i] for i in tpc_keep]
             self._tpc_descriptions = [
                 self._tpc_descriptions[i] for i in tpc_keep]
@@ -662,6 +735,7 @@ class TMmodel(object):
         self._load_thetas()
         self._load_betas_ds()
         self._load_topic_entropy()
+        self._load_topic_coherence
         self.load_tpc_descriptions()
         self.load_tpc_labels()
         self._load_ndocs_active()
@@ -679,6 +753,7 @@ class TMmodel(object):
             self._betas_ds = self._betas_ds[idx, :]
             self._ndocs_active = self._ndocs_active[idx]
             self._topic_entropy = self._topic_entropy[idx]
+            self._topic_coherence = self._topic_coherence[idx]
             self._tpc_labels = [self._tpc_labels[i] for i in idx]
             self._tpc_descriptions = [self._tpc_descriptions[i] for i in idx]
             self._edits.append('s ' + ' '.join([str(el) for el in idx]))
@@ -760,6 +835,9 @@ if __name__ == "__main__":
     parser.add_argument("--showTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Retrieve topic labels and word composition for selected model")
+    parser.add_argument("--showTopicsAdvanced", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Retrieve topic labels, word composition for selected model and advanced statistics")
     parser.add_argument("--setTpcLabels", type=str, default=None,
                         metavar=("modelName"),
                         help="Set Topics Labels for selected model")
@@ -805,6 +883,11 @@ if __name__ == "__main__":
         tm = TMmodel(tm_path.joinpath(
             f"{args.showTopics}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.showTopics()))
+
+    if args.showTopicsAdvanced:
+        tm = TMmodel(tm_path.joinpath(
+            f"{args.showTopicsAdvanced}").joinpath('TMmodel'))
+        sys.stdout.write(json.dumps(tm.showTopicsAdvanced()))
 
     if args.setTpcLabels:
         # Labels should come from standard input
