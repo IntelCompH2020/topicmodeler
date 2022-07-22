@@ -17,17 +17,21 @@ exploiting the tools available in topicmodeling.py:
 """
 import argparse
 import pathlib
-
-from PyQt6.QtWidgets import QApplication
-from PyQt6 import QtGui
 import sys
+import warnings
 
-# Local imports
+from PyQt6 import QtGui
+from PyQt6.QtWidgets import QApplication
+
 from src.gui.main_window import MainWindow
 
-if not sys.warnoptions:
-    import warnings
+
+def fxn():
+    warnings.warn("deprecated", DeprecationWarning)
+
+with warnings.catch_warnings():
     warnings.simplefilter("ignore")
+    fxn()
 
 def main():
     # ####################

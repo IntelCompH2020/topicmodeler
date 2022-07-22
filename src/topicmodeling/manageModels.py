@@ -520,6 +520,7 @@ class TMmodel(object):
             corpusFile, encoding="utf-8").readlines()]
 
         # Get Gensim dictionary
+        dictionary = None
         if self._TMfolder.parent.joinpath('dictionary.gensim').is_file():
             try:
                 dictionary = Dictionary.load_from_text(

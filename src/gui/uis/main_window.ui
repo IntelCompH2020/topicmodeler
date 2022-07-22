@@ -219,7 +219,7 @@ QToolTip {
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>../resources/images/fuzzy_training3.png</pixmap>
+                <pixmap>../resources/images/fuzzy_training6.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
