@@ -536,7 +536,7 @@ class TMmodel(object):
             self.logger.error(
                 '-- -- -- Coherence calculation failed: The number of words per topic must be equal to n_words.')
         else:
-            if metric in ["c_npmi", "u_mass"]:
+            if metric in ["c_npmi", "u_mass", "c_v", "c_uci"]:
                 cm = CoherenceModel(topics=tpc_descriptions_, texts=corpus,
                                     dictionary=dictionary, coherence=metric, topn=n_words)
                 self._topic_coherence = cm.get_coherence_per_topic()

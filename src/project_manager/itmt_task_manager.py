@@ -1661,6 +1661,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         htm_version = str(self.cf.get('Hierarchical', 'htm_version'))
         thr = float(self.cf.get('Hierarchical', 'thr'))
 
+        # Load father's TMmodel and get its topics' chemical description
+        #tmmodel = newTMmodel(TMmodel_path)
+
         # TODO: Implement this when new TMmodel available
         tmModel_father_path = self.p2p / "TMmodels" / fathermodel / "model.npz"
         vocabFile_father = self.p2p / "TMmodels" / \
@@ -3297,7 +3300,6 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             table.setRowCount(len(TopicInfo))
             table2.setRowCount(len(TopicInfo))
             df = pd.DataFrame(TopicInfo, columns=['Size', 'Label', 'Word Description', 'Ndocs Active', 'Topics entropy', 'Topics coherence'])
-            printred(df)
             for tp in range(len(TopicInfo)):
                 df2 = df.iloc[[tp]]
                 table.setItem(tp, 0, QtWidgets.QTableWidgetItem(

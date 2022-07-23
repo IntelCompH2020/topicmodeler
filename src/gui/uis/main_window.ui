@@ -5736,7 +5736,7 @@ QScrollBar:horizontal {
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>789</width>
+                                <width>266</width>
                                 <height>734</height>
                                </rect>
                               </property>
