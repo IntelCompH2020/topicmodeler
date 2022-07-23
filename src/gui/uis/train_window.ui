@@ -673,7 +673,7 @@ border:none;
                     </property>
                     <layout class="QHBoxLayout" name="horizontalLayout_80">
                      <item>
-                      <widget class="QLabel" name="label_htm_version_3">
+                      <widget class="QLabel" name="label_htm_version">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -745,7 +745,7 @@ QComboBox:on { /* shift the text when the popup opens */
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_htm_ds_thr_3">
+                      <widget class="QLabel" name="label_htm_ds_thr">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -779,12 +779,12 @@ font: 87 13pt &quot;Futura&quot;;
 padding-left: 10px;</string>
                        </property>
                        <property name="text">
-                        <string>Thershold</string>
+                        <string>Threshold</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_htm_thr_3">
+                      <widget class="QLineEdit" name="lineEdit_htm_thr">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -815,7 +815,7 @@ padding-left: 10px;</string>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="checkBox_ctm_0_good_3">
+                      <widget class="QLabel" name="checkBox_thr_0_good">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -844,7 +844,7 @@ border:none;</string>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="checkBox_ctm_0_bad_3">
+                      <widget class="QLabel" name="checkBox_thr_0_bad">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                          <horstretch>0</horstretch>

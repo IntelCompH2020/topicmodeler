@@ -31,6 +31,7 @@ keep_n=500000
 [TM]
 #Default setting for number of topics
 ntopics=25
+thetas_thr=3e-3
 
 [MalletTM]
 #Path to mallet binary
@@ -43,7 +44,6 @@ optimize_interval=10
 num_threads=4
 num_iterations=1000
 doc_topic_thr=0
-thetas_thr=3e-3
 num_iterations_inf=100
 
 [ProdLDA]
@@ -62,7 +62,6 @@ topic_prior_mean=0.0
 topic_prior_variance=None
 num_samples=10
 num_data_loader_workers=0
-thetas_thr=3e-3
 
 [CTM]
 model_type=prodLDA
@@ -83,7 +82,6 @@ topic_prior_variance=None
 num_data_loader_workers=0
 label_size=0
 loss_weights=None
-thetas_thr=3e-3
 sbert_model_to_load=paraphrase-distilroberta-base-v1
 
 [Hierarchical]

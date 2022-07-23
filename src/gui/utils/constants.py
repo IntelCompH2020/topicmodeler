@@ -55,28 +55,30 @@ class Constants:
     SORT_TM_MSG = "Topics will be sorted according to descending topic size order. No information will be lost. Topic labels will be kept as well.\rDo you wish to continue?"
     MANUAL_LABEL_MSG_STATUS_0 = "The topics could not be labeled."
     MANUAL_LABEL_MSG_STATUS_1 = "The topics were labeled successfully."
-    SORT_TOPICS_MSG_STATUS_0 = "The topics could not be sorted'"
+    SORT_TOPICS_MSG_STATUS_0 = "The topics could not be sorted."
     SORT_TOPICS_MSG_STATUS_1 = "The topics were sorted according to descending topic size order."
-    RESET_TM_MSG_STATUS_0 = "The model could not be restored to its initial configuration."
-    RESET_TM_MSG_STATUS_1 = "The was resored to its original configuration succesfully."
+    RESET_TM_MSG_STATUS_0 = " could not be restored to its initial configuration."
+    RESET_TM_MSG_STATUS_1 = " was resored to its original configuration succesfully."
 
     # Settings management-realated constants
     RESTORE_DFT_GUI_SETTINGS = "GUI settings were restored to its default value"
-    UPDATE_GUI_SETTINGS = "GUI settings were to the selected values"
+    UPDATE_GUI_SETTINGS = "GUI settings were updated to the selected values"
     RESTORE_DFT_LOG_SETTINGS = "Topic Modeling's logging settings were restored to its default value"
-    UPDATE_LOG_SETTINGS = "Topic Modeling's logging settings were to the selected values"
+    UPDATE_LOG_SETTINGS = "Topic Modeling's logging settings were updated to the selected values"
     RESTORE_DFT_MALLET_SETTINGS = "Topic Modeling's Mallet settings were restored to its default value"
-    UPDATE_MALLET_SETTINGS = "Topic Modeling's Mallet settings were to the selected values"
+    UPDATE_MALLET_SETTINGS = "Topic Modeling's Mallet settings were updated to the selected values"
     RESTORE_DFT_PRODLDA_SETTINGS = "Topic Modeling's ProdLDA settings were restored to its default value"
-    UPDATE_PRODLDA_SETTINGS = "Topic Modeling's ProdLDA settings were to the selected values"
+    UPDATE_PRODLDA_SETTINGS = "Topic Modeling's ProdLDA settings were updated to the selected values"
     RESTORE_DFT_CTM_SETTINGS = "Topic Modeling's CTM settings were restored to its default value"
-    UPDATE_CTM_SETTINGS = "Topic Modeling's CTM settings were to the selected values"
+    UPDATE_CTM_SETTINGS = "Topic Modeling's CTM settings were updated to the selected values"
     RESTORE_DFT_TM_GENERAL_SETTINGS = "Topic Modeling's general settings were restored to its default value"
-    UPDATE_TM_GENERAL_SETTINGS = "Topic Modeling's general settings were to the selected values"
+    UPDATE_TM_GENERAL_SETTINGS = "Topic Modeling's general settings updated were updated to the selected values"
+    RESTORE_DFT_HIERARCHICAL_SETTINGS = "Topic Modeling's hierarchical settings were restored to its default value"
+    UPDATE_HIERARCHICAL_SETTINGS = "Topic Modeling's hierarchical settings were updated to the selected values"
     RESTORE_DFT_SPARK_SETTINGS = "Spark settings were restored to its default value"
-    UPDATE_SPARK_SETTINGS = "Spark settings were to the selected values"
+    UPDATE_SPARK_SETTINGS = "Spark settings were updated to the selected values"
     RESTORE_DFT_PREPROC_SETTINGS = "Preprocessing settings were restored to its default value"
-    UPDATE_PREPROC_SETTINGS = "Preprocessing settings were to the selected values"
+    UPDATE_PREPROC_SETTINGS = "Preprocessing settings were updated to the selected values"
     RESTORE_DFT_ALL_SETTINGS = "All settings were restored to its default value"
     RESTORE_DFT_MSGS = [RESTORE_DFT_GUI_SETTINGS, RESTORE_DFT_LOG_SETTINGS, RESTORE_DFT_MALLET_SETTINGS, RESTORE_DFT_PRODLDA_SETTINGS,
                         RESTORE_DFT_CTM_SETTINGS, RESTORE_DFT_TM_GENERAL_SETTINGS, RESTORE_DFT_SPARK_SETTINGS, RESTORE_DFT_PREPROC_SETTINGS]
@@ -88,7 +90,7 @@ class Constants:
     NR_PARAMS_TRAIN_PRODLDA = 17
     NR_PARAMS_TRAIN_CTM = 18
     NR_PARAMS_PREPROC = 4
-    
+
     WRONG_NR_TOPICS_LDA_MSG = "The number of training topics must be larger than 0"
     WRONG_ALPHA_LDA_MSG = "The sum over topics of smoothing over doc-topic distributions (alpha) must be larger than 0."
     WRONG_OI_LDA_MSG = "The number of iterations between reestimating dirichlet hyperparameters (optimize interval) must be larger than 0. "
@@ -116,12 +118,16 @@ class Constants:
     WRONG_LABEL_SIZE = "The label size must be equals to the number of documents."
     WRONG_LABEL_SIZE_FOR_SUPERCTM = "The label size cannot be 0 if SuperCTM is being used. It must be equal to the number of documents in the training corpus."
     WRONG_LOSS_WEIGTHS_FOR_BETACTM = "The weight loss cannot be None for a BetaCTM model."
+    WRONG_HTM_THR = "The HTM-DS threshold must be in (0,1)."
     WARNING_NO_TR_CORPUS = "An appropiate training dataset must be selected to proceed."
     NO_NAME_FOR_MODEL = "A name for training the model must be specified"
     NO_DESC_FOR_MODEL = "A description for training the model must be specified"
+    WARNING_NO_FATHER_MODEL = "A model to generate the level-2 submodel must be selected first."
+    WARNING_NO_EXP_TPC = "A topic to be expanded for the generation of the level-2 model's corpus must be selected."
 
     TRAIN_LOADING_BARS = ["progress_bar_train"]
-    PREPROC_TABLES = ["table_available_stopwords","table_available_equivalences"]
+    PREPROC_TABLES = ["table_available_stopwords",
+                      "table_available_equivalences"]
 
     # Stylesheets
     HOME_BUTTON_SELECTED_STYLESHEET = \

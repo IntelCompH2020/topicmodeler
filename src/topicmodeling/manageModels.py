@@ -7,6 +7,7 @@ Provides a series of functions for Topic Model representation and curation
 
 import argparse
 import json
+import os
 import shutil
 import sys
 import torch
@@ -886,8 +887,21 @@ if __name__ == "__main__":
         sys.stdout.write(json.dumps(tm.showTopics()))
 
     if args.showTopicsAdvanced:
-        tm = TMmodel(tm_path.joinpath(
+        if tm_path.joinpath(
+            f"{args.showTopicsAdvanced}").joinpath('TMmodel').is_dir():
+            tm = TMmodel(tm_path.joinpath(
             f"{args.showTopicsAdvanced}").joinpath('TMmodel'))
+        else:
+            # It is a submodel
+            # TODO: Ask J.
+            for root, dirs, files in os.walk(tm_path):
+                sys.stdout.write(str(dirs))
+                for dir in dirs:
+                    if dir.endswith(f"{args.showTopicsAdvanced}"):
+                        path_tm = os.path.join(root, dir,'TMmodel')
+                        tm = TMmodel(path_tm)
+        #with open('data2.json', 'w') as f:
+        #json.dump(tm.showTopicsAdvanced(), f)
         sys.stdout.write(json.dumps(tm.showTopicsAdvanced()))
 
     if args.setTpcLabels:

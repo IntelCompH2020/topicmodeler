@@ -1753,7 +1753,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             num_threads = int(self.cf.get('MalletTM', 'num_threads'))
             num_iterations = int(self.cf.get('MalletTM', 'num_iterations'))
             doc_topic_thr = float(self.cf.get('MalletTM', 'doc_topic_thr'))
-            thetas_thr = float(self.cf.get('MalletTM', 'thetas_thr'))
+            thetas_thr = float(self.cf.get('TM', 'thetas_thr'))
             token_regexp = self.cf.get('MalletTM', 'token_regexp')
 
             # The following settings will only be accessed in the "advanced settings panel"
@@ -1808,7 +1808,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             num_data_loader_workers = int(self.cf.get(
                 'ProdLDA', 'num_data_loader_workers'))
             thetas_thr = float(self.cf.get(
-                'ProdLDA', 'thetas_thr'))
+                'TM', 'thetas_thr'))
 
             # Basic settings
             model_type = var_string_keyboard(
@@ -1890,7 +1890,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 float(self.cf['CTM']['topic_prior_variance'])
             num_data_loader_workers = int(
                 self.cf['CTM']['num_data_loader_workers'])
-            thetas_thr = float(self.cf['CTM']['thetas_thr'])
+            thetas_thr = float(self.cf['TM']['thetas_thr'])
             sbert_model_to_load = str(
                 self.cf['CTM']['sbert_model_to_load'])
 
@@ -3192,17 +3192,38 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         return
 
-    def train2ndTM(self, trainer):
+    def train2ndTM(self, submodelname, submodelDesc, fathername, expansion_tpc, htm_version, thr, privacy, trainer, training_params):
         """
-        Second-level topic modeling trainer.
+        Topic modeling second-level trainer
 
         Parameters
         ----------
-        trainer : string
+        submodelname: str
+            Name of the submodel to be created
+        submodelDesc: str
+            Description of the submodel to be created
+        fathername: str
+            Name of the father topic model from which the submodel is generated
+        expansion_tpc: int
+            Father model's topic from which the submodel's corpus is generated
+        htm_version: str
+            Hierarhical topic model algorithm according to which the submodel's corpus is generated.
+            Possible values are htm-ws|htm-ds
+        thr: float
+            Document-topic threshold that document in the father model's corpys must have to be kept in the submodel's corpus
+        privacy: str
+            Visibility level of the to be trained submodel
+            Possible values are public|private
+        trainer : str
             Optimizer to use for training the topic model
             Possible values are mallet|sparkLDA|prodLDA|ctm
+        training_params: dict
+            Dictionary with the parameters to be used for the training of the submodel
         """
-        # TODO
+
+        super().train2ndTM(submodelname, submodelDesc, fathername,
+                           expansion_tpc, htm_version, thr, privacy, trainer, training_params)
+
         return
 
     def load_listTMmodels(self):
@@ -3541,6 +3562,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             status = super().sortTopics()
             self.showTopics(gui)
 
+        printred(int(status.decode('utf8')))
         return int(status.decode('utf8'))
 
     def resetTM(self, gui):

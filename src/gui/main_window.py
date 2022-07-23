@@ -88,7 +88,7 @@ class MainWindow(QMainWindow):
         self.previous_settings_button = self.findChild(
             QPushButton, "settings_button_1")
         self.previous_tm_settings_button = self.findChild(
-            QPushButton, "settings_button_5_1")
+            QPushButton, "settings_button_4_1")
 
         # Get home in any operating system
         self.home = str(pathlib.Path.home())
@@ -537,10 +537,10 @@ class MainWindow(QMainWindow):
 
     def clicked_change_corpus_button(self, corpus_button):
         """
-        Method to control the selection of one of the buttons in the train bar.
+        Method to control the selection of one of the buttons in the corpus bar.
         """
 
-        # Put unpressed color for the previous pressed train button
+        # Put unpressed color for the previous pressed corpus button
         if self.previous_corpus_button:
             self.previous_corpus_button.setStyleSheet(
                 Constants.TRAIN_BUTTONS_UNSELECTED_STYLESHEET)
@@ -908,17 +908,48 @@ class MainWindow(QMainWindow):
 
         status = self.tm.resetTM(self)
         if status == 0:
-            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
-                                Constants.RESET_TM_MSG_STATUS_0)
+            msg = \
+            "The model " + self.tm.selectedTM + Constants.RESET_TM_MSG_STATUS_0
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG, msg)
         elif status == 1:
-            QMessageBox.information(
-                self, Constants.SMOOTH_SPOON_MSG, Constants.RESET_TM_MSG_STATUS_1)
+            msg = \
+            "The model " + self.tm.selectedTM + Constants.RESET_TM_MSG_STATUS_1
+            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, msg)
 
         return
 
     def clicked_pushButton_train_submodel(self):
         """Method to control the clicking of the button 'pushButton_train_submodel', which is in charge of starting the training of a submodel.
         """
+
+        if self.treeView_trained_models.currentItem() is None or \
+                self.treeView_trained_models.currentItem().text(0).lower().startswith("TMmodels"):
+                QMessageBox.warning(
+                    self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_FATHER_MODEL)
+                return
+       
+        self.train_model_subwindow.father_model = self.treeView_trained_models.currentItem().text(0)
+
+        # Get expansion topic
+        r = self.tableWidget_trained_models_topics.currentRow()
+
+        # If no topic is selected for before clicking the 'train_submodel' button, a warning message is shown to the user
+        if r == -1:
+            QMessageBox.warning(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_EXP_TPC)
+            return
+    
+        # Actualize training parameters and invoke training window
+        self.train_model_subwindow.TrDts_name = None
+        self.train_model_subwindow.preproc_settings = None
+        self.train_model_subwindow.exp_tpc = \
+            int(self.tableWidget_trained_models_topics.item(r, 0).text())
+        self.train_model_subwindow.hierarchy_level = 1
+        self.train_model_subwindow.initialize_hierarchical_level_settings()
+        self.train_model_subwindow.exec()
+
+        # Update data in modes table
+        self.tm.listAllTMmodels(self)
 
         return
 
@@ -933,7 +964,7 @@ class MainWindow(QMainWindow):
             self.previous_settings_button.setStyleSheet(
                 Constants.SETTINGS_UNSELECTED_STYLESHEET)
 
-        if self.previous_settings_button.objectName() == "settings_button_5":
+        if self.previous_settings_button.objectName() == "settings_button_4":
             for tm_settings_button in self.tm_settings_buttons:
                 tm_settings_button.hide()
                 tm_settings_button.setStyleSheet(
@@ -959,14 +990,14 @@ class MainWindow(QMainWindow):
         self.previous_tm_settings_button.setStyleSheet(
             Constants.SETTINGS_SUBBUTTON_SELECTED_STYLESHEET)
 
-        self.settings_button_5.setStyleSheet(
+        self.settings_button_4.setStyleSheet(
             Constants.SETTINGS_SELECTED_STYLESHEET)
 
         return
 
     def select_tm_settings_suboption(self):
         """
-        Method for showing the Topic Modeling settings subbutons when the button 'settings_button_5' is clicked.
+        Method for showing the Topic Modeling settings subbutons when the button 'settings_button_4' is clicked.
         """
 
         for tm_settings_button in self.tm_settings_buttons:
@@ -1015,8 +1046,6 @@ class MainWindow(QMainWindow):
                 str(cf.get('MalletTM', 'num_iterations')))
             self.lineEdit_settings_doc_top_thr.setText(
                 str(cf.get('MalletTM', 'doc_topic_thr')))
-            self.lineEdit_settings_thetas_thr.setText(
-                str(cf.get('MalletTM', 'thetas_thr')))
             self.lineEdit_settings_infer_iter.setText(
                 str(cf.get('MalletTM', 'num_iterations_inf')))
             if save:
@@ -1053,16 +1082,12 @@ class MainWindow(QMainWindow):
                 str(cf.get('ProdLDA', 'num_samples')))
             self.lineEdit_settings_workers_prod.setText(
                 str(cf.get('ProdLDA', 'num_data_loader_workers')))
-            self.lineEdit_settings_thetas_thr_prod.setText(
-                str(cf.get('ProdLDA', 'thetas_thr')))
             if save:
                 self.clicked_pushButton_apply_changes_prodlda_settings()
         elif option == "ctm":
             # CTM
             self.lineEdit_settings_under_ctm_type.setText(
                 str(cf.get('CTM', 'model_type')))
-            self.lineEdit_settings_model_type_ctm.setText(
-                str(cf.get('CTM', 'ctm_model_type')))
             self.lineEdit_settings_hidden_ctm.setText(
                 str(cf.get('CTM', 'hidden_sizes')))
             self.lineEdit_settings_activation_ctm.setText(
@@ -1091,35 +1116,21 @@ class MainWindow(QMainWindow):
                 str(cf.get('CTM', 'topic_prior_variance')))
             self.lineEdit_settings_nr_workers_ctm.setText(
                 str(cf.get('CTM', 'num_data_loader_workers')))
-            self.lineEdit_settings_label_size_ctm.setText(
-                str(cf.get('CTM', 'label_size')))
-            self.lineEdit_settings_loss_weights_ctm.setText(
-                str(cf.get('CTM', 'loss_weights')))
-            self.lineEdit_settings_thetas_thr_ctm.setText(
-                str(cf.get('CTM', 'thetas_thr')))
             self.lineEdit_settings_sbert_model_ctm.setText(
                 str(cf.get('CTM', 'sbert_model_to_load')))
             if save:
                 self.clicked_pushButton_apply_changes_ctm_settings()
         elif option == "tm_general":
             # GENERAL TM SETTINGS
+            self.lineEdit_settings_thetas_thr.setText(
+                str(cf.get('TM', 'thetas_thr')))
             self.lineEdit_settings_nr_topics.setText(
                 str(cf.get('TM', 'ntopics')))
-            self.lineEdit_settings_nr_words.setText(
-                str(cf.get('TMedit', 'n_palabras')))
-            self.lineEdit_settings_round_size.setText(
-                str(cf.get('TMedit', 'round_size')))
-            self.lineEdit_settings_netl_workers.setText(
-                str(cf.get('TMedit', 'NETLworkers')))
-            self.lineEdit_settings_ldavis_nr_docs.setText(
-                str(cf.get('TMedit', 'LDAvis_ndocs')))
-            self.lineEdit_settings_ldavis_nr_jobs.setText(
-                str(cf.get('TMedit', 'LDAvis_njobs')))
             if save:
                 self.clicked_pushButton_apply_changes_tm_general_settings()
         elif option == "spark":
             # SPARK
-            self.lineEdit_settings_spark_available.setText(
+            self.lineEdit_settings_spark_is_available.setText(
                 str(cf.get('Spark', 'spark_available')))
             self.lineEdit_settings_script_spark.setText(
                 str(cf.get('Spark', 'script_spark')))
@@ -1139,6 +1150,15 @@ class MainWindow(QMainWindow):
                 str(cf.get('Preproc', 'keep_n')))
             if save:
                 self.clicked_pushButton_apply_preprocessing_settings()
+        elif option == "hierarchical":
+            self.lineEdit_settings_exp_tpc.setText(
+                str(cf.get('Hierarchical', 'expansion_tpc')))
+            self.lineEdit_settings_htm_version.setText(
+                str(cf.get('Hierarchical', 'htm_version')))
+            self.lineEdit_settings_htm_ds_thr.setText(
+                str(cf.get('Hierarchical', 'thr')))
+            if save:
+                self.clicked_pushButton_apply_changes_hierarchical_settings()
         elif option == "all":
             for op in Constants.SETTINGS_OPTIONS:
                 self.set_default_settings(op, False, False)
@@ -1208,8 +1228,6 @@ class MainWindow(QMainWindow):
             self.lineEdit_settings_nr_iter.text()))
         cf.set('MalletTM', 'doc_topic_thr', str(
             self.lineEdit_settings_doc_top_thr.text()))
-        cf.set('MalletTM', 'thetas_thr', str(
-            self.lineEdit_settings_thetas_thr.text()))
         cf.set('MalletTM', 'num_iterations_inf', str(
             self.lineEdit_settings_infer_iter.text()))
 
@@ -1264,8 +1282,6 @@ class MainWindow(QMainWindow):
             self.lineEdit_settings_nr_samples_prod.text()))
         cf.set('ProdLDA', 'num_data_loader_workers', str(
             self.lineEdit_settings_workers_prod.text()))
-        cf.set('ProdLDA', 'thetas_thr', str(
-            self.lineEdit_settings_thetas_thr_prod.text()))
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
@@ -1305,8 +1321,6 @@ class MainWindow(QMainWindow):
 
         cf.set('CTM', 'model_type', str(
             self.lineEdit_settings_under_ctm_type.text()))
-        cf.set('CTM', 'ctm_model_type', str(
-            self.lineEdit_settings_model_type_ctm.text()))
         cf.set('CTM', 'hidden_sizes', str(
             self.lineEdit_settings_hidden_ctm.text()))
         cf.set('CTM', 'activation', str(
@@ -1332,12 +1346,6 @@ class MainWindow(QMainWindow):
             self.lineEdit_settings_topic_prior_std_ctm.text()))
         cf.set('CTM', 'num_data_loader_workers', str(
             self.lineEdit_settings_nr_workers_ctm.text()))
-        cf.set('CTM', 'label_size', str(
-            self.lineEdit_settings_label_size_ctm.text()))
-        cf.set('CTM', 'loss_weights', str(
-            self.lineEdit_settings_loss_weights_ctm.text()))
-        cf.set('CTM', 'thetas_thr', str(
-            self.lineEdit_settings_thetas_thr_ctm.text()))
         cf.set('CTM', 'sbert_model_to_load', str(
             self.lineEdit_settings_sbert_model_ctm.text()))
 
@@ -1359,6 +1367,27 @@ class MainWindow(QMainWindow):
         Method for controling the clicking of the button 'pushButton_apply_changes_hierarchical_settings' that controls the actualization of the Topic Modeler's hierarchical settings.
         """
 
+        # Save user's configuration into config file
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+
+        cf.set('Hierarchical', 'expansion_tpc', str(
+            self.lineEdit_settings_exp_tpc.text()))
+        cf.set('Hierarchical', 'htm_version', str(
+            self.lineEdit_settings_htm_version.text()))
+        cf.set('Hierarchical', 'thr', str(
+            self.lineEdit_settings_htm_ds_thr.text()))
+
+        with open(self.tm.p2config, 'w') as configfile:
+            cf.write(configfile)
+
+        QMessageBox.information(
+            self, Constants.SMOOTH_SPOON_MSG, Constants.UPDATE_HIERARCHICAL_SETTINGS)
+
+        # Reload config in task manager
+        self.tm.cf = configparser.ConfigParser()
+        self.tm.cf.read(self.tm.p2config)
+
         return
 
     def clicked_pushButton_apply_changes_tm_general_settings(self):
@@ -1370,16 +1399,10 @@ class MainWindow(QMainWindow):
         cf = configparser.ConfigParser()
         cf.read(self.tm.p2config)
 
-        cf.set('TMedit', 'n_palabras', str(
-            self.lineEdit_settings_nr_words.text()))
-        cf.set('TMedit', 'round_size', str(
-            self.lineEdit_settings_round_size.text()))
-        cf.set('TMedit', 'NETLworkers', str(
-            self.lineEdit_settings_netl_workers.text()))
-        cf.set('TMedit', 'LDAvis_ndocs', str(
-            self.lineEdit_settings_ldavis_nr_docs.text()))
-        cf.set('TMedit', 'LDAvis_njobs', str(
-            self.lineEdit_settings_ldavis_nr_jobs.text()))
+        cf.set('TM', 'thetas_thr', str(
+            self.lineEdit_settings_thetas_thr.text()))
+        cf.set('TM', 'ntopics', str(
+            self.lineEdit_settings_nr_topics.text()))
 
         with open(self.tm.p2config, 'w') as configfile:
             cf.write(configfile)
@@ -1403,7 +1426,7 @@ class MainWindow(QMainWindow):
         cf.read(self.tm.p2config)
 
         cf.set('Spark', 'spark_available', str(
-            self.lineEdit_settings_spark_available.text()))
+            self.lineEdit_settings_spark_is_available.text()))
         cf.set('Spark', 'script_spark', str(
             self.lineEdit_settings_script_spark.text()))
         cf.set('Spark', 'token_spark', str(
@@ -1498,6 +1521,8 @@ class MainWindow(QMainWindow):
         """
         Method for controlling the clicking of the button 'pushButton_restore_hierarchical_settings' that manages the setting of the Topic Modeler's hierarchical settings' default values.
         """
+
+        self.set_default_settings("hierarchical", True, True)
 
         return
 

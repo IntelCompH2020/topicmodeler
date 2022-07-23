@@ -69,6 +69,9 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.privacy = None
         self.hierarchy_level = 0
         self.hierarchical_version = "htm-ds"
+        self.exp_tpc = 0
+        self.father_model = None
+        self.thr = -1
 
         # Reload config object in case changes were doing from the settings page
         self.cf = configparser.ConfigParser()
@@ -199,6 +202,10 @@ class TrainModelWindow(QtWidgets.QDialog):
             self.frame_hierarchical.hide()
         elif self.hierarchy_level == 1:
             self.frame_hierarchical.show()
+            self.checkBox_thr_0_bad.hide()
+            self.checkBox_thr_0_good.hide()
+            self.comboBox_version_htm.setCurrentText("htm-ws")
+            self.changed_comboBox_htm_version()
 
         return
 
@@ -206,14 +213,16 @@ class TrainModelWindow(QtWidgets.QDialog):
         """It controls the selection of the HTM version used for the generation of the submodel corpus.
         """        
 
-        htm_type = self.comboBox_version_htm.currentText()
+        htm_type = self.comboBox_version_htm.currentText().lower()
 
-        if htm_type.lower() == "htm-ws":
+        if htm_type == "htm-ws":
             self.lineEdit_htm_thr.hide()
             self.label_htm_ds_thr.hide()
-        elif htm_type.lower() == "htm-ds":
+        elif htm_type == "htm-ds":
             self.lineEdit_htm_thr.show()
             self.label_htm_ds_thr.show()
+        
+        self.hierarchical_version = htm_type
 
         return
 
@@ -236,7 +245,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.lineEdit_doc_top_thr_lda.setText(
             str(self.cf.get('MalletTM', 'doc_topic_thr')))
         self.lineEdit_thetas_thr_lda.setText(
-            str(self.cf.get('MalletTM', 'thetas_thr')))
+            str(self.cf.get('TM', 'thetas_thr')))
 
         return
 
@@ -365,7 +374,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.lineEdit_workers_prod.setText(
             str(self.cf.get('ProdLDA', 'num_data_loader_workers')))
         self.lineEdit_thetas_thr_prod.setText(
-            str(self.cf.get('ProdLDA', 'thetas_thr')))
+            str(self.cf.get('TM', 'thetas_thr')))
 
         return
 
@@ -564,8 +573,8 @@ class TrainModelWindow(QtWidgets.QDialog):
             str(self.cf.get('CTM', 'topic_prior_variance')))
         self.lineEdit_ctm_workers.setText(
             str(self.cf.get('CTM', 'num_data_loader_workers')))
-        self.lineEdit_ctm_sbert_model.setText(
-            str(self.cf.get('CTM', 'thetas_thr')))
+        self.lineEdit_ctm_thetas_thr.setText(
+            str(self.cf.get('TM', 'thetas_thr')))
         self.lineEdit_ctm_sbert_model.setText(
             str(self.cf.get('CTM', 'sbert_model_to_load')))
 
@@ -584,7 +593,6 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.training_params = {}
         messages = ""
 
-        # TODO: Add conversions
         ctm_prod_type = self.comboBox_model_type_ctm.currentText()
         if ctm_prod_type.lower() not in \
                 ['prodLDA', 'lda']:
@@ -753,6 +761,15 @@ class TrainModelWindow(QtWidgets.QDialog):
         """Method to get additional training parameters for the topic model, namely the name with which the model is going to be saved, its description and privacy level.
         """
 
+        if self.hierarchy_level == 1:
+            if self.hierarchical_version == "htm-ds":
+                thr = float(self.lineEdit_htm_thr.text())
+                if thr < 0 or thr > 1:
+                    self.checkBox_thr_0_bad.show()
+                    QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG, Constants.WRONG_HTM_DS_THR_MSG)
+                    return False
+                else:
+                    self.thr = thr
         # Model name
         if self.lineEdit_model_name.text() is None or self.lineEdit_model_name.text() == "":
             QMessageBox.warning(
@@ -794,9 +811,13 @@ class TrainModelWindow(QtWidgets.QDialog):
         self.stdout.outputWritten.connect(self.append_text_train)
         self.stderr.outputWritten.connect(self.append_text_train)
 
-        # Train the topic model by invoking the task manager method
-        self.tm.trainTM(self.trainer, self.TrDts_name, self.preproc_settings,
-                        self.training_params, self.modelname, self.ModelDesc, self.privacy)
+        if self.hierarchy_level == 0:
+
+            # Train the topic model by invoking the task manager method
+            self.tm.trainTM(self.trainer, self.TrDts_name, self.preproc_settings,self.training_params, self.modelname, self.ModelDesc, self.privacy)
+
+        else:
+            self.tm.train2ndTM(self.modelname, self.ModelDesc, self.father_model, self.exp_tpc, self.hierarchical_version, self.thr, self.privacy, self.trainer, self.training_params)
 
         return
 
@@ -815,6 +836,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         
         # Hide window
         self.hide()
+        self.text_logs_train.clear()
 
         return
 
@@ -822,7 +844,7 @@ class TrainModelWindow(QtWidgets.QDialog):
         """Method to control the clicking of the 'pushButton_train' which is in charge of starting the training of a topic model. Once the button has been clicked, it checks whether an appropriate corpus for training has been selected, and training parameters have been configured appropriately. In case both former conditions are fulfilled, the training of the topic model is carried out in a secondary thread, while the execution of the GUI is kept in the main one.
         """
 
-        if self.TrDts_name is None:
+        if self.hierarchical_version == 0 and self.TrDts_name is None:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.WARNING_NO_TR_CORPUS)
             return
