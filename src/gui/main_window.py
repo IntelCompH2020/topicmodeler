@@ -319,6 +319,8 @@ class MainWindow(QMainWindow):
             self.clicked_pushButton_delete_topic)
         self.pushButton_sort_topics.clicked.connect(
             self.clicked_pushButton_sort_topics)
+        self.pushButton_label_topics.clicked.connect(
+            self.clicked_pushButton_label_topics)
         self.pushButton_reset_changes_tm.clicked.connect(
             self.clicked_pushButton_reset_changes_tm)
         self.pushButton_apply_changes_log_settings.clicked.connect(
@@ -810,7 +812,7 @@ class MainWindow(QMainWindow):
 
 
         return
-    
+
     def clicked_pushButton_curate_model(self):
 
         self.models_tabs.setCurrentWidget(self.page_edit)
@@ -818,31 +820,6 @@ class MainWindow(QMainWindow):
 
         return
     
-    def clicked_pushButton_delete_topic(self):
-
-        # Get ids of the topics to be deleted
-        checked_list = []
-        for i in range(self.tableWidget_trained_models_topics_curation.rowCount()):
-            item = self.tableWidget_trained_models_topics_curation.item(
-                i, 0)
-            if item.checkState() == QtCore.Qt.CheckState.Checked:
-                checked_list.append(i)
-
-        if len(checked_list) == 0:
-            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
-                                Constants.TOPICS_DELETE_NO_SELECTED)
-            return
-        
-        self.tm.deleteTopics(checked_list, self)
-
-        return
-    
-    def clicked_pushButton_sort_topics(self):
-
-        self.tm.sortTopics(self)
-
-        return
-
     def clicked_pushButton_show_pyldavis(self):
 
         self.models_tabs.setCurrentWidget(self.page_models_pyldavis)
@@ -858,15 +835,84 @@ class MainWindow(QMainWindow):
         return
 
     def clicked_pushButton_return_curation(self):
+        """Method to control the change from the curation view back to the Models page main view. 
+        """
         
         self.models_tabs.setCurrentWidget(self.page_models_main)
 
         return
 
+    
+    def clicked_pushButton_delete_topic(self):
+        """Method to control the clicking of the button 'pushButton_delete_topic. Once the button is clicked by the user,
+        the topics to be deleted are retrieved first from the checkboxes marked in the table 'tableWidget_trained_models_topics_curation'. Then, the TaskManager' function in charge of carrying out topics' deletion is invoked. Whether the deletion finishes successfully or not, a message informing about how the action ended is shown to the user.
+        """
+
+        # Get ids of the topics to be deleted
+        checked_list = []
+        for i in range(self.tableWidget_trained_models_topics_curation.rowCount()):
+            item = self.tableWidget_trained_models_topics_curation.item(
+                i, 0)
+            if item.checkState() == QtCore.Qt.CheckState.Checked:
+                checked_list.append(i)
+
+        if len(checked_list) == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.TOPICS_DELETE_NO_SELECTED)
+            return
+        
+        status = self.tm.deleteTopics(checked_list, self)
+
+        if status == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(checked_list) + ' could not deleted.')
+        elif status == 1:
+            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(checked_list) + ' were deleted succesfully.')
+
+        return
+    
+    def clicked_pushButton_sort_topics(self):
+        """Method to control the clicking of the button 'pushButton_sort_topics. Once the button is clicked by the user, the TaskManager' function in charge of carrying out the sorting is invoked. Whether the sorting finishes successfully or not, a message informing about how the action ended is shown to the user.
+        """
+
+        status = self.tm.sortTopics(self)
+        if status == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.SORT_TOPICS_MSG_STATUS_0)
+        elif status == 1:
+            QMessageBox.information(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.SORT_TOPICS_MSG_STATUS_1)
+        return
+    
+    def clicked_pushButton_label_topics(self):
+        """Method to control the clicking of the button 'pushButton_label_topics. Once the button is clicked by the user, the labels written in the 'tableWidget_trained_models_topics_curation' are retrieved and sent as a list to the TaskManager' function in charge of carrying out the labeling. Whether the labeling finishes successfully or not, a message informing about how the action ended is shown to the user.
+        """
+
+        # Get labels into a list
+        table = self.tableWidget_trained_models_topics_curation
+        labels = [table.item(i, 3).text() for i in range(table.rowCount())]
+
+        # Call function for manual label in task manager
+        status = self.tm.manualLabel(labels)
+        if status == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.MANUAL_LABEL_MSG_STATUS_0)
+        elif status == 1:
+            QMessageBox.information(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.MANUAL_LABEL_MSG_STATUS_1)
+        
+        return
 
     def clicked_pushButton_reset_changes_tm(self):
+        """Method to control the clicking of the button 'pushButton_reset_changes_tm. Once the button is clicked by the user, the TaskManager' function in charge of reseting the model is invoked. Whether the model is restored successfully or not, a message informing about how the action ended is shown to the user.
+        """
 
-        self.tm.resetTM(self)
+        status = self.tm.resetTM(self)
+        if status == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.RESET_TM_MSG_STATUS_0)
+        elif status == 1:
+            QMessageBox.information(
+                self, Constants.SMOOTH_SPOON_MSG, Constants.RESET_TM_MSG_STATUS_1)
 
         return
 

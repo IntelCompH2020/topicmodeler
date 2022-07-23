@@ -2057,7 +2057,7 @@ class HierarchicalTMManager(object):
                     p_z = np.multiply(thetas_d, betas[:, idx_w])
                     p_z_args = np.argsort(p_z)
                     if p_z[p_z_args[-1]] > 20*p_z[p_z_args[-2]]:
-                        if p_z_args[-1]== exp_tpc:
+                        if p_z_args[-1] == exp_tpc:
                             words_exp_idx.append(idx_w)
                     else:
                         if int(np.nonzero(np.random.multinomial(len(betas), np.multiply(thetas_d, betas[:, idx_w])))[0][0]) == exp_tpc:

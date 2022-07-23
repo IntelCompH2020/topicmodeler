@@ -107,7 +107,6 @@ class ITMTTaskManager(BaseTaskManager):
         self._dir_struct = {'datasets': 'datasets',
                             'TMmodels': 'TMmodels'}
 
-
         return
 
     def load(self):
@@ -118,7 +117,7 @@ class ITMTTaskManager(BaseTaskManager):
         self.load_lists()
 
         return
-    
+
     def create(self):
         """
         Extends the create method from the parent class to load into execution time necessary entities required for the execution of the application.
@@ -126,8 +125,8 @@ class ITMTTaskManager(BaseTaskManager):
         super().create()
         self.load_lists()
 
-        return 
-    
+        return
+
     def load_lists(self):
         """
         It loads into execution time all the necessary entities used during the execution of the application, namely:
@@ -754,7 +753,7 @@ class ITMTTaskManager(BaseTaskManager):
 
         return status
 
-    def loadTopicsDesc(self):
+    def loadTopicsDesc(self, tm=None):
         """
         This method retrieves the topics proportions, labels, 
         word descriptions and number of documents where the topics are active
@@ -766,13 +765,16 @@ class ITMTTaskManager(BaseTaskManager):
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
-        
+
         if self.__class__.__name__ == "ITMTTaskManagerCMD":
-            cmd = cmd + ' --showTopics ' + self.selectedTM
+            if tm:
+                cmd = cmd + ' --showTopics ' + tm
+            else:
+                cmd = cmd + ' --showTopics ' + self.selectedTM
         elif self.__class__.__name__ == "ITMTTaskManagerGUI":
             cmd = cmd + ' --showTopicsAdvanced ' + self.selectedTM
         printred(cmd)
-        
+
         try:
             self.logger.info(f'-- -- Running command {cmd}')
             self.TopicsDesc = check_output(args=cmd, shell=True)
@@ -801,7 +803,7 @@ class ITMTTaskManager(BaseTaskManager):
                 self._dir_struct['TMmodels']).resolve().as_posix()
         cmd = cmd + ' --setTpcLabels ' + self.selectedTM
         printred(cmd)
-        
+
         try:
             self.logger.info(f'-- -- Running command {cmd}')
             status = check_output(args=cmd, shell=True)
@@ -812,7 +814,7 @@ class ITMTTaskManager(BaseTaskManager):
         self.logger.info("Labels have been saved to Model")
         self.loadTopicsDesc()
 
-        return
+        return status
 
     def deleteTopics(self, tpcs):
         """
@@ -831,7 +833,7 @@ class ITMTTaskManager(BaseTaskManager):
                 self._dir_struct['TMmodels']).resolve().as_posix()
         cmd = cmd + ' --deleteTopics ' + self.selectedTM
         printred(cmd)
-        
+
         try:
             self.logger.info(f'-- -- Running command {cmd}')
             status = check_output(args=cmd, shell=True)
@@ -857,7 +859,7 @@ class ITMTTaskManager(BaseTaskManager):
                 self._dir_struct['TMmodels']).resolve().as_posix()
         cmd = cmd + ' --resetTM ' + self.selectedTM
         printred(cmd)
-        
+
         try:
             self.logger.info(f'-- -- Running command {cmd}')
             status = check_output(args=cmd, shell=True)
@@ -865,7 +867,8 @@ class ITMTTaskManager(BaseTaskManager):
             self.logger.error('-- -- Execution of script failed')
             return
 
-        self.logger.info("The topic model has been restored to its initial values")
+        self.logger.info(
+            "The topic model has been restored to its initial values")
         self.loadTopicsDesc()
 
         return status
@@ -881,7 +884,7 @@ class ITMTTaskManager(BaseTaskManager):
                 self._dir_struct['TMmodels']).resolve().as_posix()
         cmd = cmd + ' --sortTopics ' + self.selectedTM
         printred(cmd)
-        
+
         try:
             self.logger.info(f'-- -- Running command {cmd}')
             status = check_output(args=cmd, shell=True)
@@ -893,7 +896,7 @@ class ITMTTaskManager(BaseTaskManager):
         self.loadTopicsDesc()
 
         return status
-                
+
 ##############################################################################
 #                          ITMTTaskManagerCMD                                #
 ##############################################################################
@@ -929,7 +932,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             p2p, p2parquet, p2wdlist, config_fname=config_fname,
             metadata_fname=metadata_fname)
 
-        
     def fromHDFS(self):
         """
         This method simulates the download of a corpus from the IntelComp data space
@@ -1450,7 +1452,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         allTMmodels = json.loads(self.allTMmodels)
         allTMmodels = [el for el in allTMmodels.keys()]
-        opt = query_options(allTMmodels, 'Select the topic model that you wish to copy')
+        opt = query_options(
+            allTMmodels, 'Select the topic model that you wish to copy')
         oldModel = allTMmodels[opt]
 
         newModel = ''
@@ -1639,13 +1642,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # Return error meassage for creating Level 2 submodel when there are no models available
         if len(displayModels) == 0:
             self.logger.error(
-                    "-- -- To create a second-level submodel a model must have been created first.")
+                "-- -- To create a second-level submodel a model must have been created first.")
             return
-        
+
         # Ask user which first-level model should be used for the generation of the new submodel's corpus
         selection = query_options(
             displayModels, "Select model from which a second-level submodel will be generated")
         fathermodel = models[selection]
+
         self.logger.info(
             f'-- -- Selected father model is {allTMmodels[fathermodel]["name"]}')
 
@@ -1662,15 +1666,13 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         thr = float(self.cf.get('Hierarchical', 'thr'))
 
         # Load father's TMmodel and get its topics' chemical description
-        #tmmodel = newTMmodel(TMmodel_path)
-
-        # TODO: Implement this when new TMmodel available
-        tmModel_father_path = self.p2p / "TMmodels" / fathermodel / "model.npz"
-        vocabFile_father = self.p2p / "TMmodels" / \
-            fathermodel / "modelFiles/vocab_freq.txt"
-        # tmmodel = TMmodel(vocabfreq_file=vocabFile_father,
-        #                  from_file=tmModel_father_path)
-        # tmmodel.muestra_descriptions()
+        print("**** Topics' chemical description of the selected level-1 model:")
+        self.loadTopicsDesc(fathermodel)
+        word_info_father = json.loads(self.TopicsDesc)
+        df = pd.DataFrame(word_info_father, columns=[
+                          'Size', 'Label', 'Word Description', 'Ndocs Active'])
+        df.index.name = 'Topid ID'
+        print(df[['Word Description']])
 
         expansion_tpc = var_num_keyboard('int', expansion_tpc,
                                          "Father model's topic from which the submdodel's corpus will be generated. Select one of the above listed:")
@@ -1735,9 +1737,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         ntopics = int(self.cf.get('TM', 'ntopics'))
         ntopics = var_num_keyboard('int', ntopics,
                                    'Please, select the number of topics')
-        
+
         # We get the default path to the labels for the atl
-        path_labels = ""#"wordlists/wiki_categories.json"
+        path_labels = ""  # "wordlists/wiki_categories.json"
 
         # Retrieve parameters for training.
         # These are dependent on the training algorithm
@@ -1982,22 +1984,26 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         allTMmodels = json.loads(self.allTMmodels)
         allTMmodels = [el for el in allTMmodels.keys()]
-        opt = query_options(allTMmodels, 'Select a topic model to carry out curation tasks')
+        opt = query_options(
+            allTMmodels, 'Select a topic model to carry out curation tasks')
         self.selectedTM = allTMmodels[opt]
         print(self.selectedTM)
         self.loadTopicsDesc()
         return
 
     def showTopics(self):
-        self.logger.info(f'-- Displaying Topic Information for Model {self.selectedTM}')
+        self.logger.info(
+            f'-- Displaying Topic Information for Model {self.selectedTM}')
         TopicInfo = json.loads(self.TopicsDesc)
-        df = pd.DataFrame(TopicInfo, columns = ['Size', 'Label', 'Word Description', 'Ndocs Active'])
+        df = pd.DataFrame(TopicInfo, columns=[
+                          'Size', 'Label', 'Word Description', 'Ndocs Active'])
         df.index.name = 'Topid ID'
         print(df[['Size', 'Label', 'Word Description']])
         return
 
     def manualLabel(self):
-        self.logger.info(f'-- Manualing labeling of topics for Model {self.selectedTM}')
+        self.logger.info(
+            f'-- Manualing labeling of topics for Model {self.selectedTM}')
         TopicInfo = json.loads(self.TopicsDesc)
         NewLabels = []
 
@@ -2029,11 +2035,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         return
 
     def deleteTopics(self):
-        self.logger.info(f'-- Displaying Topic Information for Model {self.selectedTM}')
+        self.logger.info(
+            f'-- Displaying Topic Information for Model {self.selectedTM}')
         TopicInfo = json.loads(self.TopicsDesc)
-        df = pd.DataFrame(TopicInfo, columns = ['Size', 'Label', 'Word Description', 'Ndocs Active'])
+        df = pd.DataFrame(TopicInfo, columns=[
+                          'Size', 'Label', 'Word Description', 'Ndocs Active'])
         df.index.name = 'Topid ID'
-        print(df[['Size', 'Ndocs Active', 'Word Description']].sort_values(by=['Ndocs Active'], ascending=False))
+        print(df[['Size', 'Ndocs Active', 'Word Description']
+                 ].sort_values(by=['Ndocs Active'], ascending=False))
 
         displaytext = """
         *************************************************************************************
@@ -2079,7 +2088,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         if request_confirmation(msg='Do you wish to continue?'):
             super().sortTopics()
         return
-        
+
     def resetTM(self):
         displaytext = """
         *************************************************************************************
@@ -2092,7 +2101,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         if request_confirmation(msg='Do you wish to continue?'):
             super().resetTM()
         return
-
 
     def oldeditTM(self, corpus):
 
@@ -3266,7 +3274,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                         allTMmodels[TMmodel]['TrDtSet']))
                     table.setItem(0, 5, QtWidgets.QTableWidgetItem(
                         str(allTMmodels[TMmodel]['hierarchy-level'])))
-                    if  str(allTMmodels[TMmodel]['htm-version']) == "null":
+                    if str(allTMmodels[TMmodel]['htm-version']) == "null":
                         table.setItem(0, 6, QtWidgets.QTableWidgetItem(
                             "Does not apply"))
                     else:
@@ -3277,18 +3285,19 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
                     table.resizeColumnsToContents()
                     table.resizeRowsToContents()
-            
+
                     self.selectedTM = model_name
                     gui.label_available_model_being_curated.setText(model_name)
 
                     self.loadTopicsDesc()
                     self.showTopics(gui)
 
-                    model_path = self.p2p.joinpath(self._dir_struct['TMmodels']).joinpath(model_name).joinpath('TMmodel').resolve().as_posix()
-                    self.render_pyldavis(model_path,gui)
+                    model_path = self.p2p.joinpath(self._dir_struct['TMmodels']).joinpath(
+                        model_name).joinpath('TMmodel').resolve().as_posix()
+                    self.render_pyldavis(model_path, gui)
 
         return
-    
+
     def showTopics(self, gui):
 
         # Get table where TMmodel topics information is going to be displayed
@@ -3299,49 +3308,50 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             TopicInfo = json.loads(self.TopicsDesc)
             table.setRowCount(len(TopicInfo))
             table2.setRowCount(len(TopicInfo))
-            df = pd.DataFrame(TopicInfo, columns=['Size', 'Label', 'Word Description', 'Ndocs Active', 'Topics entropy', 'Topics coherence'])
+            df = pd.DataFrame(TopicInfo, columns=[
+                              'Size', 'Label', 'Word Description', 'Ndocs Active', 'Topics entropy', 'Topics coherence'])
             for tp in range(len(TopicInfo)):
                 df2 = df.iloc[[tp]]
                 table.setItem(tp, 0, QtWidgets.QTableWidgetItem(
-                        str(tp)))
+                    str(tp)))
                 table.setItem(tp, 1, QtWidgets.QTableWidgetItem(
-                        df2['Size'].item()))
+                    df2['Size'].item()))
                 table.setItem(tp, 2, QtWidgets.QTableWidgetItem(
-                        df2['Ndocs Active'].item()))
+                    df2['Ndocs Active'].item()))
                 table.setItem(tp, 3, QtWidgets.QTableWidgetItem(
-                        df2['Topics entropy'].item()))
+                    df2['Topics entropy'].item()))
                 table.setItem(tp, 4, QtWidgets.QTableWidgetItem(
-                        df2['Topics coherence'].item()))
+                    df2['Topics coherence'].item()))
                 table.setItem(tp, 5, QtWidgets.QTableWidgetItem(
-                        df2['Label'].item()))
+                    df2['Label'].item()))
                 table.setItem(tp, 6, QtWidgets.QTableWidgetItem(
-                        df2['Word Description'].item()))
-                
+                    df2['Word Description'].item()))
+
                 table2.setItem(tp, 1, QtWidgets.QTableWidgetItem(
-                        str(tp)))
+                    str(tp)))
                 table2.setItem(tp, 2, QtWidgets.QTableWidgetItem(
-                        df2['Size'].item()))
+                    df2['Size'].item()))
                 table2.setItem(tp, 3, QtWidgets.QTableWidgetItem(
-                        df2['Label'].item()))
+                    df2['Label'].item()))
                 table2.setItem(tp, 4, QtWidgets.QTableWidgetItem(
-                        df2['Ndocs Active'].item()))
+                    df2['Ndocs Active'].item()))
                 table2.setItem(tp, 5, QtWidgets.QTableWidgetItem(
-                        df2['Word Description'].item()))
-            
+                    df2['Word Description'].item()))
+
             utils.add_checkboxes_to_table(table2, 0)
             table.resizeColumnsToContents()
             table.resizeRowsToContents()
             table2.resizeColumnsToContents()
             table2.resizeRowsToContents()
         return
-    
+
     def render_pyldavis(self, model_path, gui):
         if gui.web:
-             gui.web.setParent(None)
+            gui.web.setParent(None)
         gui.web = QWebEngineView()
-        gui.web.setZoomFactor(0.3)
+        gui.web.setZoomFactor(0.4)
         url = QUrl.fromLocalFile(pathlib.Path(
-             model_path, "pyLDAvis.html").as_posix())
+            model_path, "pyLDAvis.html").as_posix())
         gui.web.load(url)
         gui.layout_plot_pyldavis_small.addWidget(gui.web)
         gui.web.show()
@@ -3356,7 +3366,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         gui.web_expand.show()
 
         return
-    
+
     def deleteTM(self, model_to_delete, gui):
         """
         Delete an Existing Topic Model
@@ -3382,9 +3392,11 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                     if reply == QMessageBox.StandardButton.Yes:
                         status = self.delete_TMmodel(TMmodel)
                         if int(status.decode('utf8')) == 0:
-                            QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' + allTMmodels[TMmodel]['name'] + ' could not be deleted.')
+                            QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' +
+                                                allTMmodels[TMmodel]['name'] + ' could not be deleted.')
                         elif int(status.decode('utf8')) == 1:
-                            QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' + allTMmodels[TMmodel]['name'] + ' was deleted successfully.')
+                            QMessageBox.information(
+                                gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' + allTMmodels[TMmodel]['name'] + ' was deleted successfully.')
 
         return
 
@@ -3409,9 +3421,11 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                 if allTMmodels[TMmodel]['name'] == model_to_rename:
                     status = self.rename_TMmodel(model_to_rename, new_name)
                     if int(status.decode('utf8')) == 0:
-                            QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' + allTMmodels[TMmodel]['name'] + ' could not be renamed.')
+                        QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' +
+                                            allTMmodels[TMmodel]['name'] + ' could not be renamed.')
                     elif int(status.decode('utf8')) == 1:
-                        QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' + allTMmodels[TMmodel]['name'] + ' was deleted successfully renamed to ' + new_name)
+                        QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' +
+                                                allTMmodels[TMmodel]['name'] + ' was deleted successfully renamed to ' + new_name)
         return
 
     def copyTM(self, model_to_copy, new_name, gui):
@@ -3435,60 +3449,67 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                 if allTMmodels[TMmodel]['name'] == model_to_copy:
                     status = self.copy_TMmodel(model_to_copy, new_name)
                     if int(status.decode('utf8')) == 0:
-                            QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'The copy of the topic model ' + allTMmodels[TMmodel]['name'] + ' could not be created.')
+                        QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'The copy of the topic model ' +
+                                            allTMmodels[TMmodel]['name'] + ' could not be created.')
                     elif int(status.decode('utf8')) == 1:
-                        QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'A copy of the topic todel ' + allTMmodels[TMmodel]['name'] + ' was created with the name ' + new_name)
+                        QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'A copy of the topic todel ' +
+                                                allTMmodels[TMmodel]['name'] + ' was created with the name ' + new_name)
 
         return
 
-    def manualLabel(self):
-        # TODO
-        self.logger.info(f'-- Manualing labeling of topics for Model {self.selectedTM}')
-        TopicInfo = json.loads(self.TopicsDesc)
-        NewLabels = []
+    def manualLabel(self, labels):
+        """"
+        This method manually labels a set of topics from the model being curated.
 
-        displaytext = """
-        *************************************************************************************
-        This function allows to manually provide labels for the topics in the model
+        Parameters
+        ----------
+        labels: list of str
+            List with the new topics' labels
 
-        For each topic you will be requested a label:
-        - You can write 'chem' to use the chemical description of the topic.
-        - You can press enter to keep the current label  
-        *************************************************************************************
+        Returns
+        -------
+        status : int
+            - 0 if the topics could not be labeled
+            - 1 if the topics were successfully labeled
         """
-        printgr(displaytext)
 
+        TopicInfo = json.loads(self.TopicsDesc)
+        new_labels = []
         for tpc, tpc_info in enumerate(TopicInfo):
-            print('=' * 5)
-            print('Topic ID:', tpc)
-            print('Current label:', tpc_info[1])
-            print('Chemical description:', tpc_info[2])
-            tag = input('New label: ')
-            if tag == 'chem':
-                NewLabels.append(tpc_info[2])
-            elif tag != '':
-                NewLabels.append(tag)
+            if labels[tpc] != '':
+                new_labels.append(labels[tpc])
             else:
-                NewLabels.append(tpc_info[1])
+                new_labels.append(tpc_info[1])
+        status = self.setTpcLabels(labels)
 
-        self.setTpcLabels(NewLabels)
-        return
+        return int(status.decode('utf8'))
 
     def deleteTopics(self, tpcs_to_delete, gui):
+        """"
+        This method deletes the topics provided in the list as input parameter
+
+        Parameters
+        ----------
+        tpcs_to_delete: list of int
+            List containing the ids of the topics that will be removed from model
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+
+        Returns
+        -------
+        status : int
+            - 0 if the topics could not be deleted
+            - 1 if the topics were deleted successfully
+        """
 
         reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(tpcs_to_delete) + ' will be deleted. Proceed?',
-                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                                QMessageBox.StandardButton.No)
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                     QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
             status = super().deleteTopics(tpcs_to_delete)
-            if int(status.decode('utf8')) == 0:
-                QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(tpcs_to_delete) + ' could not deleted.')
-            elif int(status.decode('utf8')) == 1:
-                QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(tpcs_to_delete) + ' were deleted succesfully.')
+            self.showTopics(gui)
 
-        self.showTopics(gui)
-        
-        return
+        return int(status.decode('utf8'))
 
     def showSimilar(self):
         # TODO
@@ -3499,30 +3520,51 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         print('fuseTopics')
 
     def sortTopics(self, gui):
+        """
+        Sort topics according to decreasing value of topic size
 
-        reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, Constants.SORT_TM_MSG, QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,QMessageBox.StandardButton.No)
+        Parameters
+        ----------
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+
+        Returns
+        -------
+        status : int
+            - 0 if the topics could not be sorted
+            - 1 if the topics were sorted succesfully
+        """
+
+        reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, Constants.SORT_TM_MSG,
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
             status = super().sortTopics()
-            if int(status.decode('utf8')) == 0:
-                QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'The topics could not be sorted')
-            elif int(status.decode('utf8')) == 1:
-                QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'The topics were sorted according to descending topic size order..')
-        
-        self.showTopics(gui)
+            self.showTopics(gui)
 
-        return
-        
+        return int(status.decode('utf8'))
+
     def resetTM(self, gui):
+        """
+        This method resets the topic model to its original configuration
+        after training. All curation operations will be lost, including
+        manual annotation of topics
 
-        reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, Constants.RESET_TM_MSG,QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,QMessageBox.StandardButton.No)
+        Parameters
+        ----------
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+
+        Returns
+        -------
+        status : int
+            - 0 if the model could not be restored to its initial configuration
+            - 1 if the model was restored successfully to its original configuration
+        """
+
+        reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, Constants.RESET_TM_MSG,
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.Yes:
             status = super().resetTM()
-            if int(status.decode('utf8')) == 0:
-                QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'The model could not be restored to its initial configuration.')
-            elif int(status.decode('utf8')) == 1:
-                QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'The was resored to its original configuration succesfully.')
+            self.showTopics(gui)
 
-        self.showTopics(gui)
-
-        return
-
+        return int(status.decode('utf8'))
