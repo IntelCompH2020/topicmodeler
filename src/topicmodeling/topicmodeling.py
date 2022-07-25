@@ -2412,9 +2412,9 @@ if __name__ == "__main__":
                     if not corpusFile.is_dir():
                         sys.exit("The corpus file 'corpus.parquet' does not exist.")
                     else:
-                        if train_config['TMparam']['hierarchy-level'] == 0:
+                        if train_config['hierarchy-level'] == 0:
                             CTMr.fit(corpusFile=corpusFile)
-                        elif train_config['TMparam']['hierarchy-level'] == 1:
+                        elif train_config['hierarchy-level'] == 1:
                             embbeddingsFile = configFile.parent.joinpath('embeddings.npy')
                             if not embbeddingsFile.is_file():
                                 sys.exit("The embeddings file 'embeddings.npy' does not exist.")

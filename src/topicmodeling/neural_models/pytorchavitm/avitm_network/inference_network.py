@@ -22,8 +22,7 @@ class InferenceNetwork(nn.Module):
         hidden_sizes : tuple, length = n_layers (default=(100,100))
             Size of the hidden layer
         activation : string (default='softplus')
-            Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu',
-            'selu' or 'tanh'
+            Activation function to be used, chosen from 'softplus', 'relu', 'sigmoid', 'leakyrelu', 'rrelu', 'elu', 'selu' or 'tanh'
         dropout : float (default=0.2)
             Percent of neurons to drop out.
         """
@@ -34,8 +33,7 @@ class InferenceNetwork(nn.Module):
         assert isinstance(output_size, int), "output_size must be type int."
         assert isinstance(hidden_sizes, tuple), \
             "hidden_sizes must be type tuple."
-        assert activation in ['softplus', 'relu', 'sigmoid', 'tanh', 'leakyrelu',
-                              'rrelu', 'elu', 'selu'], \
+        assert activation in ['softplus', 'relu', 'sigmoid', 'tanh', 'leakyrelu', 'rrelu', 'elu', 'selu'], \
             "activation must be 'softplus', 'relu', 'sigmoid', 'leakyrelu'," \
             " 'rrelu', 'elu', 'selu' or 'tanh'."
         assert dropout >= 0, "dropout must be >= 0."

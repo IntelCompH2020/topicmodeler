@@ -255,8 +255,7 @@ class AVITM(object):
 
             # forward pass
             self.model.zero_grad()
-            prior_mean, prior_var, posterior_mean, posterior_var, posterior_log_var, \
-                word_dists = self.model(X)
+            prior_mean, prior_var, posterior_mean, posterior_var, posterior_log_var, word_dists = self.model(X)
 
             # backward pass
             loss = self._loss(X, word_dists, prior_mean, prior_var,
@@ -302,8 +301,7 @@ class AVITM(object):
 
             # forward pass
             self.model.zero_grad()
-            prior_mean, prior_var, posterior_mean, posterior_var, posterior_log_var, \
-                word_dists = self.model(x)
+            prior_mean, prior_var, posterior_mean, posterior_var, posterior_log_var, word_dists = self.model(x)
 
             loss = self._loss(x, word_dists, prior_mean, prior_var,
                               posterior_mean, posterior_var, posterior_log_var)
@@ -365,7 +363,9 @@ class AVITM(object):
                 patience=patience, verbose=self.verbose, path=save_dir, delta=delta)
 
         train_loader = DataLoader(
-            self.train_data, batch_size=self.batch_size, shuffle=True,
+            self.train_data, 
+            batch_size=self.batch_size, 
+            shuffle=True,
             num_workers=mp.cpu_count())
 
         # init training variables
@@ -386,13 +386,14 @@ class AVITM(object):
             if self.validation_data is not None:
 
                 validation_loader = DataLoader(
-                    self.validation_data, batch_size=self.batch_size, shuffle=True,
+                    self.validation_data, 
+                    batch_size=self.batch_size, shuffle=True,
                     num_workers=mp.cpu_count())
 
                 # train epoch
                 s = datetime.datetime.now()
-                val_samples_processed, val_loss = self._validate_epoch(
-                    validation_loader)
+                val_samples_processed, val_loss = \
+                    self._validate_epoch(validation_loader)
                 e = datetime.datetime.now()
 
                 # report
@@ -417,6 +418,7 @@ class AVITM(object):
                 self.best_components = self.model.beta
                 if save_dir is not None:
                     self.save(save_dir)
+
             pbar.set_description(
                 "Epoch: [{}/{}]\t Seen Samples: [{}/{}]\tTrain Loss: {}\tTime: {}".format(
                     epoch +
@@ -479,7 +481,7 @@ class AVITM(object):
         pbar = tqdm(n_samples, position=0, leave=True)
 
         final_thetas = []
-        for sample_index in range(self.num_samples):
+        for sample_index in range(n_samples):
 
             with torch.no_grad():
                 collect_theta = []

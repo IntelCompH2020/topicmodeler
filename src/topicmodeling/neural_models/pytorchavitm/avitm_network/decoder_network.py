@@ -115,7 +115,6 @@ class DecoderNetwork(nn.Module):
         # generate samples from theta
         theta = F.softmax(
             self.reparameterize(posterior_mu, posterior_log_sigma), dim=1)
-        topic_doc = theta
         theta = self.drop_theta(theta)
 
         # prodLDA vs LDA
@@ -123,13 +122,11 @@ class DecoderNetwork(nn.Module):
             # in: batch_size x input_size x n_components
             word_dist = F.softmax(
                 self.beta_batchnorm(torch.matmul(theta, self.beta)), dim=1)
-            topic_word = self.beta
             # word_dist: batch_size x input_size
             self.topic_word_matrix = self.beta
         elif self.model_type.lower() == 'lda':
             # simplex constrain on Beta
             beta = F.softmax(self.beta_batchnorm(self.beta), dim=1)
-            topic_word = beta
             # word_dist: batch_size x input_size
             word_dist = torch.matmul(theta, beta)
             self.topic_word_matrix = beta
