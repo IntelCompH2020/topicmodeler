@@ -882,18 +882,27 @@ if __name__ == "__main__":
         sys.stdout.write(str(status))
 
     if args.showTopics:
-        tm = TMmodel(tm_path.joinpath(
+        if tm_path.joinpath(
+            f"{args.showTopics}").joinpath('TMmodel').is_dir():
+            tm = TMmodel(tm_path.joinpath(
             f"{args.showTopics}").joinpath('TMmodel'))
+        else:
+            # If it is a submodel
+            for root, dirs, files in os.walk(tm_path):
+                sys.stdout.write(str(dirs))
+                for dir in dirs:
+                    if dir.endswith(f"{args.showTopics}"):
+                        path_tm = os.path.join(root, dir,'TMmodel')
+                        tm = TMmodel(path_tm)
         sys.stdout.write(json.dumps(tm.showTopics()))
-
+        
     if args.showTopicsAdvanced:
         if tm_path.joinpath(
             f"{args.showTopicsAdvanced}").joinpath('TMmodel').is_dir():
             tm = TMmodel(tm_path.joinpath(
             f"{args.showTopicsAdvanced}").joinpath('TMmodel'))
         else:
-            # It is a submodel
-            # TODO: Ask J.
+            # If it is a submodel
             for root, dirs, files in os.walk(tm_path):
                 sys.stdout.write(str(dirs))
                 for dir in dirs:
