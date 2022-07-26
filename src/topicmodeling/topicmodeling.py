@@ -31,6 +31,7 @@ from dask.diagnostics import ProgressBar
 from gensim import corpora
 from scipy import sparse
 from sklearn.preprocessing import normalize
+import pyLDAvis as vis
 
 from manageModels import TMmodel as newTMmodel
 from neural_models.contextualized_topic_models.ctm_network.ctm import (
@@ -1825,6 +1826,13 @@ class CTMTrainer(Trainer):
         if lblFile.is_file():
             with Path(lblFile).open('r', encoding='utf8') as fin:
                 labels += json.load(fin)['wordlist']
+
+        # Data pyldavis
+        # Get LDAVIS data format
+        data_ldavis = ctm.get_ldavis_data_format(self._qt.vocab, self._train_dts, n_samples=2)
+        ctm_pd = vis.prepare(**data_ldavis)
+        file = modelFolder.joinpath('pyLDAvis.html').as_posix()
+        vis.save_html(ctm_pd, file)
 
         # Create TMmodel
         tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))

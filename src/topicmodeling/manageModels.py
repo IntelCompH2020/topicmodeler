@@ -359,6 +359,7 @@ class TMmodel(object):
                                     sort_topics=False, n_jobs=-1)
         pyLDAvis.save_html(vis_data, self._TMfolder.joinpath(
             'pyLDAvis.html').as_posix())
+        # TODO: Check substituting by "pyLDAvis.prepared_data_to_html"
         self._modify_pyldavis_html(self._TMfolder.as_posix())
 
         return
@@ -621,8 +622,7 @@ class TMmodel(object):
             Each element is a a term (topic_id, "label for topic topic_id")                    
         """
         if not labels:
-            # TODO: Ask J.A. list of "" or dft to topc_desc
-            return [(i, p) for i, p in enumerate(self._tpc_descriptions)]#[]
+            return [(i, " ") for i, p in enumerate(self._tpc_descriptions)]#[]
         if use_cuda:
             if torch.cuda.is_available():
                 device = 0
@@ -895,7 +895,7 @@ if __name__ == "__main__":
                         path_tm = os.path.join(root, dir,'TMmodel')
                         tm = TMmodel(path_tm)
         sys.stdout.write(json.dumps(tm.showTopics()))
-        
+
     if args.showTopicsAdvanced:
         if tm_path.joinpath(
             f"{args.showTopicsAdvanced}").joinpath('TMmodel').is_dir():

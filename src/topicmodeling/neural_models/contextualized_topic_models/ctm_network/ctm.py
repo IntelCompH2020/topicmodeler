@@ -738,6 +738,30 @@ class CTM(object):
             setattr(self, k, v)
 
         self.model.load_state_dict(checkpoint['state_dict'])
+    
+    def get_ldavis_data_format(self, vocab, dataset, n_samples):
+        """
+        Returns the data that can be used in input to pyldavis to plot
+        the topics
+        """
+        term_frequency = np.ravel(dataset.X_bow.sum(axis=0))
+        self.logger.info(term_frequency.shape)
+        doc_lengths = np.ravel(dataset.X_bow.sum(axis=1))
+        self.logger.info(doc_lengths.shape)
+        term_topic = self.get_topic_word_distribution()
+        self.logger.info(term_topic.shape)
+        doc_topic_distribution = self.get_doc_topic_distribution(
+            dataset, n_samples=n_samples)
+        self.logger.info(doc_topic_distribution.shape)
+        self.logger.info(len(vocab))
+
+        data = {'topic_term_dists': term_topic,
+                'doc_topic_dists': doc_topic_distribution,
+                'doc_lengths': doc_lengths,
+                'vocab': vocab,
+                'term_frequency': term_frequency}
+
+        return data
 
 
 """
