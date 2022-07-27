@@ -634,7 +634,7 @@ class TMmodel(object):
             Each element is a a term (topic_id, "label for topic topic_id")                    
         """
         if not labels:
-            return [(i, " ") for i, p in enumerate(self._tpc_descriptions)]#[]
+            return [(i, "") for i, p in enumerate(self._tpc_descriptions)]#[]
         if use_cuda:
             if torch.cuda.is_available():
                 device = 0
@@ -661,8 +661,12 @@ class TMmodel(object):
     def load_tpc_labels(self):
         if self._tpc_labels is None:
             with self._TMfolder.joinpath('tpc_labels.txt').open('r', encoding='utf8') as fin:
-                self._tpc_labels = [el.strip() for el in fin.readlines()]
-
+                lines = fin.readlines()
+                if lines[0] == "\n":
+                    self._tpc_labels = [""] * len(lines)
+                else:
+                    self._tpc_labels = [el.strip() for el in lines]
+                
     def showTopics(self):
         self._load_alphas()
         self._load_ndocs_active()
@@ -729,6 +733,7 @@ class TMmodel(object):
             self._tpc_labels = [self._tpc_labels[i] for i in tpc_keep]
             self._tpc_descriptions = [
                 self._tpc_descriptions[i] for i in tpc_keep]
+            self._logger.info(len(self._tpc_descriptions))
             self._edits.append('d ' + ' '.join([str(k) for k in tpcs]))
 
             # We are ready to save all variables in the model
@@ -771,16 +776,16 @@ class TMmodel(object):
             self._topic_entropy = self._topic_entropy[idx]
             self._topic_coherence = self._topic_coherence[idx]
             self._tpc_labels = [self._tpc_labels[i] for i in idx]
-            self._tpc_descriptions = [self._tpc_descriptions[i] for i in idx]
+            self._tpc_descriptions = [self._tpc_descriptions[i] for i in idx] 
             self._edits.append('s ' + ' '.join([str(el) for el in idx]))
-
             # We are ready to save all variables in the model
             self._save_all()
 
             self._logger.info(
                 '-- -- Topics reordering successful. All variables saved to file')
             return 1
-        except:
+        except Exception as e: 
+            self._logger.info(e)
             self._logger.info(
                 '-- -- Topics reordering generated an error. Operation failed')
             return 0

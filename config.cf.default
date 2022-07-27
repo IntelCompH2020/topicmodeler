@@ -46,6 +46,12 @@ num_iterations=1000
 doc_topic_thr=0
 num_iterations_inf=100
 
+[SparkLDA]
+alpha=5
+maxIterations=20
+optimizer=online
+optimizeDocConcentration=True
+
 [ProdLDA]
 model_type=prodLDA
 hidden_sizes=(100,100)
