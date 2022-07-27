@@ -10,17 +10,21 @@ import json
 import os
 import shutil
 import sys
+import warnings
 import torch
 from pathlib import Path
 
 import numpy as np
-import pyLDAvis
 import scipy.sparse as sparse
 from sklearn.preprocessing import normalize
 from transformers import pipeline
 from gensim.models.coherencemodel import CoherenceModel
 from gensim.corpora import Dictionary
 
+#pyLDAvis currently raises some Deprecation warnings
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore",category=DeprecationWarning)
+    import pyLDAvis
 
 class TMManager(object):
     """
@@ -347,16 +351,24 @@ class TMmodel(object):
 
         # Generate also pyLDAvisualization
         # We will compute the visualization using ndocs random documents
+        #
+        # In case the model has gone through topic deletion, we may have rows
+        # in the thetas matrix that sum up to zero (active topics have been
+        # removed for these problematic documents). We need to take this into 
+        # account 
         ndocs = 10000
-        if ndocs > self._thetas.shape[0]:
-            ndocs = self._thetas.shape[0]
-        perm = np.sort(np.random.permutation(self._thetas.shape[0])[:ndocs])
+        validDocs = np.sum(self._thetas.toarray(), axis=1)>0
+        nValidDocs = np.sum(validDocs)
+        if ndocs > nValidDocs:
+            ndocs = nValidDocs
+        perm = np.sort(np.random.permutation(nValidDocs)[:ndocs])
         # We consider all documents are equally important
         doc_len = ndocs * [1]
         vocabfreq = np.round(ndocs*(self._alphas.dot(self._betas))).astype(int)
-        vis_data = pyLDAvis.prepare(self._betas, self._thetas[perm, ].toarray(),
+        vis_data = pyLDAvis.prepare(self._betas, self._thetas[validDocs,][perm, ].toarray(),
                                     doc_len, self._vocab, vocabfreq, lambda_step=0.05,
                                     sort_topics=False, n_jobs=-1)
+        print('se jodio')
         pyLDAvis.save_html(vis_data, self._TMfolder.joinpath(
             'pyLDAvis.html').as_posix())
         # TODO: Check substituting by "pyLDAvis.prepared_data_to_html"
@@ -680,7 +692,7 @@ class TMmodel(object):
         if len(TpcLabels) == self._ntopics:
             with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
                 fout.write('\n'.join(self._tpc_labels))
-            return
+            return 1
         else:
             return 0
 
@@ -697,6 +709,7 @@ class TMmodel(object):
         self.load_tpc_labels()
         self._load_ndocs_active()
         self._load_edits()
+        self._load_vocab()
 
         try:
             # Get a list of the topics that should be kept
@@ -737,11 +750,12 @@ class TMmodel(object):
         self._load_thetas()
         self._load_betas_ds()
         self._load_topic_entropy()
-        self._load_topic_coherence
+        self._load_topic_coherence()
         self.load_tpc_descriptions()
         self.load_tpc_labels()
         self._load_ndocs_active()
         self._load_edits()
+        self._load_vocab()
 
         try:
             # Calculate order for the topics

@@ -2041,7 +2041,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         df = pd.DataFrame(TopicInfo, columns=[
                           'Size', 'Label', 'Word Description', 'Ndocs Active'])
         df.index.name = 'Topid ID'
-        print(df[['Size', 'Ndocs Active', 'Word Description']
+        df['Ndocs Active'] = df['Ndocs Active'].astype('int')
+        print(df[['Size', 'Ndocs Active', 'Word Description', 'Label']
                  ].sort_values(by=['Ndocs Active'], ascending=False))
 
         displaytext = """
