@@ -877,6 +877,36 @@ class ITMTTaskManager(BaseTaskManager):
 
         return similarTopics
 
+    def fuseTopics(self, tpcs):
+        """
+        This method merges the topics provided in the list as input parameter
+
+        Parameters
+        ----------
+        tpcs: list of int
+            List containing the ids of the topics from the model that will be merged
+        """
+
+        cmd = 'echo "' + json.dumps(tpcs).replace('"', '\\"') + '"'
+        cmd = cmd + '| python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --fuseTopics ' + self.selectedTM
+        printred(cmd)
+
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            status = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        self.logger.info("Selected topics have been merged")
+        self.loadTopicsDesc()
+
+        return status
+
     def resetTM(self):
         """
         This method resets the topic model to its original configuration
@@ -2159,7 +2189,41 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         return 
 
     def fuseTopics(self):
-        print('fuseTopics')
+        self.logger.info(
+            f'-- Displaying Topic Information for Model {self.selectedTM}')
+        TopicInfo = json.loads(self.TopicsDesc)
+        df = pd.DataFrame(TopicInfo, columns=[
+                          'Size', 'Label', 'Word Description', 'Ndocs Active'])
+        df.index.name = 'Topid ID'
+        print(df[['Size', 'Word Description', 'Label']])
+
+        displaytext = """
+        *************************************************************************************
+        The previous table displays topic information. You can obtain suggestions about 
+        similar topics using other menu option
+
+        Provide a list of the topics from the model you want to merge (e.g., 5,2,3)
+        If you do not wish to merge any topics, just press ENTER
+        *************************************************************************************
+        """
+        printgr(displaytext)
+
+        r = input('Provide list of topics to merge separated by commas: ')
+        if len(r):
+            try:
+                tpcs = [int(n) for n in r.split(',')]
+                if len(tpcs)>=2:
+                    print('The following topics will be merged:', tpcs)
+                    print(df.loc[tpcs,['Label', 'Word Description']])
+                    if request_confirmation(msg='Do you wish to continue?'):
+                        print("merging")
+                        super().fuseTopics(tpcs)
+                    return
+                else:
+                    print('You need to provide at least two topics')
+            except:
+                print('You need to provide a list of integer numbers')
+                return
 
     def sortTopics(self):
         displaytext = """
@@ -2185,6 +2249,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         if request_confirmation(msg='Do you wish to continue?'):
             super().resetTM()
         return
+
+
 
     def oldeditTM(self, corpus):
 
@@ -2251,19 +2317,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                         printmag('Coincidentes con otros tópicos (' +
                                  str(len(nonStwCandidates)) + '):')
                         print(nonStwCandidates)
-
-            elif selection == 'Fusionar dos tópicos del modelo':
-                tm.muestra_descriptions()
-                msg = '\nIntroduce el ID de los tópicos que deseas fusionar separados por comas'
-                msg += '\no presiona ENTER si no deseas fusionar ningún tópico\n'
-                r = input(msg)
-                try:
-                    tpcs = [int(n) for n in r.split(',')]
-                    if len(tpcs) >= 2:
-                        tm.fuse_topics(tpcs)
-                    modified = True
-                except:
-                    print('Debes introducir una lista de IDs')
 
     def corpus2JSON(self):
         """

@@ -183,7 +183,7 @@ showSimilar:
     - resetTM
 
 fuseTopics:
-  title: Merge Topics
+  title: Merge Topics from model
   post_opts: 
     - showTopics
     - manualLabel

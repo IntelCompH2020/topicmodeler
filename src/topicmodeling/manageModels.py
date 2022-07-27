@@ -370,7 +370,6 @@ class TMmodel(object):
         vis_data = pyLDAvis.prepare(self._betas, self._thetas[validDocs,][perm, ].toarray(),
                                     doc_len, self._vocab, vocabfreq, lambda_step=0.05,
                                     sort_topics=False, n_jobs=-1)
-        print('se jodio')
         pyLDAvis.save_html(vis_data, self._TMfolder.joinpath(
             'pyLDAvis.html').as_posix())
         # TODO: Check substituting by "pyLDAvis.prepared_data_to_html"
@@ -852,6 +851,71 @@ class TMmodel(object):
                 '-- -- Topics deletion generated an error. Operation failed')
             return 0
 
+    def fuseTopics(self, tpcs):
+        """This is a costly operation, almost everything
+        needs to get modified"""
+        self._load_alphas()
+        self._load_betas()
+        self._load_thetas()
+        #self._load_topic_coherence()
+        self.load_tpc_descriptions()
+        self.load_tpc_labels()
+        self._load_edits()
+        self._load_vocab()
+
+        try:
+            # List of topics that will be merged
+            tpcs = sorted(tpcs)
+            
+            # Calculate new variables
+
+            # For beta we keep a weighted average of topic vectors
+            weights = self._alphas[tpcs]
+            bet = weights[np.newaxis, ...].dot(
+                self._betas[tpcs, :]) / (sum(weights))
+            # keep new topic vector in upper position and delete the others
+            self._betas[tpcs[0], :] = bet
+            self._betas = np.delete(self._betas, tpcs[1:], 0)
+
+            # For theta we need to keep the sum. Since adding implies changing
+            # structure, we need to convert to full matrix first
+            # No need to renormalize
+            thetas_full = self._thetas.toarray()
+            thet = np.sum(thetas_full[:, tpcs], axis=1)
+            thetas_full[:, tpcs[0]] = thet
+            thetas_full = np.delete(thetas_full, tpcs[1:], 1)
+            self._thetas = sparse.csr_matrix(thetas_full, copy=True)
+            # Compute new alphas and number of topics
+            self._alphas = np.asarray(np.mean(self._thetas, axis=0)).ravel()
+            self._ntopics = self._thetas.shape[1]
+
+            # Compute all other variables
+            self._calculate_beta_ds()
+            self._calculate_topic_entropy()
+            self._ndocs_active = np.array((self._thetas != 0).sum(0).tolist()[0])
+
+            # Keep label and description of most significant topic
+            for tpc in tpcs[1:][::-1]:
+                del self._tpc_descriptions[tpc]
+            #Recalculate chemical description of most significant topic
+            self._tpc_descriptions[tpcs[0]] = self.get_tpc_word_descriptions(tpc=[tpcs[0]])[0][1]
+            for tpc in tpcs[1:][::-1]:
+                del self._tpc_labels[tpc]
+
+            self._calculate_topic_coherence()
+            self._edits.append('f ' + ' '.join([str(el) for el in tpcs]))
+            
+            # We are ready to save all variables in the model
+            self._save_all()
+
+            self._logger.info(
+                '-- -- Topics merging successful. All variables saved to file')
+            return 1
+        except:
+            self._logger.info(
+                '-- -- Topics merging generated an error. Operation failed')
+            return 0
+
     def sortTopics(self):
         """This is a costly operation, almost everything
         needs to get modified"""
@@ -973,6 +1037,9 @@ if __name__ == "__main__":
     parser.add_argument("--getSimilarTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Retrieve information about similar topics for selected model")
+    parser.add_argument("--fuseTopics", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Merge topics from selected model")
     parser.add_argument("--sortTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Sort topics according to size")
@@ -1065,6 +1132,15 @@ if __name__ == "__main__":
         tm = TMmodel(tm_path.joinpath(
             f"{args.getSimilarTopics}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.getSimilarTopics(int(npairs))))
+
+    if args.fuseTopics:
+        # List of topics to merge should come from standard input
+        tpcs = "".join([line for line in sys.stdin])
+        tpcs = json.loads(tpcs.replace('\\"', '"'))
+        tm = TMmodel(tm_path.joinpath(
+            f"{args.fuseTopics}").joinpath('TMmodel'))
+        status = tm.fuseTopics(tpcs)
+        sys.stdout.write(str(status))
 
     if args.sortTopics:
         tm = TMmodel(tm_path.joinpath(
