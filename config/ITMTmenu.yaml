@@ -171,7 +171,7 @@ deleteTopics:
     - resetTM
 
 showSimilar:
-  title: Suggest Similar Topics
+  title: Suggest Similar Topics for Fusion
   post_opts: 
     - showTopics
     - manualLabel
@@ -232,6 +232,12 @@ resetTM:
 
 deleteTM:
   title: Delete an Existing Topic Model
+
+
+
+
+
+
 
 
 

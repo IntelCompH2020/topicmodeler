@@ -846,6 +846,37 @@ class ITMTTaskManager(BaseTaskManager):
 
         return status
 
+    def getSimilarTopis(self, npairs):
+        """
+        This method gets pairs of similar Topics
+        It can be used to as a helping tool for obtaining
+        candidate pairs of topics to fuse
+
+        Parameters
+        ----------
+        npairs: int
+            Number of topics pairs that will be obtained
+        """
+
+        cmd = 'echo "' + json.dumps(npairs).replace('"', '\\"') + '"'
+        cmd = cmd + '| python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).resolve().as_posix()
+        cmd = cmd + ' --getSimilarTopics ' + self.selectedTM
+        printred(cmd)
+
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            similarTopics = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Execution of script failed')
+            return
+
+        self.logger.info("Similar Topics have been retrieved")
+
+        return similarTopics
+
     def resetTM(self):
         """
         This method resets the topic model to its original configuration
@@ -2073,7 +2104,59 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 return
 
     def showSimilar(self):
-        print('showSimilar')
+        self.logger.info(
+            f'-- Displaying Similar topics for Model {self.selectedTM}')
+        TopicInfo = json.loads(self.TopicsDesc)
+        df = pd.DataFrame(TopicInfo, columns=[
+                          'Size', 'Label', 'Word Description', 'Ndocs Active'])
+        df.index.name = 'Topid ID'
+
+        displaytext = """
+        *********************************************************************************************
+        This is an auxiliary tool for locating topics that are good candidates for fusion
+
+        Two criteria are used: 1) Topics that coocur in documents; 2) Topics with similar composition
+
+        To start with, you need to choose how many pairs of candidates do you want to show
+        *********************************************************************************************
+        """
+        printgr(displaytext)
+
+        msg = '\nHow many topic pairs do you wish to examine'
+        npairs = var_num_keyboard('int', 5, msg)
+        similarTopics = json.loads(self.getSimilarTopis(npairs))
+
+        displaytext = """
+        *************************************************************************************
+        Most similar topic according to topic coocurrence in the documents
+        (Be aware that Topic IDs will change after every deletion or fusion)
+        *************************************************************************************
+        """
+        printgr(displaytext)
+        for pair in similarTopics['Coocurring']:
+            printgr(20 * '=')
+            msg = 'Correlation between topics {0:d} and {1:d}: {2:.2f}%'.format(
+                pair[0], pair[1], 100 * pair[2])
+            printgr(msg)
+            print(df.loc[[pair[0], pair[1]],['Label', 'Word Description']])
+        printgr(20 * '=')
+
+        displaytext = """
+        *************************************************************************************
+        Most similar topic according to topic word-based description
+        (Be aware that Topic IDs will change after every deletion or fusion)
+        *************************************************************************************
+        """
+        printgr(displaytext)
+        for pair in similarTopics['Worddesc']:
+            printgr(20 * '=')
+            msg = 'Correlation between topics {0:d} and {1:d}: {2:.2f}%'.format(
+                pair[0], pair[1], 100 * pair[2])
+            printgr(msg)
+            print(df.loc[[pair[0], pair[1]],['Label', 'Word Description']])
+        printgr(20 * '=')
+
+        return 
 
     def fuseTopics(self):
         print('fuseTopics')
@@ -2105,55 +2188,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
     def oldeditTM(self, corpus):
 
-        # Select model for edition
-        # Final models are enumerated as corpus_givenName
-        path_model = self.p2p.joinpath(
-            corpus).joinpath(self._dir_struct['modtm'])
-        models = sorted([d for d in path_model.iterdir() if d.is_dir()])
-        display_models = [' '.join(d.name.split('_')) for d in models]
-        selection = query_options(
-            display_models, 'Select the topic model that you want to edit:')
-        path_model = models[selection]
-        tm = TMmodel(from_file=path_model.joinpath(
-            'modelo.npz'), logger=self.logger)
-
-        corpus_size = tm.get_thetas().shape[0]
-        var_exit2 = False
-        modified = False
-        print('\n---------')
-        print('You are editing topic model:', path_model)
-        print('---------\n')
-
-        options = ['**Salir',
-                   '**Visualizar tópicos',
-                   '**Visualizar las palabras de los tópicos',
-                   'Visualizar palabras de tópicos "basura" vs otros tópicos',
-                   'Exportar Visualización pyLDAvis',
-                   'Anotación de Stopwords y Equivalencias',
-                   '**Etiquetado automático de los tópicos del modelo',
-                   '**Etiquetado manual de tópicos',
-                   '**Eliminar un tópico del modelo',
-                   'Tópicos similares por coocurrencia',
-                   'Tópicos similares por palabras',
-                   'Fusionar dos tópicos del modelo',
-                   '**Ordenar tópicos por importancia',
-                   '**Resetear al modelo original']
-
         while not var_exit2:
 
-            msg = 'Available options'
-            selection = options[query_options(options, msg)]
-
-            if selection == 'Salir':
-                var_exit2 = True
-
-            elif selection == 'Visualizar tópicos':
-                tm.muestra_descriptions()
-
-            elif selection == 'Visualizar las palabras de los tópicos':
-                tm.muestra_descriptions(simple=True)
-
-            elif selection == 'Visualizar palabras de tópicos "basura" vs otros tópicos':
+            if selection == 'Visualizar palabras de tópicos "basura" vs otros tópicos':
 
                 ntopics = tm.get_ntopics()
                 msg = '\nIntroduce el ID de los tópicos "basura": '
@@ -2215,126 +2252,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                                  str(len(nonStwCandidates)) + '):')
                         print(nonStwCandidates)
 
-            elif selection == 'Exportar Visualización pyLDAvis':
-                tm.pyLDAvis(path_model.joinpath('pyLDAvis.html').as_posix(),
-                            ndocs=int(self.cf.get('TMedit', 'LDAvis_ndocs')),
-                            njobs=int(self.cf.get('TMedit', 'LDAvis_njobs')))
-
-            elif selection == 'Anotación de Stopwords y Equivalencias':
-                n_palabras = int(self.cf.get('TMedit', 'n_palabras'))
-                round_size = int(self.cf.get('TMedit', 'round_size'))
-                words = tm.most_significant_words_per_topic(
-                    n_palabras=n_palabras, tfidf=True, tpc=None)
-                words = [[wd[0] for wd in el] for el in words]
-                # Launch labelling application
-                stw, eqs = tagfilter.stw_eq_tool(words, round_size=round_size)
-                eqs = [el[0] + ' : ' + el[1] for el in eqs]
-                # Save stopwords and equivalences in corpus specific files
-                corpus_stw = Path(self.cf.get(corpus, 'stw_file'))
-                corpus_eqs = Path(self.cf.get(corpus, 'eq_file'))
-                if corpus_stw.is_file():
-                    with corpus_stw.open('r', encoding='utf8') as fin:
-                        current_stw = fin.readlines()
-                    current_stw = [el.strip() for el in current_stw]
-                    stw = stw + current_stw
-                stw = sorted(list(set(stw)))
-                with corpus_stw.open('w', encoding='utf8') as fout:
-                    [fout.write(wd + '\n') for wd in stw]
-                # Same for equivalent words
-                if corpus_eqs.is_file():
-                    with corpus_eqs.open('r', encoding='utf8') as fin:
-                        current_eqs = fin.readlines()
-                    current_eqs = [el.strip() for el in current_eqs]
-                    eqs = eqs + current_eqs
-                eqs = sorted(list(set(eqs)))
-                with corpus_eqs.open('w', encoding='utf8') as fout:
-                    [fout.write(eq + '\n') for eq in eqs]
-
-                return
-
-            elif selection == 'Etiquetado automático de los tópicos del modelo':
-                tm.automatic_topic_labeling(self.cf.get('TM', 'pathlabeling'),
-                                            workers=int(self.cf.get('TMedit', 'NETLworkers')))
-                modified = True
-
-            elif selection == 'Etiquetado manual de tópicos':
-                descriptions = tm.get_descriptions()
-                word_description = tm.get_topic_word_descriptions()
-                for desc, (tpc, worddesc) in zip(descriptions, word_description):
-                    print('=' * 5)
-                    print('Topic ID:', tpc)
-                    print('Current description:', desc)
-                    print('Word description:', worddesc)
-                    r = input('\nIntroduce the description for the topic, write "wd" use Word Description,\n' +
-                              'or press enter to keep current:\n')
-                    if r == 'wd':
-                        tm.set_description(worddesc, tpc)
-                    elif r != '':
-                        tm.set_description(r, tpc)
-                modified = True
-
-            elif selection == 'Eliminar un tópico del modelo':
-                lista = [(ndoc, desc) for ndoc, desc in zip(
-                    tm.ndocs_active_topic(), tm.get_topic_word_descriptions())]
-                for k in sorted(lista, key=lambda x: -x[0]):
-                    print('=' * 5)
-                    perc = '(' + \
-                        str(round(100 * float(k[0]) / corpus_size)) + ' %)'
-                    print('ID del tópico:', k[1][0])
-                    print('Número de documentos en los que está activo:',
-                          k[0], perc)
-                    print('Palabras más significativas:', k[1][1])
-                msg = '\nIntroduce el ID de los tópicos que deseas eliminar separados por comas'
-                msg += '\no presiona ENTER si no deseas eliminar ningún tópico\n'
-                r = input(msg)
-                try:
-                    tpcs = [int(n) for n in r.split(',')]
-                    # Eliminaremos los tópicos en orden decreciente
-                    tpcs.sort(reverse=True)
-                    for tpc in tpcs:
-                        tm.delete_topic(tpc)
-                    modified = True
-                except:
-                    print('Debes introducir una lista de topic ids')
-
-            elif selection == 'Tópicos similares por coocurrencia':
-                msg = '\nIntroduzca el número de pares de tópicos a mostrar'
-                npairs = var_num_keyboard('int', 5, msg)
-                msg = '\nIntroduzca número de palabras para mostrar'
-                nwords = var_num_keyboard('int', 10, msg)
-                selected = tm.get_similar_corrcoef(npairs)
-                for pair in selected:
-                    msg = 'Correlación de los tópicos {0:d} y {1:d}: {2:.2f}%'.format(
-                        pair[0], pair[1], 100 * pair[2])
-                    printmag(msg)
-                    printmag(20 * '=')
-                    tm.muestra_perfiles(n_palabras=nwords,
-                                        tpc=[pair[0], pair[1]])
-                printred(20 * '=')
-                printred(
-                    'Cuidado: los ids de los tópicos cambian tras la fusión o eliminación')
-                printred(20 * '=')
-
-            elif selection == 'Tópicos similares por palabras':
-                msg = '\nIntroduzca umbral para selección de palabras'
-                thr = var_num_keyboard('float', 1e-3, msg)
-                msg = '\nIntroduzca el número de pares de tópicos a mostrar'
-                npairs = var_num_keyboard('int', 5, msg)
-                msg = '\nIntroduzca número de palabras para mostrar'
-                nwords = var_num_keyboard('int', 10, msg)
-                selected = tm.get_similar_JSdist(npairs, thr)
-                for pair in selected:
-                    msg = 'Similitud de los tópicos {0:d} y {1:d}: {2:.2f}%'.format(
-                        pair[0], pair[1], 100 * pair[2])
-                    printmag(msg)
-                    printmag(20 * '=')
-                    tm.muestra_perfiles(n_palabras=nwords,
-                                        tpc=[pair[0], pair[1]])
-                printred(20 * '=')
-                printred(
-                    'Cuidado: los ids de los tópicos cambian tras la fusión o eliminación')
-                printred(20 * '=')
-
             elif selection == 'Fusionar dos tópicos del modelo':
                 tm.muestra_descriptions()
                 msg = '\nIntroduce el ID de los tópicos que deseas fusionar separados por comas'
@@ -2348,24 +2265,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 except:
                     print('Debes introducir una lista de IDs')
 
-            elif selection == 'Ordenar tópicos por importancia':
-                tm.sort_topics()
-                modified = True
-
-            elif selection == 'Resetear al modelo original':
-                tm.reset_model()
-                modified = True
-
-        if modified:
-            if request_confirmation(msg='Save modified model?'):
-                tm.save_npz(path_model.joinpath('modelo.npz'))
-
-        return
-
     def corpus2JSON(self):
         """
-        This is linked to the ITMTrainer only tentatively, since it should
-        be part of WP4 tools
+        This is linked to the ITMTrainer only tentatively
 
         Right now, it only runs the generation of the JSON files that are
         needed for ingestion of the corpus in Solr

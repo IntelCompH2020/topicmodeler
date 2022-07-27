@@ -16,6 +16,7 @@ from pathlib import Path
 
 import numpy as np
 import scipy.sparse as sparse
+from scipy.spatial.distance import jensenshannon
 from sklearn.preprocessing import normalize
 from transformers import pipeline
 from gensim.models.coherencemodel import CoherenceModel
@@ -25,6 +26,7 @@ from gensim.corpora import Dictionary
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore",category=DeprecationWarning)
     import pyLDAvis
+
 
 class TMManager(object):
     """
@@ -563,6 +565,20 @@ class TMmodel(object):
             self._topic_coherence = np.load(
                 self._TMfolder.joinpath('topic_coherence.npy'))
 
+    def _largest_indices(self, ary, n): 
+        """Returns the n largest indices from a numpy array.""" 
+        flat = ary.flatten() 
+        indices = np.argpartition(flat, -n)[-n:] 
+        indices = indices[np.argsort(-flat[indices])] 
+        idx0, idx1 = np.unravel_index(indices, ary.shape) 
+        idx0 = idx0.tolist() 
+        idx1 = idx1.tolist() 
+        selected_idx = [] 
+        for id0, id1 in zip(idx0, idx1): 
+            if id0<id1: 
+                selected_idx.append((id0, id1, ary[id0,id1])) 
+        return selected_idx 
+
     def get_model_info_for_hierarchical(self):
         """Returns the objects necessary for the creation of a level-2 topic model.
         """
@@ -634,7 +650,7 @@ class TMmodel(object):
             Each element is a a term (topic_id, "label for topic topic_id")                    
         """
         if not labels:
-            return [(i, " ") for i, p in enumerate(self._tpc_descriptions)]#[]
+            return [(i, "NA") for i, p in enumerate(self._tpc_descriptions)]#[]
         if use_cuda:
             if torch.cuda.is_available():
                 device = 0
@@ -699,6 +715,100 @@ class TMmodel(object):
     def deleteTopics(self, tpcs):
         """This is a costly operation, almost everything
         needs to get modified"""
+        self._load_alphas()
+        self._load_betas()
+        self._load_thetas()
+        self._load_betas_ds()
+        self._load_topic_entropy()
+        self._load_topic_coherence()
+        self.load_tpc_descriptions()
+        self.load_tpc_labels()
+        self._load_ndocs_active()
+        self._load_edits()
+        self._load_vocab()
+
+        try:
+            # Get a list of the topics that should be kept
+            tpc_keep = [k for k in range(self._ntopics) if k not in tpcs]
+            tpc_keep = [k for k in tpc_keep if k < self._ntopics]
+
+            # Calculate new variables
+            self._thetas = self._thetas[:, tpc_keep]
+            self._thetas = normalize(self._thetas, axis=1, norm='l1')
+            self._alphas = np.asarray(np.mean(self._thetas, axis=0)).ravel()
+            self._ntopics = self._thetas.shape[1]
+            self._betas = self._betas[tpc_keep, :]
+            self._betas_ds = self._betas_ds[tpc_keep, :]
+            self._ndocs_active = self._ndocs_active[tpc_keep]
+            self._topic_entropy = self._topic_entropy[tpc_keep]
+            self._topic_coherence = self._topic_coherence[tpc_keep]
+            self._tpc_labels = [self._tpc_labels[i] for i in tpc_keep]
+            self._tpc_descriptions = [
+                self._tpc_descriptions[i] for i in tpc_keep]
+            self._edits.append('d ' + ' '.join([str(k) for k in tpcs]))
+
+            # We are ready to save all variables in the model
+            self._save_all()
+
+            self._logger.info(
+                '-- -- Topics deletion successful. All variables saved to file')
+            return 1
+        except:
+            self._logger.info(
+                '-- -- Topics deletion generated an error. Operation failed')
+            return 0
+
+    def getSimilarTopics(self, npairs, thr=1e-3):
+        """Obtains pairs of similar topics
+        npairs: number of pairs of words
+        thr: threshold for vocabulary thresholding
+        """
+
+        self._load_thetas()
+        self._load_betas()
+
+        # Part 1 - Coocurring topics
+        # Highly correlated topics co-occure together
+        # Topic mean
+        med = np.asarray(np.mean(self._thetas, axis=0)).ravel()
+        # Topic square mean
+        thetas2 = self._thetas.multiply(self._thetas)
+        med2 = np.asarray(np.mean(thetas2, axis=0)).ravel()
+        # Topic stds
+        stds = np.sqrt(med2 - med ** 2)
+        # Topic correlation
+        num = self._thetas.T.dot(
+            self._thetas).toarray() / self._thetas.shape[0]
+        num = num - med[..., np.newaxis].dot(med[np.newaxis, ...])
+        deno = stds[..., np.newaxis].dot(stds[np.newaxis, ...])
+        corrcoef = num / deno
+        selected_coocur = self._largest_indices(corrcoef, self._ntopics + 2 * npairs)
+        selected_coocur = [(el[0], el[1], el[2].astype(float)) for el in selected_coocur]
+        
+        # Part 2 - Topics with similar word composition
+        # Computes inter-topic distance based on word distributions
+        # using Jensen Shannon distance
+        # For a more efficient computation with very large vocabularies
+        # we implement a threshold for restricting the distance calculation
+        # to columns where any element is greater than threshold thr
+        betas_aux = self._betas[:, np.where(self._betas.max(axis=0) > thr)[0]]
+        js_mat = np.zeros((self._ntopics, self._ntopics))
+        for k in range(self._ntopics):
+            for kk in range(self._ntopics):
+                js_mat[k, kk] = jensenshannon(
+                    betas_aux[k, :], betas_aux[kk, :])
+        JSsim = 1 - js_mat
+        selected_worddesc = self._largest_indices(JSsim, self._ntopics + 2 * npairs)
+        selected_worddesc = [(el[0], el[1], el[2].astype(float)) for el in selected_worddesc]
+
+        similarTopics = {
+            'Coocurring'    : selected_coocur,
+            'Worddesc'      : selected_worddesc
+        }
+
+        return similarTopics
+
+
         self._load_alphas()
         self._load_betas()
         self._load_thetas()
@@ -860,6 +970,9 @@ if __name__ == "__main__":
     parser.add_argument("--deleteTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Remove topics from selected model")
+    parser.add_argument("--getSimilarTopics", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Retrieve information about similar topics for selected model")
     parser.add_argument("--sortTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Sort topics according to size")
@@ -944,6 +1057,14 @@ if __name__ == "__main__":
             f"{args.deleteTopics}").joinpath('TMmodel'))
         status = tm.deleteTopics(tpcs)
         sys.stdout.write(str(status))
+
+    if args.getSimilarTopics:
+        # List of topics to remove should come from standard input
+        npairs = "".join([line for line in sys.stdin])
+        npairs = json.loads(npairs.replace('\\"', '"'))
+        tm = TMmodel(tm_path.joinpath(
+            f"{args.getSimilarTopics}").joinpath('TMmodel'))
+        sys.stdout.write(json.dumps(tm.getSimilarTopics(int(npairs))))
 
     if args.sortTopics:
         tm = TMmodel(tm_path.joinpath(
