@@ -2351,7 +2351,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLineEdit" name="lineEdit_nr_topics_lda_2">
+                                      <widget class="QLineEdit" name="lineEdit_nr_topics_spark">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -2382,7 +2382,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_good_3">
+                                      <widget class="QLabel" name="checkBox_spark_1_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -2411,7 +2411,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_bad_3">
+                                      <widget class="QLabel" name="checkBox_spark_1_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -2558,7 +2558,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLineEdit" name="lineEdit_alpha_lda_3">
+                                      <widget class="QLineEdit" name="lineEdit_alpha_spark">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -2589,7 +2589,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_good_44">
+                                      <widget class="QLabel" name="checkBox_spark_2_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -2618,7 +2618,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_bad_44">
+                                      <widget class="QLabel" name="checkBox_spark_2_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -2697,12 +2697,12 @@ font-weight: bold;
 border:None;</string>
                                        </property>
                                        <property name="text">
-                                        <string>Optimize interval:</string>
+                                        <string>Max iterations:</string>
                                        </property>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLineEdit" name="lineEdit_optimize_interval_lda_3">
+                                      <widget class="QLineEdit" name="lineEdit_max_iter_spark">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -2733,7 +2733,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_good_45">
+                                      <widget class="QLabel" name="checkBox_spark_3_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -2762,151 +2762,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_bad_45">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                    </layout>
-                                   </widget>
-                                  </item>
-                                  <item>
-                                   <widget class="QFrame" name="frame_nr_threads_lda_3">
-                                    <property name="styleSheet">
-                                     <string notr="true">border-bottom: 1px solid #FFFFFF;
-border-right: 0.5px solid #FFFFFF;
-border-top: 0.5px solid #FFFFFF;
-</string>
-                                    </property>
-                                    <property name="frameShape">
-                                     <enum>QFrame::StyledPanel</enum>
-                                    </property>
-                                    <property name="frameShadow">
-                                     <enum>QFrame::Plain</enum>
-                                    </property>
-                                    <layout class="QHBoxLayout" name="horizontalLayout_44">
-                                     <item>
-                                      <widget class="QLabel" name="label_nr_threads_lda_3">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>16777215</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="font">
-                                        <font>
-                                         <family>Avenir</family>
-                                         <pointsize>13</pointsize>
-                                         <weight>75</weight>
-                                         <italic>false</italic>
-                                         <bold>true</bold>
-                                        </font>
-                                       </property>
-                                       <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Number of threads for mallet parallelization.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-border:None;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string>Number of threads:</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLineEdit" name="lineEdit_nr_threads_lda_3">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="minimumSize">
-                                        <size>
-                                         <width>0</width>
-                                         <height>0</height>
-                                        </size>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>60</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_good_46">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_bad_46">
+                                      <widget class="QLabel" name="checkBox_spark_3_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -2992,12 +2848,12 @@ font-weight: bold;
 border:None;</string>
                                        </property>
                                        <property name="text">
-                                        <string>Number of iterations:</string>
+                                        <string>Optimizer</string>
                                        </property>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLineEdit" name="lineEdit_nr_iterations_lda_3">
+                                      <widget class="QLineEdit" name="lineEdit_optimizer_spark">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -3028,7 +2884,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_good_47">
+                                      <widget class="QLabel" name="checkBox_spark_4_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -3057,7 +2913,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_bad_47">
+                                      <widget class="QLabel" name="checkBox_spark_4_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -3136,12 +2992,12 @@ font-weight: bold;
 border:None;</string>
                                        </property>
                                        <property name="text">
-                                        <string>Doc-topic threshold:</string>
+                                        <string>optimizeDocConcentration</string>
                                        </property>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLineEdit" name="lineEdit_doc_top_thr_lda_3">
+                                      <widget class="QLineEdit" name="lineEdit_doc_conc_spark">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -3172,7 +3028,7 @@ border:None;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_good_48">
+                                      <widget class="QLabel" name="checkBox_spark_5_good">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>
@@ -3201,151 +3057,7 @@ border:none;</string>
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_bad_48">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                    </layout>
-                                   </widget>
-                                  </item>
-                                  <item>
-                                   <widget class="QFrame" name="frame_thetas_thr_lda_3">
-                                    <property name="styleSheet">
-                                     <string notr="true">border-bottom: 0.5px solid #FFFFFF;
-border-left: 0.5px solid #FFFFFF;
-border-top: 0.5px solid #FFFFFF;
-</string>
-                                    </property>
-                                    <property name="frameShape">
-                                     <enum>QFrame::NoFrame</enum>
-                                    </property>
-                                    <property name="frameShadow">
-                                     <enum>QFrame::Plain</enum>
-                                    </property>
-                                    <layout class="QHBoxLayout" name="horizontalLayout_128">
-                                     <item>
-                                      <widget class="QLabel" name="label_thetas_thr_lda_3">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>16777215</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="font">
-                                        <font>
-                                         <family>Avenir</family>
-                                         <pointsize>13</pointsize>
-                                         <weight>75</weight>
-                                         <italic>false</italic>
-                                         <bold>true</bold>
-                                        </font>
-                                       </property>
-                                       <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Threshold for topic activation in a document (sparsification).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">font: 87 13pt &quot;Avenir&quot;;
-color:#1A2E40;
-font-weight: bold;
-border:None;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string>Thetas threshold:</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLineEdit" name="lineEdit_thetas_thr_lda_3">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="minimumSize">
-                                        <size>
-                                         <width>0</width>
-                                         <height>0</height>
-                                        </size>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>60</width>
-                                         <height>16777215</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">QLineEdit {	
-	background-color: #FFFFFF;
-	font: 87 italic 12pt &quot;Avenir&quot;;
-	border-radius: 5px;
-	border: 1px solid #1A2E40;
-	color:black;
-}</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_good_49">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>20</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                       <property name="styleSheet">
-                                        <string notr="true">background-color:transparent;
-border:none;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="checkBox_ctm_5_bad_49">
+                                      <widget class="QLabel" name="checkBox_spark_5_bad">
                                        <property name="sizePolicy">
                                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                          <horstretch>0</horstretch>

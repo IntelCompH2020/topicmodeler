@@ -89,6 +89,7 @@ class Constants:
     NR_PARAMS_TRAIN_LDA_MALLET = 7
     NR_PARAMS_TRAIN_PRODLDA = 17
     NR_PARAMS_TRAIN_CTM = 18
+    NR_PARAMS_TRAIN_SPARK = 5
     NR_PARAMS_PREPROC = 4
 
     WRONG_NR_TOPICS_LDA_MSG = "The number of training topics must be larger than 0"
@@ -118,6 +119,9 @@ class Constants:
     WRONG_LABEL_SIZE = "The label size must be equals to the number of documents."
     WRONG_LABEL_SIZE_FOR_SUPERCTM = "The label size cannot be 0 if SuperCTM is being used. It must be equal to the number of documents in the training corpus."
     WRONG_LOSS_WEIGTHS_FOR_BETACTM = "The weight loss cannot be None for a BetaCTM model."
+    WRONG_SPARK_NITER = "The maximum number of iterations for the optimization algorithm must be larger than 0."
+    WRONG_SPARK_OPTIMIZER = "The Spark optimizer must be either 'em' (Expectation-maximization) or 'online' (variational Bayes Optimization)."
+    WRONG_SPARK_DOC_CONC = "The optimizeDocConcentration parameter must be a boolean indicating whether the doc-concentration parameter alpha will be optimized during the training of the algorithm."
     WRONG_HTM_THR = "The HTM-DS threshold must be in (0,1)."
     WARNING_NO_TR_CORPUS = "An appropiate training dataset must be selected to proceed."
     NO_NAME_FOR_MODEL = "A name for training the model must be specified"

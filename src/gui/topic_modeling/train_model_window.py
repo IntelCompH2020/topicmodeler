@@ -94,6 +94,17 @@ class TrainModelWindow(QtWidgets.QDialog):
             self.lda_mallet_checkboxes_params.append(checkbox_widget)
         for checkbox in self.lda_mallet_checkboxes_params:
             checkbox.hide()
+        
+        self.spark_kda_checkboxes_params = []
+        for id_check in np.arange(Constants.NR_PARAMS_TRAIN_SPARK):
+            checkbox_name = "checkBox_spark_" + str(id_check + 1) + "_good"
+            checkbox_widget = self.findChild(QLabel, checkbox_name)
+            self.spark_kda_checkboxes_params.append(checkbox_widget)
+            checkbox_name = "checkBox_spark_" + str(id_check + 1) + "_bad"
+            checkbox_widget = self.findChild(QLabel, checkbox_name)
+            self.spark_kda_checkboxes_params.append(checkbox_widget)
+        for checkbox in self.spark_kda_checkboxes_params:
+            checkbox.hide()
 
         self.prodlda_checkboxes_params = []
         for id_check in np.arange(Constants.NR_PARAMS_TRAIN_PRODLDA):
@@ -752,10 +763,89 @@ class TrainModelWindow(QtWidgets.QDialog):
 
     # SPARKLDA
     def get_sparklda_params(self):
+        """Method that reads from the config file the default parameters for training a SparlLDA model, and sets the corresponding values in the 'tabWidget_settings_sparklda'.
+        """
+
+        # Read values and set them in the correponding widget
+        self.lineEdit_nr_topics_spark.setText(
+            str(self.cf.get('TM', 'ntopics')))
+        self.lineEdit_alpha_spark.setText(
+            str(self.cf.get('SparkLDA', 'alpha')))
+        self.lineEdit_max_iter_spark.setText(
+            str(self.cf.get('SparkLDA', 'maxIterations')))
+        self.lineEdit_optimizer_spark.setText(
+            str(self.cf.get('SparkLDA', 'optimizer')))
+        self.lineEdit_doc_conc_spark.setText(
+            str(self.cf.get('SparkLDA', 'optimizeDocConcentration')))
         return
 
     def get_sparklda_params_from_user(self):
-        return
+        """Method that gets the parameters from the 'tabWidget_settings_sparklda' that have been modified by the user and checks whether the updated value is valid for the conditions that each parameter must meet. For each of the parameters that are not configured appropriately, the information that is going to be shown to the user in a warning message is updated accordingly. Moreover, for the parameters wrong configured, a red cross is shown on the right of each of them, while those properly configured are accompanied by a red tick. Once all the parameters are checked, a warning message is shown and the method is exited in case one or more of them are wrong configured. 
+
+        Returns
+        -------
+        Okay : Bool
+            True if all the parameters have been properly configured
+        """
+
+        okay = True
+        self.training_params = {}
+        messages = ""
+
+        ntopics = int(self.lineEdit_nr_topics_spark.text())
+        if ntopics < 0 or ntopics == 0:
+            self.checkBox_spark_1_bad.show()
+            messages += Constants.WRONG_NR_TOPICS_LDA_MSG + "\n"
+        else:
+            self.checkBox_spark_1_good.show()
+            self.training_params['ntopics'] = ntopics
+        
+        alpha = float(self.lineEdit_alpha_spark.text())
+        if alpha < 0:
+            self.checkBox_spark_2_bad.show()
+            messages += Constants.WRONG_ALPHA_LDA_MSG + "\n"
+        else:
+            self.checkBox_spark_2_good.show()
+            self.training_params['alpha'] = alpha
+        
+        max_iter = int(self.lineEdit_max_iter_spark.text())
+        if max_iter < 0:
+            self.checkBox_spark_3_bad.show()
+            messages += Constants.WRONG_SPARK_NITER + "\n"
+        else:
+            self.checkBox_spark_3_good.show()
+            self.training_params['max_iter'] = max_iter
+        
+        optimizer = str(self.lineEdit_optimizer_spark.text())
+        if optimizer not in ['em','online']:
+            self.checkBox_spark_4_bad.show()
+            messages += Constants.WRONG_SPARK_OPTIMIZER + "\n"
+        else:
+            self.checkBox_spark_4_good.show()
+            self.training_params['optimizer'] = max_iter
+
+        if self.lineEdit_doc_conc_spark.currentText() not in ['True','False']:
+            self.checkBox_spark_5_bad.show()
+            messages += Constants.WRONG_SPARK_DOC_CONC + "\n"
+        else:
+            self.checkBox_spark_5_good.show()
+            self.training_params['optimizeDocConcentration'] = True if self.lineEdit_doc_conc_spark.currentText(
+            ) == "True" else False
+
+        if len(self.training_params.keys()) != Constants.NR_PARAMS_TRAIN_SPARK:
+            QMessageBox.warning(
+                self, Constants.SMOOTH_SPOON_MSG, messages)
+            return False
+
+        cf = configparser.ConfigParser()
+        cf.read(self.tm.p2config)
+        self.training_params["labels"] = ""#"wordlists/wiki_categories.json"
+
+        # Hide checkboxes
+        for checkbox in self.spark_kda_checkboxes_params:
+            checkbox.hide()
+
+        return okay
 
     def additional_training_params(self):
         """Method to get additional training parameters for the topic model, namely the name with which the model is going to be saved, its description and privacy level.
