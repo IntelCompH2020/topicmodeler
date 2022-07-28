@@ -3264,14 +3264,10 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
                     self.selectedTM = model_name
                     gui.label_available_model_being_curated.setText(model_name)
+                    gui.label_available_model_being_curated2.setText(model_name)
 
                     self.loadTopicsDesc()
                     self.showTopics(gui)
-
-                    model_path = self.p2p.joinpath(self._dir_struct['TMmodels']).joinpath(
-                        model_name).joinpath('TMmodel').resolve().as_posix()
-                    self.render_pyldavis(model_path, gui)
-
         return
 
     def showTopics(self, gui):
@@ -3318,6 +3314,10 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             table.resizeRowsToContents()
             table2.resizeColumnsToContents()
             table2.resizeRowsToContents()
+
+            model_path = self.p2p.joinpath(self._dir_struct['TMmodels']).joinpath(self.selectedTM).joinpath('TMmodel').resolve().as_posix()
+            self.render_pyldavis(model_path, gui)
+
         return
 
     def render_pyldavis(self, model_path, gui):
@@ -3486,13 +3486,42 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
         return int(status.decode('utf8'))
 
-    def showSimilar(self):
-        # TODO
-        print('showSimilar')
+    def showSimilar(self, npairs):
+        
+        TopicInfo = json.loads(self.TopicsDesc)
+        df = pd.DataFrame(TopicInfo, columns=[
+                          'Size', 'Label', 'Word Description', 'Ndocs Active'])
+        df.index.name = 'Topid ID'
+        similarTopics = json.loads(self.getSimilarTopis(npairs))
 
-    def fuseTopics(self):
-        # TODO
-        print('fuseTopics')
+        return df, similarTopics
+
+    def fuseTopics(self, tpcs_to_fuse, gui):
+        """"
+        This method fuses the topics provided in the list as input parameter
+
+        Parameters
+        ----------
+        tpcs_to_fuse: list of int
+            List containing the ids of the topics that will be removed from model
+        gui : src.gui.main_window.MainWindow
+            QMainWindow object associated which the GUI
+
+        Returns
+        -------
+        status : int
+            - 0 if the topics could not be merged
+            - 1 if the topics were merged successfully
+        """
+
+        reply = QMessageBox.question(gui, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(tpcs_to_fuse) + ' will be merged. Proceed?',
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                     QMessageBox.StandardButton.No)
+        if reply == QMessageBox.StandardButton.Yes:
+            status = super().fuseTopics(tpcs_to_fuse)
+            self.showTopics(gui)
+
+        return int(status.decode('utf8'))
 
     def sortTopics(self, gui):
         """

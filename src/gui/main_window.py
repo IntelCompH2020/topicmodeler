@@ -17,15 +17,17 @@ import pathlib
 from functools import partial
 
 import numpy as np
+from PyQt6 import sip
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import QThreadPool, QUrl
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QPushButton
+from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QPushButton, QVBoxLayout
 from PyQt6.uic import loadUi
 from src.gui.manage_corpus.generate_tm_corpus_window import GenerateTMCorpus
 from src.gui.manage_lists.create_sw_lst_window import CreateSwLstWindow
 from src.gui.manage_lists.edit_sw_lst_window import EditSwLstWindow
 from src.gui.manage_models.copy_rename_window import CopyRenameWindow
+from src.gui.manage_models.widget_similar_topics import WidgetSimilarTopics
 from src.gui.topic_modeling.preprocessing_window import PreprocessingWindow
 from src.gui.topic_modeling.train_model_window import TrainModelWindow
 from src.gui.utils import utils
@@ -305,6 +307,8 @@ class MainWindow(QMainWindow):
             self.clicked_pushButton_return_pyldavis)
         self.pushButton_return_curation.clicked.connect(
             self.clicked_pushButton_return_curation)
+        self.pushButton_return_similar.clicked.connect(
+          self.clicked_pushButton_return_pyldavis)
         self.pushButton_train_submodel.clicked.connect(
             self.clicked_pushButton_train_submodel)
         self.pushButton_delete_model.clicked.connect(
@@ -321,8 +325,15 @@ class MainWindow(QMainWindow):
             self.clicked_pushButton_sort_topics)
         self.pushButton_label_topics.clicked.connect(
             self.clicked_pushButton_label_topics)
+        self.pushButton_show_similar_topics.clicked.connect(
+            self.clicked_pushButton_show_similar_topics)
+        self.pushButton_show_similar.clicked.connect(
+            self.clicked_pushButton_show_similar)
+        self.pushButton_fuse_topics.clicked.connect(
+            self.clicked_pushButton_fuse_topics)
         self.pushButton_reset_changes_tm.clicked.connect(
             self.clicked_pushButton_reset_changes_tm)
+
         self.pushButton_apply_changes_log_settings.clicked.connect(
             self.clicked_pushButton_apply_changes_log_settings)
         self.pushButton_apply_changes_mallet_settings.clicked.connect(
@@ -901,6 +912,79 @@ class MainWindow(QMainWindow):
                 self, Constants.SMOOTH_SPOON_MSG, Constants.MANUAL_LABEL_MSG_STATUS_1)
         
         return
+    
+    def clicked_pushButton_show_similar_topics(self):
+        
+        self.models_tabs.setCurrentWidget(self.page_similar_topics)
+
+        return
+    
+    def populateFrame(self):
+            self.deleteLayout(self.frame_similar.layout())
+
+    def deleteLayout(self, layout):
+        if layout is not None:
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+                else:
+                    self.deleteLayout(item.layout())
+            sip.delete(layout)
+
+    def clicked_pushButton_show_similar(self):  
+
+        if self.findChild(QVBoxLayout, "verticalLayoutSimilar") is not None:
+            self.populateFrame()
+
+        npairs = self.lineEdit_npairs.text()
+        df, similarTopics = self.tm.showSimilar(npairs)
+        criterion = self.comboBox_criterion.currentText()
+        self.verticalLayoutSimilar = QVBoxLayout(self.frame_similar)
+        self.verticalLayoutSimilar.setObjectName("verticalLayoutSimilar")
+        
+        if criterion.lower() == "coocurrence":
+            pairs = similarTopics['Coocurring']
+        else:
+            pairs = similarTopics['Worddesc']
+        for pair in pairs:
+            widget = WidgetSimilarTopics(pair,df)
+            widget.setObjectName("similar_" + str(pair[0]) + "_" + str(pair[1]))
+            self.verticalLayoutSimilar.addWidget(widget)
+
+        return
+    
+    def clicked_pushButton_fuse_topics(self):
+        """Method to control the clicking of the button 'pushButton_fuse_topics. Once the button is clicked by the user,
+        the topics to be merged are retrieved first from the checkboxes marked in the table 'tableWidget_trained_models_topics_curation'. Then, the TaskManager' function in charge of carrying out topics' merge is invoked. Whether the deletion finishes successfully or not, a message informing about how the action ended is shown to the user.
+        """
+
+        # Get ids of the topics to be deleted
+        checked_list = []
+        for i in range(self.tableWidget_trained_models_topics_curation.rowCount()):
+            item = self.tableWidget_trained_models_topics_curation.item(
+                i, 0)
+            if item.checkState() == QtCore.Qt.CheckState.Checked:
+                checked_list.append(i)
+
+        if len(checked_list) < 2:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
+                                Constants.TOPICS_TO_MERGE_NOT_OK)
+            return
+        
+        status = self.tm.fuseTopics(checked_list, self)
+
+        if status == 0:
+            QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(checked_list) + ' could not merged.')
+        elif status == 1:
+            QMessageBox.information(self, Constants.SMOOTH_SPOON_MSG, 'The topics ' + str(checked_list) + ' were merged succesfully.')
+        
+        if self.findChild(QVBoxLayout, "verticalLayoutSimilar") is not None:
+            self.populateFrame()
+
+        return
+
 
     def clicked_pushButton_reset_changes_tm(self):
         """Method to control the clicking of the button 'pushButton_reset_changes_tm. Once the button is clicked by the user, the TaskManager' function in charge of reseting the model is invoked. Whether the model is restored successfully or not, a message informing about how the action ended is shown to the user.

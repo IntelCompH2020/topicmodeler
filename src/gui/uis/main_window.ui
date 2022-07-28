@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1136</width>
-    <height>873</height>
+    <width>1259</width>
+    <height>871</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -3402,6 +3402,9 @@ QHeaderView::section:horizontal
                                      <height>30</height>
                                     </size>
                                    </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Make a copy of the selected topic model.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -3430,6 +3433,9 @@ QPushButton:pressed {
                                      <width>0</width>
                                      <height>30</height>
                                     </size>
+                                   </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Rename the selected topic model and edit its metadata.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                    </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
@@ -3460,6 +3466,9 @@ QPushButton:pressed {
                                      <height>30</height>
                                     </size>
                                    </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Edit the selected topic model.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -3488,6 +3497,9 @@ QPushButton:pressed {
                                      <width>0</width>
                                      <height>30</height>
                                     </size>
+                                   </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Delete the selected topic model.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                    </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
@@ -3898,7 +3910,7 @@ font: 87 12pt italic &quot;Avenir&quot;;
 padding-left: 15px;</string>
                                    </property>
                                    <property name="text">
-                                    <string>Go back to Models main page</string>
+                                    <string>Go back to Edit view</string>
                                    </property>
                                   </widget>
                                  </item>
@@ -4256,6 +4268,9 @@ QHeaderView::section:horizontal
                                      <height>30</height>
                                     </size>
                                    </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Manual label the topics with the description written in the above table.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -4273,18 +4288,21 @@ QPushButton:pressed {
 </string>
                                    </property>
                                    <property name="text">
-                                    <string>Label Topics</string>
+                                    <string>Label topics</string>
                                    </property>
                                   </widget>
                                  </item>
                                  <item>
-                                  <widget class="QPushButton" name="pushButton_fuse_topic">
+                                  <widget class="QPushButton" name="pushButton_show_similar_topics">
                                    <property name="minimumSize">
                                     <size>
                                      <width>100</width>
                                      <height>30</height>
                                     </size>
                                    </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Visualize a new view with suggestions on similar topics to be fused; the fusion can also be performed from this view.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -4302,7 +4320,39 @@ QPushButton:pressed {
 </string>
                                    </property>
                                    <property name="text">
-                                    <string>Fuse Topics</string>
+                                    <string>Show similar topics</string>
+                                   </property>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <widget class="QPushButton" name="pushButton_fuse_topics">
+                                   <property name="minimumSize">
+                                    <size>
+                                     <width>0</width>
+                                     <height>30</height>
+                                    </size>
+                                   </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Fuse the pairs of topics selected above.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   </property>
+                                   <property name="styleSheet">
+                                    <string notr="true">QPushButton {
+	background-color: #1A2E40;
+	font: 87 13pt &quot;Avenir&quot;;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+QPushButton:hover {
+	background-color: #4D6F8C;
+ }
+QPushButton:pressed {	
+	background-color: #4D6F8C;
+}
+
+</string>
+                                   </property>
+                                   <property name="text">
+                                    <string>  Fuse topics  </string>
                                    </property>
                                   </widget>
                                  </item>
@@ -4319,6 +4369,9 @@ QPushButton:pressed {
                                      <width>100</width>
                                      <height>30</height>
                                     </size>
+                                   </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Sort the topics in descending size order.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                    </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
@@ -4349,6 +4402,9 @@ QPushButton:pressed {
                                      <height>30</height>
                                     </size>
                                    </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Delete the selected topics.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -4366,7 +4422,7 @@ QPushButton:pressed {
 </string>
                                    </property>
                                    <property name="text">
-                                    <string>Delete Topics</string>
+                                    <string>Delete topics</string>
                                    </property>
                                   </widget>
                                  </item>
@@ -4515,6 +4571,9 @@ border:none;</string>
                                      <height>16777215</height>
                                     </size>
                                    </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Expand the PyLDAvis graph in a new view.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -4543,6 +4602,9 @@ QPushButton:pressed {
                                      <width>0</width>
                                      <height>30</height>
                                     </size>
+                                   </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Resets the topic model to its original configuration after training.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                    </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
@@ -4577,6 +4639,416 @@ QPushButton:pressed {
                                     </size>
                                    </property>
                                   </spacer>
+                                 </item>
+                                </layout>
+                               </widget>
+                              </item>
+                             </layout>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                         <widget class="QWidget" name="page_similar_topics">
+                          <layout class="QVBoxLayout" name="verticalLayout_48">
+                           <item>
+                            <widget class="QFrame" name="frame_similar_topics">
+                             <property name="styleSheet">
+                              <string notr="true"/>
+                             </property>
+                             <property name="frameShape">
+                              <enum>QFrame::NoFrame</enum>
+                             </property>
+                             <property name="frameShadow">
+                              <enum>QFrame::Raised</enum>
+                             </property>
+                             <layout class="QVBoxLayout" name="verticalLayout_125">
+                              <property name="spacing">
+                               <number>0</number>
+                              </property>
+                              <property name="leftMargin">
+                               <number>0</number>
+                              </property>
+                              <property name="topMargin">
+                               <number>0</number>
+                              </property>
+                              <property name="rightMargin">
+                               <number>0</number>
+                              </property>
+                              <property name="bottomMargin">
+                               <number>0</number>
+                              </property>
+                              <item>
+                               <widget class="QFrame" name="frame_top_similar_topics">
+                                <property name="styleSheet">
+                                 <string notr="true">background-color: #F2F2F2;
+border:none;</string>
+                                </property>
+                                <property name="frameShape">
+                                 <enum>QFrame::StyledPanel</enum>
+                                </property>
+                                <property name="frameShadow">
+                                 <enum>QFrame::Raised</enum>
+                                </property>
+                                <layout class="QVBoxLayout" name="verticalLayout_70">
+                                 <item>
+                                  <widget class="QFrame" name="frame_138">
+                                   <property name="sizePolicy">
+                                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                                     <horstretch>0</horstretch>
+                                     <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                   </property>
+                                   <property name="styleSheet">
+                                    <string notr="true">border:none;</string>
+                                   </property>
+                                   <property name="frameShape">
+                                    <enum>QFrame::StyledPanel</enum>
+                                   </property>
+                                   <property name="frameShadow">
+                                    <enum>QFrame::Raised</enum>
+                                   </property>
+                                   <layout class="QHBoxLayout" name="horizontalLayout_100">
+                                    <item>
+                                     <widget class="QLabel" name="label_available_model_being_curated2">
+                                      <property name="sizePolicy">
+                                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                       </sizepolicy>
+                                      </property>
+                                      <property name="minimumSize">
+                                       <size>
+                                        <width>0</width>
+                                        <height>45</height>
+                                       </size>
+                                      </property>
+                                      <property name="maximumSize">
+                                       <size>
+                                        <width>16777215</width>
+                                        <height>45</height>
+                                       </size>
+                                      </property>
+                                      <property name="font">
+                                       <font>
+                                        <family>Avenir</family>
+                                        <pointsize>18</pointsize>
+                                        <weight>10</weight>
+                                        <italic>false</italic>
+                                        <bold>false</bold>
+                                       </font>
+                                      </property>
+                                      <property name="styleSheet">
+                                       <string notr="true">color:#1A2E40;
+font: 87 18pt &quot;Avenir&quot;;
+padding-left: 10px;</string>
+                                      </property>
+                                      <property name="text">
+                                       <string>Model..</string>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QPushButton" name="pushButton_return_similar">
+                                      <property name="sizePolicy">
+                                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                       </sizepolicy>
+                                      </property>
+                                      <property name="minimumSize">
+                                       <size>
+                                        <width>30</width>
+                                        <height>30</height>
+                                       </size>
+                                      </property>
+                                      <property name="maximumSize">
+                                       <size>
+                                        <width>30</width>
+                                        <height>30</height>
+                                       </size>
+                                      </property>
+                                      <property name="styleSheet">
+                                       <string notr="true">border:none;</string>
+                                      </property>
+                                      <property name="text">
+                                       <string/>
+                                      </property>
+                                      <property name="icon">
+                                       <iconset>
+                                        <normaloff>../resources/images/arrows_left.png</normaloff>../resources/images/arrows_left.png</iconset>
+                                      </property>
+                                      <property name="iconSize">
+                                       <size>
+                                        <width>35</width>
+                                        <height>35</height>
+                                       </size>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QLabel" name="label_13">
+                                      <property name="styleSheet">
+                                       <string notr="true">color:#1A2E40;
+font: 87 12pt italic &quot;Avenir&quot;;
+padding-left: 15px;</string>
+                                      </property>
+                                      <property name="text">
+                                       <string>Go back to Edit view</string>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                   </layout>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <widget class="QFrame" name="frame_correlation">
+                                   <property name="maximumSize">
+                                    <size>
+                                     <width>16777215</width>
+                                     <height>60</height>
+                                    </size>
+                                   </property>
+                                   <property name="styleSheet">
+                                    <string notr="true">border:none;</string>
+                                   </property>
+                                   <property name="frameShape">
+                                    <enum>QFrame::StyledPanel</enum>
+                                   </property>
+                                   <property name="frameShadow">
+                                    <enum>QFrame::Raised</enum>
+                                   </property>
+                                   <layout class="QHBoxLayout" name="horizontalLayout_67">
+                                    <item>
+                                     <widget class="QLabel" name="label_correlation">
+                                      <property name="maximumSize">
+                                       <size>
+                                        <width>200</width>
+                                        <height>16777215</height>
+                                       </size>
+                                      </property>
+                                      <property name="styleSheet">
+                                       <string notr="true">color:#1A2E40;
+font: 87 12pt italic &quot;Avenir&quot;;
+padding-left: 15px;</string>
+                                      </property>
+                                      <property name="text">
+                                       <string>Pairs of topics to examine:</string>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QLineEdit" name="lineEdit_npairs">
+                                      <property name="sizePolicy">
+                                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                       </sizepolicy>
+                                      </property>
+                                      <property name="minimumSize">
+                                       <size>
+                                        <width>0</width>
+                                        <height>0</height>
+                                       </size>
+                                      </property>
+                                      <property name="maximumSize">
+                                       <size>
+                                        <width>80</width>
+                                        <height>16777215</height>
+                                       </size>
+                                      </property>
+                                      <property name="styleSheet">
+                                       <string notr="true">QLineEdit {	
+	background-color: #FFFFFF;
+	font: 87 italic 12pt &quot;Avenir&quot;;
+	border-radius: 5px;
+	border: 1px solid #1A2E40;
+	color:black;
+}</string>
+                                      </property>
+                                      <property name="readOnly">
+                                       <bool>false</bool>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QLabel" name="label_htm_version">
+                                      <property name="sizePolicy">
+                                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                       </sizepolicy>
+                                      </property>
+                                      <property name="minimumSize">
+                                       <size>
+                                        <width>0</width>
+                                        <height>20</height>
+                                       </size>
+                                      </property>
+                                      <property name="maximumSize">
+                                       <size>
+                                        <width>130</width>
+                                        <height>45</height>
+                                       </size>
+                                      </property>
+                                      <property name="font">
+                                       <font>
+                                        <family>Futura</family>
+                                        <pointsize>13</pointsize>
+                                        <weight>10</weight>
+                                        <italic>false</italic>
+                                        <bold>false</bold>
+                                       </font>
+                                      </property>
+                                      <property name="styleSheet">
+                                       <string notr="true">color:#1A2E40;
+font: 87 13pt &quot;Futura&quot;;
+padding-left: 10px;</string>
+                                      </property>
+                                      <property name="text">
+                                       <string>Similarity criterion</string>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QComboBox" name="comboBox_criterion">
+                                      <property name="styleSheet">
+                                       <string notr="true">/*COMBO BOX*/
+QComboBox {
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 1px 18px 1px 3px;
+    min-width: 6em;
+    background-color:#FFFFFF;
+	color:black;
+}
+
+
+QComboBox:on { /* shift the text when the popup opens */
+    padding-top: 3px;
+    padding-left: 4px;
+}
+
+</string>
+                                      </property>
+                                      <item>
+                                       <property name="text">
+                                        <string>Coocurrence</string>
+                                       </property>
+                                      </item>
+                                      <item>
+                                       <property name="text">
+                                        <string>Word Description</string>
+                                       </property>
+                                      </item>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <widget class="QPushButton" name="pushButton_show_similar">
+                                      <property name="minimumSize">
+                                       <size>
+                                        <width>0</width>
+                                        <height>30</height>
+                                       </size>
+                                      </property>
+                                      <property name="toolTip">
+                                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Visualize as many pairs of similar topics as the ones specified in the &quot;Pairs of topics to examine&quot; according to the selected similarity criterion.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                      </property>
+                                      <property name="styleSheet">
+                                       <string notr="true">QPushButton {
+	background-color: #1A2E40;
+	font: 87 13pt &quot;Avenir&quot;;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+QPushButton:hover {
+	background-color: #4D6F8C;
+ }
+QPushButton:pressed {	
+	background-color: #4D6F8C;
+}
+
+</string>
+                                      </property>
+                                      <property name="text">
+                                       <string>  Show similar  </string>
+                                      </property>
+                                     </widget>
+                                    </item>
+                                    <item>
+                                     <spacer name="horizontalSpacer_17">
+                                      <property name="orientation">
+                                       <enum>Qt::Horizontal</enum>
+                                      </property>
+                                      <property name="sizeHint" stdset="0">
+                                       <size>
+                                        <width>40</width>
+                                        <height>20</height>
+                                       </size>
+                                      </property>
+                                     </spacer>
+                                    </item>
+                                   </layout>
+                                  </widget>
+                                 </item>
+                                 <item>
+                                  <widget class="QFrame" name="frame_similarities">
+                                   <property name="frameShape">
+                                    <enum>QFrame::StyledPanel</enum>
+                                   </property>
+                                   <property name="frameShadow">
+                                    <enum>QFrame::Raised</enum>
+                                   </property>
+                                   <layout class="QHBoxLayout" name="horizontalLayout_22">
+                                    <item>
+                                     <widget class="QScrollArea" name="scrollArea_similarities">
+                                      <property name="styleSheet">
+                                       <string notr="true">QScrollArea{
+	border:none;
+}
+QScrollBar:horizontal {
+	background: #4D6F8C;
+    border: none;
+    height: 2px;
+	margin: 0px 2px 0 2px;
+}
+ QScrollBar:vertical {
+    background: #4D6F8C;
+    border: none;
+    width: 4px;
+    margin: 2px 0 2px 0;
+	border-radius: 0px;
+ }
+</string>
+                                      </property>
+                                      <property name="widgetResizable">
+                                       <bool>true</bool>
+                                      </property>
+                                      <widget class="QWidget" name="scrollAreaWidgetContents_similarities">
+                                       <property name="geometry">
+                                        <rect>
+                                         <x>0</x>
+                                         <y>0</y>
+                                         <width>983</width>
+                                         <height>599</height>
+                                        </rect>
+                                       </property>
+                                       <layout class="QVBoxLayout" name="verticalLayout_30">
+                                        <item>
+                                         <widget class="QFrame" name="frame_similar">
+                                          <property name="frameShape">
+                                           <enum>QFrame::StyledPanel</enum>
+                                          </property>
+                                          <property name="frameShadow">
+                                           <enum>QFrame::Raised</enum>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </widget>
+                                    </item>
+                                   </layout>
+                                  </widget>
                                  </item>
                                 </layout>
                                </widget>
@@ -5762,8 +6234,8 @@ QScrollBar:horizontal {
                               <property name="geometry">
                                <rect>
                                 <x>0</x>
-                                <y>-52</y>
-                                <width>800</width>
+                                <y>0</y>
+                                <width>923</width>
                                 <height>734</height>
                                </rect>
                               </property>
@@ -6517,7 +6989,7 @@ padding-left: 10px;</string>
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>766</width>
+                                   <width>412</width>
                                    <height>976</height>
                                   </rect>
                                  </property>
@@ -7496,8 +7968,8 @@ QScrollBar:horizontal {
                                  <property name="geometry">
                                   <rect>
                                    <x>0</x>
-                                   <y>-1223</y>
-                                   <width>766</width>
+                                   <y>0</y>
+                                   <width>324</width>
                                    <height>1823</height>
                                   </rect>
                                  </property>
@@ -9350,8 +9822,8 @@ QScrollBar:horizontal {
                                  <property name="geometry">
                                   <rect>
                                    <x>0</x>
-                                   <y>-1294</y>
-                                   <width>766</width>
+                                   <y>0</y>
+                                   <width>351</width>
                                    <height>1944</height>
                                   </rect>
                                  </property>
@@ -12290,8 +12762,8 @@ QScrollBar:horizontal {
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>780</width>
-                                   <height>596</height>
+                                   <width>288</width>
+                                   <height>492</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_67">

@@ -51,6 +51,7 @@ class Constants:
                      "tableWidget_trained_models_topics"]
     NEW_TM_NAME_NOT_SELECTED_MSG = "A new name for the models must be selected to continue."
     TOPICS_DELETE_NO_SELECTED = "You must select first the topics for deletion."
+    TOPICS_TO_MERGE_NOT_OK = "You need to provide at least two topics to be merged."
     RESET_TM_MSG = "This operation will restore the model to its original configuration after training. \rAll curation changes will be lost, including manual labeling of topics.\rDo you wish to continue?"
     SORT_TM_MSG = "Topics will be sorted according to descending topic size order. No information will be lost. Topic labels will be kept as well.\rDo you wish to continue?"
     MANUAL_LABEL_MSG_STATUS_0 = "The topics could not be labeled."
