@@ -22,11 +22,21 @@ from transformers import pipeline
 from gensim.models.coherencemodel import CoherenceModel
 from gensim.corpora import Dictionary
 
-#pyLDAvis currently raises some Deprecation warnings
+# pyLDAvis currently raises some Deprecation warnings
 with warnings.catch_warnings():
-    warnings.filterwarnings("ignore",category=DeprecationWarning)
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
     import pyLDAvis
 
+def look_for_path(tm_path, path_name):
+
+    if tm_path.joinpath(path_name).is_dir():
+        return tm_path
+    else:
+        for root, dirs, files in os.walk(tm_path):
+            for dir in dirs:
+                if dir.endswith(path_name):
+                    tm_path = Path(os.path.join(root, dir)).parent
+        return tm_path
 
 class TMManager(object):
     """
@@ -356,10 +366,10 @@ class TMmodel(object):
         #
         # In case the model has gone through topic deletion, we may have rows
         # in the thetas matrix that sum up to zero (active topics have been
-        # removed for these problematic documents). We need to take this into 
-        # account 
+        # removed for these problematic documents). We need to take this into
+        # account
         ndocs = 10000
-        validDocs = np.sum(self._thetas.toarray(), axis=1)>0
+        validDocs = np.sum(self._thetas.toarray(), axis=1) > 0
         nValidDocs = np.sum(validDocs)
         if ndocs > nValidDocs:
             ndocs = nValidDocs
@@ -367,7 +377,7 @@ class TMmodel(object):
         # We consider all documents are equally important
         doc_len = ndocs * [1]
         vocabfreq = np.round(ndocs*(self._alphas.dot(self._betas))).astype(int)
-        vis_data = pyLDAvis.prepare(self._betas, self._thetas[validDocs,][perm, ].toarray(),
+        vis_data = pyLDAvis.prepare(self._betas, self._thetas[validDocs, ][perm, ].toarray(),
                                     doc_len, self._vocab, vocabfreq, lambda_step=0.05,
                                     sort_topics=False, n_jobs=-1)
         pyLDAvis.save_html(vis_data, self._TMfolder.joinpath(
@@ -564,19 +574,19 @@ class TMmodel(object):
             self._topic_coherence = np.load(
                 self._TMfolder.joinpath('topic_coherence.npy'))
 
-    def _largest_indices(self, ary, n): 
-        """Returns the n largest indices from a numpy array.""" 
-        flat = ary.flatten() 
-        indices = np.argpartition(flat, -n)[-n:] 
-        indices = indices[np.argsort(-flat[indices])] 
-        idx0, idx1 = np.unravel_index(indices, ary.shape) 
-        idx0 = idx0.tolist() 
-        idx1 = idx1.tolist() 
-        selected_idx = [] 
-        for id0, id1 in zip(idx0, idx1): 
-            if id0<id1: 
-                selected_idx.append((id0, id1, ary[id0,id1])) 
-        return selected_idx 
+    def _largest_indices(self, ary, n):
+        """Returns the n largest indices from a numpy array."""
+        flat = ary.flatten()
+        indices = np.argpartition(flat, -n)[-n:]
+        indices = indices[np.argsort(-flat[indices])]
+        idx0, idx1 = np.unravel_index(indices, ary.shape)
+        idx0 = idx0.tolist()
+        idx1 = idx1.tolist()
+        selected_idx = []
+        for id0, id1 in zip(idx0, idx1):
+            if id0 < id1:
+                selected_idx.append((id0, id1, ary[id0, id1]))
+        return selected_idx
 
     def get_model_info_for_hierarchical(self):
         """Returns the objects necessary for the creation of a level-2 topic model.
@@ -649,7 +659,7 @@ class TMmodel(object):
             Each element is a a term (topic_id, "label for topic topic_id")                    
         """
         if not labels:
-            return [(i, "NA") for i, p in enumerate(self._tpc_descriptions)]#[]
+            return [(i, "NA") for i, p in enumerate(self._tpc_descriptions)]  # []
         if use_cuda:
             if torch.cuda.is_available():
                 device = 0
@@ -683,7 +693,7 @@ class TMmodel(object):
         self._load_ndocs_active()
         self.load_tpc_descriptions()
         self.load_tpc_labels()
-        TpcsInfo = [(str(round(el[0], 4)), el[1].strip(), el[2].strip(), str(el[3])) for el in zip(
+        TpcsInfo = [{"Size": str(round(el[0], 4)), "Label": el[1].strip(), "Word Description": el[2].strip(), "Ndocs Active": str(el[3])} for el in zip(
             self._alphas, self._tpc_labels, self._tpc_descriptions, self._ndocs_active)]
 
         return TpcsInfo
@@ -695,8 +705,8 @@ class TMmodel(object):
         self.load_tpc_labels()
         self._load_topic_entropy()
         self._load_topic_coherence()
-        TpcsInfo = [(str(round(el[0], 4)), el[1].strip(), el[2].strip(), str(el[3]), str(round(el[4], 4)), str(round(el[5], 4))) for el in zip(
-            self._alphas, self._tpc_labels, self._tpc_descriptions, self._ndocs_active, self._topic_entropy, self._topic_coherence)]
+        TpcsInfo = [{"Size": str(round(el[0], 4)), "Label": el[1].strip(), "Word Description": el[2].strip(), "Ndocs Active": str(el[3]), "Topics entropy": str(round(
+            el[4], 4)), "Topics coherence": str(round(el[5], 4))} for el in zip(self._alphas, self._tpc_labels, self._tpc_descriptions, self._ndocs_active, self._topic_entropy, self._topic_coherence)]
 
         return TpcsInfo
 
@@ -781,9 +791,11 @@ class TMmodel(object):
         num = num - med[..., np.newaxis].dot(med[np.newaxis, ...])
         deno = stds[..., np.newaxis].dot(stds[np.newaxis, ...])
         corrcoef = num / deno
-        selected_coocur = self._largest_indices(corrcoef, self._ntopics + 2 * npairs)
-        selected_coocur = [(el[0], el[1], el[2].astype(float)) for el in selected_coocur]
-        
+        selected_coocur = self._largest_indices(
+            corrcoef, self._ntopics + 2 * npairs)
+        selected_coocur = [(el[0], el[1], el[2].astype(float))
+                           for el in selected_coocur]
+
         # Part 2 - Topics with similar word composition
         # Computes inter-topic distance based on word distributions
         # using Jensen Shannon distance
@@ -797,59 +809,17 @@ class TMmodel(object):
                 js_mat[k, kk] = jensenshannon(
                     betas_aux[k, :], betas_aux[kk, :])
         JSsim = 1 - js_mat
-        selected_worddesc = self._largest_indices(JSsim, self._ntopics + 2 * npairs)
-        selected_worddesc = [(el[0], el[1], el[2].astype(float)) for el in selected_worddesc]
+        selected_worddesc = self._largest_indices(
+            JSsim, self._ntopics + 2 * npairs)
+        selected_worddesc = [(el[0], el[1], el[2].astype(float))
+                             for el in selected_worddesc]
 
         similarTopics = {
-            'Coocurring'    : selected_coocur,
-            'Worddesc'      : selected_worddesc
+            'Coocurring': selected_coocur,
+            'Worddesc': selected_worddesc
         }
 
         return similarTopics
-
-
-        self._load_alphas()
-        self._load_betas()
-        self._load_thetas()
-        self._load_betas_ds()
-        self._load_topic_entropy()
-        self._load_topic_coherence()
-        self.load_tpc_descriptions()
-        self.load_tpc_labels()
-        self._load_ndocs_active()
-        self._load_edits()
-        self._load_vocab()
-
-        try:
-            # Get a list of the topics that should be kept
-            tpc_keep = [k for k in range(self._ntopics) if k not in tpcs]
-            tpc_keep = [k for k in tpc_keep if k < self._ntopics]
-
-            # Calculate new variables
-            self._thetas = self._thetas[:, tpc_keep]
-            self._thetas = normalize(self._thetas, axis=1, norm='l1')
-            self._alphas = np.asarray(np.mean(self._thetas, axis=0)).ravel()
-            self._ntopics = self._thetas.shape[1]
-            self._betas = self._betas[tpc_keep, :]
-            self._betas_ds = self._betas_ds[tpc_keep, :]
-            self._ndocs_active = self._ndocs_active[tpc_keep]
-            self._topic_entropy = self._topic_entropy[tpc_keep]
-            self._topic_coherence = self._topic_coherence[tpc_keep]
-            self._tpc_labels = [self._tpc_labels[i] for i in tpc_keep]
-            self._tpc_descriptions = [
-                self._tpc_descriptions[i] for i in tpc_keep]
-            self._edits.append('d ' + ' '.join([str(k) for k in tpcs]))
-
-            # We are ready to save all variables in the model
-            self._save_all()
-
-            self._logger.info(
-                '-- -- Topics deletion successful. All variables saved to file')
-            return 1
-        except:
-            self._logger.info(
-                '-- -- Topics deletion generated an error. Operation failed')
-            return 0
 
     def fuseTopics(self, tpcs):
         """This is a costly operation, almost everything
@@ -857,7 +827,7 @@ class TMmodel(object):
         self._load_alphas()
         self._load_betas()
         self._load_thetas()
-        #self._load_topic_coherence()
+        # self._load_topic_coherence()
         self.load_tpc_descriptions()
         self.load_tpc_labels()
         self._load_edits()
@@ -866,7 +836,7 @@ class TMmodel(object):
         try:
             # List of topics that will be merged
             tpcs = sorted(tpcs)
-            
+
             # Calculate new variables
 
             # For beta we keep a weighted average of topic vectors
@@ -892,19 +862,21 @@ class TMmodel(object):
             # Compute all other variables
             self._calculate_beta_ds()
             self._calculate_topic_entropy()
-            self._ndocs_active = np.array((self._thetas != 0).sum(0).tolist()[0])
+            self._ndocs_active = np.array(
+                (self._thetas != 0).sum(0).tolist()[0])
 
             # Keep label and description of most significant topic
             for tpc in tpcs[1:][::-1]:
                 del self._tpc_descriptions[tpc]
-            #Recalculate chemical description of most significant topic
-            self._tpc_descriptions[tpcs[0]] = self.get_tpc_word_descriptions(tpc=[tpcs[0]])[0][1]
+            # Recalculate chemical description of most significant topic
+            self._tpc_descriptions[tpcs[0]] = self.get_tpc_word_descriptions(tpc=[tpcs[0]])[
+                0][1]
             for tpc in tpcs[1:][::-1]:
                 del self._tpc_labels[tpc]
 
             self._calculate_topic_coherence()
             self._edits.append('f ' + ' '.join([str(el) for el in tpcs]))
-            
+
             # We are ready to save all variables in the model
             self._save_all()
 
@@ -973,33 +945,6 @@ class TMmodel(object):
         except:
             return 0
 
-    def save_npz(self, npzfile):
-        """Saves the matrices that characterizes the topic model inot numpy npz file.
-
-        Parameters
-        ----------
-        npzfile: str
-            Name of the file in which the model will be saved
-        """
-
-        if isinstance(self._thetas, sparse.csr_matrix):
-            np.savez(npzfile, alphas=self._alphas, betas=self._betas,
-                     thetas_data=self._thetas.data, thetas_indices=self._thetas.indices,
-                     thetas_indptr=self._thetas.indptr, thetas_shape=self._thetas.shape,
-                     alphas_orig=self._alphas_orig, betas_orig=self._betas_orig,
-                     thetas_orig_data=self._thetas_orig.data, thetas_orig_indices=self._thetas_orig.indices,
-                     thetas_orig_indptr=self._thetas_orig.indptr, thetas_orig_shape=self._thetas_orig.shape,
-                     ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy,
-                     descriptions=self._tpc_descriptions, edits=self._edits)
-        else:
-            np.savez(npzfile, alphas=self._alphas, betas=self._betas, thetas=self._thetas, alphas_orig=self._alphas_orig, betas_orig=self._betas_orig, thetas_orig=self._thetas_orig,
-                     ntopics=self._ntopics, betas_ds=self._betas_ds, topic_entropy=self._topic_entropy, descriptions=self._tpc_descriptions, edits=self._edits)
-
-        if len(self._edits):
-            edits_file = Path(npzfile).parent.joinpath('model_edits.txt')
-            with edits_file.open('w', encoding='utf8') as fout:
-                [fout.write(el + '\n') for el in self._edits]
-
 
 ##############################################################################
 #                                  MAIN                                      #
@@ -1058,10 +1003,12 @@ if __name__ == "__main__":
         sys.stdout.write(json.dumps(allTMmodels))
 
     if args.deleteTMmodel:
+        tm_path = look_for_path(tm_path, f"{args.deleteTMmodel}")
         status = tmm.deleteTMmodel(tm_path.joinpath(f"{args.deleteTMmodel}"))
         sys.stdout.write(str(status))
 
     if args.renameTM:
+        tm_path = look_for_path(tm_path, f"{args.renameTM[0]}")
         status = tmm.renameTMmodel(
             tm_path.joinpath(f"{args.renameTM[0]}"),
             tm_path.joinpath(f"{args.renameTM[1]}"),
@@ -1069,6 +1016,7 @@ if __name__ == "__main__":
         sys.stdout.write(str(status))
 
     if args.copyTM:
+        tm_path = look_for_path(tm_path, f"{args.copyTM[0]}")
         status = tmm.copyTMmodel(
             tm_path.joinpath(f"{args.copyTM[0]}"),
             tm_path.joinpath(f"{args.copyTM[1]}"),
@@ -1076,41 +1024,22 @@ if __name__ == "__main__":
         sys.stdout.write(str(status))
 
     if args.showTopics:
-        if tm_path.joinpath(
-            f"{args.showTopics}").joinpath('TMmodel').is_dir():
-            tm = TMmodel(tm_path.joinpath(
-            f"{args.showTopics}").joinpath('TMmodel'))
-        else:
-            # If it is a submodel
-            for root, dirs, files in os.walk(tm_path):
-                sys.stdout.write(str(dirs))
-                for dir in dirs:
-                    if dir.endswith(f"{args.showTopics}"):
-                        path_tm = os.path.join(root, dir,'TMmodel')
-                        tm = TMmodel(path_tm)
+        tm_path = look_for_path(tm_path, f"{args.showTopics}")
+        tm = TMmodel(tm_path.joinpath(
+                f"{args.showTopics}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.showTopics()))
 
     if args.showTopicsAdvanced:
-        if tm_path.joinpath(
-            f"{args.showTopicsAdvanced}").joinpath('TMmodel').is_dir():
-            tm = TMmodel(tm_path.joinpath(
-            f"{args.showTopicsAdvanced}").joinpath('TMmodel'))
-        else:
-            # If it is a submodel
-            for root, dirs, files in os.walk(tm_path):
-                sys.stdout.write(str(dirs))
-                for dir in dirs:
-                    if dir.endswith(f"{args.showTopicsAdvanced}"):
-                        path_tm = os.path.join(root, dir,'TMmodel')
-                        tm = TMmodel(path_tm)
-        #with open('data2.json', 'w') as f:
-        #json.dump(tm.showTopicsAdvanced(), f)
+        tm_path = look_for_path(tm_path, f"{args.showTopicsAdvanced}")
+        tm = TMmodel(tm_path.joinpath(
+                f"{args.showTopicsAdvanced}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.showTopicsAdvanced()))
 
     if args.setTpcLabels:
         # Labels should come from standard input
         TpcLabels = "".join([line for line in sys.stdin])
         TpcLabels = json.loads(TpcLabels.replace('\\"', '"'))
+        tm_path = look_for_path(tm_path, f"{args.setTpcLabels}")
         tm = TMmodel(tm_path.joinpath(
             f"{args.setTpcLabels}").joinpath('TMmodel'))
         status = tm.setTpcLabels(TpcLabels)
@@ -1120,6 +1049,7 @@ if __name__ == "__main__":
         # List of topics to remove should come from standard input
         tpcs = "".join([line for line in sys.stdin])
         tpcs = json.loads(tpcs.replace('\\"', '"'))
+        tm_path = look_for_path(tm_path, f"{args.deleteTopics}")
         tm = TMmodel(tm_path.joinpath(
             f"{args.deleteTopics}").joinpath('TMmodel'))
         status = tm.deleteTopics(tpcs)
@@ -1129,6 +1059,7 @@ if __name__ == "__main__":
         # List of topics to remove should come from standard input
         npairs = "".join([line for line in sys.stdin])
         npairs = json.loads(npairs.replace('\\"', '"'))
+        tm_path = look_for_path(tm_path, f"{args.getSimilarTopics}")
         tm = TMmodel(tm_path.joinpath(
             f"{args.getSimilarTopics}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.getSimilarTopics(int(npairs))))
@@ -1137,18 +1068,21 @@ if __name__ == "__main__":
         # List of topics to merge should come from standard input
         tpcs = "".join([line for line in sys.stdin])
         tpcs = json.loads(tpcs.replace('\\"', '"'))
+        tm_path = look_for_path(tm_path, f"{args.fuseTopics}")
         tm = TMmodel(tm_path.joinpath(
             f"{args.fuseTopics}").joinpath('TMmodel'))
         status = tm.fuseTopics(tpcs)
         sys.stdout.write(str(status))
 
     if args.sortTopics:
+        tm_path = look_for_path(tm_path, f"{args.sortTopics}")
         tm = TMmodel(tm_path.joinpath(
             f"{args.sortTopics}").joinpath('TMmodel'))
         status = tm.sortTopics()
         sys.stdout.write(str(status))
 
     if args.resetTM:
+        tm_path = look_for_path(tm_path, f"{args.resetTM}")
         tm = TMmodel(tm_path.joinpath(f"{args.resetTM}").joinpath('TMmodel'))
         status = tm.resetTM()
         sys.stdout.write(str(status))

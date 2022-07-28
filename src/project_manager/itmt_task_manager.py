@@ -2055,9 +2055,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
     def showTopics(self):
         self.logger.info(
             f'-- Displaying Topic Information for Model {self.selectedTM}')
-        TopicInfo = json.loads(self.TopicsDesc)
-        df = pd.DataFrame(TopicInfo, columns=[
-                          'Size', 'Label', 'Word Description', 'Ndocs Active'])
+        TopicInfo = eval(self.TopicsDesc)
+        df = pd.DataFrame.from_records(TopicInfo)
         df.index.name = 'Topid ID'
         print(df[['Size', 'Label', 'Word Description']])
         return
@@ -3282,11 +3281,10 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         table2 = gui.tableWidget_trained_models_topics_curation
 
         if self.TopicsDesc:
-            TopicInfo = json.loads(self.TopicsDesc)
+            TopicInfo = eval(self.TopicsDesc)
             table.setRowCount(len(TopicInfo))
             table2.setRowCount(len(TopicInfo))
-            df = pd.DataFrame(TopicInfo, columns=[
-                              'Size', 'Label', 'Word Description', 'Ndocs Active', 'Topics entropy', 'Topics coherence'])
+            df = pd.DataFrame.from_records(TopicInfo)
             for tp in range(len(TopicInfo)):
                 df2 = df.iloc[[tp]]
                 table.setItem(tp, 0, QtWidgets.QTableWidgetItem(

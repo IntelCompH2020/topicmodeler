@@ -1682,7 +1682,6 @@ class ProdLDATrainer(Trainer):
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, avitm)
-        tm.save_npz(corpusFile.parent.joinpath('model.npz'))
 
         return
 
@@ -1953,7 +1952,6 @@ class CTMTrainer(Trainer):
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, ctm)
-        tm.save_npz(corpusFile.parent.joinpath('model.npz'))
 
         return
 
