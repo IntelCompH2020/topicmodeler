@@ -273,6 +273,9 @@ QToolTip {
                  <height>45</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Welcome page.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="styleSheet">
                 <string notr="true">QPushButton {	
 	background-image: ICON_REPLACE;
@@ -337,6 +340,9 @@ QPushButton:pressed {
                  <width>16777215</width>
                  <height>45</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Corpus management page.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">QPushButton {	
@@ -403,6 +409,9 @@ QPushButton:pressed {
                  <height>45</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Wordlist management page.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="styleSheet">
                 <string notr="true">QPushButton {	
 	background-image: ICON_REPLACE;
@@ -467,6 +476,9 @@ QPushButton:pressed {
                  <width>16777215</width>
                  <height>45</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Model management page.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">QPushButton {	
@@ -559,6 +571,9 @@ QPushButton:pressed {
                  <width>16777215</width>
                  <height>45</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Settings page.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">QPushButton {	
@@ -732,7 +747,7 @@ QPushButton:pressed {
                           <string/>
                          </property>
                          <property name="pixmap">
-                          <pixmap>../../../../../Intelcomp/Picture 1.png</pixmap>
+                          <pixmap>../resources/images/intelcomp.png</pixmap>
                          </property>
                         </widget>
                        </item>
@@ -2544,6 +2559,9 @@ QHeaderView::section:horizontal
                                      <height>30</height>
                                     </size>
                                    </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Generate a training dataset with the documents of one or several available local datasets.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -2926,6 +2944,9 @@ QHeaderView::section:horizontal
                                      <height>30</height>
                                     </size>
                                    </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Train the dataset.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -2967,6 +2988,9 @@ QPushButton:pressed {
                                      <width>0</width>
                                      <height>30</height>
                                     </size>
+                                   </property>
+                                   <property name="toolTip">
+                                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Delete the dataset.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                    </property>
                                    <property name="styleSheet">
                                     <string notr="true">QPushButton {
@@ -3761,6 +3785,9 @@ QHeaderView::section:horizontal
                                   <width>200</width>
                                   <height>30</height>
                                  </size>
+                                </property>
+                                <property name="toolTip">
+                                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Train a level-2 model from one of the topics of the selected level-1 model. To do so, one of the topics of the selected level-1 model must be chosen for expansion by selecting one of the rows in the above table.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                 </property>
                                 <property name="styleSheet">
                                  <string notr="true">QPushButton {
@@ -4946,7 +4973,7 @@ QComboBox:on { /* shift the text when the popup opens */
                                      <widget class="QPushButton" name="pushButton_show_similar">
                                       <property name="minimumSize">
                                        <size>
-                                        <width>0</width>
+                                        <width>200</width>
                                         <height>30</height>
                                        </size>
                                       </property>
@@ -4970,7 +4997,7 @@ QPushButton:pressed {
 </string>
                                       </property>
                                       <property name="text">
-                                       <string>  Show similar  </string>
+                                       <string>Show similar</string>
                                       </property>
                                      </widget>
                                     </item>
@@ -5401,6 +5428,9 @@ QScrollBar:vertical {
                            <height>30</height>
                           </size>
                          </property>
+                         <property name="toolTip">
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Create a new wordlist (stopwords, keywords or equivalences list).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         </property>
                          <property name="styleSheet">
                           <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -5443,6 +5473,9 @@ QPushButton:pressed {
                            <height>30</height>
                           </size>
                          </property>
+                         <property name="toolTip">
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Modify the selected wordlist.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         </property>
                          <property name="styleSheet">
                           <string notr="true">QPushButton {
 	background-color: #1A2E40;
@@ -5484,6 +5517,9 @@ QPushButton:pressed {
                            <width>0</width>
                            <height>30</height>
                           </size>
+                         </property>
+                         <property name="toolTip">
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Delete the selected wordlist.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                          </property>
                          <property name="styleSheet">
                           <string notr="true">QPushButton {

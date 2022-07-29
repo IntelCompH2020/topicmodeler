@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>UTLIT/TM</string>
+   <string>ITMT</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -5952,9 +5952,10 @@ border:none;</string>
                     </widget>
                     <widget class="QWidget" name="page_trainCTM">
                      <property name="styleSheet">
-                      <string notr="true">border:none;</string>
+                      <string notr="true">border:none;
+background-color: #F2F2F2;</string>
                      </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_10">
+                     <layout class="QHBoxLayout" name="horizontalLayout_4">
                       <property name="spacing">
                        <number>0</number>
                       </property>
@@ -5973,7 +5974,7 @@ border:none;</string>
                       <item>
                        <widget class="QFrame" name="frame_trainCTM">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -5987,7 +5988,10 @@ border:none;</string>
                         <property name="frameShadow">
                          <enum>QFrame::Plain</enum>
                         </property>
-                        <layout class="QHBoxLayout" name="horizontalLayout_104">
+                        <layout class="QHBoxLayout" name="horizontalLayout_5">
+                         <property name="spacing">
+                          <number>0</number>
+                         </property>
                          <property name="leftMargin">
                           <number>0</number>
                          </property>

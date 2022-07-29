@@ -13,6 +13,7 @@ It implements the functions needed to
 # import configparser
 import datetime as DT
 import json
+import os
 import pathlib
 # import logging
 import shutil
@@ -1608,7 +1609,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             StwLists = [StwLists[int(el)] for el in selection.split(',')]
         else:
             StwLists = []
-
         # Lists of equivalences
         EqLists = [eql for eql in allWdLists.keys()
                    if allWdLists[eql]['valid_for'] == 'equivalences']
@@ -3015,8 +3015,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                         allWdLists[WdList]['name']))
                     table.setItem(row, 2, QtWidgets.QTableWidgetItem(
                         allWdLists[WdList]['description']))
-                    row += 1
-        return
+                    row += 1            
+        return typeWdLists
 
     def NewWdList(self, listType, wds, lst_name, lst_privacy, lst_desc):
         """
@@ -3315,7 +3315,13 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
             table2.resizeColumnsToContents()
             table2.resizeRowsToContents()
 
-            model_path = self.p2p.joinpath(self._dir_struct['TMmodels']).joinpath(self.selectedTM).joinpath('TMmodel').resolve().as_posix()
+            tm_path = self.p2p.joinpath(self._dir_struct['TMmodels'])
+            if not tm_path.joinpath(self.selectedTM).is_dir():
+                for root, dirs, files in os.walk(tm_path):
+                    for dir in dirs:
+                        if dir.endswith(self.selectedTM):
+                            tm_path = Path(os.path.join(root, dir)).parent
+            model_path = tm_path.joinpath(self.selectedTM).joinpath('TMmodel').resolve().as_posix()
             self.render_pyldavis(model_path, gui)
 
         return

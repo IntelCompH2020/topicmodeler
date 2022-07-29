@@ -31,7 +31,7 @@ class CreateSwLstWindow(QtWidgets.QDialog):
         ########################################################################
         self.tm = tm
         self.status = 0
-        self.list_type = None
+        self.list_type = "stopwords"
 
         ########################################################################
         # Widgets initial configuration
@@ -50,9 +50,10 @@ class CreateSwLstWindow(QtWidgets.QDialog):
         """It adapts the format of the wordlist that needs to be introdued in the 'textEdit_wordlst' for the wordlist type selected in the 'comboBox_wordlst_type'.
         """
 
-        self.list_type = self.comboBox_wordlst_type.currentText()
+        self.list_type = self.comboBox_wordlst_type.currentText().lower()
+        print(self.list_type)
         if self.list_type == "Stopwords":
-            msg = "stw1,stw2, ..."
+            msg = "stw1,stw2, ..."  
         elif self.list_type == "Keywords":
             msg = "key1,key2, ..."
         elif self.list_type == "Equivalences":

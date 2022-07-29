@@ -46,18 +46,12 @@ class WidgetCreateTMCorpus(QWidget):
         """
 
         self.comboBox_trdts_id.addItems(self.columns_dts)
-        self.tableWidget_available_fields_raw.setRowCount(
-            len(self.columns_dts)-1)
         self.tableWidget_available_fields_lemmas.setRowCount(
-            len(self.columns_dts)-1)
-        self.tableWidget_fields_to_include_raw.setRowCount(
             len(self.columns_dts)-1)
         self.tableWidget_fields_to_include_lemmas.setRowCount(
             len(self.columns_dts)-1)
 
         for i in np.arange(1, len(self.columns_dts), 1):
-            self.tableWidget_available_fields_raw.setItem(
-                i-1, 0, QTableWidgetItem(str(self.columns_dts[i])))
             self.tableWidget_available_fields_lemmas.setItem(
                 i-1, 0, QTableWidgetItem(str(self.columns_dts[i])))
 

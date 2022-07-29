@@ -126,6 +126,9 @@ class MainWindow(QMainWindow):
         for menu_button in self.menu_buttons:
             menu_button.clicked.connect(
                 partial(self.clicked_change_menu_button, menu_button))
+        for extra_menu_button in self.extra_menu_buttons:
+            extra_menu_button.clicked.connect(
+                partial(self.clicked_change_extra_menu_button, extra_menu_button))
 
         # PAGE 1: Home
         ###############
@@ -538,6 +541,34 @@ class MainWindow(QMainWindow):
                     Constants.OTHER_BUTTONS_UNSELECTED_STYLESHEET)
 
         self.previous_page_button = menu_button
+        if self.previous_page_button.objectName() == "menu_button_1":
+            self.previous_page_button.setStyleSheet(
+                Constants.HOME_BUTTON_SELECTED_STYLESHEET)
+        else:
+            self.previous_page_button.setStyleSheet(
+                Constants.OTHER_BUTTONS_SELECTED_STYLESHEET)
+        return
+    
+    def clicked_change_extra_menu_button(self, extra_menu_button):
+        """
+        Method to control the selection of one of the buttons in the menu bar through the extra menu buttons.
+        """
+
+        # Put unpressed color for the previous pressed menu button
+        if self.previous_page_button:
+            if self.previous_page_button.objectName() == "menu_button_1":
+                self.previous_page_button.setStyleSheet(
+                    Constants.HOME_BUTTON_UNSELECTED_STYLESHEET)
+            else:
+                self.previous_page_button.setStyleSheet(
+                    Constants.OTHER_BUTTONS_UNSELECTED_STYLESHEET)
+
+        if extra_menu_button.objectName() == "pushButton_corpus_home":
+            self.previous_page_button = self.findChild(QPushButton, "menu_button_2")
+        elif extra_menu_button.objectName() == "pushButton_models_home":
+            self.previous_page_button = self.findChild(QPushButton, "menu_button_4")
+        elif extra_menu_button.objectName() == "pushButton_wordlists_home":
+            self.previous_page_button = self.findChild(QPushButton, "menu_button_3")
         if self.previous_page_button.objectName() == "menu_button_1":
             self.previous_page_button.setStyleSheet(
                 Constants.HOME_BUTTON_SELECTED_STYLESHEET)

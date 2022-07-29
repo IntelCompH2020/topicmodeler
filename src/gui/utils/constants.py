@@ -25,9 +25,8 @@ class Constants:
                      "table_available_tr_datasets"]
     DOWNLOAD_CORPUS_TABLES = ["table_available_fields",
                               "table_fields_to_include", "table_filters"]
-    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_raw",
-                               "tableWidget_fields_to_include_raw",
-                               "tableWidget_available_fields_lemmas", "tableWidget_fields_to_include_lemmas"]
+    CREATE_TM_CORPUS_TABLES = ["tableWidget_available_fields_lemmas",    
+                               "tableWidget_fields_to_include_lemmas"]
     CREATE_TR_DST_NOT_SELECTED_MSG = "One or more local datasets must be selected to create a training dataset."
 
     # Wordlists management-related constants

@@ -139,15 +139,10 @@ class GenerateTMCorpus(QtWidgets.QDialog):
                     fields_for_lemmas.append(
                         i_widget.tableWidget_fields_to_include_lemmas.item(row, 0).text())
             fields_for_raw = []
-            for row in range(i_widget.tableWidget_fields_to_include_raw.rowCount()):
-                if i_widget.tableWidget_fields_to_include_raw.item(row, 0):
-                    fields_for_raw.append(
-                        i_widget.tableWidget_fields_to_include_raw.item(row, 0).text())
             filtering_condition = ""  # TODO
 
             i_dict = {'identifier_field': identifier_field,
                       'fields_for_lemmas': fields_for_lemmas,
-                      'fields_for_raw': fields_for_raw,
                       'filtering_condition': filtering_condition
                       }
             dict_to_tm_corpus[i_dts_id] = i_dict

@@ -87,6 +87,8 @@ class EmbeddingsManager(object):
             # check if it is a file
             if entry.as_posix().endswith("parquet"):
                 res.append(entry)
+        
+        print("Number of parquet to process: " + str(len(res)))
 
         def det(x):
             try:
@@ -132,7 +134,7 @@ class EmbeddingsManager(object):
             new_name = "parquet_embeddings" + time + ".parquet"
             outFile = parquet_new.joinpath(new_name)
             df.to_parquet(outFile)
-            print(outFile)
+            print("outFile")
 
         return
 

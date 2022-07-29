@@ -80,13 +80,13 @@ class PreprocessingWindow(QtWidgets.QDialog):
         self.lineEdit_keep_n.setText(str(cf.get('Preproc', 'keep_n')))
 
         # Fill table of stopwords with the available lists of stopwords
-        self.tm.listWdListsByType(self.table_available_stopwords, "stopwords")
+        self.sw_lists = self.tm.listWdListsByType(self.table_available_stopwords, "stopwords")
 
         # Add checkboxes in the first column so the user can select the stopwords to use
         utils.add_checkboxes_to_table(self.table_available_stopwords, 0)
 
         # Fill table of stopwords with the available lists of equivalences
-        self.tm.listWdListsByType(
+        self.eq_lists = self.tm.listWdListsByType(
             self.table_available_equivalences, "equivalences")
 
         # Add checkboxes in the first column so the user can select the stopwords to use
@@ -104,20 +104,23 @@ class PreprocessingWindow(QtWidgets.QDialog):
         keep_n = int(self.lineEdit_keep_n.text())
 
         # Get ids of the stopword lists that are going to be used
-        StwLists = []
+        StwLists_items = []
         for i in range(self.table_available_stopwords.rowCount()):
             item = self.table_available_stopwords.item(
                 i, 0)
             if item.checkState() == QtCore.Qt.CheckState.Checked:
-                StwLists.append(i)
+                StwLists_items.append(i)
 
         # Get ids of the equivalences lists that are going to be used
-        EqLists = []
+        EqLists_items = []
         for i in range(self.table_available_equivalences.rowCount()):
             item = self.table_available_equivalences.item(
                 i, 0)
             if item.checkState() == QtCore.Qt.CheckState.Checked:
-                EqLists.append(i)
+                EqLists_items.append(i)
+        
+        StwLists = [self.sw_lists[int(el)] for el in StwLists_items]
+        EqLists = [self.eq_lists[int(el)] for el in EqLists_items]
 
         self.preproc_settings = {
             "min_lemas": min_lemas,
