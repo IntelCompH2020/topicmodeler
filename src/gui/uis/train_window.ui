@@ -836,7 +836,7 @@ border:none;</string>
                         <string/>
                        </property>
                        <property name="pixmap">
-                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                        <pixmap>../resources/images/good.png</pixmap>
                        </property>
                        <property name="scaledContents">
                         <bool>true</bool>
@@ -865,7 +865,7 @@ border:none;</string>
                         <string/>
                        </property>
                        <property name="pixmap">
-                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                        <pixmap>../resources/images/bad.png</pixmap>
                        </property>
                        <property name="scaledContents">
                         <bool>true</bool>
@@ -1168,7 +1168,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1197,7 +1197,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1375,7 +1375,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1404,7 +1404,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1519,7 +1519,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1548,7 +1548,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1663,7 +1663,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1692,7 +1692,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1814,7 +1814,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1843,7 +1843,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1958,7 +1958,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -1987,7 +1987,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2102,7 +2102,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2131,7 +2131,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2403,7 +2403,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2432,7 +2432,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2610,7 +2610,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2639,7 +2639,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2754,7 +2754,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2783,7 +2783,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2905,7 +2905,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -2934,7 +2934,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -3049,7 +3049,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -3078,7 +3078,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -3353,7 +3353,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -3382,7 +3382,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -3518,7 +3518,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -3547,7 +3547,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -3662,7 +3662,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -3806,7 +3806,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -3835,7 +3835,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4013,7 +4013,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4042,7 +4042,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4213,7 +4213,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4242,7 +4242,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4357,7 +4357,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4386,7 +4386,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4522,7 +4522,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4551,7 +4551,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4669,7 +4669,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4698,7 +4698,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4816,7 +4816,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4845,7 +4845,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4963,7 +4963,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -4992,7 +4992,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5117,7 +5117,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5146,7 +5146,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5264,7 +5264,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5293,7 +5293,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5444,7 +5444,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5473,7 +5473,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5609,7 +5609,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5638,7 +5638,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5753,7 +5753,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5782,7 +5782,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5897,7 +5897,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -5926,7 +5926,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6223,7 +6223,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6252,7 +6252,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6367,7 +6367,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6396,7 +6396,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6511,7 +6511,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6540,7 +6540,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6655,7 +6655,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6684,7 +6684,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6862,7 +6862,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -6891,7 +6891,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7062,7 +7062,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7091,7 +7091,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7206,7 +7206,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7235,7 +7235,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7371,7 +7371,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7400,7 +7400,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7515,7 +7515,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7544,7 +7544,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7659,7 +7659,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7688,7 +7688,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7803,7 +7803,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7832,7 +7832,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7954,7 +7954,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -7983,7 +7983,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8098,7 +8098,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8127,7 +8127,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8242,7 +8242,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8271,7 +8271,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8423,7 +8423,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8452,7 +8452,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8588,7 +8588,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8617,7 +8617,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8733,7 +8733,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8762,7 +8762,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8877,7 +8877,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/good.png</pixmap>
+                                        <pixmap>../resources/images/good.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>
@@ -8906,7 +8906,7 @@ border:none;</string>
                                         <string/>
                                        </property>
                                        <property name="pixmap">
-                                        <pixmap>../../../../jellyfish-spoon/src/gui/uis/resources/images/bad.png</pixmap>
+                                        <pixmap>../resources/images/bad.png</pixmap>
                                        </property>
                                        <property name="scaledContents">
                                         <bool>true</bool>

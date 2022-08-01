@@ -739,6 +739,7 @@ class MainWindow(QMainWindow):
 
         # Update data in wordlists table
         self.tm.listAllWdLists(self)
+        self.textEdit_wordlist_content.setPlainText("")
 
         return
 

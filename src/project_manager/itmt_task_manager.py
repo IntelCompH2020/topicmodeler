@@ -366,8 +366,8 @@ class ITMTTaskManager(BaseTaskManager):
             - 1 if the wordlist was deleted successfully
         """
 
-        cmd = 'python src/manageLists/manageLists.py --deleteWordList --path_WdList '
-        cmd = cmd + wd_list
+        cmd = 'python src/manageLists/manageLists.py --deleteWordList '
+        cmd = cmd + wd_list + ' --path_wordlists ' + self.p2wdlist.as_posix()
         printred(cmd)
         try:
             self.logger.info(f'-- -- Running command {cmd}')
@@ -1428,7 +1428,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             if Y_or_N.upper() == "Y":
                 if request_confirmation(
                         msg='Word List ' + allWdLists[WdLst]['name'] + ' will be deleted. Proceed?'):
-                    self.delete_WdLst(WdLst)
+                    self.delete_WdLst(allWdLists[WdLst]['name'])
 
         return
 
@@ -3083,7 +3083,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                                                  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                                                  QMessageBox.StandardButton.No)
                     if reply == QMessageBox.StandardButton.Yes:
-                        status = self.delete_WdLst(WdLst)
+                        status = self.delete_WdLst(allWdLists[WdLst]['name'])
                         if int(status.decode('utf8')) == 0:
                             QMessageBox.warning(gui, Constants.SMOOTH_SPOON_MSG, 'Wordlist ' +
                                                 allWdLists[WdLst]['name'] + ' could not be deleted.')
