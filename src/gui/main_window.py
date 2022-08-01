@@ -642,7 +642,7 @@ class MainWindow(QMainWindow):
 
         # If no training corpus is selected for deletion before clicking the 'pushButton_delete_trdtst' button,
         # a warning message is shown to the user
-        if r is None:
+        if r == -1:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.TM_DELETE_NO_CORPUS_MSG)
             return
@@ -694,7 +694,7 @@ class MainWindow(QMainWindow):
         r = self.table_available_wordlists.currentRow()
 
         # If no wordlist for edition is selected  before clicking the 'pushButton_edit_wordlist' button, a warning message is shown to the user
-        if not r:
+        if r == -1:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.EDIT_WORDLIST_NOT_SELECTED_MSG)
             return
@@ -729,7 +729,7 @@ class MainWindow(QMainWindow):
         r = self.table_available_wordlists.currentRow()
 
         # If no training corpus is selected for deletion before clicking the 'pushButton_delete_wordlist' button, a warning message is shown to the user
-        if not r:
+        if r is None:
             QMessageBox.warning(
                 self, Constants.SMOOTH_SPOON_MSG, Constants.DELETE_WORDLIST_NOT_SELECTED_MSG)
             return
