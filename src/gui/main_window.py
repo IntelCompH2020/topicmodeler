@@ -606,7 +606,7 @@ class MainWindow(QMainWindow):
             if item.checkState() == QtCore.Qt.CheckState.Checked:
                 checked_list.append(i)
 
-        if len(checked_list) == 0:
+        if len(checked_list) < 1:
             QMessageBox.warning(self, Constants.SMOOTH_SPOON_MSG,
                                 Constants.CREATE_TR_DST_NOT_SELECTED_MSG)
             return

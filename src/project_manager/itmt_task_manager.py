@@ -1696,10 +1696,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # Get first-level models are available for expansion
         allTMmodels = json.loads(self.allTMmodels)
-        models = [model for model in allTMmodels.keys()]
+        models = [list(allTMmodels.keys())[id_model] for id_model in range(len(allTMmodels.keys())) if allTMmodels[id_model]['hierarchy-level'] == 0]
         displayModels = [allTMmodels[id_model]['name'] + ': ' +
                          allTMmodels[id_model]['description'] for id_model in models if allTMmodels[id_model]['hierarchy-level'] == 0]
-
         # Return error meassage for creating Level 2 submodel when there are no models available
         if len(displayModels) == 0:
             self.logger.error(

@@ -32,7 +32,7 @@ class Constants:
     # Wordlists management-related constants
     WORDLIST_CREATION_MSG_STATUS_0 = "The wordlist could not be created."
     WORDLIST_CREATION_MSG_STATUS_1 = "The wordlist was created successfully."
-    WORDLIST_CREATION_MSG_STATUS_2 = "The wordlist replaced an existing dataset"
+    WORDLIST_CREATION_MSG_STATUS_2 = "The wordlist replaced an existing one."
     WORDLIST_EDITION_MSG_STATUS_0 = "The wordlist could not be created."
     WORDLIST_EDITION_MSG_STATUS_1 = "The wordlist was created successfully."
     WORDLIST_EDITION_MSG_STATUS_2 = "The wordlist replaced an existing dataset"
