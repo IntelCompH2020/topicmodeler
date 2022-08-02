@@ -325,7 +325,7 @@ class TMmodel(object):
         self._ndocs_active = np.array((self._thetas != 0).sum(0).tolist()[0])
         self._tpc_descriptions = [el[1]
                                   for el in self.get_tpc_word_descriptions()]
-        self._calculate_topic_coherence()
+        self.calculate_topic_coherence(metric="c_npmi")
         self._tpc_labels = [el[1] for el in self.get_tpc_labels(labels)]
 
         # We are ready to save all variables in the model
@@ -380,8 +380,8 @@ class TMmodel(object):
         vis_data = pyLDAvis.prepare(self._betas, self._thetas[validDocs, ][perm, ].toarray(),
                                     doc_len, self._vocab, vocabfreq, lambda_step=0.05,
                                     sort_topics=False, n_jobs=-1)
-        pyLDAvis.save_html(vis_data, self._TMfolder.joinpath(
-            'pyLDAvis.html').as_posix())
+        with self._TMfolder.joinpath("pyLDAvis.html").open("w") as f:
+            pyLDAvis.save_html(vis_data, f)
         # TODO: Check substituting by "pyLDAvis.prepared_data_to_html"
         self._modify_pyldavis_html(self._TMfolder.as_posix())
 
@@ -526,11 +526,11 @@ class TMmodel(object):
             self._topic_entropy = np.load(
                 self._TMfolder.joinpath('topic_entropy.npy'))
 
-    def _calculate_topic_coherence(self, metric="c_npmi", n_words=15):
+    def calculate_topic_coherence(self, metric="c_npmi", n_words=15):
 
         # Load topic information
         if self._tpc_descriptions is None:
-            self._load_tpc_descriptions()
+            self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
         # Convert topic information into list of lists
         tpc_descriptions_ = \
             [tpc.split(', ') for tpc in self._tpc_descriptions]
@@ -541,8 +541,8 @@ class TMmodel(object):
                 'modelFiles/corpus.txt')
         else:
             corpusFile = self._TMfolder.parent.joinpath('corpus.txt')
-        corpus = [line.rsplit(' 0 ')[1].strip().split() for line in open(
-            corpusFile, encoding="utf-8").readlines()]
+        with corpusFile.open("r", encoding="utf-8") as f:
+            corpus = [line.rsplit(" 0 ")[1].strip().split() for line in f.readlines()]
 
         # Get Gensim dictionary
         dictionary = None
