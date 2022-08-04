@@ -1,7 +1,6 @@
 import argparse
 import warnings
 from pathlib import Path
-from time import gmtime, strftime
 from typing import List
 
 import numpy as np
@@ -106,15 +105,18 @@ class EmbeddingsManager(object):
         elif source == "patents":
             pass
 
-        for f in tqdm(res):
-            df = pd.read_parquet(f).fillna("")
+        for i, f in enumerate(tqdm(res)):
+            df = pd.read_parquet(f)#.fillna("")
 
             # Filter out abstracts with no text
             df = df[df[raw_text_fld] != ""]
+            print("Number of papers without empty abstract: " + str(len(df)))
 
             # Detect abstracts' language and filter out those which are not in English
             df['langue'] = df[raw_text_fld].apply(det)
             df = df[df['langue'] == 'en']
+
+            print("Number of papers in english: " + str(len(df)))
 
             # Concatenation of title and abstract is used as the text to generated of the embeddings
             df['title_abstract'] = df[[title_fld, raw_text_fld]].apply(
@@ -130,11 +132,10 @@ class EmbeddingsManager(object):
             df['embeddings'] = embeddings
 
             # Save new df in parquet file
-            time = strftime("_%Y-%m-%d-%-S", gmtime())
-            new_name = "parquet_embeddings" + time + ".parquet"
+            new_name = "parquet_embeddings_part_" + str(i) + ".parquet"
             outFile = parquet_new.joinpath(new_name)
             df.to_parquet(outFile)
-            print("outFile")
+            print(outFile)
 
         return
 
