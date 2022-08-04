@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 import argparse
 import signal
+# import pynvml
 
 
 class Mem:
@@ -12,6 +13,7 @@ class Mem:
         self.user = user
         self.processes = processes
         self.exit = False
+#         pynvml.nvmlInit()
         signal.signal(signal.SIGINT, self._terminate)
         signal.signal(signal.SIGTERM, self._terminate)
 
@@ -52,11 +54,24 @@ class Mem:
                     rss = []
                     vms = []
                     cpu = []
+#                     gpu = []
+
                     for p in getattr(self, proc):
                         try:
                             rss.append(p.memory_info().rss)
                             vms.append(p.memory_info().vms)
                             cpu.append(p.cpu_percent())
+#                             # TODO: Get GPU
+#                             gpus = list(range(pynvml.nvmlDeviceGetCount()))
+#                             for device_id in gpus:
+#                                 hd = pynvml.nvmlDeviceGetHandleByIndex(device_id)
+#                                 cps = pynvml.nvmlDeviceGetGraphicsRunningProcesses(hd)
+#                                 for ps in cps :
+#                                     # check pid values
+#                                     if ps.usedGpuMemory:
+#                                         gpu.append(ps.usedGpuMemory)
+#                                     else:
+#                                         gpu.append(0)
                         except Exception as e:
                             # print(e)
                             pass
@@ -64,8 +79,11 @@ class Mem:
                     rss = sum(rss) / 1024 / 1024
                     vms = sum(vms) / 1024 / 1024
                     cpu = sum(cpu)
+                    # TODO:
+#                     gpu = sum(gpu) / 1024 / 1024
                     fout.write(f"{proc},{rss:.2f},{vms:.2f},{cpu:.2f}\n")
             time.sleep(1)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

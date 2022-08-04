@@ -33,13 +33,13 @@ from scipy import sparse
 from sklearn.preprocessing import normalize
 import pyLDAvis as vis
 
-from manageModels import TMmodel as newTMmodel
-from neural_models.contextualized_topic_models.ctm_network.ctm import (
+from .manageModels import TMmodel as newTMmodel
+from .neural_models.contextualized_topic_models.ctm_network.ctm import (
     CombinedTM, ZeroShotTM)
-from neural_models.contextualized_topic_models.utils.data_preparation import \
+from .neural_models.contextualized_topic_models.utils.data_preparation import \
     prepare_ctm_dataset
-from neural_models.pytorchavitm.avitm_network.avitm import AVITM
-from neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
+from .neural_models.pytorchavitm.avitm_network.avitm import AVITM
+from .neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
 
 # TODO: This function is also in utils/misc
 def file_lines(fname):
