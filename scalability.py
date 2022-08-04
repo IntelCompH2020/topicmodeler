@@ -257,7 +257,7 @@ def main():
                     labels += json.load(fin)['wordlist']
             tpc_labels = [el[1] for el in tm.get_tpc_labels(labels)]
             with tm._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
-                fout.write('\n'.join([tpc_labels]))
+                fout.write('\n'.join(tpc_labels))
             logger.info("-- Finished topic labeling")
             ######################################################################################
 
