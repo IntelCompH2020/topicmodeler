@@ -102,7 +102,9 @@ class EmbeddingsManager(object):
         elif source == "cordis":
             raw_text_fld = "rawtext"
             title_fld = "title"
-        elif source == "patents":
+        elif source == "patstat":
+            raw_text_fld = "appln_abstract"
+            title_fld = "appln_title"
             pass
 
         for i, f in enumerate(tqdm(res)):
