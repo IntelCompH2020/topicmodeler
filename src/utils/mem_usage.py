@@ -3,7 +3,7 @@ import time
 from pathlib import Path
 import argparse
 import signal
-# import pynvml
+import pynvml
 
 
 class Mem:
@@ -13,7 +13,11 @@ class Mem:
         self.user = user
         self.processes = processes
         self.exit = False
-#         pynvml.nvmlInit()
+        try:
+            pynvml.nvmlInit()
+        except:
+            # Manage use in different OS
+            pass
         signal.signal(signal.SIGINT, self._terminate)
         signal.signal(signal.SIGTERM, self._terminate)
 
@@ -31,9 +35,21 @@ class Mem:
         return user_processes
 
     def proc_info(self, fname):
+        # Check if there are gpus
+        try:
+            gpus = list(range(pynvml.nvmlDeviceGetCount()))
+        except:
+            # Manage use in different OS
+            gpus = []
+            pass
+        
+
+        # Generate file
         fname = Path(fname)
         with fname.open("w") as fout:
-            fout.write("process,rss,vms,cpu\n")
+            fout.write("process,rss,vms,cpu,gpu_memory,gpu\n")
+        
+        # Keep measuring
         while not self.exit:
             for arg in self.processes:
                 setattr(self, arg, [])
@@ -54,24 +70,31 @@ class Mem:
                     rss = []
                     vms = []
                     cpu = []
-#                     gpu = []
+                    gpu_mem = []
+                    gpu = []
 
                     for p in getattr(self, proc):
                         try:
                             rss.append(p.memory_info().rss)
                             vms.append(p.memory_info().vms)
                             cpu.append(p.cpu_percent())
-#                             # TODO: Get GPU
-#                             gpus = list(range(pynvml.nvmlDeviceGetCount()))
-#                             for device_id in gpus:
-#                                 hd = pynvml.nvmlDeviceGetHandleByIndex(device_id)
-#                                 cps = pynvml.nvmlDeviceGetGraphicsRunningProcesses(hd)
-#                                 for ps in cps :
-#                                     # check pid values
-#                                     if ps.usedGpuMemory:
-#                                         gpu.append(ps.usedGpuMemory)
-#                                     else:
-#                                         gpu.append(0)
+                            # Get GPU
+                            if not gpus:
+                                gpu_mem.append(0)
+                                gpu.append(0)
+                            else:
+                                for device_id in gpus:
+                                    hd = pynvml.nvmlDeviceGetHandleByIndex(device_id)
+                                    use = pynvml.nvmlDeviceGetUtilizationRates(hd).gpu
+                                    gpu_ps = pynvml.nvmlDeviceGetComputeRunningProcesses(hd)
+                                    gpu.append(use)
+                                    for gp in gpu_ps :
+                                        # TODO: check pid values
+                                        if gp.usedGpuMemory and gp.pid==p.pid:
+                                            gpu_mem.append(gp.usedGpuMemory)
+                                        else:
+                                            gpu_mem.append(0)
+                            
                         except Exception as e:
                             # print(e)
                             pass
@@ -79,9 +102,9 @@ class Mem:
                     rss = sum(rss) / 1024 / 1024
                     vms = sum(vms) / 1024 / 1024
                     cpu = sum(cpu)
-                    # TODO:
-#                     gpu = sum(gpu) / 1024 / 1024
-                    fout.write(f"{proc},{rss:.2f},{vms:.2f},{cpu:.2f}\n")
+                    gpu_mem = sum(gpu_mem) / 1024 / 1024
+                    gpu = sum(gpu)
+                    fout.write(f"{proc},{rss:.2f},{vms:.2f},{cpu:.2f},{gpu_mem:.2f},{gpu:.2f}\n")
             time.sleep(1)
 
 

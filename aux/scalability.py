@@ -1,7 +1,5 @@
 """
 Compute some additional measures when creating models such as memory or cpu usage
-
-TODO: This should probably be in a different directory
 """
 import datetime as DT
 import json
@@ -15,6 +13,8 @@ from getpass import getuser
 from itertools import product
 from pathlib import Path
 
+sys.path.insert(0, Path(__file__).parent.parent.resolve().as_posix())
+
 from src.topicmodeling.manageModels import TMmodel
 from src.topicmodeling.topicmodeling import (CTMTrainer, MalletTrainer,
                                              ProdLDATrainer)
@@ -22,10 +22,17 @@ from src.utils.mem_usage import Mem
 
 warnings.filterwarnings(action="ignore")
 
+####################################################
+################### TO BE FILLED ###################
+####################################################
 # Parameters
-models = Path("/home/joseantem/TM/models")
-origCFile_txt = Path("/home/joseantem/Datasets/TMcorpus/cordis_lemmas.txt")
-origCFile_par = Path("/home/joseantem/Datasets/TMcorpus/cordis_full.parquet")
+models = Path("/Users/joseantem/Documents/TM/models/")
+origCFile_txt = Path("/Users/joseantem/Documents/datasets/corpus/cordis_lemmas.txt")
+origCFile_par = Path("/Users/joseantem/Documents/datasets/corpus/cordis_full.parquet")
+mallet_path = Path("/Users/joseantem/Documents/mallet-2.0.8/bin/mallet")
+lblFile = Path("/Users/joseantem/Documents/github/topicmodeler/wordlists/wiki_categories.json")
+####################################################
+
 # Fixed params
 fixed_params = {
     "activation": "softplus",
@@ -35,11 +42,9 @@ fixed_params = {
     "dropout": 0.2,
     "hidden_sizes": (100, 100),
     "labels": "",
-    #     "labels": "wordlists/wiki_categories.json",
     "learn_priors": True,
     "lr": 2e-3,
-    # "mallet_path": "/Users/joseantem/Documents/mallet-2.0.8/bin/mallet",
-    "mallet_path": "/home/joseantem/mallet-2.0.8/bin/mallet",
+    "mallet_path": mallet_path,
     "momentum": 0.99,
     "num_data_loader_workers": mp.cpu_count(),
     "num_threads": 4,
@@ -170,15 +175,15 @@ def main():
     coherences = ["c_npmi", "u_mass"]  # c_npmi is computed by default
     ########################################
     # TODO:
-    number_topics = [10, 20, 50, 100]
-    number_iterations = [100, 500, 1000]
+    number_topics = [10, 20]
+    number_iterations = [100, 500]
     number_samples = [10, 20, 50]
     number_epochs = [100]
     model_types = ["prodLDA", "LDA"]
     ctm_model_types = ["ZeroShotTM", "CombinedTM"]
     ########################################
 
-    for trainer in topicModelTypes[:3]:
+    for trainer in topicModelTypes[:1]:
         if trainer == "mallet":
             param_conf = ({"ntopics": n, "num_iterations": i}
                           for n, i in product(number_topics, number_iterations))
@@ -212,7 +217,6 @@ def main():
                           indent=2, default=str)
             tm = TMmodel(model_path.joinpath("TMmodel"))
 
-            # TODO: select corpus
             # Copy corpus to model path
             corpusFile = config_file.parent.joinpath(f"corpus.{CFtype}")
             shutil.copy(origCFile, corpusFile)
@@ -249,16 +253,15 @@ def main():
             logger.info("-- Finished measuring memory")
 
             ######################################################################################
-            logger.info("-- Computing topic labels outside memory measure")
-            lblFile = Path("wordlists/wiki_categories.json")
-            labels = []
-            if lblFile.is_file():
-                with Path(lblFile).open('r', encoding='utf8') as fin:
-                    labels += json.load(fin)['wordlist']
-            tpc_labels = [el[1] for el in tm.get_tpc_labels(labels)]
-            with tm._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
-                fout.write('\n'.join(tpc_labels))
-            logger.info("-- Finished topic labeling")
+            # logger.info("-- Computing topic labels outside memory measure")
+            # labels = []
+            # if lblFile.is_file():
+            #     with Path(lblFile).open('r', encoding='utf8') as fin:
+            #         labels += json.load(fin)['wordlist']
+            # tpc_labels = [el[1] for el in tm.get_tpc_labels(labels)]
+            # with tm._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
+            #     fout.write('\n'.join(tpc_labels))
+            # logger.info("-- Finished topic labeling")
             ######################################################################################
 
             t_total = t_end - t_start
