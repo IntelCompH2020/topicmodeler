@@ -33,13 +33,13 @@ from scipy import sparse
 from sklearn.preprocessing import normalize
 import pyLDAvis as vis
 
-from .manageModels import TMmodel as newTMmodel
-from .neural_models.contextualized_topic_models.ctm_network.ctm import (
-    CombinedTM, ZeroShotTM)
-from .neural_models.contextualized_topic_models.utils.data_preparation import \
-    prepare_ctm_dataset
-from .neural_models.pytorchavitm.avitm_network.avitm import AVITM
-from .neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
+from manageModels import TMmodel as newTMmodel
+#from .neural_models.contextualized_topic_models.ctm_network.ctm import (
+#    CombinedTM, ZeroShotTM)
+#from .neural_models.contextualized_topic_models.utils.data_preparation import \
+#    prepare_ctm_dataset
+#from .neural_models.pytorchavitm.avitm_network.avitm import AVITM
+#from .neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
 
 # TODO: This function is also in utils/misc
 def file_lines(fname):
@@ -180,7 +180,7 @@ class textPreproc(object):
 
         Parameters
         ----------
-        trDF: Pandas or Spark dataframe
+        trDF: Dask or Spark dataframe
             This routine works on the following column "all_lemmas"
             Other columns are left untouched
 
@@ -423,6 +423,7 @@ class textPreproc(object):
                 self._logger.error(
                     '-- -- sparkLDA requires preprocessing with spark')
                 return
+
             elif tmTrainer == "prodLDA":
 
                 outFile = dirpath.joinpath('corpus.parquet')
@@ -1477,6 +1478,166 @@ class MalletTrainer(Trainer):
         return
 
 
+class sparkLDATrainer(Trainer):
+    """
+    Wrapper for the Spark LDA Topic Model Training. Implements the
+    following functionalities
+    - Training of the model
+    - Creation and persistence of the TMmodel object for tm curation
+    """
+
+    def __init__(self, ntopics=25, alpha=5.0, maxIter=20, optimizer='online',
+                    optimizeDocConcentration=True, subsamplingRate=0.05, thetas_thr=0.003,
+                    labels=None, logger=None):
+        """
+        Initilization Method
+
+        Parameters
+        ----------
+        ntopics: int
+            Number of topics for the model
+        alpha: float
+            Parameter for the Dirichlet prior on doc distribution
+        maxIter: int
+            Maximum number of iterations
+        optimizer: str
+            Optimiation algorithm 'online'|'em' (see Spark MLLIB documentation)
+        optimizeDocConcentration: bool
+            If True, the prior for the documents Dirichlet will be optimized
+        subsamplingRate: float
+            percentage of documents that will be used for every minibatch
+        thetas_thr: float
+            Min value for sparsification of topic proportions after training
+        labels: list(str)
+            Lists of labels to assign to topics
+        logger: Logger object
+            To log object activity
+        """
+
+        super().__init__(logger)
+
+        self._ntopics = ntopics
+        self._alpha = alpha
+        self._maxIter = maxIter
+        self._optimizer = optimizer
+        self._optimizeDocConcentration = optimizeDocConcentration
+        self._subsamplingRate = subsamplingRate
+        self._thetas_thr = thetas_thr
+        self._labels = labels
+
+    def _createTMmodel(self, modelFolder, ldaModel, df):
+        """Creates an object of class TMmodel hosting the topic model
+        that has been trained using Spark LDA
+
+        Parameters
+        ----------
+        modelFolder: Path
+            the folder with the mallet output files
+        ldaModel: Spark LDAModel
+            Spark model already fitted with the training data
+        df: Spark dataframe
+            With training data
+
+        Returns
+        -------
+        tm: TMmodel
+            The topic model as an object of class TMmodel
+
+        """
+
+        # Calculation and Sparsification of thetas matrix
+        self._logger.debug('-- -- Spark LDA Sparsifying doc-topics matrix')
+        
+        #We calculate the full matrix. We need to do the following
+        # * Obtain topic representation of documents
+        # * Convert DenseVectors to arrays
+        # * Generate a numpy matrix (thetas32)
+        # * Threshold the matrix
+        #This can be probably implemented in a more efficient manner
+        df = (
+            ldaModel.transform(df)
+            .select("topicDistribution")
+            .withColumn('topicDistribution', vector_to_array('topicDistribution'))
+        )
+        thetas32 = np.array([el[0] for el in df.toPandas().values.tolist()])
+        # Create figure to check thresholding is correct
+        self._SaveThrFig(thetas32, modelFolder.joinpath('thetasDist.pdf'))
+        # Set to zeros all thetas below threshold, and renormalize
+        thetas32[thetas32 < self._thetas_thr] = 0
+        thetas32 = normalize(thetas32, axis=1, norm='l1')
+        thetas32 = sparse.csr_matrix(thetas32, copy=True)
+
+        # Recalculate topic weights to avoid errors due to sparsification
+        alphas = np.asarray(np.mean(thetas32, axis=0)).ravel()
+
+        #Topics-vocabulary matrix
+        betas = normalize(ldaModel.topicsMatrix().toArray().T, axis=1, norm='l1')
+
+        #Load vocabulary file
+        with Path(modelFolder.parent.joinpath('vocabulary.txt')).open('r', encoding='utf8') as fin:
+            vocab = [el.strip() for el in fin.readlines()]
+
+        # Load labels for AutoTM
+        lblFile = Path(self._labels)
+        labels = []
+        if lblFile.is_file():
+            with Path(lblFile).open('r', encoding='utf8') as fin:
+                labels += json.load(fin)['wordlist']
+
+        tm = newTMmodel(modelFolder.parent.joinpath('TMmodel'))
+        tm.create(betas=betas, thetas=thetas32, alphas=alphas,
+                  vocab=vocab, labels=labels)
+
+        return tm
+
+        """
+        auxfile = "/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/testproject/TMmodels/sparkkkk/aux.txt"
+        with Path(auxfile).open("w") as fout:
+            fout.write(str(self._thetas_thr))
+        """
+
+    def fit(self, corpusFile):
+        """
+        Training of Spark LDA Topic Model
+
+        Parameters
+        ----------
+        corpusFile: Path
+            Path to parquet file in mallet format
+        """
+
+        # Output model folder and training file for the corpus
+        if not corpusFile.exists():
+            self._logger.error(
+                f'-- -- Provided corpus Path does not exist -- Stop')
+            sys.exit()
+
+        #Train spark LDA model and obtain also the topic distribution of
+        #documents
+        ##################################################
+        # Importing Data to mallet
+        self._logger.info('-- -- Training LDA model with Spark')
+
+        df = spark.read.parquet(f"file://{corpusFile.resolve().as_posix()}")
+        lda = pysparkLDA(featuresCol="bow", maxIter=self._maxIter, k=self._ntopics,
+            optimizer=self._optimizer, subsamplingRate=self._subsamplingRate,
+            optimizeDocConcentration=self._optimizeDocConcentration,
+            docConcentration=self._ntopics*[self._alpha/self._ntopics])
+        ldaModel = lda.fit(df)
+
+        #Save model for future use
+        modelFolder = corpusFile.parent.joinpath('modelFiles')
+        modelFolder.mkdir()
+        ldaModel.save(f"file://{modelFolder.joinpath('sparkLDAmodel').as_posix()}")
+
+        ##################################################
+        # Create TMmodel object
+
+        tm = self._createTMmodel(modelFolder, ldaModel, df)
+
+        return
+
+
 class ProdLDATrainer(Trainer):
     """
     Wrapper for the ProdLDA Topic Model Training. Implements the
@@ -2181,8 +2342,6 @@ if __name__ == "__main__":
     parser.add_argument('--spark', action='store_true', default=False,
                         help='Indicate that spark cluster is available',
                         required=False)
-    parser.add_argument('--path_models', type=str, default=None,
-                        help="path to topic models folder")
     parser.add_argument('--preproc', action='store_true', default=False,
                         help="Preprocess training data according to config file")
     parser.add_argument('--train', action='store_true', default=False,
@@ -2200,6 +2359,8 @@ if __name__ == "__main__":
         import pyspark.sql.functions as F
         from pyspark.ml.feature import (CountVectorizer, StopWordsRemover,
                                         Tokenizer)
+        from pyspark.ml.clustering import LDA as pysparkLDA
+        from pyspark.ml.functions import vector_to_array
         from pyspark.sql import SparkSession
 
         spark = SparkSession\
@@ -2275,6 +2436,12 @@ if __name__ == "__main__":
                     # TODO: Check that this is done properly in Spark
                     trDF = (trDF.join(eDF, trDF.id == eDF.id, "left")
                         .drop(df.id))
+
+                #For sparkLDA, we need also a corpus.txt file only for coherence calculation
+                if train_config['trainer']=='sparkLDA':
+                    tPreproc.exportTrData(trDF=trDF,
+                                        dirpath=configFile.parent.resolve(),
+                                        tmTrainer='mallet')
 
                 trDataFile = tPreproc.exportTrData(trDF=trDF,
                                                    dirpath=configFile.parent.resolve(),
@@ -2363,10 +2530,19 @@ if __name__ == "__main__":
                             "You need access to a spark cluster to run sparkLDA")
                         sys.exit(
                             "You need access to a spark cluster to run sparkLDA")
-                    sparkLDATr = sparkLDATrainer()
-                    sparkLDATr.fit(
-                        configFile.parent.joinpath('corpus.parquet'))
+                    
+                    sparkLDATr = sparkLDATrainer(
+                        ntopics=train_config['TMparam']['ntopics'],
+                        alpha=train_config['TMparam']['alpha'],
+                        maxIter=train_config['TMparam']['maxIter'],
+                        optimizer=train_config['TMparam']['optimizer'],
+                        optimizeDocConcentration=train_config['TMparam']['optimizeDocConcentration'],
+                        subsamplingRate=train_config['TMparam']['subsamplingRate'],
+                        thetas_thr=train_config['TMparam']['thetas_thr'],
+                        labels=train_config['TMparam']['labels'])
 
+                    sparkLDATr.fit(corpusFile=configFile.parent.joinpath('corpus.parquet'))
+                    
                 elif train_config['trainer'] == 'prodLDA':
                     ProdLDATr = ProdLDATrainer(
                         n_components=train_config['TMparam']['ntopics'],

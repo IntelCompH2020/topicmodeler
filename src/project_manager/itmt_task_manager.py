@@ -419,12 +419,12 @@ class ITMTTaskManager(BaseTaskManager):
             if old_model_dir.exists():
                 shutil.rmtree(old_model_dir)
 
-            # Copy current project folder to the backup folder.
+            # Copy current model folder to the backup folder.
             shutil.move(modeldir, old_model_dir)
             self.logger.info(
                 f'-- -- Creating backup of existing model in {old_model_dir}')
 
-        # 2. Create corpus_folder and save model training configuration
+        # 2. Create model folder and save model training configuration
         modeldir.mkdir()
         configFile = modeldir.joinpath('trainconfig.json')
 
@@ -1543,6 +1543,14 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         self.logger.info(f'-- Topic Model Training')
 
+        #In case sparkLDA is selected, make sure a Spark cluster is available
+        #to avoid requesting settings that will not be used
+        if trainer == "sparkLDA":
+            if not self.cf.get('Spark', 'spark_available') == 'True':
+                self.logger.error(
+                    "-- -- sparkLDA requires access to a Spark cluster")
+                return
+
         displaytext = """
         *************************************************************************************
         We will retrieve all parameters needed for training the topic model
@@ -1847,7 +1855,43 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             }
 
         elif trainer == "sparkLDA":
-            TMparam = {}
+
+            # Default values are read from config file
+            alpha = float(self.cf.get('SparkLDA', 'alpha'))
+            maxIter = int(self.cf.get('SparkLDA', 'maxIterations'))
+            optimizer = self.cf.get('SparkLDA', 'optimizer')
+            optimizeDocConcentration = self.cf.get('SparkLDA', 'optimizeDocConcentration') == 'True'
+            subsamplingRate = float(self.cf.get('SparkLDA', 'subsamplingRate'))
+            thetas_thr = float(self.cf.get('TM', 'thetas_thr'))
+
+            # The following settings will only be accessed in the "advanced settings panel"
+            Y_or_N = input(
+                f"Do you wish to access the advanced settings panel [Y/N]?:")
+            if Y_or_N.upper() == "Y":
+                alpha = var_num_keyboard('float', alpha,
+                                         'Prior parameter for the Dirichlet for doc generation')
+                maxIter = var_num_keyboard('int', maxIter,
+                                                  'Maximum Number of Iterations for the training')
+                optimizer = var_string_keyboard(
+                                'str', optimizer, "Optimizer that will be used, 'online' or 'em'")
+                subsamplingRate = var_num_keyboard('float', subsamplingRate,
+                                'Percentage of docs that will be used in every minibatch')
+                optimizeDocConcentration = var_string_keyboard(
+                    'bool', optimizeDocConcentration, 'If true, assymmetric prior for alpha will allowed')
+                thetas_thr = var_num_keyboard('float', thetas_thr,
+                                              'Threshold for topic activation in a doc (sparsification)')
+
+            TMparam = {
+                "ntopics": ntopics,
+                "alpha": alpha,
+                "maxIter": maxIter,
+                "optimizer": optimizer,
+                "optimizeDocConcentration": optimizeDocConcentration,
+                "subsamplingRate": subsamplingRate,
+                "thetas_thr": thetas_thr,
+                "labels": path_labels
+            }
+        
         elif trainer == "prodLDA":
             model_type = str(self.cf.get('ProdLDA', 'model_type'))
             hidden_sizes = tuple(

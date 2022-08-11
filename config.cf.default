@@ -49,8 +49,10 @@ num_iterations_inf=100
 [SparkLDA]
 alpha=5
 maxIterations=20
+#Supported values for optimizer are 'em' and 'online'
 optimizer=online
 optimizeDocConcentration=True
+subsamplingRate=0.05
 
 [ProdLDA]
 model_type=prodLDA
