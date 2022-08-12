@@ -1,17 +1,21 @@
 """
 Compute some additional measures when creating models such as memory or cpu usage
 """
+
+import pandas as pd
 import datetime as DT
-import json
-import logging
 import multiprocessing as mp
-import shutil
+import logging
+import json
+# import shutil
 import sys
 import time
 import warnings
 from getpass import getuser
 from itertools import product
 from pathlib import Path
+from random import choices
+from typing import Union
 
 sys.path.insert(0, Path(__file__).parent.parent.resolve().as_posix())
 
@@ -40,7 +44,7 @@ fixed_params = {
     "batch_size": 64,
     "doc_topic_thr": 0.0,
     "dropout": 0.2,
-    "hidden_sizes": (100, 100),
+    "hidden_sizes": (50, 50),
     "labels": "",
     "learn_priors": True,
     "lr": 2e-3,
@@ -74,9 +78,48 @@ handler.setLevel(logging.INFO)
 logger.addHandler(handler)
 
 
-def mem_use(fname):
-    m = Mem(user=getuser(), processes=["python3", "java"])
+def mem_use(fname, processes, gpu=False):
+    m = Mem(user=getuser(), processes=processes, gpu=gpu)
     m.proc_info(f"{fname}.txt")
+
+
+def copy_sampled_corpus(origCFile: Path, corpusFile: Path, samp: Union[int, float]):
+    """Saves a sample of the original origCFile into selected corpusFile"""
+    if not origCFile.is_file():
+        print(
+            f"Error: File '{origCFile.resolve().as_posix()}' does not exist.")
+        return
+
+    if isinstance(samp, float) and (samp > 1 or samp < 0):
+        print(
+            "Error: Not valid sample. If 'float', it must be in range [0, 1]")
+        return
+
+    if origCFile.suffix == ".txt":
+        with origCFile.open("r") as f:
+            corpus = f.readlines()
+        with corpusFile.open("w") as f:
+            if isinstance(samp, float):
+                samp = int(samp * len(corpus))
+            f.writelines(choices(corpus, k=samp))
+
+    elif origCFile.suffix == '.parquet':
+        # TODO: import with spark
+        # try:
+        #     df = spark.read.parquet(origCFile)
+        #     if isinstance(samp, int):
+        #         frac = samp/df.count()
+        #     else:
+        #         frac = samp
+        #     return df.sample(False, frac, seed=1)
+
+        # except:
+        df = pd.read_parquet(origCFile)
+        if isinstance(samp, float):
+            df = df.sample(frac=samp, replace=False)
+        elif isinstance(samp, int):
+            df = df.sample(n=samp, replace=False)
+        df.to_parquet(corpusFile)
 
 
 def get_model_config(trainer, TMparam):
@@ -177,28 +220,40 @@ def main():
     # TODO:
     number_topics = [10, 20]
     number_iterations = [100, 500]
-    number_samples = [10, 20, 50]
-    number_epochs = [100]
+    number_threads = [2, 4, 8]
+    number_samples = [10, 20]
+    number_epochs = [10]
     model_types = ["prodLDA", "LDA"]
     ctm_model_types = ["ZeroShotTM", "CombinedTM"]
+    number_docs = [5000, 10000]
     ########################################
 
-    for trainer in topicModelTypes[:1]:
+    for trainer in topicModelTypes[:3]:
         if trainer == "mallet":
-            param_conf = ({"ntopics": n, "num_iterations": i}
-                          for n, i in product(number_topics, number_iterations))
+            param_conf = ({"ndocs": d, "ntopics": n, "num_iterations": i, "num_threads": t}
+                          for d, n, i, t in product(number_docs, number_topics, number_iterations, number_threads))
             origCFile = origCFile_txt
             CFtype = "txt"
+            processes = ["python3", "java"]
+            use_gpu = False
         elif trainer == "prodLDA":
-            param_conf = ({"n_components": n, "num_samples": s, "num_epochs": e, "model_type": m}
-                          for n, s, e, m in product(number_topics, number_samples, number_epochs, model_types))
+            param_conf = ({"ndocs": d, "n_components": n, "num_samples": s, "num_epochs": e, "model_type": m}
+                          for d, n, s, e, m in product(number_docs, number_topics, number_samples, number_epochs, model_types))
             origCFile = origCFile_par
             CFtype = "parquet"
+            processes = ["python3"]
+            use_gpu = True
         elif trainer == "ctm":
-            param_conf = ({"n_components": n, "num_samples": s, "num_epochs": e, "model_type": m, "ctm_model_type": t}
-                          for n, s, e, m, t in product(number_topics, number_samples, number_epochs, model_types, ctm_model_types))
+            param_conf = ({"ndocs": d, "n_components": n, "num_samples": s, "num_epochs": e, "model_type": m, "ctm_model_type": t}
+                          for d, n, s, e, m, t in product(number_docs, number_topics, number_samples, number_epochs, model_types, ctm_model_types))
             origCFile = origCFile_par
             CFtype = "parquet"
+            processes = ["python3"]
+            use_gpu = True
+
+        else:
+            logger.error("Not valid trainer")
+            exit()
 
         for tuned_params in param_conf:
             # Set configuration
@@ -211,6 +266,11 @@ def main():
             model_path.mkdir(parents=True, exist_ok=True)
             model_stats = model_path.joinpath("stats")
             model_stats.mkdir(parents=True, exist_ok=True)
+            tuned_params_conf = model_stats.joinpath("tuned_params.json")
+            with tuned_params_conf.open("w", encoding="utf-8") as fout:
+                tuned_params = {"trainer": trainer, **tuned_params}
+                json.dump(tuned_params, fout, ensure_ascii=False,
+                          indent=2, default=str)
             config_file = model_path.joinpath("config.json")
             with config_file.open("w", encoding="utf-8") as fout:
                 json.dump(train_config, fout, ensure_ascii=False,
@@ -219,13 +279,14 @@ def main():
 
             # Copy corpus to model path
             corpusFile = config_file.parent.joinpath(f"corpus.{CFtype}")
-            shutil.copy(origCFile, corpusFile)
+            copy_sampled_corpus(origCFile, corpusFile, tuned_params["ndocs"])
+            # shutil.copy(origCFile, corpusFile)
 
             # Start memory usage script
             logger.info("-- Started measuring memory")
-            thrd = mp.Process(target=mem_use, args=(
-                model_stats.joinpath("mem_use"),))
+            thrd = mp.Process(target=mem_use, args=(model_stats.joinpath("mem_use"), processes, use_gpu))
             thrd.start()
+            time.sleep(1)
 
             # Execute command
             # cmd = f"python3 src/topicmodeling/topicmodeling.py --config {config_file.resolve().as_posix()} --train"
@@ -250,6 +311,7 @@ def main():
 
             t_end = time.perf_counter()
             thrd.terminate()
+            time.sleep(1)
             logger.info("-- Finished measuring memory")
 
             ######################################################################################
