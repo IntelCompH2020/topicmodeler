@@ -6,61 +6,24 @@ Provides several classes for Topic Modeling
     - textPreproc: Preparation of datasets for training topic models, including
                    - string cleaning (stopword removal + equivalent terms)
                    - BoW calculation
-    - Trainer:  Generic class for training a topic model from a given corpus and performing inference on a new unseen corpus. The following classes, each of them representing a specific trainer, extend from it:
+    - Trainer:  Generic class for training a topic model from a given corpus and performing inference on a new unseen corpus. 
+    The following classes, each of them representing a specific trainer, extend from it:
         * MalletTrainer
         * sparkLDATrainer
         * ProdLDATrainer
         * CTMTrainer
     - HierarchicalTMManager: Manages the creation of the corpus associated with a 2nd level hierarchical topic model
 """
-
 import argparse
 import json
-import multiprocessing as mp
 import os
-import shutil
 import sys
 from abc import abstractmethod
 from pathlib import Path
-from subprocess import check_output
 
-import dask.dataframe as dd
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-from dask.diagnostics import ProgressBar
-from gensim import corpora
-from scipy import sparse
-from sklearn.preprocessing import normalize
-
-from manageModels import TMmodel
-from neural_models.contextualized_topic_models.ctm_network.ctm import (
-    CombinedTM, ZeroShotTM)
-from neural_models.contextualized_topic_models.utils.data_preparation import \
-    prepare_ctm_dataset
-from neural_models.pytorchavitm.avitm_network.avitm import AVITM
-from neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
-
-
-# TODO: Consider moving this to a different place
-def file_lines(fname):
-    """
-    Count number of lines in file
-
-    Parameters
-    ----------
-    fname: Path
-        the file whose number of lines is calculated
-
-    Returns
-    -------
-    number of lines
-    """
-    with fname.open('r', encoding='utf8') as f:
-        for i, l in enumerate(f):
-            pass
-    return i + 1
 
 
 class textPreproc(object):
@@ -449,10 +412,10 @@ class textPreproc(object):
                     DFparquet = trDF[['id', 'cleantext', 'embeddings']].rename(
                         columns={"cleantext": "bow_text"})
                     schema = pa.schema([
-                                ('id', pa.int64()),
-                                ('bow_text', pa.string()),
-                                ('embeddings', pa.list_(pa.float64()))
-                            ])
+                        ('id', pa.int64()),
+                        ('bow_text', pa.string()),
+                        ('embeddings', pa.list_(pa.float64()))
+                    ])
                     DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
                                          'scheduler': 'processes'})
 
@@ -839,8 +802,8 @@ class sparkLDATrainer(Trainer):
     """
 
     def __init__(self, ntopics=25, alpha=5.0, maxIter=20, optimizer='online',
-                    optimizeDocConcentration=True, subsamplingRate=0.05, thetas_thr=0.003,
-                    labels=None, logger=None):
+                 optimizeDocConcentration=True, subsamplingRate=0.05, thetas_thr=0.003,
+                 labels=None, logger=None):
         """
         Initilization Method
 
@@ -899,13 +862,13 @@ class sparkLDATrainer(Trainer):
 
         # Calculation and Sparsification of thetas matrix
         self._logger.debug('-- -- Spark LDA Sparsifying doc-topics matrix')
-        
-        #We calculate the full matrix. We need to do the following
+
+        # We calculate the full matrix. We need to do the following
         # * Obtain topic representation of documents
         # * Convert DenseVectors to arrays
         # * Generate a numpy matrix (thetas32)
         # * Threshold the matrix
-        #This can be probably implemented in a more efficient manner
+        # This can be probably implemented in a more efficient manner
         df = (
             ldaModel.transform(df)
             .select("topicDistribution")
@@ -922,10 +885,11 @@ class sparkLDATrainer(Trainer):
         # Recalculate topic weights to avoid errors due to sparsification
         alphas = np.asarray(np.mean(thetas32, axis=0)).ravel()
 
-        #Topics-vocabulary matrix
-        betas = normalize(ldaModel.topicsMatrix().toArray().T, axis=1, norm='l1')
+        # Topics-vocabulary matrix
+        betas = normalize(
+            ldaModel.topicsMatrix().toArray().T, axis=1, norm='l1')
 
-        #Load vocabulary file
+        # Load vocabulary file
         with Path(modelFolder.parent.joinpath('vocabulary.txt')).open('r', encoding='utf8') as fin:
             vocab = [el.strip() for el in fin.readlines()]
 
@@ -964,23 +928,24 @@ class sparkLDATrainer(Trainer):
                 f'-- -- Provided corpus Path does not exist -- Stop')
             sys.exit()
 
-        #Train spark LDA model and obtain also the topic distribution of
-        #documents
+        # Train spark LDA model and obtain also the topic distribution of
+        # documents
         ##################################################
         # Importing Data to mallet
         self._logger.info('-- -- Training LDA model with Spark')
 
         df = spark.read.parquet(f"file://{corpusFile.resolve().as_posix()}")
         lda = pysparkLDA(featuresCol="bow", maxIter=self._maxIter, k=self._ntopics,
-            optimizer=self._optimizer, subsamplingRate=self._subsamplingRate,
-            optimizeDocConcentration=self._optimizeDocConcentration,
-            docConcentration=self._ntopics*[self._alpha/self._ntopics])
+                         optimizer=self._optimizer, subsamplingRate=self._subsamplingRate,
+                         optimizeDocConcentration=self._optimizeDocConcentration,
+                         docConcentration=self._ntopics*[self._alpha/self._ntopics])
         ldaModel = lda.fit(df)
 
-        #Save model for future use
+        # Save model for future use
         modelFolder = corpusFile.parent.joinpath('modelFiles')
         modelFolder.mkdir()
-        ldaModel.save(f"file://{modelFolder.joinpath('sparkLDAmodel').as_posix()}")
+        ldaModel.save(
+            f"file://{modelFolder.joinpath('sparkLDAmodel').as_posix()}")
 
         ##################################################
         # Create TMmodel object
@@ -1006,7 +971,7 @@ class ProdLDATrainer(Trainer):
                  learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99,
                  solver='adam', num_epochs=100, reduce_on_plateau=False,
                  topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10,
-                 num_data_loader_workers=mp.cpu_count(), thetas_thr=0.003,
+                 num_data_loader_workers=0, thetas_thr=0.003,
                  labels=None, logger=None):
         """
         Initilization Method
@@ -1214,7 +1179,7 @@ class CTMTrainer(Trainer):
                  hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
                  learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, solver='adam',
                  num_epochs=100, num_samples=10, reduce_on_plateau=False, topic_prior_mean=0.0,
-                 topic_prior_variance=None, num_data_loader_workers=mp.cpu_count(), label_size=0,
+                 topic_prior_variance=None, num_data_loader_workers=0, label_size=0,
                  loss_weights=None, thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1',
                  labels=None, logger=None):
         """
@@ -1346,7 +1311,8 @@ class CTMTrainer(Trainer):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
             import pyLDAvis as vis
-        data_ldavis = ctm.get_ldavis_data_format(self._qt.vocab, self._train_dts, n_samples=2)
+        data_ldavis = ctm.get_ldavis_data_format(
+            self._qt.vocab, self._train_dts, n_samples=2)
         ctm_pd = vis.prepare(**data_ldavis)
         file = modelFolder.joinpath('pyLDAvis.html').as_posix()
         vis.save_html(ctm_pd, file)
@@ -1475,6 +1441,11 @@ class CTMTrainer(Trainer):
 
 
 class HierarchicalTMManager(object):
+    """
+    Main class for the creation of hierarchical topic models. Implements the
+    following functionalities
+    - Generation of the corpus of a second-level submodel based on the chosen hierarchical algorithm and the specified first-level topic model
+    """
 
     def __init__(self, logger=None):
         """
@@ -1507,7 +1478,7 @@ class HierarchicalTMManager(object):
             Submodel's configuration file' s path
         """
 
-        # Read training configurations from father model and submodel     
+        # Read training configurations from father model and submodel
         configFile_c = Path(configFile_c)
         configFile_f = Path(configFile_f)
         with configFile_f.open('r', encoding='utf8') as fin:
@@ -1732,6 +1703,10 @@ if __name__ == "__main__":
     # configuration file, and run the preprocessing of the training data using
     # the textPreproc class
     if args.preproc:
+
+        # Import modules only necessary for preprocessing
+        import shutil
+
         configFile = Path(args.config)
         if configFile.is_file():
             with configFile.open('r', encoding='utf8') as fin:
@@ -1792,13 +1767,13 @@ if __name__ == "__main__":
                     # We perform a left join to keep the embeddings of only those documents kept after preprocessing
                     # TODO: Check that this is done properly in Spark
                     trDF = (trDF.join(eDF, trDF.id == eDF.id, "left")
-                        .drop(df.id))
+                            .drop(df.id))
 
-                #For sparkLDA, we need also a corpus.txt file only for coherence calculation
-                if train_config['trainer']=='sparkLDA':
+                # For sparkLDA, we need also a corpus.txt file only for coherence calculation
+                if train_config['trainer'] == 'sparkLDA':
                     tPreproc.exportTrData(trDF=trDF,
-                                        dirpath=configFile.parent.resolve(),
-                                        tmTrainer='mallet')
+                                          dirpath=configFile.parent.resolve(),
+                                          tmTrainer='mallet')
 
                 trDataFile = tPreproc.exportTrData(trDF=trDF,
                                                    dirpath=configFile.parent.resolve(),
@@ -1806,6 +1781,12 @@ if __name__ == "__main__":
                 sys.stdout.write(trDataFile.as_posix())
 
             else:
+
+                # Import necessary modules for Dask and its associated corpus preprocessing
+                import dask.dataframe as dd
+                from dask.diagnostics import ProgressBar
+                from gensim import corpora
+
                 # Read all training data and configure them as a dask dataframe
                 for idx, DtSet in enumerate(trDtSet['Dtsets']):
                     df = dd.read_parquet(DtSet['parquet']).fillna("")
@@ -1861,12 +1842,26 @@ if __name__ == "__main__":
     # If the training flag is activated, we need to check availability of
     # configuration file, and run the topic model training
     if args.train:
+
+        # Import modules only necessary for training
+        import matplotlib.pyplot as plt
+        from scipy import sparse
+        from sklearn.preprocessing import normalize
+
+        from manageModels import TMmodel
+        from tm_utils import file_lines
+
         configFile = Path(args.config)
         if configFile.is_file():
             with configFile.open('r', encoding='utf8') as fin:
                 train_config = json.load(fin)
 
                 if train_config['trainer'] == 'mallet':
+
+                    # Import necessary libraries for Mallet
+                    from subprocess import check_output
+
+                    # Create a MalletTrainer object with the parameters specified in the configuration file
                     MallTr = MalletTrainer(
                         mallet_path=train_config['TMparam']['mallet_path'],
                         ntopics=train_config['TMparam']['ntopics'],
@@ -1878,6 +1873,8 @@ if __name__ == "__main__":
                         thetas_thr=train_config['TMparam']['thetas_thr'],
                         token_regexp=train_config['TMparam']['token_regexp'],
                         labels=train_config['TMparam']['labels'])
+
+                    # Train the Mallet topic model with the specified corpus
                     MallTr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.txt'))
 
@@ -1887,7 +1884,7 @@ if __name__ == "__main__":
                             "You need access to a spark cluster to run sparkLDA")
                         sys.exit(
                             "You need access to a spark cluster to run sparkLDA")
-                    
+
                     sparkLDATr = sparkLDATrainer(
                         ntopics=train_config['TMparam']['ntopics'],
                         alpha=train_config['TMparam']['alpha'],
@@ -1898,9 +1895,18 @@ if __name__ == "__main__":
                         thetas_thr=train_config['TMparam']['thetas_thr'],
                         labels=train_config['TMparam']['labels'])
 
-                    sparkLDATr.fit(corpusFile=configFile.parent.joinpath('corpus.parquet'))
-                    
+                    sparkLDATr.fit(
+                        corpusFile=configFile.parent.joinpath('corpus.parquet'))
+
                 elif train_config['trainer'] == 'prodLDA':
+
+                    # Import necessary libraries for prodLDA
+                    from neural_models.pytorchavitm.avitm_network.avitm import \
+                        AVITM
+                    from neural_models.pytorchavitm.utils.data_preparation import \
+                        prepare_dataset
+
+                    # Create a ProdLDATrainer object with the parameters specified in the configuration file
                     ProdLDATr = ProdLDATrainer(
                         n_components=train_config['TMparam']['ntopics'],
                         model_type=train_config['TMparam']['model_type'],
@@ -1921,10 +1927,20 @@ if __name__ == "__main__":
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
                         labels=train_config['TMparam']['labels'])
+
+                    # Train the ProdLDA topic model with the specified corpus
                     ProdLDATr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.parquet'))
 
                 elif train_config['trainer'] == 'ctm':
+
+                    # Import necessary libraries for CTM
+                    from neural_models.contextualized_topic_models.ctm_network.ctm import (
+                        CombinedTM, ZeroShotTM)
+                    from neural_models.contextualized_topic_models.utils.data_preparation import \
+                        prepare_ctm_dataset
+
+                    # Create a CTMTrainer object with the parameters specified in the configuration file
                     CTMr = CTMTrainer(
                         n_components=train_config['TMparam']['ntopics'],
                         model_type=train_config['TMparam']['model_type'],
@@ -1947,16 +1963,20 @@ if __name__ == "__main__":
                         sbert_model_to_load=train_config['TMparam']['sbert_model_to_load'],
                         labels=train_config['TMparam']['labels'])
 
-                    corpusFile=configFile.parent.joinpath('corpus.parquet')
+                    # Train the CTM topic model with the specified corpus
+                    corpusFile = configFile.parent.joinpath('corpus.parquet')
                     if not corpusFile.is_dir():
-                        sys.exit("The corpus file 'corpus.parquet' does not exist.")
+                        sys.exit(
+                            "The corpus file 'corpus.parquet' does not exist.")
                     else:
                         if train_config['hierarchy-level'] == 0:
                             CTMr.fit(corpusFile=corpusFile)
                         elif train_config['hierarchy-level'] == 1:
-                            embbeddingsFile = configFile.parent.joinpath('embeddings.npy')
+                            embbeddingsFile = configFile.parent.joinpath(
+                                'embeddings.npy')
                             if not embbeddingsFile.is_file():
-                                sys.exit("The embeddings file 'embeddings.npy' does not exist.")
+                                sys.exit(
+                                    "The embeddings file 'embeddings.npy' does not exist.")
                             else:
                                 CTMr.fit(corpusFile=corpusFile,
                                          embeddingsFile=embbeddingsFile)
@@ -1964,20 +1984,30 @@ if __name__ == "__main__":
             sys.exit('You need to provide a valid configuration file')
 
     if args.hierarchical:
+
+        # Import necessary modules for the hierarchical manager
+        import dask.dataframe as dd
+        from dask.diagnostics import ProgressBar
+
+        from manageModels import TMmodel
+
         if not args.config_child:
             sys.exit('You need to provide a configuration file for the submodel')
         else:
             configFile_f = Path(args.config)
             if not configFile_f.is_file():
-                sys.exit('You need to provide a valid configuration file for the father model.')
+                sys.exit(
+                    'You need to provide a valid configuration file for the father model.')
             else:
                 configFile_c = Path(args.config_child)
                 if not configFile_c.is_file():
-                    sys.exit('You need to provide a valid configuration file for the submodel.')
+                    sys.exit(
+                        'You need to provide a valid configuration file for the submodel.')
                 else:
                     tMmodel_path = configFile_f.parent.joinpath('TMmodel')
                     if not os.path.isdir(tMmodel_path):
-                        sys.exit('There must exist a valid TMmodel folder for the parent corpus')            
+                        sys.exit(
+                            'There must exist a valid TMmodel folder for the parent corpus')
 
                     # Create hierarhicalTMManager object
                     hierarchicalTMManager = HierarchicalTMManager()

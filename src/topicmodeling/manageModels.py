@@ -2,41 +2,21 @@
 * *IntelComp H2020 project*
 * *Topic Modeling Toolbox*
 
-Provides a series of functions for Topic Model representation and curation
+Provides several classes for Topic Modeling management, representation, and curation
+    - TMManager: Management of topic models 
+    - TMmodel: Generic representation of all topic models that serve for its curation
 """
 
 import argparse
 import json
-import os
 import shutil
 import sys
 import warnings
-import torch
 from pathlib import Path
 
 import numpy as np
 import scipy.sparse as sparse
-from scipy.spatial.distance import jensenshannon
-from sklearn.preprocessing import normalize
-from transformers import pipeline
-from gensim.models.coherencemodel import CoherenceModel
-from gensim.corpora import Dictionary
 
-# pyLDAvis currently raises some Deprecation warnings
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-    import pyLDAvis
-
-def look_for_path(tm_path, path_name):
-
-    if tm_path.joinpath(path_name).is_dir():
-        return tm_path
-    else:
-        for root, dirs, files in os.walk(tm_path):
-            for dir in dirs:
-                if dir.endswith(path_name):
-                    tm_path = Path(os.path.join(root, dir)).parent
-        return tm_path
 
 class TMManager(object):
     """
@@ -362,8 +342,12 @@ class TMmodel(object):
             fout.write('\n'.join(self._tpc_labels))
 
         # Generate also pyLDAvisualization
+        # pyLDAvis currently raises some Deprecation warnings
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            import pyLDAvis
+
         # We will compute the visualization using ndocs random documents
-        #
         # In case the model has gone through topic deletion, we may have rows
         # in the thetas matrix that sum up to zero (active topics have been
         # removed for these problematic documents). We need to take this into
@@ -530,7 +514,8 @@ class TMmodel(object):
 
         # Load topic information
         if self._tpc_descriptions is None:
-            self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
+            self._tpc_descriptions = [el[1]
+                                      for el in self.get_tpc_word_descriptions()]
         # Convert topic information into list of lists
         tpc_descriptions_ = \
             [tpc.split(', ') for tpc in self._tpc_descriptions]
@@ -542,7 +527,13 @@ class TMmodel(object):
         else:
             corpusFile = self._TMfolder.parent.joinpath('corpus.txt')
         with corpusFile.open("r", encoding="utf-8") as f:
-            corpus = [line.rsplit(" 0 ")[1].strip().split() for line in f.readlines()]
+            corpus = [line.rsplit(" 0 ")[1].strip().split()
+                      for line in f.readlines()]
+
+        # Import necessary modules for coherence calculation with Gensim
+        # TODO: This needs to be substituted by a non-Gensim based calculation of the coherence
+        from gensim.corpora import Dictionary
+        from gensim.models.coherencemodel import CoherenceModel
 
         # Get Gensim dictionary
         dictionary = None
@@ -659,8 +650,10 @@ class TMmodel(object):
             Each element is a a term (topic_id, "label for topic topic_id")                    
         """
         if not labels:
-            return [(i, "NA") for i, p in enumerate(self._tpc_descriptions)]  # []
+            return [(i, "NA") for i, p in enumerate(self._tpc_descriptions)]
+
         if use_cuda:
+            import torch
             if torch.cuda.is_available():
                 device = 0
                 self._logger.info("-- -- CUDA available: GPU will be used")
@@ -676,6 +669,7 @@ class TMmodel(object):
             device = -1
             self._logger.info("-- -- CUDA unavailable: GPU will not be used")
 
+        from transformers import pipeline
         classifier = pipeline("zero-shot-classification",
                               model="facebook/bart-large-mnli",
                               device=device)
@@ -743,6 +737,7 @@ class TMmodel(object):
 
             # Calculate new variables
             self._thetas = self._thetas[:, tpc_keep]
+            from sklearn.preprocessing import normalize
             self._thetas = normalize(self._thetas, axis=1, norm='l1')
             self._alphas = np.asarray(np.mean(self._thetas, axis=0)).ravel()
             self._ntopics = self._thetas.shape[1]
@@ -798,7 +793,9 @@ class TMmodel(object):
 
         # Part 2 - Topics with similar word composition
         # Computes inter-topic distance based on word distributions
-        # using Jensen Shannon distance
+        # using scipy implementation of Jensen Shannon distance
+        from scipy.spatial.distance import jensenshannon
+
         # For a more efficient computation with very large vocabularies
         # we implement a threshold for restricting the distance calculation
         # to columns where any element is greater than threshold thr
@@ -951,6 +948,8 @@ class TMmodel(object):
 ##############################################################################
 if __name__ == "__main__":
 
+    from tm_utils import look_for_path
+
     parser = argparse.ArgumentParser(
         description="Scripts for Topic Modeling Service")
     parser.add_argument("--path_TMmodels", type=str, default=None, required=True,
@@ -1026,13 +1025,13 @@ if __name__ == "__main__":
     if args.showTopics:
         tm_path = look_for_path(tm_path, f"{args.showTopics}")
         tm = TMmodel(tm_path.joinpath(
-                f"{args.showTopics}").joinpath('TMmodel'))
+            f"{args.showTopics}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.showTopics()))
 
     if args.showTopicsAdvanced:
         tm_path = look_for_path(tm_path, f"{args.showTopicsAdvanced}")
         tm = TMmodel(tm_path.joinpath(
-                f"{args.showTopicsAdvanced}").joinpath('TMmodel'))
+            f"{args.showTopicsAdvanced}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.showTopicsAdvanced()))
 
     if args.setTpcLabels:
