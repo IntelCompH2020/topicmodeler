@@ -183,23 +183,4 @@ def format_title(tgt_str):
     #Quitamos " y retornos de carro
     return capitalized_title.replace('"','').replace('\n','')
 
-def file_lines(fname):
-    """Counts the number of lines in a file
-
-    Parameters
-    ----------      
-    fname: pathlib.Path
-        Path to the file whose lines are being count
-    
-    Returns
-    -------
-    :
-        The number of lines in the given file
-    """    
-    # Count number of lines in file
-    with fname.open('r', encoding='utf8') as f:
-        for i, l in enumerate(f):
-            pass
-    return i + 1
-
 
