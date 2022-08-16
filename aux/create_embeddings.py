@@ -87,6 +87,13 @@ class EmbeddingsManager(object):
             if entry.as_posix().endswith("parquet"):
                 res.append(entry)
         
+        process_entries = []
+        for entry in parquet_new.iterdir():
+            # check if it is a file
+            if entry.as_posix().endswith("parquet"):
+                s = entry.as_posix().split("/")[7].split("_")[3].split(".")[0]
+                process_entries.append(int(s))
+            
         print("Number of parquet to process: " + str(len(res)))
 
         def det(x):
@@ -108,36 +115,38 @@ class EmbeddingsManager(object):
             pass
 
         for i, f in enumerate(tqdm(res)):
-            df = pd.read_parquet(f)#.fillna("")
+            if i not in process_entries:
+                print("Processing now: " + str(i))
+                df = pd.read_parquet(f)#.fillna("")
 
-            # Filter out abstracts with no text
-            df = df[df[raw_text_fld] != ""]
-            print("Number of papers without empty abstract: " + str(len(df)))
+                # Filter out abstracts with no text
+                df = df[df[raw_text_fld] != ""]
+                print("Number of papers without empty abstract: " + str(len(df)))
 
-            # Detect abstracts' language and filter out those which are not in English
-            df['langue'] = df[raw_text_fld].apply(det)
-            df = df[df['langue'] == 'en']
+                # Detect abstracts' language and filter out those which are not in English
+                df['langue'] = df[raw_text_fld].apply(det)
+                df = df[df['langue'] == 'en']
 
-            print("Number of papers in english: " + str(len(df)))
+                print("Number of papers in english: " + str(len(df)))
 
-            # Concatenation of title and abstract is used as the text to generated of the embeddings
-            df['title_abstract'] = df[[title_fld, raw_text_fld]].apply(
-                " ".join, axis=1)
-            raw = df['title_abstract'].values.tolist()
-            embeddings = self.bert_embeddings_from_list(
-                texts=raw,
-                sbert_model_to_load=embeddins_model,
-                max_seq_length=max_seq_length)
+                # Concatenation of title and abstract is used as the text to generated of the embeddings
+                df['title_abstract'] = df[[title_fld, raw_text_fld]].apply(
+                    " ".join, axis=1)
+                raw = df['title_abstract'].values.tolist()
+                embeddings = self.bert_embeddings_from_list(
+                    texts=raw,
+                    sbert_model_to_load=embeddins_model,
+                    max_seq_length=max_seq_length)
 
-            # Remove unnecessay columns in the df
-            df.drop('title_abstract', inplace=True, axis=1)
-            df['embeddings'] = embeddings
+                # Remove unnecessay columns in the df
+                df.drop('title_abstract', inplace=True, axis=1)
+                df['embeddings'] = embeddings
 
-            # Save new df in parquet file
-            new_name = "parquet_embeddings_part_" + str(i) + ".parquet"
-            outFile = parquet_new.joinpath(new_name)
-            df.to_parquet(outFile)
-            print(outFile)
+                # Save new df in parquet file
+                new_name = "parquet_embeddings_part_" + str(i) + ".parquet"
+                outFile = parquet_new.joinpath(new_name)
+                df.to_parquet(outFile)
+                print(outFile)
 
         return
 
