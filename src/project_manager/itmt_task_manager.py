@@ -1043,6 +1043,10 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         filterCondition = filterCondition.replace(
             ' ', 'SsS').replace("'", "XxX")
 
+        #In case we want to sampling a dataset
+        perc = var_num_keyboard('int', 100,
+                                   'If you wish to sample the dataset, indicate the percentage (an integer [1-100])')
+
         # We need a name for the dataset
         dtsName = ""
         while not len(dtsName):
@@ -1067,7 +1071,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # printgr('filterCondition: '  + filterCondition)
         # printgr('Pathdataset: ' +path_dataset.resolve().as_posix())
         options = '"-p ' + parquet_table + ' -s ' + selectFields + \
-                  ' -d ' + path_dataset.resolve().as_posix()
+                  ' -d ' + path_dataset.resolve().as_posix() + \
+                  ' -sp ' + str(perc)
         if len(filterCondition):
             options = options + ' -f ' + filterCondition + '"'
         else:
@@ -1086,6 +1091,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         cmd = script_spark + ' -C ' + token_spark + \
             ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
         printred(cmd)
+        
         try:
             self.logger.info(f'-- -- Running command {cmd}')
             check_output(args=cmd, shell=True)

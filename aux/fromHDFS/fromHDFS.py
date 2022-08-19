@@ -27,12 +27,14 @@ if __name__ == "__main__":
     parser.add_argument('-p', help='path to main table that will be imported', type=str, required=True)
     parser.add_argument('-s', help='list of fields that will be imported', type=str, required=True)
     parser.add_argument('-d', help='path to dataset where the data will be stored', type=str, required=True)
+    parser.add_argument('-sp', help='Percentage for dataset sampling', type=int, required=True)
     parser.add_argument('-f', help='String with filtering conditions', type=str, required=False)
     args = parser.parse_args()
 
     parquet_table = args.p
     selectFields = args.s
     path_dataset = args.d
+    perc = float(args.sp)/100
     
     # We read the table with the output of NLP processes and identify id field 
     lemmas_table = parquet_table.split('.parquet')[0] + '_NLP.parquet'
@@ -59,6 +61,10 @@ if __name__ == "__main__":
     dataset = (dataset.join(lemmas_df, dataset.id ==  lemmas_df.id, "left")
                           .drop(lemmas_df.id)
                     )
+
+    # Sampling dataset if necessary
+    if perc < 1:
+        dataset = dataset.sample(fraction=perc)
 
     # Save dataset
     dataset.write.parquet(f"file://{path_dataset}",

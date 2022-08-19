@@ -21,6 +21,7 @@ exploiting the tools available in topicmodeling.py:
 
 import pathlib
 import argparse
+import json
 
 #Local imports
 from src.menu_navigator.menu_navigator import MenuNavigator
@@ -65,6 +66,12 @@ def main():
     if not parquet_path.is_dir():
         try:
             parquet_path.mkdir(parents=True)
+            empty_dir = {}
+            path_datasetMeta = parquet_path.joinpath('datasetMeta.json')
+            with path_datasetMeta.open('w', encoding='utf-8') as outfile:
+                json.dump(empty_dir, outfile, ensure_ascii=False,
+                          indent=2, default=str)
+
         except:
             print('Invalid folder for parquet datasets')
             return
