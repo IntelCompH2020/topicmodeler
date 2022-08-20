@@ -459,9 +459,11 @@ class ITMTTaskManager(BaseTaskManager):
             script_spark = self.cf.get('Spark', 'script_spark')
             token_spark = self.cf.get('Spark', 'token_spark')
             script_path = './src/topicmodeling/topicmodeling.py'
+            machines = self.cf.get('Spark', 'machines')
+            cores = self.cf.get('Spark', 'cores')
             options = '"--spark --preproc --config ' + configFile.resolve().as_posix() + '"'
             cmd = script_spark + ' -C ' + token_spark + \
-                ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+                ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
             printred(cmd)
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
@@ -492,9 +494,11 @@ class ITMTTaskManager(BaseTaskManager):
                 script_spark = self.cf.get('Spark', 'script_spark')
                 token_spark = self.cf.get('Spark', 'token_spark')
                 script_path = './src/topicmodeling/topicmodeling.py'
+                machines = self.cf.get('Spark', 'machines')
+                cores = self.cf.get('Spark', 'cores')
                 options = '"--spark --train --config ' + configFile.resolve().as_posix() + '"'
                 cmd = script_spark + ' -C ' + token_spark + \
-                    ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+                    ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
                 printred(cmd)
                 try:
                     self.logger.info(f'-- -- Running command {cmd}')
@@ -608,10 +612,12 @@ class ITMTTaskManager(BaseTaskManager):
                 script_spark = self.cf.get('Spark', 'script_spark')
                 token_spark = self.cf.get('Spark', 'token_spark')
                 script_path = './src/topicmodeling/topicmodeling.py'
+                machines = self.cf.get('Spark', 'machines')
+                cores = self.cf.get('Spark', 'cores')
                 options = '"--spark --train --config ' + \
                     configFile_c.resolve().as_posix() + '"'
                 cmd = script_spark + ' -C ' + token_spark + \
-                    ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+                    ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
                 printred(cmd)
                 try:
                     self.logger.info(f'-- -- Running command {cmd}')
@@ -1092,8 +1098,10 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         script_spark = self.cf.get('Spark', 'script_spark')
         token_spark = self.cf.get('Spark', 'token_spark')
         script_path = '/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/aux/fromHDFS/fromHDFS.py'
+        machines = self.cf.get('Spark', 'machines')
+        cores = self.cf.get('Spark', 'cores')
         cmd = script_spark + ' -C ' + token_spark + \
-            ' -c 4 -N 10 -S ' + script_path + ' -P ' + options
+            ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
         printred(cmd)
         
         try:

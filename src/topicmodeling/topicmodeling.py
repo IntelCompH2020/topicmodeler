@@ -24,7 +24,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-
+import dask.dataframe as dd
+                
 
 class textPreproc(object):
     """
@@ -1808,7 +1809,6 @@ if __name__ == "__main__":
             else:
 
                 # Import necessary modules for Dask and its associated corpus preprocessing
-                import dask.dataframe as dd
                 from dask.diagnostics import ProgressBar
                 from gensim import corpora
 
@@ -2012,7 +2012,6 @@ if __name__ == "__main__":
     if args.hierarchical:
 
         # Import necessary modules for the hierarchical manager
-        import dask.dataframe as dd
         from dask.diagnostics import ProgressBar
 
         from manageModels import TMmodel

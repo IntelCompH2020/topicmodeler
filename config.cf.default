@@ -9,6 +9,8 @@ cons_format = %%(levelname)-8s | %%(message)s
 
 [Spark]
 spark_available = True
+machines = 10
+cores = 4
 script_spark = /export/usuarios_ml4ds/jarenas/script-spark/script-spark
 token_spark = /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json
 
