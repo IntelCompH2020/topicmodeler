@@ -134,7 +134,7 @@ class textPreproc(object):
 
         return equivalent
 
-    def preprocBOW(self, trDF):
+    def preprocBOW(self, trDF, nw=0):
         """
         Preprocesses the documents in the dataframe to carry
         out the following tasks
@@ -148,6 +148,8 @@ class textPreproc(object):
         trDF: Dask or Spark dataframe
             This routine works on the following column "all_lemmas"
             Other columns are left untouched
+        nw: Number of workers to use if Dask is selected
+            If nw=0 use Dask default value (number of cores)
 
         Returns
         -------
@@ -196,7 +198,11 @@ class textPreproc(object):
 
             with ProgressBar():
                 DFtokens = trDF[['final_tokens']]
-                DFtokens = DFtokens.compute(scheduler='processes')
+                if nw>0:
+                    DFtokens = DFtokens.compute(scheduler='processes', num_workers=nw)
+                else:
+                    #Use Dask default (i.e., number of available cores)
+                    DFtokens = DFtokens.compute(scheduler='processes')
             self._GensimDict = corpora.Dictionary(
                 DFtokens['final_tokens'].values.tolist())
 
@@ -317,7 +323,7 @@ class textPreproc(object):
         else:
             return 0
 
-    def exportTrData(self, trDF, dirpath, tmTrainer):
+    def exportTrData(self, trDF, dirpath, tmTrainer, nw=0):
         """
         Exports the training data in the provided dataset to the
         format required by the topic modeling trainer
@@ -332,6 +338,8 @@ class textPreproc(object):
             The folder where the data will be saved
         tmTrainer: string
             The output format [mallet|sparkLDA|prodLDA|ctm]
+        nw: Number of workers to use if Dask is selected
+            If nw=0 use Dask default value (number of cores)
 
         Returns
         -------
@@ -381,7 +389,12 @@ class textPreproc(object):
                 with ProgressBar():
                     #trDF = trDF.persist(scheduler='processes')
                     DFmallet = trDF[['2mallet']]
-                    DFmallet.to_csv(outFile, index=False, header=False, single_file=True,
+                    if nw>0:
+                        DFmallet.to_csv(outFile, index=False, header=False, single_file=True,
+                                    compute_kwargs={'scheduler': 'processes', 'num_workers': nw})
+                    else:
+                        #Use Dask default number of workers (i.e., number of cores)
+                        DFmallet.to_csv(outFile, index=False, header=False, single_file=True,
                                     compute_kwargs={'scheduler': 'processes'})
 
             elif tmTrainer == 'sparkLDA':
@@ -398,7 +411,12 @@ class textPreproc(object):
                 with ProgressBar():
                     DFparquet = trDF[['id', 'cleantext']].rename(
                         columns={"cleantext": "bow_text"})
-                    DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
+                    if nw>0:
+                        DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
+                                         'scheduler': 'processes', 'num_workers': nw})
+                    else:
+                        #Use Dask default number of workers (i.e., number of cores)
+                        DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
                                          'scheduler': 'processes'})
 
             elif tmTrainer == "ctm":
@@ -416,7 +434,12 @@ class textPreproc(object):
                         ('bow_text', pa.string()),
                         ('embeddings', pa.list_(pa.float64()))
                     ])
-                    DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
+                    if nw>0:
+                        DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
+                                         'scheduler': 'processes', 'num_workers': nw})
+                    else:
+                        #Use Dask default number of workers (i.e., number of cores)
+                        DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
                                          'scheduler': 'processes'})
 
         else:
@@ -1672,6 +1695,8 @@ if __name__ == "__main__":
                         required=False)
     parser.add_argument('--preproc', action='store_true', default=False,
                         help="Preprocess training data according to config file")
+    parser.add_argument('--nw', type=int, required=False, default=0,
+                        help="Number of workers when preprocessing data with Dask. Use 0 to use Dask default")
     parser.add_argument('--train', action='store_true', default=False,
                         help="Train Topic Model according to config file")
     parser.add_argument('--hierarchical', action='store_true', default=False,
@@ -1812,7 +1837,7 @@ if __name__ == "__main__":
 
                 #trDF = trDF.drop_duplicates(subset=["id"], ignore_index=True)
                 # We preprocess the data and save the Gensim Model used to obtain the BoW
-                trDF = tPreproc.preprocBOW(trDF)
+                trDF = tPreproc.preprocBOW(trDF, nw=args.nw)
                 tPreproc.saveGensimDict(configFile.parent.resolve())
 
                 # If the trainer is CTM, we also need the embeddings
@@ -1833,7 +1858,8 @@ if __name__ == "__main__":
 
                 trDataFile = tPreproc.exportTrData(trDF=trDF,
                                                    dirpath=configFile.parent.resolve(),
-                                                   tmTrainer=train_config['trainer'])
+                                                   tmTrainer=train_config['trainer'],
+                                                   nw=args.nw)
                 sys.stdout.write(trDataFile.as_posix())
 
         else:

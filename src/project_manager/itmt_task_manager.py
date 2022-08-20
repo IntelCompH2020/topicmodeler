@@ -471,8 +471,12 @@ class ITMTTaskManager(BaseTaskManager):
 
         else:
             # Run command for corpus preprocessing using gensim
-            cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {configFile.as_posix()}'
+            # Preprocessing will be accelerated with Dask using the number of
+            # workers indicated in the configuration file for the project
+            num_workers = self.cf.get('Dask', 'num_workers')
+            cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {configFile.as_posix()} --nw {num_workers}'
             printred(cmd)
+            return
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
                 output = check_output(args=cmd, shell=True)

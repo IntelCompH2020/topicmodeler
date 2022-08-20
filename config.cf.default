@@ -12,6 +12,9 @@ spark_available = True
 script_spark = /export/usuarios_ml4ds/jarenas/script-spark/script-spark
 token_spark = /export/usuarios_ml4ds/jarenas/script-spark/tokencluster.json
 
+[Dask]
+num_workers = 0
+
 [HDFS]
 #This paths are specific to UC3M deployment
 Semantic Scholar = /export/ml4ds/IntelComp/Datalake/SemanticScholar/20220201/papers.parquet
