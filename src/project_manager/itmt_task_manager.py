@@ -478,7 +478,7 @@ class ITMTTaskManager(BaseTaskManager):
             num_workers = self.cf.get('Dask', 'num_workers')
             cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {configFile.as_posix()} --nw {num_workers}'
             printred(cmd)
-            return
+            
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
                 output = check_output(args=cmd, shell=True)
@@ -2310,8 +2310,133 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         if request_confirmation(msg='Do you wish to continue?'):
             super().resetTM()
         return
+    
+    def inference(self):
 
+        # Ask user which model should be used for inference
+        allTMmodels = json.loads(self.allTMmodels)
+        allTMmodels = [el for el in allTMmodels.keys()]
+        opt = query_options(
+            allTMmodels, 'Select a topic model to be used for inference')
+        self.selectedTM = allTMmodels[opt]
+        print(self.selectedTM)
 
+        # Ask user to provide a valid text file for performing inference
+        allTrDtsets = json.loads(self.allTrDtsets)
+        dtSets = [dts for dts in allTrDtsets.keys()]
+        displaydtSets = [allTrDtsets[dts]['name'] + ': ' +
+                         allTrDtsets[dts]['description'] for dts in dtSets]
+        selection = query_options(
+            displaydtSets, "Select dataset for performing infefrence")
+        InfDtSet = dtSets[selection]
+        self.logger.info(
+            f'-- -- Selected holdout corpus is {allTrDtsets[InfDtSet]["name"]}')
+
+        # Ask user to provide name for the inference model, description, and privacy level
+        inference_name = ''
+        while not len(inference_name):
+            inference_name = input('Enter a name to save the new inference model: ')
+
+        inference_desc = ""
+        while not len(inference_desc):
+            inference_desc = input(
+                'Introduce a description for the inference model: ')
+
+        privacy = ['Public', 'Private']
+        opt = query_options(
+            privacy, 'Define visibility for the inference model')
+        privacy = privacy[opt]
+
+        # 1. Create directory for inference within the model folder if it does not exists
+        modeldir = \
+            self.p2p.joinpath(
+                self._dir_struct['TMmodels']).joinpath(self.selectedTM)
+        inferencedir = modeldir.joinpath('TMinference')
+        if not inferencedir.exists():
+            inferencedir.mkdir()
+
+        # 2. Create inference folder for the current inference process
+        current_inferencedir = inferencedir.joinpath(inference_name)
+        if current_inferencedir.exists():
+
+            # Remove current backup folder, if it exists
+            old_current_inferencedir = Path(str(current_inferencedir) + '_old/')
+            if old_current_inferencedir.exists():
+                shutil.rmtree(old_current_inferencedir)
+
+            # Copy current model folder to the backup folder.
+            shutil.move(current_inferencedir, old_current_inferencedir)
+            self.logger.info(
+                f'-- -- Creating backup of existing inference model in {old_current_inferencedir}')
+        current_inferencedir.mkdir()
+        
+        # 3. Save inference configuration
+        infer_configFile = current_inferencedir.joinpath('inferconfig.json')
+        train_configFile = modeldir.joinpath('trainconfig.json')
+
+        with train_configFile.open('r', encoding='utf8') as fin:
+                train_config = json.load(fin)
+
+        infer_config = {
+            "name": inference_name,
+            "description": inference_desc,
+            "infer_path": current_inferencedir.as_posix(),
+            "model_for_infer_path": modeldir.as_posix(), 
+            "visibility": privacy,
+            "trainer": train_config['trainer'],
+            "TrDtSet": InfDtSet, #Save as TrDSet since the preprocessing script looks for this field
+            "Preproc": train_config['Preproc'],
+            "TMparam": train_config['TMparam'],
+            "creation_date": DT.datetime.now(),
+            "hierarchy-level": train_config['hierarchy-level'],
+            "htm-version": train_config['htm-version'],
+        }
+
+        with infer_configFile.open('w', encoding='utf-8') as outfile:
+            json.dump(infer_config, outfile,
+                      ensure_ascii=False, indent=2, default=str)
+
+        # 4. Preprocessing of Training Data
+        if self.cf.get('Spark', 'spark_available') == 'True':
+            script_spark = self.cf.get('Spark', 'script_spark')
+            token_spark = self.cf.get('Spark', 'token_spark')
+            script_path = './src/topicmodeling/topicmodeling.py'
+            machines = self.cf.get('Spark', 'machines')
+            cores = self.cf.get('Spark', 'cores')
+            options = '"--spark --preproc --config ' + infer_configFile.resolve().as_posix() + '"'
+            cmd = script_spark + ' -C ' + token_spark + \
+                ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
+            printred(cmd)
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                output = check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Execution of script failed')
+
+        else:
+            # Run command for corpus preprocessing using gensim
+            # Preprocessing will be accelerated with Dask using the number of
+            # workers indicated in the configuration file for the project
+            num_workers = self.cf.get('Dask', 'num_workers')
+            cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {infer_configFile.as_posix()} --nw {num_workers}'
+            printred(cmd)
+            
+            try:
+                self.logger.info(f'-- -- Running command {cmd}')
+                output = check_output(args=cmd, shell=True)
+            except:
+                self.logger.error('-- -- Command execution failed')
+        
+        # 5. Perform inference
+        cmd = f'python src/topicmodeling/inferencer.py --infer --config {infer_configFile.as_posix()}'
+        printred(cmd)
+        try:
+            self.logger.info(f'-- -- Running command {cmd}')
+            output = check_output(args=cmd, shell=True)
+        except:
+            self.logger.error('-- -- Command execution failed')
+
+        return
 
     def oldeditTM(self, corpus):
 
@@ -2400,7 +2525,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         return
 
-    def extractPipe(self, corpus):
+    def old_extractPipe(self, corpus):
 
         # A proper corpus with BoW, vocabulary, etc .. should exist
         path_corpus = self.p2p.joinpath(
@@ -2448,7 +2573,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         return
 
-    def inference(self, corpus):
+    def old_inference(self, corpus):
 
         # A proper corpus should exist with the corresponding ipmortation pipe
         path_pipe = self.p2p.joinpath(corpus).joinpath(

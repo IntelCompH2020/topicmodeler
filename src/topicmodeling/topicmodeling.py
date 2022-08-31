@@ -579,15 +579,6 @@ class Trainer(object):
 
         pass
 
-    @abstractmethod
-    def predict(self):
-        """
-        Inference of Topic Model
-        """
-
-        pass
-
-
 class MalletTrainer(Trainer):
     """
     Wrapper for the Mallet Topic Model Training. Implements the
@@ -726,6 +717,49 @@ class MalletTrainer(Trainer):
         thetas_file.unlink()
 
         return tm
+    
+    def _extract_pipe(self, modelFolder):
+        """
+        Creates a pipe based on a small amount of the training data to ensure that the holdout data that may be later inferred is compatible with the training data
+
+        Parameters
+        ----------
+        modelFolder: Path
+            Path to the model folder
+        """
+
+        # Get corpus file
+        path_corpus = modelFolder.joinpath('corpus.mallet')
+        if not path_corpus.is_file():
+            self._logger.error('-- Pipe extraction: Could not locate corpus file')
+            return
+
+        # Create auxiliary file with only first line from the original corpus file
+        path_txt = modelFolder.parent.joinpath('corpus.txt')
+        with path_txt.open('r', encoding='utf8') as f:
+            first_line = f.readline()
+        path_aux = modelFolder.joinpath('corpus_aux.txt')
+        with path_aux.open('w', encoding='utf8') as fout:
+            fout.write(first_line + '\n')
+
+        # We perform the import with the only goal to keep a small file containing the pipe
+        self._logger.info('-- Extracting pipeline')
+        path_pipe = modelFolder.joinpath('import.pipe')
+        
+        cmd = self._mallet_path.as_posix() + \
+            ' import-file --use-pipe-from %s --input %s --output %s'   
+        cmd = cmd % (path_corpus, path_aux, path_pipe)
+
+        try:
+            self._logger.info(f'-- Running command {cmd}')
+            check_output(args=cmd, shell=True)
+        except:
+            self._logger.error('-- Failed to extract pipeline. Revise command')
+
+        # Remove auxiliary file
+        path_aux.unlink()
+
+        return
 
     def fit(self, corpusFile):
         """
@@ -814,9 +848,11 @@ class MalletTrainer(Trainer):
 
         tm = self._createTMmodel(modelFolder)
 
+        # Create pipe for future inference tasks
+        self._extract_pipe(modelFolder)
+
         return
-
-
+    
 class sparkLDATrainer(Trainer):
     """
     Wrapper for the Spark LDA Topic Model Training. Implements the

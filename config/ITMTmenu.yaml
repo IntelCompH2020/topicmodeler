@@ -93,7 +93,7 @@ TMoptions:
     - copyTM
     - editTM
     - deleteTM
-    #- inference
+    - inference
 
 listTM:
   title: List available topic models
@@ -233,6 +233,13 @@ resetTM:
 deleteTM:
   title: Delete an Existing Topic Model
 
+inference:
+  title: Topic inference utilizing a pretrained model
+  #options:
+  #  - parameters:
+  #      S24Ever: Usar modelos de Semantic Scholar (Computer Science)
+  #      Crunch4Ever: Usar modelos de CrunchBase
+
 
 
 
@@ -247,13 +254,6 @@ extractPipe:
     - parameters:
         S24Ever: Extracción del pipeline para Semantic Scholar (Computer Science)
         Crunch4Ever: Extracción del pipeline para CrunchBase
-
-inference:
-  title: Inferencia de tópicos usando un modelo preentrenado
-  options:
-    - parameters:
-        S24Ever: Usar modelos de Semantic Scholar (Computer Science)
-        Crunch4Ever: Usar modelos de CrunchBase
 
 scalability:
   title: Validación de modelos de tópicos
