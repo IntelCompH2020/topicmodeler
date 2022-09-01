@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 import numpy as np
 from sklearn.preprocessing import normalize
+from src.topicmodeling.tm_utils import unpickler
 
 
 class Inferencer(object):
@@ -228,6 +229,52 @@ class ProdLDAInferencer(Inferencer):
         super().__init__(inferConfigFile, logger)
 
     def predict(self):
+        """
+        Performs topic inference utilizing a pretrained model according to ProdLDA
+        """
+
+        # Check if the model to perform inference on exists
+        model_for_inf = Path(
+            self._inferConfig["model_for_infer_path"])
+        if not os.path.isdir(model_for_inf):
+            self._logger.error(
+                f'-- -- Provided path for the model to perform inference on path is not valid -- Stop')
+            return
+
+        # A proper pickle file containing the avitm model should exist
+        path_pickle = Path(
+            self._inferConfig["model_for_infer_path"]).joinpath('modelFiles/model.pickle')
+        if not path_pickle.is_file():
+            self._logger.error(
+                '-- Inference error. Pickle with the AVITM model not found')
+            return
+
+        # Holdout corpus should exist
+        holdout_corpus = Path(
+            self._inferConfig['infer_path']).joinpath("corpus.parquet")
+        if not holdout_corpus.is_file():
+            self._logger.error(
+                '-- Inference error. File to perform the inference on not found')
+            return
+
+        # Generating holdout corpus in the input format required by ProdLDA
+        self._logger.info(
+            '-- -- Inference: BOW Dataset object generation')
+        df = pd.read_parquet(holdout_corpus)
+        df_lemas = df[["bow_text"]].values.tolist()
+        df_lemas = [doc[0].split() for doc in df_lemas]
+
+        ho_corpus = [el for el in df_lemas]
+        ho_data = prepare_hold_out_dataset(ho_corpus, avitm.train_data.cv, avitm.train_data.idx2token)
+
+        # Get inferred thetas matrix
+        avitm = unpickler(path_pickle)
+        thetas32 = np.asarray(
+            avitm.get_doc_topic_distribution(ho_data))
+        
+        super().apply_model_editions(thetas32)
+        super().transform_inference_output(thetas32, 100)
+
         return
 
 
@@ -268,8 +315,7 @@ if __name__ == "__main__":
                     # Import necessary libraries for prodLDA
                     from neural_models.pytorchavitm.avitm_network.avitm import \
                         AVITM
-                    from neural_models.pytorchavitm.utils.data_preparation import \
-                        prepare_dataset
+                    from src.topicmodeling.neural_models.pytorchavitm.utils.data_preparation import prepare_hold_out_dataset
 
                     # Create inferencer object
                     inferencer = ProdLDAInferencer(infer_config)

@@ -8,6 +8,21 @@ Provides a series of auxiliary functions for creation and management of topic mo
 import os
 from pathlib import Path
 
+import pickle
+
+
+def unpickler(file: str):
+    """Unpickle file"""
+    with open(file, 'rb') as f:
+        return pickle.load(f)
+
+
+def pickler(file: str, ob):
+    """Pickle object to file"""
+    with open(file, 'wb') as f:
+        pickle.dump(ob, f)
+    return 0
+
 
 def file_lines(fname):
     """

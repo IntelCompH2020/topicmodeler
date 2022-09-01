@@ -1218,6 +1218,10 @@ class ProdLDATrainer(Trainer):
 
         avitm.fit(self._train_dataset, self._val_dataset)
 
+        # Save avitm model for future inference
+        model_file = modelFolder.joinpath('model.pickle')
+        pickler(model_file, avitm)
+
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, avitm)
 
@@ -1493,6 +1497,10 @@ class CTMTrainer(Trainer):
                 loss_weights=self._loss_weights)
 
         ctm.fit(self._train_dts, self._val_dts)
+
+        # Save ctm model for future inference
+        model_file = modelFolder.joinpath('model.pickle')
+        pickler(ctm, model_file)
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, ctm)
@@ -1967,6 +1975,7 @@ if __name__ == "__main__":
                         AVITM
                     from neural_models.pytorchavitm.utils.data_preparation import \
                         prepare_dataset
+                    from tm_utils import pickler
 
                     # Create a ProdLDATrainer object with the parameters specified in the configuration file
                     ProdLDATr = ProdLDATrainer(

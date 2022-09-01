@@ -7,7 +7,7 @@ class BOWDataset(Dataset):
     
     """Class to load BOW dataset."""
 
-    def __init__(self, X, idx2token):
+    def __init__(self, X, idx2token, cv):
 
         """
         Initializes BOWDataset.
@@ -22,6 +22,7 @@ class BOWDataset(Dataset):
 
         self.X = X
         self.idx2token = idx2token
+        self.cv = cv
 
     def __len__(self):
         """Returns length of dataset."""

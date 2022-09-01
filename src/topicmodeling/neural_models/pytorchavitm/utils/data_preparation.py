@@ -52,7 +52,7 @@ def prepare_dataset(corpus, val_size=0.25):
     id2token = {k: v for k, v in zip(range(0, len(idx2token)), idx2token)}
 
     # The train dataset is an object from the class BOWDataset
-    train_data = BOWDataset(train_bow, idx2token)
+    train_data = BOWDataset(train_bow, idx2token, cv)
 
     ##############################################
     # Prepare validation dataset in AVITM format #
@@ -60,6 +60,17 @@ def prepare_dataset(corpus, val_size=0.25):
     docs_val_conv = [" ".join(docs_val[i]) for i in np.arange(len(docs_val))]
     val_bow = cv.transform(docs_val_conv)
     val_bow = val_bow.toarray()
-    val_data = BOWDataset(val_bow, idx2token)
+    val_data = BOWDataset(val_bow, idx2token, cv)
 
     return train_data, val_data, input_size, id2token, docs_train
+
+def prepare_hold_out_dataset(hold_out_corpus, cv, idx2token):
+
+    docs_ho_conv = \
+        [" ".join(hold_out_corpus[i]) for i in np.arange(len(hold_out_corpus))]
+    ho_bow = cv.transform(docs_ho_conv)
+    ho_bow = ho_bow.toarray()
+    ho_data = BOWDataset(ho_bow, idx2token)
+
+    return ho_data
+
