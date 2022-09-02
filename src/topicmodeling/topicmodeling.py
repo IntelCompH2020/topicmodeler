@@ -2010,6 +2010,7 @@ if __name__ == "__main__":
                         CombinedTM, ZeroShotTM)
                     from neural_models.contextualized_topic_models.utils.data_preparation import \
                         prepare_ctm_dataset
+                    from tm_utils import pickler
 
                     # Create a CTMTrainer object with the parameters specified in the configuration file
                     CTMr = CTMTrainer(
