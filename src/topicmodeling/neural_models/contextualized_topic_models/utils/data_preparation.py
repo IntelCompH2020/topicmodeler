@@ -1,10 +1,11 @@
-import numpy as np
-from sentence_transformers import SentenceTransformer
-import scipy.sparse
 import warnings
+
+import numpy as np
+import scipy.sparse
+from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
 
 # Local imports
 from ..datasets.dataset import CTMDataset
@@ -46,7 +47,7 @@ def bert_embeddings_from_list(texts, sbert_model_to_load, batch_size=32, max_seq
     model = SentenceTransformer(sbert_model_to_load)
 
     if max_seq_length is not None:
-       model.max_seq_length = max_seq_length
+        model.max_seq_length = max_seq_length
 
     check_max_local_length(max_seq_length, texts)
 
@@ -60,8 +61,8 @@ def check_max_local_length(max_seq_length, texts):
         warnings.warn(f"the longest document in your collection has {max_local_length} words, the model instead "
                       f"truncates to {max_seq_length} tokens.")
 
-def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=None, sbert_model_to_load='paraphrase-distilroberta-base-v1',val_size=0.25, max_seq_length=512):
 
+def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=None, sbert_model_to_load='paraphrase-distilroberta-base-v1', val_size=0.25, max_seq_length=512):
     """It prepares the training data in the format that is asked as input in a CTM model.
 
     Parameters
@@ -98,26 +99,32 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
     docs_train: list
         Train documents
     """
-    
+
     if custom_embeddings is None and unpreprocessed_corpus is None:
-        raise TypeError("Custom embeddings or an unpreprocessed corpus to generate the embeddings from must be provided")
+        raise TypeError(
+            "Custom embeddings or an unpreprocessed corpus to generate the embeddings from must be provided")
 
     # Create embeddings from text if no custom embeddings are provided
     if custom_embeddings is None:
-        docs_conv = [" ".join(unpreprocessed_corpus[i]) for i in np.arange(len(unpreprocessed_corpus))]
-        custom_embeddings = bert_embeddings_from_list(docs_conv, sbert_model_to_load, max_seq_length=max_seq_length)
+        docs_conv = [" ".join(unpreprocessed_corpus[i])
+                     for i in np.arange(len(unpreprocessed_corpus))]
+        custom_embeddings = bert_embeddings_from_list(
+            docs_conv, sbert_model_to_load, max_seq_length=max_seq_length)
 
     # Divide text data and embeddings into training and validation sets
     docs_train, docs_val, embeddings_train, embeddings_val = \
-        train_test_split(corpus, custom_embeddings, test_size=val_size, random_state=42)
+        train_test_split(corpus, custom_embeddings,
+                         test_size=val_size, random_state=42)
 
     # Create a CountVectorizer object to convert a collection of text documents into a matrix of token counts
-    cv = CountVectorizer(input='content', lowercase=True, stop_words='english', binary=False)
-    
+    cv = CountVectorizer(input='content', lowercase=True,
+                         stop_words='english', binary=False)
+
     #######################################
     # Prepare train dataset in CTM format #
     #######################################
-    docs_train_conv = [" ".join(docs_train[i]) for i in np.arange(len(docs_train))]
+    docs_train_conv = [" ".join(docs_train[i])
+                       for i in np.arange(len(docs_train))]
 
     # Learn the vocabulary dictionary, train_bow = document-term matrix.
     train_bow = cv.fit_transform(docs_train_conv)
@@ -137,9 +144,52 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
     # Prepare validation dataset in CTM format #
     ############################################
     docs_val_conv = [" ".join(docs_val[i]) for i in np.arange(len(docs_val))]
-    validation_dataset = qt.transform(text_for_bow=docs_val_conv, text_for_contextual = docs_val_conv, custom_embeddings=embeddings_val)
+    validation_dataset = qt.transform(
+        text_for_bow=docs_val_conv, text_for_contextual=docs_val_conv, custom_embeddings=embeddings_val)
 
     return training_dataset, validation_dataset, input_size, id2token, qt, embeddings_train, custom_embeddings, docs_train
+
+
+def prepare_hold_out_dataset(hold_out_corpus, qt, unpreprocessed_ho_corpus=None, embeddings_ho=None, sbert_model_to_load='paraphrase-distilroberta-base-v1', max_seq_length=512):
+    """It prepares the holdout data in the format that is asked as input in CTM, based on the TopicModelDataPreparation object generated for the training dataset
+
+    Parameters
+    ----------
+    hold_out_corpus: List[str]
+        List of hold-out lemmatized documents
+    qt: TopicModelDataPreparation 
+        Object that contains the necessary information for the construction of a CTMDataset
+    unpreprocessed_ho_corpus: List[str]
+        List of hold-out raw documents
+    embeddings_ho:
+        Embeddings associated with the hold-out documents
+    sbert_model_to_load: str (default='paraphrase-distilroberta-base-v1')
+        Model (e.g. paraphrase-distilroberta-base-v1) to be used for generating the embeddings
+    max_seq_length: int (default=512)
+
+    Returns
+    -------
+    ho_data: CTMDataset
+        Holdout dataset in the required format for CTM
+    """
+
+    if embeddings_ho is None and unpreprocessed_ho_corpus is None:
+        raise TypeError(
+            "Custom embeddings or an unpreprocessed corpus to generate the embeddings from must be provided")
+
+    # Create embeddings from text if no custom embeddings are provided
+    if embeddings_ho is None:
+        docs_conv = [" ".join(unpreprocessed_ho_corpus[i])
+                     for i in np.arange(len(unpreprocessed_ho_corpus))]
+        embeddings_ho = bert_embeddings_from_list(
+            docs_conv, sbert_model_to_load, max_seq_length=max_seq_length)
+
+    docs_ho_conv = \
+        [" ".join(hold_out_corpus[i]) for i in np.arange(len(hold_out_corpus))]
+    ho_data = qt.transform(text_for_bow=docs_ho_conv,
+                           text_for_contextual=docs_ho_conv, custom_embeddings=embeddings_ho)
+
+    return ho_data
 
 
 class TopicModelDataPreparation:
@@ -180,13 +230,15 @@ class TopicModelDataPreparation:
                 assert len(custom_embeddings) == len(text_for_bow)
 
             if type(custom_embeddings).__module__ != 'numpy':
-                raise TypeError("contextualized_embeddings must be a numpy.ndarray type object")
+                raise TypeError(
+                    "contextualized_embeddings must be a numpy.ndarray type object")
 
         if text_for_bow is not None:
             assert len(text_for_contextual) == len(text_for_bow)
 
         if self.contextualized_model is None and custom_embeddings is None:
-            raise Exception("A contextualized model or contextualized embeddings must be defined")
+            raise Exception(
+                "A contextualized model or contextualized embeddings must be defined")
 
         # TODO: this count vectorizer removes tokens that have len = 1, might be unexpected for the users
         self.vectorizer = CountVectorizer()
@@ -201,11 +253,13 @@ class TopicModelDataPreparation:
         else:
             train_contextualized_embeddings = custom_embeddings
         self.vocab = self.vectorizer.get_feature_names()
-        self.id2token = {k: v for k, v in zip(range(0, len(self.vocab)), self.vocab)}
+        self.id2token = {k: v for k, v in zip(
+            range(0, len(self.vocab)), self.vocab)}
 
         if labels:
             self.label_encoder = OneHotEncoder()
-            encoded_labels = self.label_encoder.fit_transform(np.array([labels]).reshape(-1, 1))
+            encoded_labels = self.label_encoder.fit_transform(
+                np.array([labels]).reshape(-1, 1))
         else:
             encoded_labels = None
         return CTMDataset(
@@ -216,7 +270,7 @@ class TopicModelDataPreparation:
         """
         This method create the input for the prediction. Essentially, it creates the embeddings with the contextualized
         model of choice and with trained vectorizer.
-        
+
         If text_for_bow is missing, it should be because we are using ZeroShotTM
 
         Parameters
@@ -241,7 +295,8 @@ class TopicModelDataPreparation:
             assert len(text_for_contextual) == len(text_for_bow)
 
         if self.contextualized_model is None:
-            raise Exception("You should define a contextualized model if you want to create the embeddings")
+            raise Exception(
+                "You should define a contextualized model if you want to create the embeddings")
 
         if text_for_bow is not None:
             test_bow_embeddings = self.vectorizer.transform(text_for_bow)
@@ -254,7 +309,8 @@ class TopicModelDataPreparation:
                     "are using ZeroShotTM in a cross-lingual setting")
 
             # we just need an object that is matrix-like so that pytorch does not complain
-            test_bow_embeddings = scipy.sparse.csr_matrix(np.zeros((len(text_for_contextual), 1)))
+            test_bow_embeddings = scipy.sparse.csr_matrix(
+                np.zeros((len(text_for_contextual), 1)))
 
         if custom_embeddings is None:
             test_contextualized_embeddings = bert_embeddings_from_list(
@@ -263,7 +319,8 @@ class TopicModelDataPreparation:
             test_contextualized_embeddings = custom_embeddings
 
         if labels:
-            encoded_labels = self.label_encoder.transform(np.array([labels]).reshape(-1, 1))
+            encoded_labels = self.label_encoder.transform(
+                np.array([labels]).reshape(-1, 1))
         else:
             encoded_labels = None
 

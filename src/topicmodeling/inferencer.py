@@ -5,11 +5,12 @@ import sys
 from abc import abstractmethod
 from pathlib import Path
 from subprocess import check_output
-import pandas as pd
-from tqdm import tqdm
 
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import normalize
+from tqdm import tqdm
+
 from tm_utils import unpickler
 
 
@@ -52,7 +53,7 @@ class Inferencer(object):
             Doc-topic distribution of the inferred documents
         multiplier: int
             Factor by which the topic weights are multiplied
-        """   
+        """
 
         self._logger.info(
             '-- Inference: Saving the topic distribution for each document in text format')
@@ -62,8 +63,9 @@ class Inferencer(object):
             for tpc_id in np.arange(thetas32.shape[1]):
                 freq = multiplier*thetas32[doc_id][tpc_id]
                 doc_repr += str(tpc_id) + "|" + str(freq) + " "
-            docs_repr.append([doc_id,doc_repr])
-        df = pd.DataFrame(docs_repr, columns=["DocID", "TpcRepr"]).set_index("DocID", drop=False)
+            docs_repr.append([doc_id, doc_repr])
+        df = pd.DataFrame(docs_repr, columns=["DocID", "TpcRepr"]).set_index(
+            "DocID", drop=False)
 
         infer_path = Path(self._inferConfig["infer_path"])
         doc_topics_file_csv = infer_path.joinpath("doc-topics.csv")
@@ -72,17 +74,16 @@ class Inferencer(object):
         return
 
     def apply_model_editions(self, thetas32):
-
         """Load thetas file, apply model edition actions, and save it as a numpy array
 
         Parameters
         ----------
         thetas32: np.ndarray
             Doc-topic distribution of the inferred documents
-        """        
+        """
         self._logger.info(
             '-- Inference: Applying model edition transformations')
-       
+
         model_for_infer_path = Path(self._inferConfig["model_for_infer_path"])
         infer_path = Path(self._inferConfig["infer_path"])
 
@@ -106,7 +107,7 @@ class Inferencer(object):
                         thetas32[:, tpcs[0]] = thet
                         thetas32 = np.delete(thetas32, tpcs[1:], 1)
         thetas32 = normalize(thetas32, axis=1, norm='l1')
-        self._logger.info(thetas32.shape)#nodcs*ntopics
+        self._logger.info(thetas32.shape)  # nodcs*ntopics
         doc_topics_file_npy = infer_path.joinpath("doc-topics.npy")
         np.save(doc_topics_file_npy, thetas32)
 
@@ -207,7 +208,7 @@ class MalletInferencer(Inferencer):
         cols = [k for k in np.arange(2, ntopics + 2)]
         thetas32 = np.loadtxt(doc_topics_file, delimiter='\t',
                               dtype=np.float32, usecols=cols)
-        
+
         super().apply_model_editions(thetas32)
         super().transform_inference_output(thetas32, 100)
 
@@ -263,20 +264,21 @@ class ProdLDAInferencer(Inferencer):
         df = pd.read_parquet(holdout_corpus)
         df_lemas = df[["bow_text"]].values.tolist()
         df_lemas = [doc[0].split() for doc in df_lemas]
-        
+
         # Get avitm object for performing inference
         avitm = unpickler(path_pickle)
-        
+
         # Prepare holdout corpus in avitm format
         ho_corpus = [el for el in df_lemas]
-        ho_data = prepare_hold_out_dataset(ho_corpus, avitm.train_data.cv, avitm.train_data.idx2token)
-        
+        ho_data = prepare_hold_out_dataset(
+            ho_corpus, avitm.train_data.cv, avitm.train_data.idx2token)
+
         # Get inferred thetas matrix
         self._logger.info(
             '-- -- Inference: Getting inferred thetas matrix')
         thetas32 = np.asarray(
             avitm.get_doc_topic_distribution(ho_data))
-        
+
         super().apply_model_editions(thetas32)
         super().transform_inference_output(thetas32, 100)
 
@@ -289,6 +291,67 @@ class CTMInferencer(Inferencer):
         super().__init__(inferConfigFile, logger)
 
     def predict(self):
+        """
+        Performs topic inference utilizing a pretrained model according to CTM
+        """
+
+        # Check if the model to perform inference on exists
+        model_for_inf = Path(
+            self._inferConfig["model_for_infer_path"])
+        if not os.path.isdir(model_for_inf):
+            self._logger.error(
+                f'-- -- Provided path for the model to perform inference on path is not valid -- Stop')
+            return
+
+        # A proper pickle file containing the avitm model should exist
+        path_pickle = Path(
+            self._inferConfig["model_for_infer_path"]).joinpath('modelFiles/model.pickle')
+        if not path_pickle.is_file():
+            self._logger.error(
+                '-- Inference error. Pickle with the CTM model not found')
+            return
+
+        # Get avitm object for performing inference
+        ctm = unpickler(path_pickle)
+
+        # Holdout corpus should exist
+        holdout_corpus = Path(
+            self._inferConfig['infer_path']).joinpath("corpus.parquet")
+        if not os.path.isdir(holdout_corpus):
+            self._logger.error(
+                '-- Inference error. File to perform the inference on not found')
+            return
+
+        # Generating holdout corpus in the input format required by CTM
+        self._logger.info(
+            '-- -- Inference: CTM Dataset object generation')
+        df = pd.read_parquet(holdout_corpus)
+        df_lemas = df[["bow_text"]].values.tolist()
+        df_lemas = [doc[0].split() for doc in df_lemas]
+        corpus = [el for el in df_lemas]
+
+        if not "embeddings" in list(df.columns.values):
+            df_raw = df[["all_rawtext"]].values.tolist()
+            df_raw = [doc[0].split() for doc in df_raw]
+            unpreprocessed_corpus = [el for el in df_raw]
+            embeddings = None
+        else:
+            embeddings = df.embeddings.values
+            unpreprocessed_corpus = None
+
+        ho_data = prepare_hold_out_dataset(
+            hold_out_corpus=corpus,
+            qt=ctm.train_data.qt, unpreprocessed_ho_corpus=unpreprocessed_corpus, embeddings_ho=embeddings)
+
+        # Get inferred thetas matrix
+        self._logger.info(
+            '-- -- Inference: Getting inferred thetas matrix')
+        thetas32 = np.asarray(
+            ctm.get_doc_topic_distribution(ho_data))
+
+        super().apply_model_editions(thetas32)
+        super().transform_inference_output(thetas32, 100)
+
         return
 
 
@@ -318,23 +381,20 @@ if __name__ == "__main__":
 
                 elif infer_config['trainer'] == 'prodLDA':
                     # Import necessary libraries for prodLDA
-                    from neural_models.pytorchavitm.avitm_network.avitm import \
-                        AVITM
-                    from neural_models.pytorchavitm.utils.data_preparation import prepare_hold_out_dataset
+                    from neural_models.pytorchavitm.utils.data_preparation import \
+                        prepare_hold_out_dataset
 
                     # Create inferencer object
                     inferencer = ProdLDAInferencer(infer_config)
 
                 elif infer_config['trainer'] == 'ctm':
                     # Import necessary libraries for CTM
-                    from neural_models.contextualized_topic_models.ctm_network.ctm import (
-                        CombinedTM, ZeroShotTM)
                     from neural_models.contextualized_topic_models.utils.data_preparation import \
-                        prepare_ctm_dataset
+                        prepare_hold_out_dataset
 
                     # Create inferencer object
                     inferencer = CTMInferencer(infer_config)
-                
+
                 inferencer.predict()
         else:
             sys.exit('You need to provide a valid configuration file')

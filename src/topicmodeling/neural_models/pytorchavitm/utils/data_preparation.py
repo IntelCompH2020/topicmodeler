@@ -32,16 +32,19 @@ def prepare_dataset(corpus, val_size=0.25):
     """
 
     # Divide data into training and validation
-    docs_train, docs_val = train_test_split(corpus, test_size=val_size, random_state=42)
+    docs_train, docs_val = train_test_split(
+        corpus, test_size=val_size, random_state=42)
 
     # Create a CountVectorizer object to convert a collection of text documents into a matrix of token counts
     # Max and min_df not considered since cleaning is being previously performed
-    cv = CountVectorizer(input='content', lowercase=True, stop_words='english', binary=False)
+    cv = CountVectorizer(input='content', lowercase=True,
+                         stop_words='english', binary=False)
 
     #########################################
     # Prepare train dataset in AVITM format #
     #########################################
-    docs_train_conv = [" ".join(docs_train[i]) for i in np.arange(len(docs_train))]
+    docs_train_conv = [" ".join(docs_train[i])
+                       for i in np.arange(len(docs_train))]
 
     # Learn the vocabulary dictionary, train_bow = document-term matrix.
     train_bow = cv.fit_transform(docs_train_conv).toarray()
@@ -64,7 +67,24 @@ def prepare_dataset(corpus, val_size=0.25):
 
     return train_data, val_data, input_size, id2token, docs_train
 
+
 def prepare_hold_out_dataset(hold_out_corpus, cv, idx2token):
+    """It prepares the holdout data in the format that is asked as input in AVITM, based on the countvectorizer object generated for the training dataset
+
+    Parameters
+    ----------
+    hold_out_corpus: List[str]
+        List of hold-out documents
+    cv: CountVectorizer 
+        Sparse representation of the vocabulary counts 
+    idx2token: ndarray
+        Output feature names
+
+    Returns
+    -------
+    ho_data: BOWDataset
+        Holdout dataset in the required format for AVITM
+    """
 
     docs_ho_conv = \
         [" ".join(hold_out_corpus[i]) for i in np.arange(len(hold_out_corpus))]
@@ -73,4 +93,3 @@ def prepare_hold_out_dataset(hold_out_corpus, cv, idx2token):
     ho_data = BOWDataset(ho_bow, idx2token, cv)
 
     return ho_data
-

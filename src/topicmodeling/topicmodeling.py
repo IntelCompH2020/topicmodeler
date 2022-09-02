@@ -1408,7 +1408,7 @@ class CTMTrainer(Trainer):
         modelFolder = corpusFile.parent.joinpath('modelFiles')
         modelFolder.mkdir()
 
-        # Generating the corpus in the input format required by ProdLDA
+        # Generating the corpus in the input format required by CTM
         self._logger.info('-- -- CTM Corpus Generation: BOW Dataset object')
         df = pd.read_parquet(corpusFile)
         df_lemas = df[["bow_text"]].values.tolist()
@@ -1500,7 +1500,7 @@ class CTMTrainer(Trainer):
 
         # Save ctm model for future inference
         model_file = modelFolder.joinpath('model.pickle')
-        pickler(ctm, model_file)
+        pickler(model_file, ctm)
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, ctm)
