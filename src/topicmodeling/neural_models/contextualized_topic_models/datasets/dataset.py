@@ -6,7 +6,7 @@ from scipy import sparse
 class CTMDataset(Dataset):
     """Class to load BoW and the contextualized embeddings."""
 
-    def __init__(self, X_contextual, X_bow, idx2token, labels=None):
+    def __init__(self, X_contextual, X_bow, idx2token, qt, labels=None):
 
         if X_bow.shape[0] != len(X_contextual):
             raise Exception("Wait! BoW and Contextual Embeddings have different sizes! "
@@ -21,6 +21,7 @@ class CTMDataset(Dataset):
         self.X_contextual = X_contextual
         self.idx2token = idx2token
         self.labels = labels
+        self.qt = qt
 
     def __len__(self):
         """Return length of dataset."""

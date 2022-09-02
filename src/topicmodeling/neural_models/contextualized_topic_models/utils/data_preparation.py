@@ -205,7 +205,7 @@ class TopicModelDataPreparation:
 
     def load(self, contextualized_embeddings, bow_embeddings, id2token, labels=None):
         return CTMDataset(
-            X_contextual=contextualized_embeddings, X_bow=bow_embeddings, idx2token=id2token, labels=labels)
+            X_contextual=contextualized_embeddings, X_bow=bow_embeddings, idx2token=id2token, qt=self, labels=labels)
 
     def fit(self, text_for_contextual, text_for_bow, labels=None, custom_embeddings=None):
         """
@@ -325,4 +325,4 @@ class TopicModelDataPreparation:
             encoded_labels = None
 
         return CTMDataset(X_contextual=test_contextualized_embeddings, X_bow=test_bow_embeddings,
-                          idx2token=self.id2token, labels=encoded_labels)
+                          idx2token=self.id2token, qt=self, labels=encoded_labels)
