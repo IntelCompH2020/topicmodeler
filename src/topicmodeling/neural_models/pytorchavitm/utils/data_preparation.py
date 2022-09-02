@@ -70,7 +70,7 @@ def prepare_hold_out_dataset(hold_out_corpus, cv, idx2token):
         [" ".join(hold_out_corpus[i]) for i in np.arange(len(hold_out_corpus))]
     ho_bow = cv.transform(docs_ho_conv)
     ho_bow = ho_bow.toarray()
-    ho_data = BOWDataset(ho_bow, idx2token)
+    ho_data = BOWDataset(ho_bow, idx2token, cv)
 
     return ho_data
 

@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 import numpy as np
 from sklearn.preprocessing import normalize
-from src.topicmodeling.tm_utils import unpickler
+from tm_utils import unpickler
 
 
 class Inferencer(object):
@@ -252,7 +252,7 @@ class ProdLDAInferencer(Inferencer):
         # Holdout corpus should exist
         holdout_corpus = Path(
             self._inferConfig['infer_path']).joinpath("corpus.parquet")
-        if not holdout_corpus.is_file():
+        if not os.path.isdir(holdout_corpus):
             self._logger.error(
                 '-- Inference error. File to perform the inference on not found')
             return
@@ -263,12 +263,17 @@ class ProdLDAInferencer(Inferencer):
         df = pd.read_parquet(holdout_corpus)
         df_lemas = df[["bow_text"]].values.tolist()
         df_lemas = [doc[0].split() for doc in df_lemas]
-
+        
+        # Get avitm object for performing inference
+        avitm = unpickler(path_pickle)
+        
+        # Prepare holdout corpus in avitm format
         ho_corpus = [el for el in df_lemas]
         ho_data = prepare_hold_out_dataset(ho_corpus, avitm.train_data.cv, avitm.train_data.idx2token)
-
+        
         # Get inferred thetas matrix
-        avitm = unpickler(path_pickle)
+        self._logger.info(
+            '-- -- Inference: Getting inferred thetas matrix')
         thetas32 = np.asarray(
             avitm.get_doc_topic_distribution(ho_data))
         
@@ -315,7 +320,7 @@ if __name__ == "__main__":
                     # Import necessary libraries for prodLDA
                     from neural_models.pytorchavitm.avitm_network.avitm import \
                         AVITM
-                    from src.topicmodeling.neural_models.pytorchavitm.utils.data_preparation import prepare_hold_out_dataset
+                    from neural_models.pytorchavitm.utils.data_preparation import prepare_hold_out_dataset
 
                     # Create inferencer object
                     inferencer = ProdLDAInferencer(infer_config)
