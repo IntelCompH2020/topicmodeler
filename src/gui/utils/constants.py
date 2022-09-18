@@ -35,7 +35,7 @@ class Constants:
     WORDLIST_CREATION_MSG_STATUS_2 = "The wordlist replaced an existing one."
     WORDLIST_EDITION_MSG_STATUS_0 = "The wordlist could not be created."
     WORDLIST_EDITION_MSG_STATUS_1 = "The wordlist was created successfully."
-    WORDLIST_EDITION_MSG_STATUS_2 = "The wordlist replaced an existing dataset"
+    WORDLIST_EDITION_MSG_STATUS_2 = "The wordlist was updated successfully."
     EDIT_WORDLIST_NOT_SELECTED_MSG = "A wordlist to be edited must be selected first."
     DELETE_WORDLIST_NOT_SELECTED_MSG = "A wordlist to be deleted must be selected first."
 

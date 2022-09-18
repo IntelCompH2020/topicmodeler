@@ -327,6 +327,7 @@ class TMmodel(object):
         np.save(self._TMfolder.joinpath('alphas.npy'), self._alphas)
         np.save(self._TMfolder.joinpath('betas.npy'), self._betas)
         sparse.save_npz(self._TMfolder.joinpath('thetas.npz'), self._thetas)
+
         with self._TMfolder.joinpath('edits.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._edits))
         np.save(self._TMfolder.joinpath('betas_ds.npy'), self._betas_ds)
@@ -364,6 +365,7 @@ class TMmodel(object):
         vis_data = pyLDAvis.prepare(self._betas, self._thetas[validDocs, ][perm, ].toarray(),
                                     doc_len, self._vocab, vocabfreq, lambda_step=0.05,
                                     sort_topics=False, n_jobs=-1)
+
         with self._TMfolder.joinpath("pyLDAvis.html").open("w") as f:
             pyLDAvis.save_html(vis_data, f)
         # TODO: Check substituting by "pyLDAvis.prepared_data_to_html"
@@ -835,7 +837,6 @@ class TMmodel(object):
             tpcs = sorted(tpcs)
 
             # Calculate new variables
-
             # For beta we keep a weighted average of topic vectors
             weights = self._alphas[tpcs]
             bet = weights[np.newaxis, ...].dot(
@@ -843,7 +844,6 @@ class TMmodel(object):
             # keep new topic vector in upper position and delete the others
             self._betas[tpcs[0], :] = bet
             self._betas = np.delete(self._betas, tpcs[1:], 0)
-
             # For theta we need to keep the sum. Since adding implies changing
             # structure, we need to convert to full matrix first
             # No need to renormalize
@@ -855,7 +855,6 @@ class TMmodel(object):
             # Compute new alphas and number of topics
             self._alphas = np.asarray(np.mean(self._thetas, axis=0)).ravel()
             self._ntopics = self._thetas.shape[1]
-
             # Compute all other variables
             self._calculate_beta_ds()
             self._calculate_topic_entropy()
@@ -871,9 +870,8 @@ class TMmodel(object):
             for tpc in tpcs[1:][::-1]:
                 del self._tpc_labels[tpc]
 
-            self._calculate_topic_coherence()
+            self.calculate_topic_coherence()
             self._edits.append('f ' + ' '.join([str(el) for el in tpcs]))
-
             # We are ready to save all variables in the model
             self._save_all()
 
