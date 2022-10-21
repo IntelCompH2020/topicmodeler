@@ -40,7 +40,7 @@ class CorpusManager(object):
         metafile = path_parquet.joinpath('datasetMeta.json')
         with open(metafile, 'r', encoding='utf8') as fin:
             allDtsets = json.load(fin)
-        allDtsets = {path_parquet.joinpath(Dts).resolve().as_posix() : allDtsets[Dts]
+        allDtsets = {path_parquet.joinpath(Dts).resolve().as_posix(): allDtsets[Dts]
                         for Dts in allDtsets.keys()}
 
         return allDtsets
@@ -133,54 +133,134 @@ class CorpusManager(object):
             except:
                 return 0
 
+    def renameTrDtset(self, name: Path, new_name: Path):
+        """
+        Renames a dataset
+
+        Parameters
+        ----------
+        name : pathlib.Path
+            Path to the json file to be renamed
+
+        new_name : pathlib.Path
+            Path to the new name for the json file
+
+        Returns
+        -------
+        status : int
+            - 0 if the dataset could not be renamed
+            - 1 if the dataset was renamed successfully
+
+        """
+
+        if not name.is_file():
+            print(f"File '{name.as_posix()}' does not exist.")
+            return 0
+        if new_name.is_file():
+            print(
+                f"File '{new_name.as_posix()}' already exists. Rename or delete it first.")
+            return 0
+        try:
+            with name.open("r", encoding="utf8") as fin:
+                Dtset = json.load(fin)
+            Dtset["name"] = new_name.stem
+            with new_name.open("w", encoding="utf-8") as fout:
+                json.dump(Dtset, fout, ensure_ascii=False, indent=2, default=str)
+            name.unlink()
+            return 1
+        except:
+            return 0
+
+    def copyTrDtset(self, name: Path):
+        """
+        Creates a copy of a wordlist
+
+        Parameters
+        ----------
+        name : pathlib.Path
+            Path to the json file to be copied
+
+        Returns
+        -------
+        status : int
+            - 0 if the wordlist could not be renamed
+            - 1 if the wordlist was renamed successfully
+
+        """
+
+        if not name.is_file():
+            print(f"File '{name.as_posix()}' does not exist.")
+            return 0
+        try:
+            path_copy = name.with_name(f"{name.stem}-copy.json")
+            shutil.copy(name, path_copy)
+            with path_copy.open("r", encoding="utf8") as fin:
+                Dtset = json.load(fin)
+            Dtset["name"] = path_copy.stem
+            with path_copy.open("w", encoding="utf-8") as fout:
+                json.dump(Dtset, fout, ensure_ascii=False, indent=2, default=str)
+            return 1
+        except:
+            return 0
+
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Scripts for Corpus Management Service')
+    parser.add_argument("--path_downloaded", type=str, default=None, required=True,
+                        metavar=("path_to_datasets"),
+                        help="path to downloaded datasets")
+    parser.add_argument("--path_datasets", type=str, default=None, required=True,
+                        metavar=("path_to_datasets"),
+                        help="path to training datasets")
     parser.add_argument('--listDownloaded', action='store_true', default=False,
                         help='List datasets downloaded from HDFS with metadata.')
     parser.add_argument('--saveTrDtset', action='store_true', default=False,
                         help='Save Training Dataset')
     parser.add_argument('--listTrDtsets', action='store_true', default=False,
                         help='List Training Datasets')
-    parser.add_argument('--deleteTrDtset', action='store_true', default=False,
+    parser.add_argument('--deleteTrDtset', type=str, default=None,
+                        metavar=("filename"),
                         help='Delete a Training Dataset')
-    parser.add_argument('--parquet', type=str, default=None,
-                        help="path to downloaded parquet datasets")
-    parser.add_argument('--path_datasets', type=str, default=None,
-                        help="path to project datasets")
-    parser.add_argument('--path_TrDtset', type=str, default=None,
-                        help="path to Training dataset that will be deleted")
+    parser.add_argument("--renameTrDtset", type=str, default=None, nargs=2,
+                        metavar=("filename", "new_filename"),
+                        help="Rename wordlist with selected name to new name")
+    parser.add_argument("--copyTrDtset", type=str, default=None,
+                        metavar=("filename"),
+                        help="Make a copy of wordlist with selected name")
     args = parser.parse_args()
 
     cm = CorpusManager()
 
-    if args.listDownloaded:
-        if not args.parquet:
-            sys.exit('You need to indicate the location of downloaded datasets')
+    dwds_path = Path(args.path_downloaded)
+    trds_path = Path(args.path_datasets)
 
-        allDtsets = cm.listDownloaded(Path(args.parquet))
+    if args.listDownloaded:
+        allDtsets = cm.listDownloaded(dwds_path)
         sys.stdout.write(json.dumps(allDtsets))
 
     if args.saveTrDtset:
-        if not args.path_datasets:
-            sys.exit('You need to indicate the location of training datasets')
         Dtset = [line for line in sys.stdin][0]
         Dtset = json.loads(Dtset.replace('\\"', '"'))
 
-        status = cm.saveTrDtset(Path(args.path_datasets), Dtset)
+        status = cm.saveTrDtset(trds_path, Dtset)
         sys.stdout.write(str(status))
 
     if args.listTrDtsets:
-        if not args.path_datasets:
-            sys.exit('You need to indicate the location of training datasets')
-
-        allTrDtsets = cm.listTrDtsets(Path(args.path_datasets))
+        allTrDtsets = cm.listTrDtsets(trds_path)
         sys.stdout.write(json.dumps(allTrDtsets))
 
     if args.deleteTrDtset:
-        if not args.path_TrDtset:
-            sys.exit('You need to indicate the location of the training dataset that will be deleted')
+        status = cm.deleteTrDtset(trds_path.joinpath(f"{args.deleteTrDtset}.json"))
+        sys.stdout.write(str(status))
+    
+    if args.renameTrDtset:
+        status = cm.renameTrDtset(
+            trds_path.joinpath(f"{args.renameTrDtset[0]}.json"),
+            trds_path.joinpath(f"{args.renameTrDtset[1]}.json"),
+        )
+        sys.stdout.write(str(status))
 
-        status = cm.deleteTrDtset(Path(args.path_TrDtset))
+    if args.copyTrDtset:
+        status = cm.copyTrDtset(trds_path.joinpath(f"{args.copyTrDtset}.json"))
         sys.stdout.write(str(status))
