@@ -3593,7 +3593,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                                             allTMmodels[TMmodel]['name'] + ' could not be renamed.')
                     elif int(status.decode('utf8')) == 1:
                         QMessageBox.information(gui, Constants.SMOOTH_SPOON_MSG, 'Topic Model ' +
-                                                allTMmodels[TMmodel]['name'] + ' was deleted successfully renamed to ' + new_name)
+                                                allTMmodels[TMmodel]['name'] + ' was succesfully renamed to ' + new_name)
         return
 
     def copyTM(self, model_to_copy, new_name, gui):

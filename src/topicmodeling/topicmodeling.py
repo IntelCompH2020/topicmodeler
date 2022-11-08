@@ -21,11 +21,11 @@ import sys
 from abc import abstractmethod
 from pathlib import Path
 
+import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import dask.dataframe as dd
-                
+
 
 class textPreproc(object):
     """
@@ -199,10 +199,11 @@ class textPreproc(object):
 
             with ProgressBar():
                 DFtokens = trDF[['final_tokens']]
-                if nw>0:
-                    DFtokens = DFtokens.compute(scheduler='processes', num_workers=nw)
+                if nw > 0:
+                    DFtokens = DFtokens.compute(
+                        scheduler='processes', num_workers=nw)
                 else:
-                    #Use Dask default (i.e., number of available cores)
+                    # Use Dask default (i.e., number of available cores)
                     DFtokens = DFtokens.compute(scheduler='processes')
             self._GensimDict = corpora.Dictionary(
                 DFtokens['final_tokens'].values.tolist())
@@ -390,13 +391,13 @@ class textPreproc(object):
                 with ProgressBar():
                     #trDF = trDF.persist(scheduler='processes')
                     DFmallet = trDF[['2mallet']]
-                    if nw>0:
+                    if nw > 0:
                         DFmallet.to_csv(outFile, index=False, header=False, single_file=True,
-                                    compute_kwargs={'scheduler': 'processes', 'num_workers': nw})
+                                        compute_kwargs={'scheduler': 'processes', 'num_workers': nw})
                     else:
-                        #Use Dask default number of workers (i.e., number of cores)
+                        # Use Dask default number of workers (i.e., number of cores)
                         DFmallet.to_csv(outFile, index=False, header=False, single_file=True,
-                                    compute_kwargs={'scheduler': 'processes'})
+                                        compute_kwargs={'scheduler': 'processes'})
 
             elif tmTrainer == 'sparkLDA':
                 self._logger.error(
@@ -412,13 +413,13 @@ class textPreproc(object):
                 with ProgressBar():
                     DFparquet = trDF[['id', 'cleantext']].rename(
                         columns={"cleantext": "bow_text"})
-                    if nw>0:
+                    if nw > 0:
                         DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
-                                         'scheduler': 'processes', 'num_workers': nw})
+                            'scheduler': 'processes', 'num_workers': nw})
                     else:
-                        #Use Dask default number of workers (i.e., number of cores)
+                        # Use Dask default number of workers (i.e., number of cores)
                         DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
-                                         'scheduler': 'processes'})
+                            'scheduler': 'processes'})
 
             elif tmTrainer == "ctm":
                 outFile = dirpath.joinpath('corpus.parquet')
@@ -435,13 +436,13 @@ class textPreproc(object):
                         ('bow_text', pa.string()),
                         ('embeddings', pa.list_(pa.float64()))
                     ])
-                    if nw>0:
+                    if nw > 0:
                         DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
-                                         'scheduler': 'processes', 'num_workers': nw})
+                            'scheduler': 'processes', 'num_workers': nw})
                     else:
-                        #Use Dask default number of workers (i.e., number of cores)
+                        # Use Dask default number of workers (i.e., number of cores)
                         DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
-                                         'scheduler': 'processes'})
+                            'scheduler': 'processes'})
 
         else:
             # Spark dataframe
@@ -578,6 +579,7 @@ class Trainer(object):
         """
 
         pass
+
 
 class MalletTrainer(Trainer):
     """
@@ -717,7 +719,7 @@ class MalletTrainer(Trainer):
         thetas_file.unlink()
 
         return tm
-    
+
     def _extract_pipe(self, modelFolder):
         """
         Creates a pipe based on a small amount of the training data to ensure that the holdout data that may be later inferred is compatible with the training data
@@ -731,7 +733,8 @@ class MalletTrainer(Trainer):
         # Get corpus file
         path_corpus = modelFolder.joinpath('corpus.mallet')
         if not path_corpus.is_file():
-            self._logger.error('-- Pipe extraction: Could not locate corpus file')
+            self._logger.error(
+                '-- Pipe extraction: Could not locate corpus file')
             return
 
         # Create auxiliary file with only first line from the original corpus file
@@ -745,9 +748,9 @@ class MalletTrainer(Trainer):
         # We perform the import with the only goal to keep a small file containing the pipe
         self._logger.info('-- Extracting pipeline')
         path_pipe = modelFolder.joinpath('import.pipe')
-        
+
         cmd = self._mallet_path.as_posix() + \
-            ' import-file --use-pipe-from %s --input %s --output %s'   
+            ' import-file --use-pipe-from %s --input %s --output %s'
         cmd = cmd % (path_corpus, path_aux, path_pipe)
 
         try:
@@ -852,7 +855,8 @@ class MalletTrainer(Trainer):
         self._extract_pipe(modelFolder)
 
         return
-    
+
+
 class sparkLDATrainer(Trainer):
     """
     Wrapper for the Spark LDA Topic Model Training. Implements the
@@ -1555,7 +1559,7 @@ class HierarchicalTMManager(object):
             tr_config_c = json.load(fin)
 
         # Get father model's trainin corpus as dask dataframe
-        if tr_config_f['trainer'] in ["ctm", "prodLDA"]:
+        if tr_config_f['trainer'] == "ctm":
             corpusFile = configFile_f.parent.joinpath('modelFiles/corpus.txt')
         else:
             corpusFile = configFile_f.parent.joinpath('corpus.txt')
@@ -1563,6 +1567,13 @@ class HierarchicalTMManager(object):
             corpusFile, encoding="utf-8").readlines()]
         tr_data_df = pd.DataFrame(data=corpus, columns=['doc'])
         tr_data_df['id'] = range(1, len(tr_data_df) + 1)
+
+        w_assignFile = configFile_f.parent.joinpath('w_assign.txt')
+        if tr_config_c['htm-version'] == "htm-ws" and w_assignFile.is_file():
+            w_assign = [line.strip() for line in open(
+                w_assignFile, encoding="utf-8").readlines()]
+            tr_data_df['w_assign'] = w_assign
+
         tr_data_ddf = dd.from_pandas(tr_data_df, npartitions=2)
 
         # Get embeddings if the trainer is CTM
@@ -1584,7 +1595,7 @@ class HierarchicalTMManager(object):
             self._logger.info(
                 '-- -- -- Creating training corpus according to HTM-WS.')
 
-            def get_htm_ws_corpus(row, thetas, betas, vocab_id2w, vocab_w2id, exp_tpc):
+            def get_htm_ws_corpus_base(row, thetas, betas, vocab_id2w, vocab_w2id, exp_tpc):
                 """Function to carry out the selection of words according to HTM-WS.
 
                 Parameters
@@ -1615,26 +1626,73 @@ class HierarchicalTMManager(object):
                                  for word in doc if word in vocab_w2id]
 
                 # ids of words in d assigned to exp_tpc
-                words_exp_idx = []
+                assignments = []
                 for idx_w in words_doc_idx:
                     p_z = np.multiply(thetas_d, betas[:, idx_w])
                     p_z_args = np.argsort(p_z)
                     if p_z[p_z_args[-1]] > 20*p_z[p_z_args[-2]]:
-                        if p_z_args[-1] == exp_tpc:
-                            words_exp_idx.append(idx_w)
+                        assignments.append(p_z_args[-1])
                     else:
-                        if int(np.nonzero(np.random.multinomial(len(betas), np.multiply(thetas_d, betas[:, idx_w])))[0][0]) == exp_tpc:
-                            words_exp_idx.append(idx_w)
+                        sampling = np.random.multinomial(1, np.multiply(
+                            thetas_d, betas[:, idx_w])/np.sum(np.multiply(thetas_d, betas[:, idx_w])))
+                        assignments.append(int(np.nonzero(sampling)[0][0]))
 
-                # Only words generated by exp_tpc are kept
-                reduced_doc = [vocab_id2w[str(id_word)]
-                               for id_word in words_exp_idx]
+                assignments_str = ' '.join([str(el) for el in assignments])
+
+                return assignments_str
+
+            def get_htm_ws_corpus_from_zs(row, thetas, betas, vocab_id2w, vocab_w2id, exp_tpc):
+
+                doc = row["doc"].split()
+                w_assign = row["w_assign"].split()
+
+                reduced_doc = [el[0] for el in zip(
+                    doc, w_assign) if el[1] == str(exp_tpc)]
+
                 reduced_doc_str = ' '.join([el for el in reduced_doc])
 
                 return reduced_doc_str
 
-            tr_data_ddf['reduced_doc'] = tr_data_ddf.apply(
-                get_htm_ws_corpus, axis=1, meta=('x', 'object'), args=(thetas, betas, vocab_id2w, vocab_w2id, exp_tpc))
+            if tr_config_c['trainer'] == "ctm":
+
+                if not w_assignFile.is_file():
+                    print("Generating assignments file...")
+                    tr_data_ddf['w_assign'] = tr_data_ddf.apply(
+                        get_htm_ws_corpus_base, axis=1, meta=('x', 'object'), args=(thetas, betas, vocab_id2w, vocab_w2id, exp_tpc))
+
+                    with ProgressBar():
+                        DFmallet = tr_data_ddf[['w_assign']]
+                        DFmallet.to_csv(
+                            w_assignFile, index=False,
+                            header=False, single_file=True,
+                            compute_kwargs={'scheduler': 'processes'})
+                    print("Saved assignments file")
+
+                tr_data_ddf['reduced_doc'] = tr_data_ddf.apply(
+                    get_htm_ws_corpus_from_zs, axis=1, meta=('x', 'object'), args=(thetas, betas, vocab_id2w, vocab_w2id, exp_tpc))
+
+            elif tr_config_c['trainer'] == "mallet":
+                topic_state_model = configFile_f.parent.joinpath(
+                    'modelFiles/topic-state.gz').as_posix()
+
+                # 0 = document's id
+                # 1 = document's name
+                # 3
+                # 4 = word
+                # 5 = topic to which the word belongs
+
+                with gzip.open(topic_state_model) as fin:
+                    topic_state_df = pd.read_csv(fin, delim_whitespace=True,
+                                                 names=['docid', 'NA1', 'NA2',
+                                                        'NA3', 'word', 'tpc'],
+                                                 header=None, skiprows=3)
+
+                topic_state_df.word.replace('nan', np.nan, inplace=True)
+                topic_state_df.fillna('nan_value', inplace=True)
+
+                topic_state_df_tpc = topic_state_df[topic_state_df['tpc'] == exp_tpc]
+                topic_to_corpus = topic_state_df_tpc.groupby(
+                    'docid')['word'].apply(list).reset_index(name='new')
 
             if tr_config_c['trainer'] == "mallet":
 
@@ -1642,21 +1700,11 @@ class HierarchicalTMManager(object):
                 if outFile.is_file():
                     outFile.unlink()
 
-                tr_data_ddf['2mallet'] = tr_data_ddf['id'].apply(
-                    str, meta=('id', 'str')) + " 0 " + tr_data_ddf['reduced_doc']
+                with open(outFile, 'w', encoding='utf-8') as fout:
+                    for el in topic_to_corpus.values.tolist():
+                        fout.write(str(el[0]) + ' 0 ' + ' '.join(el[1]) + '\n')
 
-                with ProgressBar():
-                    DFmallet = tr_data_ddf[['2mallet']]
-                    DFmallet.to_csv(
-                        outFile, index=False,
-                        header=False, single_file=True,
-                        compute_kwargs={'scheduler': 'processes'})
-
-            elif tr_config_c['trainer'] == 'sparkLDA':
-                pass
-
-            elif tr_config_c['trainer'] == "prodLDA" or tr_config_c['trainer'] == "ctm":
-
+            elif tr_config_c['trainer'] == "ctm":
                 outFile = configFile_c.parent.joinpath('corpus.parquet')
                 if outFile.is_file():
                     outFile.unlink()
@@ -1679,7 +1727,7 @@ class HierarchicalTMManager(object):
                  if thetas[idx, exp_tpc] > thr]
 
             # Keep selected documents from the father's corpus
-            tr_data_ddf = tr_data_ddf.loc[doc_ids_to_keep, :]
+            tr_data_ddf = tr_data_ddf.loc[doc_ids_to_keep]
 
             # Save corpus file in the format required by each trainer
             if tr_config_c['trainer'] == "mallet":
@@ -1696,10 +1744,7 @@ class HierarchicalTMManager(object):
                     DFmallet.to_csv(outFile, index=False, header=False, single_file=True, compute_kwargs={
                                     'scheduler': 'processes'})
 
-            elif tr_config_c['trainer'] == 'sparkLDA':
-                pass
-
-            elif tr_config_c['trainer'] == "prodLDA" or tr_config_c['trainer'] == "ctm":
+            elif tr_config_c['trainer'] == "ctm":
 
                 outFile = configFile_c.parent.joinpath('corpus.parquet')
                 if outFile.is_file():
@@ -1713,7 +1758,7 @@ class HierarchicalTMManager(object):
                         compute_kwargs={'scheduler': 'processes'})
 
             if tr_config_c['trainer'] == "ctm":
-                embeddings = embeddings[doc_ids_to_keep, :]
+                embeddings = embeddings[doc_ids_to_keep]
 
         else:
             self._logger.error(
