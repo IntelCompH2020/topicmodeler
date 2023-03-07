@@ -3,7 +3,7 @@
 * *Topic Modeling Toolbox*
 
 Provides several classes for Topic Modeling management, representation, and curation
-    - TMManager: Management of topic models 
+    - TMManager: Management of topic models and domain classification models
     - TMmodel: Generic representation of all topic models that serve for its curation
 """
 
@@ -25,26 +25,29 @@ class TMManager(object):
 
     def listTMmodels(self, path_TMmodels: Path):
         """
-        Returns a dictionary with all topic models
+        Returns a dictionary with all topic models or all DC models
 
         Parameters
         ----------
         path_TMmodels : pathlib.Path
-            Path to the folder hosting the topic models
+            Path to the folder hosting the topic models or the dc models
 
         Returns
         -------
         allTMmodels : Dictionary (path -> dictionary)
-            One dictionary entry per wordlist
+            One dictionary entry per model
             key is the topic model name
             value is a dictionary with metadata
         """
         allTMmodels = {}
         modelFolders = [el for el in path_TMmodels.iterdir()]
+        #print(modelFolders)
 
         for TMf in modelFolders:
-            modelConfig = TMf.joinpath('trainconfig.json')
-            if modelConfig.is_file():
+            # For topic models
+            if TMf.joinpath('trainconfig.json').is_file():
+                print(f"{TMf.as_posix()} is a topic model")
+                modelConfig = TMf.joinpath('trainconfig.json')
                 with modelConfig.open('r', encoding='utf8') as fin:
                     modelInfo = json.load(fin)
                     allTMmodels[modelInfo['name']] = {
@@ -57,41 +60,62 @@ class TMManager(object):
                         "hierarchy-level": modelInfo['hierarchy-level'],
                         "htm-version": modelInfo['htm-version']
                     }
-                submodelFolders = [el for el in TMf.iterdir() if not el.as_posix().endswith(
-                    "modelFiles") and not el.as_posix().endswith("corpus.parquet") and not el.as_posix().endswith("_old")]
-                for sub_TMf in submodelFolders:
-                    submodelConfig = sub_TMf.joinpath('trainconfig.json')
-                    if submodelConfig.is_file():
-                        with submodelConfig.open('r', encoding='utf8') as fin:
-                            submodelInfo = json.load(fin)
-                            corpus = "Subcorpus created from " + \
-                                str(modelInfo['name'])
-                            allTMmodels[submodelInfo['name']] = {
-                                "name": submodelInfo['name'],
-                                "description": submodelInfo['description'],
-                                "visibility": submodelInfo['visibility'],
-                                "trainer": submodelInfo['trainer'],
-                                "TrDtSet": corpus,
-                                "creation_date": submodelInfo['creation_date'],
-                                "hierarchy-level": submodelInfo['hierarchy-level'],
-                                "htm-version": submodelInfo['htm-version']
-                            }
+                    submodelFolders = [
+                        el for el in TMf.iterdir() 
+                        if not el.as_posix().endswith("modelFiles") 
+                        and not el.as_posix().endswith("corpus.parquet") 
+                        and not el.as_posix().endswith("_old")]
+                    for sub_TMf in submodelFolders:
+                        submodelConfig = sub_TMf.joinpath('trainconfig.json')
+                        if submodelConfig.is_file():
+                            with submodelConfig.open('r', encoding='utf8') as fin:
+                                submodelInfo = json.load(fin)
+                                corpus = "Subcorpus created from " + \
+                                    str(modelInfo['name'])
+                                allTMmodels[submodelInfo['name']] = {
+                                    "name": submodelInfo['name'],
+                                    "description": submodelInfo['description'],
+                                    "visibility": submodelInfo['visibility'],
+                                    "trainer": submodelInfo['trainer'],
+                                    "TrDtSet": corpus,
+                                    "creation_date": submodelInfo['creation_date'],
+                                    "hierarchy-level": submodelInfo['hierarchy-level'],
+                                    "htm-version": submodelInfo['htm-version']
+                                }
+            # For DC models
+            elif TMf.joinpath('dc_config.json').is_file():
+                print(f"{TMf.as_posix()} is a domain classifier model")
+                modelConfig = TMf.joinpath('dc_config.json')
+                with modelConfig.open('r', encoding='utf8') as fin:
+                    modelInfo = json.load(fin)
+                allTMmodels[modelInfo['name']] = {
+                            "name": modelInfo['name'],
+                            "description": modelInfo['description'],
+                            "visibility": modelInfo['visibility'],
+                            "type": modelInfo['type'],
+                            "corpus": modelInfo['corpus'],
+                            "tag": modelInfo['tag'],
+                            "creation_date": modelInfo['creation_date']
+                        }
+            else:
+                print(f"No valid JSON file provided for Topic models or DC models")
+                return 0
         return allTMmodels
 
     def deleteTMmodel(self, path_TMmodel: Path):
         """
-        Deletes a Topic Model
+        Deletes a Topic Model or a DC model
 
         Parameters
         ----------
         path_TMmodel : pathlib.Path
-            Path to the folder containing the Topic Model
+            Path to the folder containing the Topic Model or the DC model
 
         Returns
         -------
         status : int
-            - 0 if the Topic Model could not be deleted
-            - 1 if the Topic Model was deleted successfully
+            - 0 if the model could not be deleted
+            - 1 if the model was deleted successfully
         """
 
         if not path_TMmodel.is_dir():
@@ -106,7 +130,7 @@ class TMManager(object):
 
     def renameTMmodel(self, name: Path, new_name: Path):
         """
-        Renames a topic model
+        Renames a topic model or a DC model
 
         Parameters
         ----------
@@ -114,7 +138,7 @@ class TMManager(object):
             Path to the model to be renamed
 
         new_name : pathlib.Path
-            Path to the new name for the topic model
+            Path to the new name for the model
 
         Returns
         -------
@@ -131,10 +155,17 @@ class TMManager(object):
                 f"Model '{new_name.as_posix()}' already exists. Rename or delete it first.")
             return 0
         try:
-            with name.joinpath('trainconfig.json').open("r", encoding="utf8") as fin:
+            # Checking whether it is a TM or DC model
+            if name.joinpath('trainconfig.json').is_file():
+                config_file = name.joinpath('trainconfig.json')
+                print("is a tm model")
+            elif name.joinpath('dc_config.json').is_file():
+                config_file = name.joinpath('dc_config.json')
+                print("is a dc model")
+            with config_file.open("r", encoding="utf8") as fin:
                 TMmodel = json.load(fin)
             TMmodel["name"] = new_name.stem
-            with name.joinpath('trainconfig.json').open("w", encoding="utf-8") as fout:
+            with config_file.open("w", encoding="utf-8") as fout:
                 json.dump(TMmodel, fout, ensure_ascii=False,
                           indent=2, default=str)
             shutil.move(name, new_name)
@@ -144,7 +175,7 @@ class TMManager(object):
 
     def copyTMmodel(self, name: Path, new_name: Path):
         """
-        Makes a copy of an existing topic model
+        Makes a copy of an existing TM or DC model
 
         Parameters
         ----------
@@ -152,7 +183,7 @@ class TMManager(object):
             Path to the model to be copied
 
         new_name : pathlib.Path
-            Path to the new name for the topic model
+            Path to the new name for the model
 
         Returns
         -------
@@ -170,10 +201,16 @@ class TMManager(object):
             return 0
         try:
             shutil.copytree(name, new_name)
-            with new_name.joinpath('trainconfig.json').open("r", encoding="utf8") as fin:
+            
+            # Checking whether it is a TM or DC model
+            if new_name.joinpath('trainconfig.json').is_file():
+                config_file = name.joinpath('trainconfig.json')
+            elif new_name.joinpath('dc_config.json').is_file():
+                config_file = name.joinpath('dc_config.json')
+            with config_file.open("r", encoding="utf8") as fin:
                 TMmodel = json.load(fin)
             TMmodel["name"] = new_name.stem
-            with new_name.joinpath('trainconfig.json').open("w", encoding="utf-8") as fout:
+            with config_file.open("w", encoding="utf-8") as fout:
                 json.dump(TMmodel, fout, ensure_ascii=False,
                           indent=2, default=str)
             return 1
@@ -950,7 +987,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Scripts for Topic Modeling Service")
-    parser.add_argument("--path_TMmodels", type=str, default=None, required=True,
+    parser.add_argument("--path_TMmodels", type=str, 
+                        default=None, required=True,
                         metavar=("path_to_TMs"),
                         help="path to topic models folder")
     parser.add_argument("--listTMmodels", action="store_true", default=False,
