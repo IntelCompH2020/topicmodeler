@@ -41,8 +41,7 @@ class TMManager(object):
         """
         allTMmodels = {}
         modelFolders = [el for el in path_TMmodels.iterdir()]
-        print(modelFolders)
-
+        
         for TMf in modelFolders:
             # For topic models
             if TMf.joinpath('trainconfig.json').is_file():
@@ -158,10 +157,8 @@ class TMManager(object):
             # Checking whether it is a TM or DC model
             if name.joinpath('trainconfig.json').is_file():
                 config_file = name.joinpath('trainconfig.json')
-                print("is a tm model")
             elif name.joinpath('dc_config.json').is_file():
                 config_file = name.joinpath('dc_config.json')
-                print("is a dc model")
             with config_file.open("r", encoding="utf8") as fin:
                 TMmodel = json.load(fin)
             TMmodel["name"] = new_name.stem
