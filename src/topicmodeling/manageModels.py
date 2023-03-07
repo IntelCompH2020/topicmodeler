@@ -41,7 +41,7 @@ class TMManager(object):
         """
         allTMmodels = {}
         modelFolders = [el for el in path_TMmodels.iterdir()]
-        #print(modelFolders)
+        print(modelFolders)
 
         for TMf in modelFolders:
             # For topic models
