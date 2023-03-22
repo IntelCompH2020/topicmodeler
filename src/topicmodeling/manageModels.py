@@ -53,6 +53,7 @@ class TMManager(object):
                         "name": modelInfo['name'],
                         "description": modelInfo['description'],
                         "visibility": modelInfo['visibility'],
+                        "creator": modelInfo['creator'],
                         "trainer": modelInfo['trainer'],
                         "TrDtSet": modelInfo['TrDtSet'],
                         "creation_date": modelInfo['creation_date'],
@@ -75,6 +76,7 @@ class TMManager(object):
                                     "name": submodelInfo['name'],
                                     "description": submodelInfo['description'],
                                     "visibility": submodelInfo['visibility'],
+                                    "creator": modelInfo['creator'],
                                     "trainer": submodelInfo['trainer'],
                                     "TrDtSet": corpus,
                                     "creation_date": submodelInfo['creation_date'],
@@ -91,6 +93,7 @@ class TMManager(object):
                             "name": modelInfo['name'],
                             "description": modelInfo['description'],
                             "visibility": modelInfo['visibility'],
+                            "creator": modelInfo['creator'],
                             "type": modelInfo['type'],
                             "corpus": modelInfo['corpus'],
                             "tag": modelInfo['tag'],
@@ -100,6 +103,62 @@ class TMManager(object):
                 print(f"No valid JSON file provided for Topic models or DC models")
                 return 0
         return allTMmodels
+        
+    def getTMmodel(self, path_TMmodel: Path):
+        """
+        Returns a dictionary with a topic model and it's sub-models
+
+        Parameters
+        ----------
+        path_TMmodel : pathlib.Path
+            Path to the folder hosting the topic model
+
+        Returns
+        -------
+        result : Dictionary (path -> dictionary)
+            One dictionary entry per model
+            key is the topic model name
+            value is a dictionary with metadata
+        """
+        result = {}
+        
+        modelConfig = path_TMmodel.joinpath('trainconfig.json')
+        if modelConfig.is_file():
+            with modelConfig.open('r', encoding='utf8') as fin:
+                modelInfo = json.load(fin)
+                result[modelInfo['name']] = {
+                    "name": modelInfo['name'],
+                    "description": modelInfo['description'],
+                    "visibility": modelInfo['visibility'],
+                    "creator": modelInfo['creator'],
+                    "trainer": modelInfo['trainer'],
+                    "TMparam": modelInfo['TMparam'],
+                    "creation_date": modelInfo['creation_date'],
+                    "hierarchy-level": modelInfo['hierarchy-level'],
+                    "htm-version": modelInfo['htm-version']
+                }
+            submodelFolders = [el for el in path_TMmodel.iterdir() if not el.as_posix().endswith(
+                "modelFiles") and not el.as_posix().endswith("corpus.parquet") and not el.as_posix().endswith("_old")]
+            for sub_TMf in submodelFolders:
+                submodelConfig = sub_TMf.joinpath('trainconfig.json')
+                if submodelConfig.is_file():
+                    with submodelConfig.open('r', encoding='utf8') as fin:
+                        submodelInfo = json.load(fin)
+                        corpus = "Subcorpus created from " + \
+                            str(modelInfo['name'])
+                        result[submodelInfo['name']] = {
+                            "name": submodelInfo['name'],
+                            "description": submodelInfo['description'],
+                            "visibility": submodelInfo['visibility'],
+                            "creator": modelInfo['creator'],
+                            "trainer": submodelInfo['trainer'],
+                            "TrDtSet": corpus,
+                            "TMparam": submodelInfo['TMparam'],
+                            "creation_date": submodelInfo['creation_date'],
+                            "hierarchy-level": submodelInfo['hierarchy-level'],
+                            "htm-version": submodelInfo['htm-version']
+                        }
+        return result;
 
     def deleteTMmodel(self, path_TMmodel: Path):
         """
@@ -990,6 +1049,9 @@ if __name__ == "__main__":
                         help="path to topic models folder")
     parser.add_argument("--listTMmodels", action="store_true", default=False,
                         help="List Available Topic Models")
+    parser.add_argument("--getTMmodel", type=str, default=None,
+                        metavar=("modelName"),
+                        help="Get more info about a specific model")
     parser.add_argument("--deleteTMmodel", type=str, default=None,
                         metavar=("modelName"),
                         help="Delete Topic Model with selected name")
@@ -1032,6 +1094,11 @@ if __name__ == "__main__":
 
     if args.listTMmodels:
         allTMmodels = tmm.listTMmodels(tm_path)
+        sys.stdout.write(json.dumps(allTMmodels))
+        
+    if args.getTMmodel:
+        tm_path = look_for_path(tm_path, f"{args.getTMmodel}")
+        allTMmodels = tmm.getTMmodel(tm_path.joinpath(f"{args.getTMmodel}"))
         sys.stdout.write(json.dumps(allTMmodels))
 
     if args.deleteTMmodel:
