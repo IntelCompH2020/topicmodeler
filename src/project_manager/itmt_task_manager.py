@@ -153,7 +153,7 @@ class ITMTTaskManager(BaseTaskManager):
         the option 'listDownloaded'.
         """
 
-        cmd = 'python src/manageCorpus/manageCorpus.py --listDownloaded --parquet '
+        cmd = 'python src/manageCorpus/manageCorpus.py --listDownloaded --path_downloaded '
         cmd = cmd + self.p2parquet.resolve().as_posix()
         printred(cmd)
         try:
@@ -1171,6 +1171,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         """
 
         # We need first to get all available (downloaded) datasets
+        printgr(self.allDtsets)
         allDtsets = json.loads(self.allDtsets)
 
         # Now we start user interaction to gather datasets

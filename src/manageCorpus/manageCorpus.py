@@ -41,7 +41,7 @@ class CorpusManager(object):
         with open(metafile, 'r', encoding='utf8') as fin:
             allDtsets = json.load(fin)
         allDtsets = {path_parquet.joinpath(Dts).resolve().as_posix(): allDtsets[Dts]
-                        for Dts in allDtsets.keys()}
+                     for Dts in allDtsets.keys()}
 
         return allDtsets
 
@@ -62,7 +62,8 @@ class CorpusManager(object):
             value is a dictionary with metadata
         """
         allTrDtsets = {}
-        jsonfiles = [el for el in path_dataset.iterdir() if el.suffix == '.json']
+        jsonfiles = [el for el in path_dataset.iterdir()
+                     if el.suffix == '.json']
 
         for TrDts in jsonfiles:
             with open(TrDts, 'r', encoding='utf8') as fin:
@@ -101,11 +102,13 @@ class CorpusManager(object):
                 path_old = path_datasets.joinpath(Dtset['name'] + '.json.old')
                 shutil.move(path_Dtset, path_old)
                 with path_Dtset.open('w', encoding='utf-8') as fout:
-                    json.dump(Dtset, fout, ensure_ascii=False, indent=2, default=str)
+                    json.dump(Dtset, fout, ensure_ascii=False,
+                              indent=2, default=str)
                 return 2
             else:
                 with path_Dtset.open('w', encoding='utf-8') as fout:
-                    json.dump(Dtset, fout, ensure_ascii=False, indent=2, default=str)
+                    json.dump(Dtset, fout, ensure_ascii=False,
+                              indent=2, default=str)
                 return 1
 
     def deleteTrDtset(self, path_TrDtset):
@@ -165,7 +168,8 @@ class CorpusManager(object):
                 Dtset = json.load(fin)
             Dtset["name"] = new_name.stem
             with new_name.open("w", encoding="utf-8") as fout:
-                json.dump(Dtset, fout, ensure_ascii=False, indent=2, default=str)
+                json.dump(Dtset, fout, ensure_ascii=False,
+                          indent=2, default=str)
             name.unlink()
             return 1
         except:
@@ -198,7 +202,8 @@ class CorpusManager(object):
                 Dtset = json.load(fin)
             Dtset["name"] = path_copy.stem
             with path_copy.open("w", encoding="utf-8") as fout:
-                json.dump(Dtset, fout, ensure_ascii=False, indent=2, default=str)
+                json.dump(Dtset, fout, ensure_ascii=False,
+                          indent=2, default=str)
             return 1
         except:
             return 0
@@ -206,12 +211,14 @@ class CorpusManager(object):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Scripts for Corpus Management Service')
-    parser.add_argument("--path_downloaded", type=str, default=None, required=True,
+    parser = argparse.ArgumentParser(
+        description='Scripts for Corpus Management Service')
+    parser.add_argument("--path_downloaded", type=str,
+                        default=None, required=False,
                         metavar=("path_to_datasets"),
                         help="path to downloaded datasets")
-    parser.add_argument("--path_datasets", type=str, default=None, required=True,
-                        metavar=("path_to_datasets"),
+    parser.add_argument("--path_datasets", type=str, default=None,
+                        required=False, metavar=("path_to_datasets"),
                         help="path to training datasets")
     parser.add_argument('--listDownloaded', action='store_true', default=False,
                         help='List datasets downloaded from HDFS with metadata.')
@@ -232,8 +239,10 @@ if __name__ == "__main__":
 
     cm = CorpusManager()
 
-    dwds_path = Path(args.path_downloaded)
-    trds_path = Path(args.path_datasets)
+    if args.path_downloaded:
+        dwds_path = Path(args.path_downloaded)
+    if args.path_datasets:
+        trds_path = Path(args.path_datasets)
 
     if args.listDownloaded:
         allDtsets = cm.listDownloaded(dwds_path)
@@ -251,9 +260,10 @@ if __name__ == "__main__":
         sys.stdout.write(json.dumps(allTrDtsets))
 
     if args.deleteTrDtset:
-        status = cm.deleteTrDtset(trds_path.joinpath(f"{args.deleteTrDtset}.json"))
+        status = cm.deleteTrDtset(
+            trds_path.joinpath(f"{args.deleteTrDtset}.json"))
         sys.stdout.write(str(status))
-    
+
     if args.renameTrDtset:
         status = cm.renameTrDtset(
             trds_path.joinpath(f"{args.renameTrDtset[0]}.json"),
