@@ -432,6 +432,7 @@ class ITMTTaskManager(BaseTaskManager):
             "name": modelname,
             "description": ModelDesc,
             "visibility": privacy,
+            "creator": "ITMT",
             "trainer": trainer,
             "TrDtSet": TrDtSet,
             "Preproc": Preproc,
@@ -580,6 +581,7 @@ class ITMTTaskManager(BaseTaskManager):
             "name": submodelname,
             "description": submodelDesc,
             "visibility": privacy,
+            "creator": "ITMT",
             "trainer": trainer,
             "expansion_tpc": expansion_tpc,
             "thr": thr,
@@ -2384,6 +2386,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             "infer_path": current_inferencedir.as_posix(),
             "model_for_infer_path": modeldir.as_posix(), 
             "visibility": privacy,
+            "creator": "ITMT",
             "trainer": train_config['trainer'],
             "TrDtSet": InfDtSet, #Save as TrDSet since the preprocessing script looks for this field
             "Preproc": train_config['Preproc'],
