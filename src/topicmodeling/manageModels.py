@@ -1168,7 +1168,7 @@ if __name__ == "__main__":
 
     if args.fuseTopics is not None and args.topics is not None:
         # List of topics to merge should come from standard input
-        tpcs = args.topics
+        tpcs = json.loads(args.topics)
         tm_path = look_for_path(tm_path, f"{args.fuseTopics}")
         tm = TMmodel(tm_path.joinpath(
             f"{args.fuseTopics}").joinpath('TMmodel'))
