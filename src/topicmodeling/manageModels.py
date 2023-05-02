@@ -1079,6 +1079,9 @@ if __name__ == "__main__":
     parser.add_argument("--fuseTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Merge topics from selected model")
+    parser.add_argument("--topics", type=str, default=None,
+                        metavar=("topics"),
+                        help="Chosen topics from selected model to merge")
     parser.add_argument("--sortTopics", type=str, default=None,
                         metavar=("modelName"),
                         help="Sort topics according to size")
@@ -1163,10 +1166,9 @@ if __name__ == "__main__":
             f"{args.getSimilarTopics}").joinpath('TMmodel'))
         sys.stdout.write(json.dumps(tm.getSimilarTopics(int(npairs))))
 
-    if args.fuseTopics:
+    if args.fuseTopics is not None and args.topics is not None:
         # List of topics to merge should come from standard input
-        tpcs = "".join([line for line in sys.stdin])
-        tpcs = json.loads(tpcs.replace('\\"', '"'))
+        tpcs = args.topics
         tm_path = look_for_path(tm_path, f"{args.fuseTopics}")
         tm = TMmodel(tm_path.joinpath(
             f"{args.fuseTopics}").joinpath('TMmodel'))
