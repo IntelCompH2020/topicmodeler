@@ -3422,7 +3422,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
             # Get dictionary with the information of all models
             allTMmodels = json.loads(self.allTMmodels)
-
+        
             # Get table where TMmodel information is going to be displayed
             table = gui.table_available_trained_models_desc
             table.setRowCount(1)

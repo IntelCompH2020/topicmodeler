@@ -45,7 +45,7 @@ class TMManager(object):
         for TMf in modelFolders:
             # For topic models
             if TMf.joinpath('trainconfig.json').is_file():
-                print(f"{TMf.as_posix()} is a topic model")
+                #print(f"{TMf.as_posix()} is a topic model")
                 modelConfig = TMf.joinpath('trainconfig.json')
                 with modelConfig.open('r', encoding='utf8') as fin:
                     modelInfo = json.load(fin)
