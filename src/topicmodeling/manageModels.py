@@ -85,7 +85,7 @@ class TMManager(object):
                                 }
             # For DC models
             elif TMf.joinpath('dc_config.json').is_file():
-                print(f"{TMf.as_posix()} is a domain classifier model")
+                #print(f"{TMf.as_posix()} is a domain classifier model")
                 modelConfig = TMf.joinpath('dc_config.json')
                 with modelConfig.open('r', encoding='utf8') as fin:
                     modelInfo = json.load(fin)
