@@ -1427,6 +1427,8 @@ class CTMTrainer(Trainer):
                 self._embeddings = None
             else:
                 self._embeddings = df.embeddings.values
+                if isinstance(self._embeddings[0],str):
+                    self._embeddings = np.array([np.array(el.split(), dtype=np.float32) for el in self._embeddings]) 
                 self._unpreprocessed_corpus = None
         else:
             if not embeddingsFile.is_file():
