@@ -1243,13 +1243,30 @@ class CTMTrainer(Trainer):
 
     """
 
-    def __init__(self, n_components=10, ctm_model_type='CombinedTM', model_type='prodLDA',
-                 hidden_sizes=(100, 100), activation='softplus', dropout=0.2,
-                 learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99, solver='adam',
-                 num_epochs=100, num_samples=10, reduce_on_plateau=False, topic_prior_mean=0.0,
-                 topic_prior_variance=None, num_data_loader_workers=0, label_size=0,
-                 loss_weights=None, thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1',
-                 labels=None, logger=None):
+    def __init__(self,
+                 n_components=10,
+                 ctm_model_type='CombinedTM',
+                 model_type='prodLDA',
+                 hidden_sizes=(100, 100),
+                 activation='softplus',
+                 dropout_in=0.2,
+                 dropout_out=0.2,
+                 learn_priors=True,
+                 batch_size=64,
+                 lr=2e-3,
+                 momentum=0.99,
+                 solver='adam',
+                 num_epochs=100,
+                 num_samples=10,
+                 reduce_on_plateau=False,
+                 topic_prior_mean=0.0,
+                 topic_prior_variance=None, 
+                 num_data_loader_workers=0,
+                 label_size=0,
+                 loss_weights=None,
+                 thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1',
+                 labels=None,
+                 logger=None):
         """
         Initilization Method
 
@@ -1304,13 +1321,13 @@ class CTMTrainer(Trainer):
         """
 
         super().__init__(logger)
-
         self._n_components = n_components
         self._model_type = model_type
         self._ctm_model_type = ctm_model_type
         self._hidden_sizes = hidden_sizes
         self._activation = activation
-        self._dropout = dropout
+        self._dropout_in = dropout_in
+        self._dropout_out = dropout_out
         self._learn_priors = learn_priors
         self._batch_size = batch_size
         self._lr = lr
@@ -1459,45 +1476,39 @@ class CTMTrainer(Trainer):
 
         if self._ctm_model_type == 'ZeroShotTM':
             ctm = ZeroShotTM(
-                logger=self._logger,
-                input_size=self._input_size,
+                bow_size=self._input_size,
                 contextual_size=768,
                 n_components=self._n_components,
                 model_type=self._model_type,
                 hidden_sizes=self._hidden_sizes,
                 activation=self._activation,
-                dropout=self._dropout,
+                dropout_in=self._dropout_in,
+                dropout_out=self._dropout_out,
                 learn_priors=self._learn_priors,
                 batch_size=self._batch_size,
                 lr=self._lr,
                 momentum=self._momentum,
                 solver=self._solver,
                 num_epochs=self._num_epochs,
-                num_samples=self._num_samples,
                 reduce_on_plateau=self._reduce_on_plateau,
-                topic_prior_mean=self._topic_prior_mean,
-                topic_prior_variance=self._topic_prior_variance,
                 num_data_loader_workers=self._num_data_loader_workers)
         else:
             ctm = CombinedTM(
-                logger=self._logger,
-                input_size=self._input_size,
+                bow_size=self._input_size,
                 contextual_size=768,
                 n_components=self._n_components,
                 model_type=self._model_type,
                 hidden_sizes=self._hidden_sizes,
                 activation=self._activation,
-                dropout=self._dropout,
+                dropout_in=self._dropout_in,
+                dropout_out=self._dropout_out,
                 learn_priors=self._learn_priors,
                 batch_size=self._batch_size,
                 lr=self._lr,
                 momentum=self._momentum,
                 solver=self._solver,
                 num_epochs=self._num_epochs,
-                num_samples=self._num_samples,
                 reduce_on_plateau=self._reduce_on_plateau,
-                topic_prior_mean=self._topic_prior_mean,
-                topic_prior_variance=self._topic_prior_variance,
                 num_data_loader_workers=self._num_data_loader_workers,
                 label_size=self._label_size,
                 loss_weights=self._loss_weights)
@@ -2060,13 +2071,21 @@ if __name__ == "__main__":
                     from tm_utils import pickler
 
                     # Create a CTMTrainer object with the parameters specified in the configuration file
+                    if 'dropout_in' in train_config.keys() and 'dropout_out' in train_config.keys():
+                        dropout_in_ = train_config['TMparam']['dropout_in']
+                        dropout_out_ = train_config['TMparam']['dropout_out']
+                    elif 'dropout' in train_config.keys():
+                        dropout_in_ = dropout_out_ = train_config['TMparam']['dropout']
+                    else: 
+                        dropout_in_ = dropout_out_ = 0.2
                     CTMr = CTMTrainer(
                         n_components=train_config['TMparam']['ntopics'],
                         model_type=train_config['TMparam']['model_type'],
                         hidden_sizes=tuple(
                             train_config['TMparam']['hidden_sizes']),
                         activation=train_config['TMparam']['activation'],
-                        dropout=train_config['TMparam']['dropout'],
+                        dropout_in=dropout_in_,
+                        dropout_out=dropout_out_,
                         learn_priors=train_config['TMparam']['learn_priors'],
                         batch_size=train_config['TMparam']['batch_size'],
                         lr=train_config['TMparam']['lr'],
@@ -2079,7 +2098,6 @@ if __name__ == "__main__":
                         topic_prior_variance=train_config['TMparam']['topic_prior_variance'],
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        sbert_model_to_load=train_config['TMparam']['sbert_model_to_load'],
                         labels=train_config['TMparam']['labels'])
 
                     # Train the CTM topic model with the specified corpus

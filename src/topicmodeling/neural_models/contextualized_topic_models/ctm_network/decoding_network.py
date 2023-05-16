@@ -8,10 +8,19 @@ from .inference_network import CombinedInferenceNetwork, ContextualInferenceNetw
 class DecoderNetwork(nn.Module):
     """PyTorch class for feed forward AVITM network."""
 
-    def __init__(self, input_size, contextual_size, infnet, n_components=10, 
-                 model_type='prodLDA', hidden_sizes=(100,100), 
-                 activation='softplus', dropout=0.2, learn_priors=True,
-                 topic_prior_mean=0.0, topic_prior_variance=None,
+    def __init__(self,
+                 input_size,
+                 contextual_size,
+                 infnet,
+                 n_components=10, 
+                 model_type='prodLDA', 
+                 hidden_sizes=(100,100), 
+                 activation='softplus',
+                 dropout_in=0.2,
+                 dropout_out=0.2,
+                 learn_priors=True,
+                 topic_prior_mean=0.0,
+                 topic_prior_variance=None,
                  label_size=0):
 
         """
@@ -58,7 +67,8 @@ class DecoderNetwork(nn.Module):
                               'rrelu', 'elu', 'selu'], \
             "activation must be 'softplus', 'relu', 'sigmoid', 'leakyrelu'," \
             " 'rrelu', 'elu', 'selu' or 'tanh'."
-        assert dropout >= 0, "dropout must be >= 0."
+        assert dropout_in >= 0, "dropout must be >= 0."
+        assert dropout_out >= 0, "dropout must be >= 0."
         assert isinstance(topic_prior_mean, float), \
             "topic_prior_mean must be type float"
 
@@ -67,17 +77,30 @@ class DecoderNetwork(nn.Module):
         self.model_type = model_type
         self.hidden_sizes = hidden_sizes
         self.activation = activation
-        self.dropout = dropout
+        self.dropout_in = dropout_in
+        self.dropout_out = dropout_out
         self.learn_priors = learn_priors
         self.topic_word_matrix = None
 
         # Initialize inference network according to the type specified with the parameter "infnet"
         if infnet == "zeroshot":
             self.inf_net = ContextualInferenceNetwork(
-                input_size, contextual_size, n_components, hidden_sizes, activation, label_size=label_size)
+                input_size,
+                contextual_size,
+                n_components,
+                hidden_sizes,
+                activation,
+                dropout_out,
+                label_size=label_size)
         elif infnet == "combined":
             self.inf_net = CombinedInferenceNetwork(
-                input_size, contextual_size, n_components, hidden_sizes, activation, label_size=label_size)
+                input_size,
+                contextual_size,
+                n_components,
+                hidden_sizes,
+                activation,
+                dropout_out,
+                label_size=label_size)
         else:
             raise Exception('Missing infnet parameter, options are zeroshot and combined')
 
@@ -114,7 +137,7 @@ class DecoderNetwork(nn.Module):
         self.beta_batchnorm = nn.BatchNorm1d(input_size, affine=False)
 
         # dropout on theta
-        self.drop_theta = nn.Dropout(p=self.dropout)
+        self.drop_theta = nn.Dropout(p=self.dropout_in)
 
     @staticmethod
     def reparameterize(mu, logvar):

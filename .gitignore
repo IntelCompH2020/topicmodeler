@@ -147,6 +147,7 @@ folder
 
 # pycharm files
 .idea
+.vscode
 
 # recent.pickle
 src/gui/utils/recent.pickle

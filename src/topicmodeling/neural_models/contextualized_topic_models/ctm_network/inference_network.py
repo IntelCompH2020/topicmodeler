@@ -7,8 +7,14 @@ class ContextualInferenceNetwork(nn.Module):
 
     """ContextualInferenceNetwork Network."""
 
-    def __init__(self, input_size, bert_size, output_size, hidden_sizes,
-                 activation='softplus', dropout=0.2, label_size=0):
+    def __init__(self,
+                 input_size,
+                 bert_size,
+                 output_size, 
+                 hidden_sizes,
+                 activation='softplus',
+                 dropout=0.2,
+                 label_size=0):
 
         """
         Initializes ContextualInferenceNetwork.
