@@ -304,6 +304,7 @@ class TMmodel(object):
     _edits = None  # Store all editions made to the model
     _ntopics = None
     _betas_ds = None
+    _coords = None
     _topic_entropy = None
     _topic_coherence = None
     _ndocs_active = None
@@ -313,6 +314,7 @@ class TMmodel(object):
     _vocab_id2w = None
     _vocab = None
     _size_vocab = None
+    _sims = None
 
     def __init__(self, TMfolder, logger=None):
         """Class initializer
@@ -847,7 +849,7 @@ class TMmodel(object):
         if self._coords is None:
             with self._TMfolder.joinpath('tpc_coords.txt').open('r', encoding='utf8') as fin:
                 # read the data from the file and convert it back to a list of tuples
-                data = [tuple(map(float, line.strip()[1:-1].split(', '))) for line in fin]
+                self._coords = [tuple(map(float, line.strip()[1:-1].split(', '))) for line in fin]
 
     def get_alphas(self):
         self._load_alphas()
