@@ -314,7 +314,7 @@ class TMmodel(object):
     _vocab_id2w = None
     _vocab = None
     _size_vocab = None
-    _sims = None
+    #_sims = None
 
     def __init__(self, TMfolder, logger=None):
         """Class initializer
@@ -404,7 +404,7 @@ class TMmodel(object):
                                   for el in self.get_tpc_word_descriptions()]
         self.calculate_topic_coherence()  # cohrs_aux
         self._tpc_labels = [el[1] for el in self.get_tpc_labels(labels)]
-        self._calculate_sims()
+        #self._calculate_sims()
 
         # We are ready to save all variables in the model
         self._save_all()
@@ -425,7 +425,7 @@ class TMmodel(object):
         np.save(self._TMfolder.joinpath('alphas.npy'), self._alphas)
         np.save(self._TMfolder.joinpath('betas.npy'), self._betas)
         sparse.save_npz(self._TMfolder.joinpath('thetas.npz'), self._thetas)
-        sparse.save_npz(self._TMfolder.joinpath('distances.npz'), self._sims)
+        #sparse.save_npz(self._TMfolder.joinpath('distances.npz'), self._sims)
 
         with self._TMfolder.joinpath('edits.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._edits))
@@ -746,10 +746,10 @@ class TMmodel(object):
         self._load_betas()
         self._load_thetas()
         self._load_vocab()
-        self._load_sims()
+        #self._load_sims()
         self.load_tpc_coords()
 
-        return self._alphas, self._betas, self._thetas, self._vocab, self._sims, self._coords
+        return self._alphas, self._betas, self._thetas, self._vocab, self._coords #self._sims, 
 
     def get_tpc_word_descriptions(self, n_words=15, tfidf=True, tpc=None):
         """returns the chemical description of topics
@@ -1044,7 +1044,7 @@ class TMmodel(object):
             self.calculate_topic_coherence()
             self._edits.append('f ' + ' '.join([str(el) for el in tpcs]))
             # We are ready to save all variables in the model
-            self._calculate_sims()
+            #self._calculate_sims()
             self._save_all()
 
             self._logger.info(

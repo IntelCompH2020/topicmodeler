@@ -249,6 +249,7 @@ class AVITM(object):
         for batch_samples in loader:
             # batch_size x vocab_size
             X = batch_samples['X']
+            X = X.reshape(X.shape[0], -1)
 
             if self.USE_CUDA:
                 X = X.cuda()
