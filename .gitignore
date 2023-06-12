@@ -159,3 +159,4 @@ Dockerfile
 .devcontainer
 mallet-2.0.8
 aux_scripts/._fromHDFS
+generate_automatic.py
