@@ -592,7 +592,7 @@ class MalletTrainer(Trainer):
 
     """
 
-    def __init__(self, mallet_path, ntopics=25, alpha=5.0, optimize_interval=10, num_threads=4, num_iterations=1000, doc_topic_thr=0.0, thetas_thr=0.003, token_regexp=None, labels=None, logger=None):
+    def __init__(self, mallet_path, ntopics=25, alpha=5.0, optimize_interval=10, num_threads=4, num_iterations=1000, doc_topic_thr=0.0, thetas_thr=0.003, token_regexp=None, labels=None, get_sims=False, logger=None):
         """
         Initilization Method
 
@@ -634,6 +634,7 @@ class MalletTrainer(Trainer):
         self._thetas_thr = thetas_thr
         self._token_regexp = token_regexp
         self._labels = labels
+        self._get_sims = get_sims
 
         if not self._mallet_path.is_file():
             self._logger.error(
@@ -711,7 +712,8 @@ class MalletTrainer(Trainer):
             with Path(lblFile).open('r', encoding='utf8') as fin:
                 labels += json.load(fin)['wordlist']
 
-        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'))
+        tm = TMmodel(TMfolder=modelFolder.parent.joinpath('TMmodel'), 
+                     get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab, labels=labels)
 
@@ -1983,6 +1985,8 @@ if __name__ == "__main__":
         if configFile.is_file():
             with configFile.open('r', encoding='utf8') as fin:
                 train_config = json.load(fin)
+                
+                get_sims =  train_config["get_sims"] if "get_sims" in train_config.keys() else False
 
                 if train_config['trainer'] == 'mallet':
 
@@ -2000,7 +2004,8 @@ if __name__ == "__main__":
                         doc_topic_thr=train_config['TMparam']['doc_topic_thr'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
                         token_regexp=train_config['TMparam']['token_regexp'],
-                        labels=train_config['TMparam']['labels'])
+                        labels=train_config['TMparam']['labels'],
+                        get_sims=get_sims)
 
                     # Train the Mallet topic model with the specified corpus
                     MallTr.fit(

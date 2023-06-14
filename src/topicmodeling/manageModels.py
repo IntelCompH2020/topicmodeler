@@ -316,7 +316,7 @@ class TMmodel(object):
     _size_vocab = None
     _sims = None
 
-    def __init__(self, TMfolder, logger=None):
+    def __init__(self, TMfolder, get_sims=False,logger=None):
         """Class initializer
 
         We just need to make sure that we have a folder where the
@@ -352,6 +352,9 @@ class TMmodel(object):
 
         self._logger.info(
             '-- -- -- Topic model object (TMmodel) successfully created')
+        
+        # TODO: Rename attribute
+        self._calculate_sims = calculate_sims
 
     def create(self, betas=None, thetas=None, alphas=None, vocab=None, labels=None):
         """Creates the topic model from the relevant matrices that characterize it. In addition to the initialization of the corresponding object's variables, all the associated variables and visualizations which are computationally costly are calculated so they are available for the other methods.
@@ -404,7 +407,8 @@ class TMmodel(object):
                                   for el in self.get_tpc_word_descriptions()]
         self.calculate_topic_coherence()  # cohrs_aux
         self._tpc_labels = [el[1] for el in self.get_tpc_labels(labels)]
-        self._calculate_sims()
+        if self._calculate_sims:
+            self._calculate_sims()
 
         # We are ready to save all variables in the model
         self._save_all()
@@ -425,6 +429,7 @@ class TMmodel(object):
         np.save(self._TMfolder.joinpath('alphas.npy'), self._alphas)
         np.save(self._TMfolder.joinpath('betas.npy'), self._betas)
         sparse.save_npz(self._TMfolder.joinpath('thetas.npz'), self._thetas)
+        # TODO: Add condition for sims
         sparse.save_npz(self._TMfolder.joinpath('distances.npz'), self._sims)
 
         with self._TMfolder.joinpath('edits.txt').open('w', encoding='utf8') as fout:
@@ -746,6 +751,7 @@ class TMmodel(object):
         self._load_betas()
         self._load_thetas()
         self._load_vocab()
+        # TODO: Add controls for sims
         self._load_sims()
         self.load_tpc_coords()
 
@@ -1046,6 +1052,7 @@ class TMmodel(object):
             self.calculate_topic_coherence()
             self._edits.append('f ' + ' '.join([str(el) for el in tpcs]))
             # We are ready to save all variables in the model
+            # TODO: Add controls for sims
             self._calculate_sims()
             self._save_all()
 
