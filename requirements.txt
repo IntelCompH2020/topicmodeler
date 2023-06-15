@@ -42,4 +42,4 @@ torch==2.0.1
 tqdm==4.65.0
 Cython==0.29.34
 #sparse-dot-topn==0.3.1
-sparse-dot-topn=0.3.4
+sparse-dot-topn==0.3.4
