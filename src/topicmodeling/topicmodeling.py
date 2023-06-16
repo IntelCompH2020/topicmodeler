@@ -618,6 +618,8 @@ class MalletTrainer(Trainer):
             Regular expression for mallet topic model trainer (java type)
         labels: list(str)
             Lists of labels to assign to topics
+        get_sims: boolean
+            Flag to detect if similarities are going to be calculated or not.
         logger: Logger object
             To log object activity
         """
@@ -869,7 +871,7 @@ class sparkLDATrainer(Trainer):
 
     def __init__(self, ntopics=25, alpha=5.0, maxIter=20, optimizer='online',
                  optimizeDocConcentration=True, subsamplingRate=0.05, thetas_thr=0.003,
-                 labels=None, logger=None):
+                 labels=None, get_sims = False, logger=None):
         """
         Initilization Method
 
@@ -891,6 +893,8 @@ class sparkLDATrainer(Trainer):
             Min value for sparsification of topic proportions after training
         labels: list(str)
             Lists of labels to assign to topics
+        get_sims: boolean
+            Flag to detect if similarities are going to be calculated or not.
         logger: Logger object
             To log object activity
         """
@@ -905,6 +909,7 @@ class sparkLDATrainer(Trainer):
         self._subsamplingRate = subsamplingRate
         self._thetas_thr = thetas_thr
         self._labels = labels
+        self._get_sims = get_sims
 
     def _createTMmodel(self, modelFolder, ldaModel, df):
         """Creates an object of class TMmodel hosting the topic model
@@ -966,7 +971,7 @@ class sparkLDATrainer(Trainer):
             with Path(lblFile).open('r', encoding='utf8') as fin:
                 labels += json.load(fin)['wordlist']
 
-        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'))
+        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'), get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab, labels=labels)
 
@@ -1038,7 +1043,7 @@ class ProdLDATrainer(Trainer):
                  solver='adam', num_epochs=100, reduce_on_plateau=False,
                  topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10,
                  num_data_loader_workers=0, thetas_thr=0.003,
-                 labels=None, logger=None):
+                 labels=None, get_sims=False, logger=None):
         """
         Initilization Method
 
@@ -1083,6 +1088,8 @@ class ProdLDATrainer(Trainer):
             Min value for sparsification of topic proportions after training
         labels: list(str)
             Lists of labels to assign to topics
+        get_sims: boolean
+            Flag to detect if similarities are going to be calculated or not.
         logger: Logger object
             To log object activity
         """
@@ -1107,6 +1114,7 @@ class ProdLDATrainer(Trainer):
         self._num_data_loader_workers = num_data_loader_workers
         self._thetas_thr = thetas_thr
         self._labels = labels
+        self._get_sims = get_sims
 
         return
 
@@ -1158,7 +1166,7 @@ class ProdLDATrainer(Trainer):
                 labels += json.load(fin)['wordlist']
 
         # Create TMmodel
-        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'))
+        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'), get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab, labels=labels)
 
@@ -1268,6 +1276,7 @@ class CTMTrainer(Trainer):
                  loss_weights=None,
                  thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1',
                  labels=None,
+                 get_sims=False,
                  logger=None):
         """
         Initilization Method
@@ -1318,6 +1327,8 @@ class CTMTrainer(Trainer):
             Model to be used for calculating the embeddings
         labels: list(str)
             Lists of labels to assign to topics
+        get_sims: boolean
+            Flag to detect if similarities are going to be calculated or not.
         logger: Logger object
             To log object activity
         """
@@ -1346,6 +1357,7 @@ class CTMTrainer(Trainer):
         self._loss_weights = loss_weights
         self._thetas_thr = thetas_thr
         self._labels = labels
+        self._get_sims = get_sims
 
         return
 
@@ -1405,7 +1417,7 @@ class CTMTrainer(Trainer):
         vis.save_html(ctm_pd, file)
 
         # Create TMmodel
-        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'))
+        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'), get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab, labels=labels)
 
@@ -2026,7 +2038,8 @@ if __name__ == "__main__":
                         optimizeDocConcentration=train_config['TMparam']['optimizeDocConcentration'],
                         subsamplingRate=train_config['TMparam']['subsamplingRate'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        labels=train_config['TMparam']['labels'])
+                        labels=train_config['TMparam']['labels'],
+                        get_sims=get_sims)
 
                     sparkLDATr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.parquet'))
@@ -2060,7 +2073,8 @@ if __name__ == "__main__":
                         num_samples=train_config['TMparam']['num_samples'],
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        labels=train_config['TMparam']['labels'])
+                        labels=train_config['TMparam']['labels'],
+                        get_sims=get_sims)
 
                     # Train the ProdLDA topic model with the specified corpus
                     ProdLDATr.fit(
@@ -2103,7 +2117,8 @@ if __name__ == "__main__":
                         topic_prior_variance=train_config['TMparam']['topic_prior_variance'],
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        labels=train_config['TMparam']['labels'])
+                        labels=train_config['TMparam']['labels'],
+                        get_sims=get_sims)
 
                     # Train the CTM topic model with the specified corpus
                     corpusFile = configFile.parent.joinpath('corpus.parquet')

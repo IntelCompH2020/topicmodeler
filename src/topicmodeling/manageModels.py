@@ -328,6 +328,8 @@ class TMmodel(object):
         TMfolder: Path
             Contains the name of an existing folder or a new folder
             where the model will be created
+        get_sims: boolean
+            Flag to detect if similarities are going to be calculated or not.
         logger:
             External logger to use. If None, a logger will be created for the object
         """
@@ -353,8 +355,7 @@ class TMmodel(object):
         self._logger.info(
             '-- -- -- Topic model object (TMmodel) successfully created')
         
-        # TODO: Rename attribute
-        self._calculate_sims = calculate_sims
+        self._get_sims = get_sims
 
     def create(self, betas=None, thetas=None, alphas=None, vocab=None, labels=None):
         """Creates the topic model from the relevant matrices that characterize it. In addition to the initialization of the corresponding object's variables, all the associated variables and visualizations which are computationally costly are calculated so they are available for the other methods.
@@ -407,7 +408,7 @@ class TMmodel(object):
                                   for el in self.get_tpc_word_descriptions()]
         self.calculate_topic_coherence()  # cohrs_aux
         self._tpc_labels = [el[1] for el in self.get_tpc_labels(labels)]
-        if self._calculate_sims:
+        if self._get_sims:
             self._calculate_sims()
 
         # We are ready to save all variables in the model
@@ -429,8 +430,8 @@ class TMmodel(object):
         np.save(self._TMfolder.joinpath('alphas.npy'), self._alphas)
         np.save(self._TMfolder.joinpath('betas.npy'), self._betas)
         sparse.save_npz(self._TMfolder.joinpath('thetas.npz'), self._thetas)
-        # TODO: Add condition for sims
-        sparse.save_npz(self._TMfolder.joinpath('distances.npz'), self._sims)
+        if self._get_sims:
+            sparse.save_npz(self._TMfolder.joinpath('distances.npz'), self._sims)
 
         with self._TMfolder.joinpath('edits.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._edits))
@@ -751,8 +752,8 @@ class TMmodel(object):
         self._load_betas()
         self._load_thetas()
         self._load_vocab()
-        # TODO: Add controls for sims
-        self._load_sims()
+        if self._get_sims:
+            self._load_sims()
         self.load_tpc_coords()
 
         return self._alphas, self._betas, self._thetas, self._vocab, self._sims, self._coords
@@ -1052,8 +1053,8 @@ class TMmodel(object):
             self.calculate_topic_coherence()
             self._edits.append('f ' + ' '.join([str(el) for el in tpcs]))
             # We are ready to save all variables in the model
-            # TODO: Add controls for sims
-            self._calculate_sims()
+            if self._get_sims:
+                self._calculate_sims()
             self._save_all()
 
             self._logger.info(
