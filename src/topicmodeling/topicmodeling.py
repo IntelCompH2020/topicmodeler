@@ -1235,6 +1235,7 @@ class ProdLDATrainer(Trainer):
         # Save avitm model for future inference
         model_file = modelFolder.joinpath('model.pickle')
         pickler(model_file, avitm)
+        #avitm.save(modelFolder.joinpath('model'))
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, avitm)

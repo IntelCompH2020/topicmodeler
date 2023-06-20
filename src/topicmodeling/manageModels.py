@@ -481,7 +481,7 @@ class TMmodel(object):
         with self._TMfolder.joinpath("pyLDAvis.html").open("w") as f:
             pyLDAvis.save_html(vis_data, f)
         # TODO: Check substituting by "pyLDAvis.prepared_data_to_html"
-        self._modify_pyldavis_html(self._TMfolder.as_posix())
+        #self._modify_pyldavis_html(self._TMfolder.as_posix())
 
         # Get coordinates of topics in the pyLDAvis visualization
         vis_data_dict = vis_data.to_dict()
@@ -638,28 +638,53 @@ class TMmodel(object):
             self._topic_entropy = np.load(
                 self._TMfolder.joinpath('topic_entropy.npy'))
 
-    def calculate_topic_coherence(self, metrics=["c_v", "c_npmi"], n_words=15, only_one=True):
+    def calculate_topic_coherence(self,
+                                  metrics=["c_v", "c_npmi"],
+                                  n_words=15,
+                                  reference_text=None,
+                                  only_one=True):
+        """Calculates the per-topic coherence of a topic model, given as TMmodel.
+        
+        If only_one is False and metrics is a list of different coherence metrics, the function returns a list of lists, where each sublist contains the coherence values for the respective metric.
+        
+        If reference_text is given, the coherence is calculated with respect to this text. Otherwise, the coherence is calculated with respect to the corpus used to train the topic model.
+        
+        Parameters
+        ----------
+        metrics : list of str, optional
+            List of coherence metrics to be calculated. Possible values are 'c_v', 'c_uci', 'c_npmi', 'u_mass'. 
+            The default is ["c_v", "c_npmi"].
+        n_words : int, optional
+            Number of words to be used for calculating the coherence. The default is 15.
+        reference_text : str, optional
+            Text to be used as reference for calculating the coherence. The default is None.
+        only_one : bool, optional
+            If True, only one coherence value is returned. If False, a list of coherence values is returned. The default is True.
+        """
 
         # Load topic information
         if self._tpc_descriptions is None:
-            self._tpc_descriptions = [el[1]
-                                      for el in self.get_tpc_word_descriptions()]
-        # Convert topic information into list of lists
+            self._tpc_descriptions = \
+                [el[1] for el in self.get_tpc_word_descriptions()]
+                
+        # Convert topic information into list of lists (Gensim's Coherence Model format)
         tpc_descriptions_ = \
             [tpc.split(', ') for tpc in self._tpc_descriptions]
 
-        # Get texts to calculate coherence
-        if self._TMfolder.parent.joinpath('modelFiles/corpus.txt').is_file():
-            corpusFile = self._TMfolder.parent.joinpath(
-                'modelFiles/corpus.txt')
+        if reference_text is None:
+            # Get text to calculate coherence
+            if self._TMfolder.parent.joinpath('modelFiles/corpus.txt').is_file():
+                corpusFile = self._TMfolder.parent.joinpath(
+                    'modelFiles/corpus.txt')
+            else:
+                corpusFile = self._TMfolder.parent.joinpath('corpus.txt')
+            with corpusFile.open("r", encoding="utf-8") as f:
+                corpus = [line.rsplit(" 0 ")[1].strip().split() for line in f.readlines(
+                ) if line.rsplit(" 0 ")[1].strip().split() != []]
         else:
-            corpusFile = self._TMfolder.parent.joinpath('corpus.txt')
-        with corpusFile.open("r", encoding="utf-8") as f:
-            corpus = [line.rsplit(" 0 ")[1].strip().split() for line in f.readlines(
-            ) if line.rsplit(" 0 ")[1].strip().split() != []]
+            pass
 
         # Import necessary modules for coherence calculation with Gensim
-        # TODO: This needs to be substituted by a non-Gensim based calculation of the coherence
         from gensim.corpora import Dictionary
         from gensim.models.coherencemodel import CoherenceModel
 

@@ -29,18 +29,18 @@ from subprocess import check_output
 import pandas as pd
 import pyarrow.parquet as pt
 # from sklearn.preprocessing import normalize
-from PyQt6 import QtWidgets
+#from PyQt6 import QtWidgets
 #from src.topicmodeling.topicmodeling import TMmodel
-from PyQt6.QtCore import QUrl
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QMessageBox
-from src.gui.utils import utils
-from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
+#from PyQt6.QtCore import QUrl
+#from PyQt6.QtWebEngineWidgets import QWebEngineView
+#from PyQt6.QtWidgets import QMessageBox
+#from src.gui.utils import utils
+#from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
 from src.utils.misc import (printgr, printmag, printred, query_options,
                             request_confirmation, var_num_keyboard,
                             var_string_keyboard)
 
-from ..gui.utils.constants import Constants
+#from ..gui.utils.constants import Constants
 from .base_task_manager import BaseTaskManager
 
 

@@ -316,7 +316,7 @@ class AVITM(object):
 
         return samples_processed, val_loss
 
-    def fit(self, train_dataset, validation_dataset=None, save_dir=None, patience=5, delta=0, n_samples=20):
+    def fit(self, train_dataset, validation_dataset=None, save_dir=None, patience=5, delta=0, n_samples=1):
         """
         Trains the AVITM model.
 
@@ -457,7 +457,7 @@ class AVITM(object):
             predicted_topics.append(predicted_topic)
         return predicted_topics
 
-    def get_doc_topic_distribution(self, dataset, n_samples=20):
+    def get_doc_topic_distribution(self, dataset, n_samples=1):
         """
         Gets the document-topic distribution for a dataset of topics. Includes multiple sampling to reduce variation via
 
