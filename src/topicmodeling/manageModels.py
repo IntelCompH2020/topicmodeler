@@ -682,7 +682,8 @@ class TMmodel(object):
                 corpus = [line.rsplit(" 0 ")[1].strip().split() for line in f.readlines(
                 ) if line.rsplit(" 0 ")[1].strip().split() != []]
         else:
-            pass
+            # Texts should be given as a list of lists of strings
+            corpus = reference_text
 
         # Import necessary modules for coherence calculation with Gensim
         from gensim.corpora import Dictionary

@@ -1231,14 +1231,15 @@ class ProdLDATrainer(Trainer):
                       num_data_loader_workers=self._num_data_loader_workers)
 
         avitm.fit(self._train_dataset, self._val_dataset)
+                
+        # Create TMmodel object
+        tm = self._createTMmodel(modelFolder, avitm)
 
         # Save avitm model for future inference
         model_file = modelFolder.joinpath('model.pickle')
-        pickler_avitm_for_ewb_inferencer(path_model_infer=model_file,
-                                         avitm_model=avitm)
-
-        # Create TMmodel object
-        tm = self._createTMmodel(modelFolder, avitm)
+        pickler_avitm_for_ewb_inferencer(
+            path_model_infer=model_file,
+            avitm_model=avitm)
 
         return
 
