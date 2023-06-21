@@ -1234,8 +1234,8 @@ class ProdLDATrainer(Trainer):
 
         # Save avitm model for future inference
         model_file = modelFolder.joinpath('model.pickle')
-        pickler(model_file, avitm)
-        #avitm.save(modelFolder.joinpath('model'))
+        pickler_avitm_for_ewb_inferencer(path_model_infer=model_file,
+                                         avitm_model=avitm)
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, avitm)
@@ -2052,7 +2052,7 @@ if __name__ == "__main__":
                         AVITM
                     from neural_models.pytorchavitm.utils.data_preparation import \
                         prepare_dataset
-                    from tm_utils import pickler
+                    from tm_utils import pickler, pickler_avitm_for_ewb_inferencer
 
                     # Create a ProdLDATrainer object with the parameters specified in the configuration file
                     ProdLDATr = ProdLDATrainer(
