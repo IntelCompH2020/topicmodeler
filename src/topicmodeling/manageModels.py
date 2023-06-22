@@ -642,7 +642,8 @@ class TMmodel(object):
                                   metrics=["c_v", "c_npmi"],
                                   n_words=15,
                                   reference_text=None,
-                                  only_one=True):
+                                  only_one=True,
+                                  aggregated=False):
         """Calculates the per-topic coherence of a topic model, given as TMmodel.
         
         If only_one is False and metrics is a list of different coherence metrics, the function returns a list of lists, where each sublist contains the coherence values for the respective metric.
@@ -714,6 +715,10 @@ class TMmodel(object):
                     cm = CoherenceModel(topics=tpc_descriptions_, texts=corpus,
                                         dictionary=dictionary, coherence=metric, topn=n_words)
                     self._topic_coherence = cm.get_coherence_per_topic()
+                    
+                    if aggregated:
+                        mean = cm.aggregate_measures(self._topic_coherence)
+                        return mean
                 else:
                     self.logger.error(
                         '-- -- -- Coherence metric provided is not available.')
