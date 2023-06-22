@@ -704,7 +704,7 @@ class TMmodel(object):
                 dictionary = Dictionary(corpus)
 
         if n_words > len(tpc_descriptions_[0]):
-            self.logger.error(
+            self._logger.error(
                 '-- -- -- Coherence calculation failed: The number of words per topic must be equal to n_words.')
         else:
             if only_one:
@@ -720,7 +720,7 @@ class TMmodel(object):
                         mean = cm.aggregate_measures(self._topic_coherence)
                         return mean
                 else:
-                    self.logger.error(
+                    self._logger.error(
                         '-- -- -- Coherence metric provided is not available.')
             else:
                 cohrs_aux = []
@@ -734,7 +734,7 @@ class TMmodel(object):
                         cohrs_aux.extend(aux)
                         self._logger.info(cohrs_aux)
                     else:
-                        self.logger.error(
+                        self._logger.error(
                             '-- -- -- Coherence metric provided is not available.')
                 self._topic_coherence = cohrs_aux
 
