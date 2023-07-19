@@ -434,7 +434,8 @@ class textPreproc(object):
                     schema = pa.schema([
                         ('id', pa.int64()),
                         ('bow_text', pa.string()),
-                        ('embeddings', pa.list_(pa.float64()))
+                        ('embeddings', pa.string())
+                        #('embeddings', pa.list_(pa.float64()))
                     ])
                     if nw > 0:
                         DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
