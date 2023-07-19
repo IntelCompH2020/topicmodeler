@@ -1940,6 +1940,7 @@ if __name__ == "__main__":
                         pass
                     # Concatenate text fields
                     for idx2, col in enumerate(DtSet['lemmasfld']):
+                        df = df.rename(columns={DtSet['idfld']: 'id'})
                         if idx2 == 0:
                             df["all_lemmas"] = df[col]
                         else:
@@ -1963,6 +1964,10 @@ if __name__ == "__main__":
                     # We get full df containing the embeddings
                     for idx, DtSet in enumerate(trDtSet['Dtsets']):
                         df = dd.read_parquet(DtSet['parquet']).fillna("")
+                
+                        # Rename id column to "id"
+                        df = df.rename(columns={DtSet['idfld']: 'id'})
+                        
                         df = df[["id", "embeddings"]]
 
                         # Concatenate dataframes
