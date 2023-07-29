@@ -1493,6 +1493,7 @@ class CTMTrainer(Trainer):
 
         if self._ctm_model_type == 'ZeroShotTM':
             ctm = ZeroShotTM(
+                logger=self._logger,
                 input_size=self._input_size,
                 contextual_size=768,
                 n_components=self._n_components,
@@ -1511,6 +1512,7 @@ class CTMTrainer(Trainer):
                 num_data_loader_workers=self._num_data_loader_workers)
         else:
             ctm = CombinedTM(
+                logger=self._logger,
                 input_size=self._input_size,
                 contextual_size=768,
                 n_components=self._n_components,
