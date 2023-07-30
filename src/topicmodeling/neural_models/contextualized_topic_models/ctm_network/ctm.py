@@ -435,7 +435,8 @@ class CTM(object):
                    Model Type: {}\n\
                    Hidden Sizes: {}\n\
                    Activation: {}\n\
-                   Dropout: {}\n\
+                   Dropout in : {}\n\
+                   Dropout out : {}\n\
                    Learn Priors: {}\n\
                    Learning Rate: {}\n\
                    Momentum: {}\n\
@@ -443,7 +444,7 @@ class CTM(object):
                    Save Dir: {}".format(
                 self.n_components, self.topic_prior_mean,
                 self.topic_prior_variance, self.model_type,
-                self.hidden_sizes, self.activation, self.dropout, self.learn_priors,
+                self.hidden_sizes, self.activation, self.dropout_in, self.dropout_out, self.learn_priors,
                 self.lr, self.momentum, self.reduce_on_plateau, save_dir))
 
         self.model_dir = save_dir
@@ -726,7 +727,7 @@ class CTM(object):
         model_dir = "contextualized_topic_model_nc_{}_tpm_{}_tpv_{}_hs_{}_ac_{}_do_{}_lr_{}_mo_{}_rp_{}". \
             format(self.n_components, 0.0, 1 - (1. / self.n_components),
                    self.model_type, self.hidden_sizes, self.activation,
-                   self.dropout, self.lr, self.momentum,
+                   self.dropout_in, self.lr, self.momentum,
                    self.reduce_on_plateau)
         return model_dir
 
