@@ -643,8 +643,8 @@ class TMmodel(object):
                                   n_words=15,
                                   reference_text=None,
                                   only_one=True,
-                                  aggregated=False):
-        """Calculates the per-topic coherence of a topic model, given as TMmodel.
+                                  aggregated=False) -> list:
+        """Calculates the per-topic coherence of a topic model, given as TMmodel, or its average coherence when aggregated is True.
         
         If only_one is False and metrics is a list of different coherence metrics, the function returns a list of lists, where each sublist contains the coherence values for the respective metric.
         
@@ -661,6 +661,8 @@ class TMmodel(object):
             Text to be used as reference for calculating the coherence. The default is None.
         only_one : bool, optional
             If True, only one coherence value is returned. If False, a list of coherence values is returned. The default is True.
+        aggregated : bool, optional
+            If True, the average coherence of the topic model is returned. If False, the coherence of each topic is returned. The default is False.
         """
 
         # Load topic information
@@ -706,6 +708,7 @@ class TMmodel(object):
         if n_words > len(tpc_descriptions_[0]):
             self._logger.error(
                 '-- -- -- Coherence calculation failed: The number of words per topic must be equal to n_words.')
+            return None
         else:
             if only_one:
                 metric = metrics[0]
@@ -722,6 +725,7 @@ class TMmodel(object):
                 else:
                     self._logger.error(
                         '-- -- -- Coherence metric provided is not available.')
+                    return None
             else:
                 cohrs_aux = []
                 for metric in metrics:
@@ -736,7 +740,10 @@ class TMmodel(object):
                     else:
                         self._logger.error(
                             '-- -- -- Coherence metric provided is not available.')
+                        return None
                 self._topic_coherence = cohrs_aux
+                
+        return self._topic_coherence    
 
     def _load_topic_coherence(self):
         if self._topic_coherence is None:
