@@ -722,6 +722,7 @@ class TMmodel(object):
                     if aggregated:
                         mean = cm.aggregate_measures(self._topic_coherence)
                         return mean
+                    return self._topic_coherence
                 else:
                     self._logger.error(
                         '-- -- -- Coherence metric provided is not available.')

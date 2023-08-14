@@ -822,7 +822,8 @@ class MalletTrainer(Trainer):
             fout.write('num-iterations = ' + str(self._num_iterations) + '\n')
             fout.write('doc-topics-threshold = ' +
                        str(self._doc_topic_thr) + '\n')
-            # fout.write('output-state = ' + os.path.join(self._outputFolder, 'topic-state.gz') + '\n')
+            fout.write('output-state = ' +
+                       modelFolder.joinpath('topic-state.gz').resolve().as_posix() + '\n')
             fout.write('output-doc-topics = ' +
                        modelFolder.joinpath('doc-topics.txt').resolve().as_posix() + '\n')
             fout.write('word-topic-counts-file = ' +
