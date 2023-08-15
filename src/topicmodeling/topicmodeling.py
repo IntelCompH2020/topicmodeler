@@ -15,6 +15,7 @@ Provides several classes for Topic Modeling
     - HierarchicalTMManager: Manages the creation of the corpus associated with a 2nd level hierarchical topic model
 """
 import argparse
+import gzip
 import json
 import os
 import sys
