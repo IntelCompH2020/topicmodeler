@@ -803,7 +803,7 @@ class TMmodel(object):
         unique_words = set()
         for topic in self._tpc_descriptions:
             unique_words = unique_words.union(set(topic.split(", ")))
-        td = len(unique_words) / (self.topk * len(self._tpc_descriptions))
+        td = len(unique_words) / (n_words * len(self._tpc_descriptions))
         return td
 
     def _load_topic_coherence(self):
