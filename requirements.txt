@@ -46,3 +46,4 @@ Cython==0.29.34
 scipy==1.10.1
 #sparse-dot-topn==0.3.4
 sparse-dot-topn~=0.3.1
+rbo==0.1.3

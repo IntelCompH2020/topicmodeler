@@ -373,7 +373,7 @@ class textPreproc(object):
                 lemmasstr: str
                     Clean text including only the lemmas in the dictionary
                 """
-                #bow = self._GensimDict.doc2bow(tokens)
+                # bow = self._GensimDict.doc2bow(tokens)
                 # return ''.join([el[1] * (self._GensimDict[el[0]]+ ' ') for el in bow])
                 return ' '.join([el for el in tokens if el in vocabulary])
 
@@ -390,7 +390,7 @@ class textPreproc(object):
                     str, meta=('id', 'str')) + " 0 " + trDF['cleantext']
 
                 with ProgressBar():
-                    #trDF = trDF.persist(scheduler='processes')
+                    # trDF = trDF.persist(scheduler='processes')
                     DFmallet = trDF[['2mallet']]
                     if nw > 0:
                         DFmallet.to_csv(outFile, index=False, header=False, single_file=True,
@@ -436,7 +436,7 @@ class textPreproc(object):
                         ('id', pa.int64()),
                         ('bow_text', pa.string()),
                         ('embeddings', pa.string())
-                        #('embeddings', pa.list_(pa.float64()))
+                        # ('embeddings', pa.list_(pa.float64()))
                     ])
                     if nw > 0:
                         DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
@@ -472,7 +472,7 @@ class textPreproc(object):
                 # but this is failing repeatedly, so I avoid coalescing in Spark and
                 # instead concatenate all files after creation
                 tempFolder = dirpath.joinpath('tempFolder')
-                #malletDF.coalesce(1).write.format("text").option("header", "false").save(f"file://{tempFolder.as_posix()}")
+                # malletDF.coalesce(1).write.format("text").option("header", "false").save(f"file://{tempFolder.as_posix()}")
                 malletDF.write.format("text").option("header", "false").save(
                     f"file://{tempFolder.as_posix()}")
                 # Concatenate all text files
@@ -716,7 +716,7 @@ class MalletTrainer(Trainer):
             with Path(lblFile).open('r', encoding='utf8') as fin:
                 labels += json.load(fin)['wordlist']
 
-        tm = TMmodel(TMfolder=modelFolder.parent.joinpath('TMmodel'), 
+        tm = TMmodel(TMfolder=modelFolder.parent.joinpath('TMmodel'),
                      get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab, labels=labels)
@@ -874,7 +874,7 @@ class sparkLDATrainer(Trainer):
 
     def __init__(self, ntopics=25, alpha=5.0, maxIter=20, optimizer='online',
                  optimizeDocConcentration=True, subsamplingRate=0.05, thetas_thr=0.003,
-                 labels=None, get_sims = False, logger=None):
+                 labels=None, get_sims=False, logger=None):
         """
         Initilization Method
 
@@ -974,7 +974,8 @@ class sparkLDATrainer(Trainer):
             with Path(lblFile).open('r', encoding='utf8') as fin:
                 labels += json.load(fin)['wordlist']
 
-        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'), get_sims=self._get_sims)
+        tm = TMmodel(modelFolder.parent.joinpath(
+            'TMmodel'), get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab, labels=labels)
 
@@ -1169,7 +1170,8 @@ class ProdLDATrainer(Trainer):
                 labels += json.load(fin)['wordlist']
 
         # Create TMmodel
-        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'), get_sims=self._get_sims)
+        tm = TMmodel(modelFolder.parent.joinpath(
+            'TMmodel'), get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab, labels=labels)
 
@@ -1234,7 +1236,7 @@ class ProdLDATrainer(Trainer):
                       num_data_loader_workers=self._num_data_loader_workers)
 
         avitm.fit(self._train_dataset, self._val_dataset)
-                
+
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, avitm)
 
@@ -1275,7 +1277,7 @@ class CTMTrainer(Trainer):
                  num_samples=10,
                  reduce_on_plateau=False,
                  topic_prior_mean=0.0,
-                 topic_prior_variance=None, 
+                 topic_prior_variance=None,
                  num_data_loader_workers=0,
                  label_size=0,
                  loss_weights=None,
@@ -1422,7 +1424,8 @@ class CTMTrainer(Trainer):
         vis.save_html(ctm_pd, file)
 
         # Create TMmodel
-        tm = TMmodel(modelFolder.parent.joinpath('TMmodel'), get_sims=self._get_sims)
+        tm = TMmodel(modelFolder.parent.joinpath(
+            'TMmodel'), get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab, labels=labels)
 
@@ -1463,8 +1466,9 @@ class CTMTrainer(Trainer):
                 self._embeddings = None
             else:
                 self._embeddings = df.embeddings.values
-                if isinstance(self._embeddings[0],str):
-                    self._embeddings = np.array([np.array(el.split(), dtype=np.float32) for el in self._embeddings]) 
+                if isinstance(self._embeddings[0], str):
+                    self._embeddings = np.array(
+                        [np.array(el.split(), dtype=np.float32) for el in self._embeddings])
                 self._unpreprocessed_corpus = None
         else:
             if not embeddingsFile.is_file():
@@ -1959,7 +1963,7 @@ if __name__ == "__main__":
                     else:
                         trDF = dd.concat([trDF, df])
 
-                #trDF = trDF.drop_duplicates(subset=["id"], ignore_index=True)
+                # trDF = trDF.drop_duplicates(subset=["id"], ignore_index=True)
                 # We preprocess the data and save the Gensim Model used to obtain the BoW
                 trDF = tPreproc.preprocBOW(trDF, nw=args.nw)
                 tPreproc.saveGensimDict(configFile.parent.resolve())
@@ -1969,10 +1973,10 @@ if __name__ == "__main__":
                     # We get full df containing the embeddings
                     for idx, DtSet in enumerate(trDtSet['Dtsets']):
                         df = dd.read_parquet(DtSet['parquet']).fillna("")
-                
+
                         # Rename id column to "id"
                         df = df.rename(columns={DtSet['idfld']: 'id'})
-                        
+
                         df = df[["id", "embeddings"]]
 
                         # Concatenate dataframes
@@ -2009,8 +2013,9 @@ if __name__ == "__main__":
         if configFile.is_file():
             with configFile.open('r', encoding='utf8') as fin:
                 train_config = json.load(fin)
-                
-                get_sims =  train_config["get_sims"] if "get_sims" in train_config.keys() else False
+
+                get_sims = train_config["get_sims"] if "get_sims" in train_config.keys(
+                ) else False
 
                 if train_config['trainer'] == 'mallet':
 
@@ -2107,7 +2112,7 @@ if __name__ == "__main__":
                         dropout_out_ = train_config['TMparam']['dropout_out']
                     elif 'dropout' in train_config.keys():
                         dropout_in_ = dropout_out_ = train_config['TMparam']['dropout']
-                    else: 
+                    else:
                         dropout_in_ = dropout_out_ = 0.2
                     CTMr = CTMTrainer(
                         n_components=train_config['TMparam']['ntopics'],
@@ -2134,7 +2139,7 @@ if __name__ == "__main__":
 
                     # Train the CTM topic model with the specified corpus
                     corpusFile = configFile.parent.joinpath('corpus.parquet')
-                    if not corpusFile.is_dir():
+                    if not corpusFile.is_dir() and not corpusFile.is_file():
                         sys.exit(
                             "The corpus file 'corpus.parquet' does not exist.")
                     else:

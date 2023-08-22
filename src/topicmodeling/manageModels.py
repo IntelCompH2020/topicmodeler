@@ -8,17 +8,18 @@ Provides several classes for Topic Modeling management, representation, and cura
 """
 
 import argparse
+import itertools
 import json
 import shutil
 import sys
 import warnings
 from pathlib import Path
-import pandas as pd
 
 import numpy as np
+import pandas as pd
+import rbo
 import scipy.sparse as sparse
 from sparse_dot_topn import awesome_cossim_topn
-
 
 
 class TMManager(object):
@@ -44,11 +45,11 @@ class TMManager(object):
         """
         allTMmodels = {}
         modelFolders = [el for el in path_TMmodels.iterdir()]
-        
+
         for TMf in modelFolders:
             # For topic models
             if TMf.joinpath('trainconfig.json').is_file():
-                #print(f"{TMf.as_posix()} is a topic model")
+                # print(f"{TMf.as_posix()} is a topic model")
                 modelConfig = TMf.joinpath('trainconfig.json')
                 with modelConfig.open('r', encoding='utf8') as fin:
                     modelInfo = json.load(fin)
@@ -64,9 +65,9 @@ class TMManager(object):
                         "htm-version": modelInfo['htm-version']
                     }
                     submodelFolders = [
-                        el for el in TMf.iterdir() 
-                        if not el.as_posix().endswith("modelFiles") 
-                        and not el.as_posix().endswith("corpus.parquet") 
+                        el for el in TMf.iterdir()
+                        if not el.as_posix().endswith("modelFiles")
+                        and not el.as_posix().endswith("corpus.parquet")
                         and not el.as_posix().endswith("_old")]
                     for sub_TMf in submodelFolders:
                         submodelConfig = sub_TMf.joinpath('trainconfig.json')
@@ -88,25 +89,25 @@ class TMManager(object):
                                 }
             # For DC models
             elif TMf.joinpath('dc_config.json').is_file():
-                #print(f"{TMf.as_posix()} is a domain classifier model")
+                # print(f"{TMf.as_posix()} is a domain classifier model")
                 modelConfig = TMf.joinpath('dc_config.json')
                 with modelConfig.open('r', encoding='utf8') as fin:
                     modelInfo = json.load(fin)
                 allTMmodels[modelInfo['name']] = {
-                            "name": modelInfo['name'],
-                            "description": modelInfo['description'],
-                            "visibility": modelInfo['visibility'],
-                            "creator": modelInfo['creator'],
-                            "type": modelInfo['type'],
-                            "corpus": modelInfo['corpus'],
-                            "tag": modelInfo['tag'],
-                            "creation_date": modelInfo['creation_date']
-                        }
+                    "name": modelInfo['name'],
+                    "description": modelInfo['description'],
+                    "visibility": modelInfo['visibility'],
+                    "creator": modelInfo['creator'],
+                    "type": modelInfo['type'],
+                    "corpus": modelInfo['corpus'],
+                    "tag": modelInfo['tag'],
+                    "creation_date": modelInfo['creation_date']
+                }
             else:
                 print(f"No valid JSON file provided for Topic models or DC models")
                 return 0
         return allTMmodels
-        
+
     def getTMmodel(self, path_TMmodel: Path):
         """
         Returns a dictionary with a topic model and it's sub-models
@@ -124,7 +125,7 @@ class TMManager(object):
             value is a dictionary with metadata
         """
         result = {}
-        
+
         modelConfig = path_TMmodel.joinpath('trainconfig.json')
         if modelConfig.is_file():
             with modelConfig.open('r', encoding='utf8') as fin:
@@ -260,7 +261,7 @@ class TMManager(object):
             return 0
         try:
             shutil.copytree(name, new_name)
-            
+
             # Checking whether it is a TM or DC model
             if new_name.joinpath('trainconfig.json').is_file():
                 config_file = name.joinpath('trainconfig.json')
@@ -275,6 +276,7 @@ class TMManager(object):
             return 1
         except:
             return 0
+
 
 class TMmodel(object):
     # This class represents a Topic Model according to the LDA generative model
@@ -316,7 +318,7 @@ class TMmodel(object):
     _size_vocab = None
     _sims = None
 
-    def __init__(self, TMfolder, get_sims=False,logger=None):
+    def __init__(self, TMfolder, get_sims=False, logger=None):
         """Class initializer
 
         We just need to make sure that we have a folder where the
@@ -354,7 +356,7 @@ class TMmodel(object):
 
         self._logger.info(
             '-- -- -- Topic model object (TMmodel) successfully created')
-        
+
         self._get_sims = get_sims
 
     def create(self, betas=None, thetas=None, alphas=None, vocab=None, labels=None):
@@ -431,7 +433,8 @@ class TMmodel(object):
         np.save(self._TMfolder.joinpath('betas.npy'), self._betas)
         sparse.save_npz(self._TMfolder.joinpath('thetas.npz'), self._thetas)
         if self._get_sims:
-            sparse.save_npz(self._TMfolder.joinpath('distances.npz'), self._sims)
+            sparse.save_npz(self._TMfolder.joinpath(
+                'distances.npz'), self._sims)
 
         with self._TMfolder.joinpath('edits.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._edits))
@@ -481,7 +484,7 @@ class TMmodel(object):
         with self._TMfolder.joinpath("pyLDAvis.html").open("w") as f:
             pyLDAvis.save_html(vis_data, f)
         # TODO: Check substituting by "pyLDAvis.prepared_data_to_html"
-        #self._modify_pyldavis_html(self._TMfolder.as_posix())
+        # self._modify_pyldavis_html(self._TMfolder.as_posix())
 
         # Get coordinates of topics in the pyLDAvis visualization
         vis_data_dict = vis_data.to_dict()
@@ -645,11 +648,11 @@ class TMmodel(object):
                                   only_one=True,
                                   aggregated=False) -> list:
         """Calculates the per-topic coherence of a topic model, given as TMmodel, or its average coherence when aggregated is True.
-        
+
         If only_one is False and metrics is a list of different coherence metrics, the function returns a list of lists, where each sublist contains the coherence values for the respective metric.
-        
+
         If reference_text is given, the coherence is calculated with respect to this text. Otherwise, the coherence is calculated with respect to the corpus used to train the topic model.
-        
+
         Parameters
         ----------
         metrics : list of str, optional
@@ -669,7 +672,7 @@ class TMmodel(object):
         if self._tpc_descriptions is None:
             self._tpc_descriptions = \
                 [el[1] for el in self.get_tpc_word_descriptions()]
-                
+
         # Convert topic information into list of lists (Gensim's Coherence Model format)
         tpc_descriptions_ = \
             [tpc.split(', ') for tpc in self._tpc_descriptions]
@@ -718,7 +721,7 @@ class TMmodel(object):
                     cm = CoherenceModel(topics=tpc_descriptions_, texts=corpus,
                                         dictionary=dictionary, coherence=metric, topn=n_words)
                     self._topic_coherence = cm.get_coherence_per_topic()
-                    
+
                     if aggregated:
                         mean = cm.aggregate_measures(self._topic_coherence)
                         return mean
@@ -743,8 +746,33 @@ class TMmodel(object):
                             '-- -- -- Coherence metric provided is not available.')
                         return None
                 self._topic_coherence = cohrs_aux
-                
-        return self._topic_coherence    
+
+        return self._topic_coherence
+
+    def calculate_rbo(self,
+                      weight: float = 1.0,
+                      n_words: int = 15):
+        """Calculates the rank_biased_overlap over the topics in a topic model.
+
+        Parameters
+        ----------
+        weigth : float, optional
+            Weight of each agreement at depth d: p**(d-1). When set to 1.0, there is no weight, the rbo returns to average overlap. The defau>
+        n_words : int, optional
+            Number of words to be used for calculating the rbo. The default is 15.
+        """
+
+        # Load topic information
+        if self._tpc_descriptions is None:
+            self._tpc_descriptions = \
+                [el[1] for el in self.get_tpc_word_descriptions(n_words)]
+
+        collect = []
+        for list1, list2 in itertools.combinations(self._tpc_descriptions, 2):
+            rbo_val = rbo.RankingSimilarity(list1, list2).rbo(p=weight)
+            collect.append(rbo_val)
+
+        return 1 - np.mean(collect)
 
     def _load_topic_coherence(self):
         if self._topic_coherence is None:
@@ -1203,6 +1231,7 @@ class TMmodel(object):
         df = pd.DataFrame(data)
         return df, self._vocab_id2w
 
+
 ##############################################################################
 #                                  MAIN                                      #
 ##############################################################################
@@ -1212,7 +1241,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Scripts for Topic Modeling Service")
-    parser.add_argument("--path_TMmodels", type=str, 
+    parser.add_argument("--path_TMmodels", type=str,
                         default=None, required=True,
                         metavar=("path_to_TMs"),
                         help="path to topic models folder")
@@ -1267,7 +1296,7 @@ if __name__ == "__main__":
     if args.listTMmodels:
         allTMmodels = tmm.listTMmodels(tm_path)
         sys.stdout.write(json.dumps(allTMmodels))
-        
+
     if args.getTMmodel:
         tm_path = look_for_path(tm_path, f"{args.getTMmodel}")
         allTMmodels = tmm.getTMmodel(tm_path.joinpath(f"{args.getTMmodel}"))
