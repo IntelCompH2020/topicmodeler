@@ -751,7 +751,7 @@ class TMmodel(object):
 
     def calculate_rbo(self,
                       weight: float = 1.0,
-                      n_words: int = 15):
+                      n_words: int = 15) -> float:
         """Calculates the rank_biased_overlap over the topics in a topic model.
 
         Parameters
@@ -760,6 +760,11 @@ class TMmodel(object):
             Weight of each agreement at depth d: p**(d-1). When set to 1.0, there is no weight, the rbo returns to average overlap. The defau>
         n_words : int, optional
             Number of words to be used for calculating the rbo. The default is 15.
+
+        Returns
+        -------
+        rbo : float
+            Rank_biased_overlap
         """
 
         # Load topic information
@@ -769,10 +774,37 @@ class TMmodel(object):
 
         collect = []
         for list1, list2 in itertools.combinations(self._tpc_descriptions, 2):
-            rbo_val = rbo.RankingSimilarity(list1, list2).rbo(p=weight)
+            rbo_val = rbo.RankingSimilarity(
+                list1.split(", "), list2.split(", ")).rbo(p=weight)
             collect.append(rbo_val)
 
         return 1 - np.mean(collect)
+
+    def calculate_topic_diversity(self,
+                                  n_words: int = 15) -> float:
+        """Calculates the percentage of unique words in the topn words of all topics. Diversity close to 0 indicates redundant topics; diversity close to 1 indicates more varied topics.
+
+        Parameters
+        ----------
+        n_words : int, optional
+            Number of words to be used for calculating the rbo. The default is 15.
+
+        Returns
+        -------
+        td : float
+            Topic diversity
+        """
+
+        # Load topic information
+        if self._tpc_descriptions is None:
+            self._tpc_descriptions = \
+                [el[1] for el in self.get_tpc_word_descriptions(n_words)]
+
+        unique_words = set()
+        for topic in self._tpc_descriptions:
+            unique_words = unique_words.union(set(topic.split(", ")))
+        td = len(unique_words) / (self.topk * len(self._tpc_descriptions))
+        return td
 
     def _load_topic_coherence(self):
         if self._topic_coherence is None:
