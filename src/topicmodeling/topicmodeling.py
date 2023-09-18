@@ -1262,6 +1262,7 @@ class CTMTrainer(Trainer):
 
     def __init__(self,
                  n_components=10,
+                 contextual_size=768,
                  ctm_model_type='CombinedTM',
                  model_type='prodLDA',
                  hidden_sizes=(100, 100),
@@ -2116,6 +2117,7 @@ if __name__ == "__main__":
                         dropout_in_ = dropout_out_ = 0.2
                     CTMr = CTMTrainer(
                         n_components=train_config['TMparam']['ntopics'],
+                        contextual_size=train_config['TMparam']['contextual_size'],
                         model_type=train_config['TMparam']['model_type'],
                         hidden_sizes=tuple(
                             train_config['TMparam']['hidden_sizes']),
