@@ -1351,6 +1351,7 @@ class CTMTrainer(Trainer):
         self._dropout_out = dropout_out
         self._learn_priors = learn_priors
         self._batch_size = batch_size
+        self._contextual_size = contextual_size
         self._lr = lr
         self._momentum = momentum
         self._solver = solver
@@ -1502,7 +1503,7 @@ class CTMTrainer(Trainer):
             ctm = ZeroShotTM(
                 logger=self._logger,
                 input_size=self._input_size,
-                contextual_size=768,
+                contextual_size=self._contextual_size,
                 n_components=self._n_components,
                 model_type=self._model_type,
                 hidden_sizes=self._hidden_sizes,
@@ -1521,7 +1522,7 @@ class CTMTrainer(Trainer):
             ctm = CombinedTM(
                 logger=self._logger,
                 input_size=self._input_size,
-                contextual_size=768,
+                contextual_size=self._contextual_size,
                 n_components=self._n_components,
                 model_type=self._model_type,
                 hidden_sizes=self._hidden_sizes,

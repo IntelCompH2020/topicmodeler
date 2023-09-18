@@ -96,6 +96,7 @@ num_data_loader_workers=0
 label_size=0
 loss_weights=None
 sbert_model_to_load=paraphrase-distilroberta-base-v1
+contextual_size=768
 
 [Hierarchical]
 expansion_tpc=0
