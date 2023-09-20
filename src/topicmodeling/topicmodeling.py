@@ -1692,7 +1692,7 @@ class HierarchicalTMManager(object):
                 reduced_doc_str = ' '.join([el for el in reduced_doc])
 
                 return reduced_doc_str
-
+            
             if tr_config_c['trainer'] == "ctm":
 
                 if not w_assignFile.is_file():
@@ -1711,6 +1711,7 @@ class HierarchicalTMManager(object):
                 tr_data_ddf['reduced_doc'] = tr_data_ddf.apply(
                     get_htm_ws_corpus_from_zs, axis=1, meta=('x', 'object'), args=(thetas, betas, vocab_id2w, vocab_w2id, exp_tpc))
 
+            
             elif tr_config_c['trainer'] == "mallet":
                 topic_state_model = configFile_f.parent.joinpath(
                     'modelFiles/topic-state.gz').as_posix()
@@ -1726,7 +1727,15 @@ class HierarchicalTMManager(object):
                                                  names=['docid', 'NA1', 'NA2',
                                                         'NA3', 'word', 'tpc'],
                                                  header=None, skiprows=3)
-
+                
+                # Read the dictionary from the JSON file
+                with open(configFile_f.parent.joinpath(
+                    'TMmodel/corr.json').as_posix(), 'r') as json_file:
+                    corr = json.load(json_file)
+                corr = {np.int64(key): value for key, value in corr.items()}
+                # Map Mallet topics to the new ID given by the TMmodel ordering
+                topic_state_df['tpc'] = topic_state_df['tpc'].map(corr)
+                
                 topic_state_df.word.replace('nan', np.nan, inplace=True)
                 topic_state_df.fillna('nan_value', inplace=True)
 

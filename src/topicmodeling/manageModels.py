@@ -554,6 +554,11 @@ class TMmodel(object):
         self._alphas = self._alphas[idx]
         self._betas = self._betas[idx, :]
         self._thetas = self._thetas[:, idx]
+        
+        # Save equivalences mapping between original Topic IDs and new IDs
+        corr = {int(idx[i]): i for i in range(len(self._alphas))}
+        with open(self._TMfolder.joinpath('corr.json').as_posix(), 'w') as json_file:
+            json.dump(corr, json_file)
 
         return
 
