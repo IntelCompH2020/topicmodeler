@@ -2142,19 +2142,19 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         *************************************************************************************
         """
         printgr(displaytext)
-
+        
         for tpc, tpc_info in enumerate(TopicInfo):
             print('=' * 5)
             print('Topic ID:', tpc)
-            print('Current label:', tpc_info[1])
-            print('Chemical description:', tpc_info[2])
+            print('Current label:', tpc_info['Label'])
+            print('Chemical description:', tpc_info['Word Description'])
             tag = input('New label: ')
             if tag == 'chem':
-                NewLabels.append(tpc_info[2])
+                NewLabels.append(tpc_info['Word Description'])
             elif tag != '':
                 NewLabels.append(tag)
             else:
-                NewLabels.append(tpc_info[1])
+                NewLabels.append(tpc_info['Label'])
 
         self.setTpcLabels(NewLabels)
         return
