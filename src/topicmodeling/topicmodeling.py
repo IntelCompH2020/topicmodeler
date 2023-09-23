@@ -1734,7 +1734,6 @@ class HierarchicalTMManager(object):
                     corr = json.load(json_file)
                 corr = {np.int64(key): value for key, value in corr.items()}
                 
-                corr = {np.int64(value): key for key, value in corr.items()}
                 # Map Mallet topics to the new ID given by the TMmodel ordering
                 topic_state_df['tpc'] = topic_state_df['tpc'].map(corr)
                 
