@@ -78,6 +78,42 @@ def var_num_keyboard(vartype,default,question):
             print('The value you provided is not valid. Using default value.')
             return default
             
+
+def var_arrnum_keyboard(vartype,default,question):
+    """Read a list with numeric values from the keyboard
+
+    Parameters
+    ----------        
+    vartype:
+        Type of numeric variables to expect 'int' or 'float'
+    default:
+        Default value for the variable
+    question:
+        Text for querying the user
+    
+    Returns
+    -------
+    :
+        A list with the values provided by the user. 
+        If only one element is to be returned, we return just a number
+        If no feasible values is provided, we return the default value
+    """
+    aux = input(question + ' [' + str(default) + ']: ')
+    # We generate a list with all values that were given separated by commas
+    aux2 = aux.split(',')
+    if vartype == 'int':
+        aux2 = [is_integer(el) for el in aux2 if is_integer(el) and is_integer(el)>=0]
+    else:
+        aux2 = [is_float(el) for el in aux2 if is_float(el) and is_float(el)>=0]
+    if not len(aux2):
+        print('The value you provided is not valid. Using default value.')
+        return default
+    elif len(aux2)==1:
+        return aux2[0]
+    else:
+        return aux2
+
+
 def var_string_keyboard(option, default, question):
     """Read a string variable from the keyboard
 
@@ -129,6 +165,7 @@ def var_string_keyboard(option, default, question):
         return default
     else:
         return aux2
+
 
 def request_confirmation(msg="     Are you sure?"):
 

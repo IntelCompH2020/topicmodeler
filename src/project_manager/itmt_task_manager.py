@@ -38,7 +38,7 @@ import pyarrow.parquet as pt
 #from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
 from src.utils.misc import (printgr, printmag, printred, query_options,
                             request_confirmation, var_num_keyboard,
-                            var_string_keyboard)
+                            var_string_keyboard, var_arrnum_keyboard)
 
 #from ..gui.utils.constants import Constants
 from .base_task_manager import BaseTaskManager
@@ -391,10 +391,10 @@ class ITMTTaskManager(BaseTaskManager):
 
         Parameters
         ----------
-        modelname: str
-            Name of the model to be created
-        ModelDesc: str
-            Description of the model to be created
+        modelname: str or [str]
+            (list of) Name of the model to be created
+        ModelDesc: str or [str]
+            (list of) Description of the model to be created
         privacy: str
             Visibility level of the to be trained submodel
             Possible values are public|private
@@ -405,119 +405,141 @@ class ITMTTaskManager(BaseTaskManager):
             Name of the training dataset
         Preproc: dict
             Dictionary with the corpus's prepreocessing parameters
-        training_params: dict
-            Dictionary with the parameters to be used for the training of the submodel
+        training_params: dict or [dict]
+            (list of) Dictionary with the parameters to be used for the training of the submodel
         """
 
-        # 1. Create model directory
-        modeldir = self.p2p.joinpath(
-            self._dir_struct['TMmodels']).joinpath(modelname)
-        if modeldir.exists():
+        # The function allows for training of a single model or several models. In case only one model
+        # is required, we still need to iterate over the elements of the list, so some variables
+        # need to be transformed to dicationaries
+        if not isinstance(training_params, list):
+            training_params = [training_params]
+            modelname = [modelname]
+            ModelDesc = [ModelDesc]
 
-            # Remove current backup folder, if it exists
-            old_model_dir = Path(str(modeldir) + '_old/')
-            if old_model_dir.exists():
-                shutil.rmtree(old_model_dir)
+        for idx, (trainingP, modelN, modelD) in enumerate(zip(training_params, modelname, ModelDesc)):
 
-            # Copy current model folder to the backup folder.
-            shutil.move(modeldir, old_model_dir)
-            self.logger.info(
-                f'-- -- Creating backup of existing model in {old_model_dir}')
+            # 1. Create model directory
+            modeldir = self.p2p.joinpath(
+                self._dir_struct['TMmodels']).joinpath(modelN)
+            if modeldir.exists():
 
-        # 2. Create model folder and save model training configuration
-        modeldir.mkdir()
-        configFile = modeldir.joinpath('trainconfig.json')
+                # Remove current backup folder, if it exists
+                old_model_dir = Path(str(modeldir) + '_old/')
+                if old_model_dir.exists():
+                    shutil.rmtree(old_model_dir)
 
-        train_config = {
-            "name": modelname,
-            "description": ModelDesc,
-            "visibility": privacy,
-            "creator": "ITMT",
-            "trainer": trainer,
-            "TrDtSet": TrDtSet,
-            "Preproc": Preproc,
-            "TMparam": training_params,
-            "creation_date": DT.datetime.now(),
-            "hierarchy-level": 0,
-            "htm-version": None,
-        }
+                # Copy current model folder to the backup folder.
+                shutil.move(modeldir, old_model_dir)
+                self.logger.info(
+                    f'-- -- Creating backup of existing model in {old_model_dir}')
 
-        with configFile.open('w', encoding='utf-8') as outfile:
-            json.dump(train_config, outfile,
-                      ensure_ascii=False, indent=2, default=str)
+            # 2. Create model folder and save model training configuration
+            modeldir.mkdir()
+            configFile = modeldir.joinpath('trainconfig.json')
 
-        # 3. Topic Modeling starts
-        # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-        # This fragment of code creates a spark cluster and submits the task
-        # This function is dependent on UC3M local deployment infrastructure
-        # and will not work in BSC production environment
-        #
-        # Needs to be modified with the BSC Spark Cluster and/or CITE SparkSubmit
-        # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+            train_config = {
+                "name": modelN,
+                "description": modelD,
+                "visibility": privacy,
+                "creator": "ITMT",
+                "trainer": trainer,
+                "TrDtSet": TrDtSet,
+                "Preproc": Preproc,
+                "TMparam": trainingP,
+                "creation_date": DT.datetime.now(),
+                "hierarchy-level": 0,
+                "htm-version": None,
+            }
 
-        # Step 1: Preprocessing of Training Data
-        if self.cf.get('Spark', 'spark_available') == 'True':
-            script_spark = self.cf.get('Spark', 'script_spark')
-            token_spark = self.cf.get('Spark', 'token_spark')
-            script_path = './src/topicmodeling/topicmodeling.py'
-            machines = self.cf.get('Spark', 'machines')
-            cores = self.cf.get('Spark', 'cores')
-            options = '"--spark --preproc --config ' + configFile.resolve().as_posix() + '"'
-            cmd = script_spark + ' -C ' + token_spark + \
-                ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
-            printred(cmd)
-            try:
-                self.logger.info(f'-- -- Running command {cmd}')
-                output = check_output(args=cmd, shell=True)
-            except:
-                self.logger.error('-- -- Execution of script failed')
+            with configFile.open('w', encoding='utf-8') as outfile:
+                json.dump(train_config, outfile,
+                          ensure_ascii=False, indent=2, default=str)
 
-        else:
-            # Run command for corpus preprocessing using gensim
-            # Preprocessing will be accelerated with Dask using the number of
-            # workers indicated in the configuration file for the project
-            num_workers = self.cf.get('Dask', 'num_workers')
-            cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {configFile.as_posix()} --nw {num_workers}'
-            printred(cmd)
-            
-            try:
-                self.logger.info(f'-- -- Running command {cmd}')
-                output = check_output(args=cmd, shell=True)
-            except:
-                self.logger.error('-- -- Command execution failed')
+            # 3. Topic Modeling starts
+            # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+            # This fragment of code creates a spark cluster and submits the task
+            # This function is dependent on UC3M local deployment infrastructure
+            # and will not work in BSC production environment
+            #
+            # Needs to be modified with the BSC Spark Cluster and/or CITE SparkSubmit
+            # =*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-        # Step 2: Training of Topic Model
-        if trainer == "sparkLDA":
-            if not self.cf.get('Spark', 'spark_available') == 'True':
-                self.logger.error(
-                    "-- -- sparkLDA requires access to a Spark cluster")
+            if idx == 0:
+                # Store for later use
+                modeldir0 = modeldir 
+                # We carry out the preprocessing only for the first model
+                # Step 1: Preprocessing of Training Data
+                if self.cf.get('Spark', 'spark_available') == 'True':
+                    script_spark = self.cf.get('Spark', 'script_spark')
+                    token_spark = self.cf.get('Spark', 'token_spark')
+                    script_path = './src/topicmodeling/topicmodeling.py'
+                    machines = self.cf.get('Spark', 'machines')
+                    cores = self.cf.get('Spark', 'cores')
+                    options = '"--spark --preproc --config ' + configFile.resolve().as_posix() + '"'
+                    cmd = script_spark + ' -C ' + token_spark + \
+                        ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
+                    printred(cmd)
+                    try:
+                        self.logger.info(f'-- -- Running command {cmd}')
+                        output = check_output(args=cmd, shell=True)
+                    except:
+                        self.logger.error('-- -- Execution of script failed')
+
+                else:
+                    # Run command for corpus preprocessing using gensim
+                    # Preprocessing will be accelerated with Dask using the number of
+                    # workers indicated in the configuration file for the project
+                    num_workers = self.cf.get('Dask', 'num_workers')
+                    cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {configFile.as_posix()} --nw {num_workers}'
+                    printred(cmd)
+                    
+                    try:
+                        self.logger.info(f'-- -- Running command {cmd}')
+                        output = check_output(args=cmd, shell=True)
+                    except:
+                        self.logger.error('-- -- Command execution failed')
             else:
-                script_spark = self.cf.get('Spark', 'script_spark')
-                token_spark = self.cf.get('Spark', 'token_spark')
-                script_path = './src/topicmodeling/topicmodeling.py'
-                machines = self.cf.get('Spark', 'machines')
-                cores = self.cf.get('Spark', 'cores')
-                options = '"--spark --train --config ' + configFile.resolve().as_posix() + '"'
-                cmd = script_spark + ' -C ' + token_spark + \
-                    ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
+                #Create symbolic links to all files and folders containing the preprocessed corpus
+                files_to_check = ['corpus.parquet', 'dictionary.gensim', 'corpus.txt', 'vocabulary.txt', 'CntVecModel']
+                for el in files_to_check:
+                    target = modeldir0.joinpath(el).resolve()
+                    symbolic = modeldir.joinpath(el)
+                    if target.exists():
+                        symbolic.symlink_to(target)
+
+            # Step 2: Training of Topic Model
+            if trainer == "sparkLDA":
+                if not self.cf.get('Spark', 'spark_available') == 'True':
+                    self.logger.error(
+                        "-- -- sparkLDA requires access to a Spark cluster")
+                else:
+                    script_spark = self.cf.get('Spark', 'script_spark')
+                    token_spark = self.cf.get('Spark', 'token_spark')
+                    script_path = './src/topicmodeling/topicmodeling.py'
+                    machines = self.cf.get('Spark', 'machines')
+                    cores = self.cf.get('Spark', 'cores')
+                    options = '"--spark --train --config ' + configFile.resolve().as_posix() + '"'
+                    cmd = script_spark + ' -C ' + token_spark + \
+                        ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
+                    printred(cmd)
+                    try:
+                        self.logger.info(f'-- -- Running command {cmd}')
+                        check_output(args=cmd, shell=True)
+                    except:
+                        self.logger.error('-- -- Execution of script failed')
+
+            else:
+                # Other models do not require Spark
+                cmd = f'python src/topicmodeling/topicmodeling.py --train --config {configFile.as_posix()}'
                 printred(cmd)
                 try:
                     self.logger.info(f'-- -- Running command {cmd}')
-                    check_output(args=cmd, shell=True)
+                    output = check_output(args=cmd, shell=True)
                 except:
-                    self.logger.error('-- -- Execution of script failed')
+                    self.logger.error('-- -- Command execution failed')
 
-        else:
-            # Other models do not require Spark
-            cmd = f'python src/topicmodeling/topicmodeling.py --train --config {configFile.as_posix()}'
-            printred(cmd)
-            try:
-                self.logger.info(f'-- -- Running command {cmd}')
-                output = check_output(args=cmd, shell=True)
-            except:
-                self.logger.error('-- -- Command execution failed')
-
-        # Reload the list of topic models to consider the one created in the current execution
+        # Reload the list of topic models to consider the one(s) created in the current execution
         self.load_listTMmodels()
 
         return
@@ -1694,6 +1716,19 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         opt = query_options(privacy, 'Define visibility for the model')
         privacy = privacy[opt]
 
+        if isinstance(TMparam["ntopics"], list):
+            # If we want to train for more than one number of topics, we need to 
+            # expand variables TMparam, ModelDesc, and modelname
+            modelname = [modelname + "_" + str(el) + "tpc" for el in TMparam["ntopics"]]
+            ModelDesc = [ModelDesc + " (" + str(el) + " topics)" for el in TMparam["ntopics"]]
+            # Crear una lista de diccionarios, manteniendo las entradas originales
+            TMparam_aux = []
+            for ntpc in TMparam["ntopics"]:
+                dictio = TMparam.copy()
+                dictio["ntopics"] = ntpc
+                TMparam_aux.append(dictio)
+            TMparam = TMparam_aux
+
         # Actual training of the topic model takes place
         super().trainTM(modelname, ModelDesc, privacy, trainer,
                         TrDtSet, Preproc, TMparam)
@@ -1825,7 +1860,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # First the user must select/confirm number of topics
         ntopics = int(self.cf.get('TM', 'ntopics'))
-        ntopics = var_num_keyboard('int', ntopics,
+        ntopics = var_arrnum_keyboard('int', ntopics,
                                    'Please, select the number of topics')
 
         # We get the default path to the labels for the atl
