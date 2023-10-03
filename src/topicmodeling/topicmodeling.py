@@ -184,6 +184,10 @@ class textPreproc(object):
                     # replacement of equivalent words
                     cleantext = [self._equivalents[el] if el in self._equivalents else el
                                  for el in cleantext]
+                    # remove stopwords again, in case equivalences introduced new stopwords
+                    cleantext = [
+                        el for el in cleantext if el not in self._stopwords]
+
                 return cleantext
 
             # Compute tokens, clean them, and filter out documents
