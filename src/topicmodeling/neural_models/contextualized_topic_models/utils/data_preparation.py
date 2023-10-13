@@ -62,7 +62,13 @@ def check_max_local_length(max_seq_length, texts):
                       f"truncates to {max_seq_length} tokens.")
 
 
-def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=None, sbert_model_to_load='paraphrase-distilroberta-base-v1', val_size=0.25, max_seq_length=512):
+def prepare_ctm_dataset(
+    corpus,
+    unpreprocessed_corpus=None,
+    custom_embeddings=None, sbert_model_to_load='paraphrase-distilroberta-base-v1',
+    val_size=0.25,
+    max_seq_length=512,
+    max_features=None):
     """It prepares the training data in the format that is asked as input in a CTM model.
 
     Parameters
@@ -117,8 +123,14 @@ def prepare_ctm_dataset(corpus, unpreprocessed_corpus=None, custom_embeddings=No
                          test_size=val_size, random_state=42)
 
     # Create a CountVectorizer object to convert a collection of text documents into a matrix of token counts
-    cv = CountVectorizer(input='content', lowercase=True,
-                         stop_words='english', binary=False)
+    if max_features is not None: 
+        print(f"Limiting the number of features during the creation of the CountVectorizer to {max_features}...")
+    cv = CountVectorizer(
+        input='content',
+        lowercase=True,
+        stop_words='english',
+        binary=False,
+        max_features=max_features)
 
     #######################################
     # Prepare train dataset in CTM format #
