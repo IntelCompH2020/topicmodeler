@@ -2032,7 +2032,7 @@ if __name__ == "__main__":
             with configFile.open('r', encoding='utf8') as fin:
                 train_config = json.load(fin)
 
-                get_sims = train_config["get_sims"] if "get_sims" in train_config.keys(
+                get_sims = train_config['TMparam']["get_sims"] if "get_sims" in train_config['TMparam'].keys(
                 ) else False
 
                 if train_config['trainer'] == 'mallet':
@@ -2125,14 +2125,14 @@ if __name__ == "__main__":
                     from tm_utils import pickler
 
                     # Create a CTMTrainer object with the parameters specified in the configuration file
-                    if 'dropout_in' in train_config.keys() and 'dropout_out' in train_config.keys():
+                    if 'dropout_in' in train_config['TMparam'].keys() and 'dropout_out' in train_config['TMparam'].keys():
                         dropout_in_ = train_config['TMparam']['dropout_in']
                         dropout_out_ = train_config['TMparam']['dropout_out']
-                    elif 'dropout' in train_config.keys():
+                    elif 'dropout' in train_config['TMparam'].keys():
                         dropout_in_ = dropout_out_ = train_config['TMparam']['dropout']
                     else:
                         dropout_in_ = dropout_out_ = 0.2
-                    max_features = int(train_config['TMparam']['max_features']) if 'max_features' in train_config.keys(
+                    max_features = int(train_config['TMparam']['max_features']) if 'max_features' in train_config['TMparam'].keys(
                     ) else None
                     CTMr = CTMTrainer(
                         n_components=train_config['TMparam']['ntopics'],
