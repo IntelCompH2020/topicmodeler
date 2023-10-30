@@ -103,6 +103,9 @@ class TMManager(object):
                     "tag": modelInfo['tag'],
                     "creation_date": modelInfo['creation_date']
                 }
+            # This condition only applies for Mac OS
+            elif TMf.name == ".DS_Store":
+                pass
             else:
                 print(f"No valid JSON file provided for Topic models or DC models")
                 return 0
