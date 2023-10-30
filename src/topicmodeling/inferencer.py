@@ -1,3 +1,6 @@
+# For a more complete script, see:
+# https://github.com/IntelCompH2020/EWB/blob/main/ewb-inferencer/src/core/inferencer/base/inferencer.py
+
 import argparse
 import json
 import os
@@ -108,10 +111,10 @@ class Inferencer(object):
                         thetas32 = np.delete(thetas32, tpcs[1:], 1)
         thetas32 = normalize(thetas32, axis=1, norm='l1')
         self._logger.info(thetas32.shape)  # nodcs*ntopics
-        doc_topics_file_npy = infer_path.joinpath("doc-topics.npy")
+        doc_topics_file_npy = infer_path.joinpath("thetas_infer.npy")
         np.save(doc_topics_file_npy, thetas32)
 
-        return
+        return thetas32
 
     @abstractmethod
     def predict(self):
@@ -209,10 +212,10 @@ class MalletInferencer(Inferencer):
         thetas32 = np.loadtxt(doc_topics_file, delimiter='\t',
                               dtype=np.float32, usecols=cols)
 
-        super().apply_model_editions(thetas32)
-        super().transform_inference_output(thetas32, 100)
+        thetas32 = super().apply_model_editions(thetas32)
+        thetas32_rpr = super().transform_inference_output(thetas32, 1000)
 
-        return
+        return thetas32_rpr
 
 
 class SparkLDAInferencer(Inferencer):
@@ -279,10 +282,10 @@ class ProdLDAInferencer(Inferencer):
         thetas32 = np.asarray(
             avitm.get_doc_topic_distribution(ho_data))
 
-        super().apply_model_editions(thetas32)
-        super().transform_inference_output(thetas32, 100)
+        thetas32 = super().apply_model_editions(thetas32)
+        thetas32_rpr = super().transform_inference_output(thetas32, 1000)
 
-        return
+        return thetas32_rpr
 
 
 class CTMInferencer(Inferencer):
@@ -349,10 +352,10 @@ class CTMInferencer(Inferencer):
         thetas32 = np.asarray(
             ctm.get_doc_topic_distribution(ho_data))
 
-        super().apply_model_editions(thetas32)
-        super().transform_inference_output(thetas32, 100)
+        thetas32 = super().apply_model_editions(thetas32)
+        thetas32_rpr = super().transform_inference_output(thetas32, 1000)
 
-        return
+        return thetas32_rpr
 
 
 ##############################################################################
