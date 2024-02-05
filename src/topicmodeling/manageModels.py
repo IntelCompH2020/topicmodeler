@@ -20,6 +20,7 @@ import pandas as pd
 import rbo
 import scipy.sparse as sparse
 from sparse_dot_topn import awesome_cossim_topn
+from topic_labeller import TopicLabeller
 
 
 class TMManager(object):
@@ -926,33 +927,42 @@ class TMmodel(object):
         tpc_labels: list of tuples
             Each element is a a term (topic_id, "label for topic topic_id")                    
         """
-        if not labels:
-            return [(i, "NA") for i, p in enumerate(self._tpc_descriptions)]
+        
+        # if use_cuda:
+        #     import torch
+        #     if torch.cuda.is_available():
+        #         device = 0
+        #         self._logger.info("-- -- CUDA available: GPU will be used")
+        #     else:
+        #         device = -1
+        #         self._logger.warning(
+        #             "-- -- 'use_cuda' set to True when cuda is unavailable."
+        #             "Make sure CUDA is available or set 'use_cuda=False'"
+        #         )
+        #         self._logger.info(
+        #             "-- -- CUDA unavailable: GPU will not be used")
+        # else:
+        #     device = -1
+        #     self._logger.info("-- -- CUDA unavailable: GPU will not be used")
 
-        if use_cuda:
-            import torch
-            if torch.cuda.is_available():
-                device = 0
-                self._logger.info("-- -- CUDA available: GPU will be used")
-            else:
-                device = -1
-                self._logger.warning(
-                    "-- -- 'use_cuda' set to True when cuda is unavailable."
-                    "Make sure CUDA is available or set 'use_cuda=False'"
-                )
-                self._logger.info(
-                    "-- -- CUDA unavailable: GPU will not be used")
-        else:
-            device = -1
-            self._logger.info("-- -- CUDA unavailable: GPU will not be used")
-
-        from transformers import pipeline
-        classifier = pipeline("zero-shot-classification",
-                              model="facebook/bart-large-mnli",
-                              device=device)
-        predictions = classifier(self._tpc_descriptions, labels)
-        predictions = [(i, p["labels"][0]) for i, p in enumerate(predictions)]
-        return predictions
+        # from transformers import pipeline
+        # classifier = pipeline("zero-shot-classification",
+        #                       model="facebook/bart-large-mnli",
+        #                       device=device)
+        # predictions = classifier(self._tpc_descriptions, labels)
+        # predictions = [(i, p["labels"][0]) for i, p in enumerate(predictions)]
+        
+        # Load tpc descriptions
+        self.load_tpc_descriptions()
+        
+        # Create a topic labeller object
+        tl = TopicLabeller(model="gpt-4")
+        
+        # Get labels
+        labels = tl.get_labels(self._tpc_descriptions)
+        labels_format = [(i, p) for i, p in enumerate(labels)]
+            
+        return labels_format
 
     def load_tpc_labels(self):
         if self._tpc_labels is None:
