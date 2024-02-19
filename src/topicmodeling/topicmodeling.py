@@ -15,6 +15,7 @@ Provides several classes for Topic Modeling
     - HierarchicalTMManager: Manages the creation of the corpus associated with a 2nd level hierarchical topic model
 """
 import argparse
+import ast
 import gzip
 import json
 import os
@@ -22,6 +23,8 @@ import sys
 from abc import abstractmethod
 from pathlib import Path
 
+import dask
+dask.config.set({'dataframe.query-planning': True})
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
@@ -210,8 +213,11 @@ class textPreproc(object):
                 else:
                     # Use Dask default (i.e., number of available cores)
                     DFtokens = DFtokens.compute(scheduler='processes')
-            self._GensimDict = corpora.Dictionary(
-                DFtokens['final_tokens'].values.tolist())
+            
+            final_tokens = DFtokens['final_tokens'].values.tolist()
+            if isinstance(final_tokens[0], str):
+                final_tokens = [ast.literal_eval(doc) for doc in final_tokens]
+            self._GensimDict = corpora.Dictionary(final_tokens)
 
             # Remove words that appear in less than no_below documents, or in more than
             # no_above, and keep at most keep_n most frequent terms
@@ -379,6 +385,8 @@ class textPreproc(object):
                 """
                 # bow = self._GensimDict.doc2bow(tokens)
                 # return ''.join([el[1] * (self._GensimDict[el[0]]+ ' ') for el in bow])
+                if isinstance(tokens, str):
+                    tokens = ast.literal_eval(tokens)
                 return ' '.join([el for el in tokens if el in vocabulary])
 
             trDF['cleantext'] = trDF['final_tokens'].apply(
