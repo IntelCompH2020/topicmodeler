@@ -23,8 +23,8 @@ import sys
 from abc import abstractmethod
 from pathlib import Path
 
-import dask
-dask.config.set({'dataframe.query-planning': True})
+#import dask
+#dask.config.set({'dataframe.query-planning': True})
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
