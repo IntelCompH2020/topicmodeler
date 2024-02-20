@@ -1863,9 +1863,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         ntopics = var_arrnum_keyboard('int', ntopics,
                                    'Please, select the number of topics')
 
-        # We get the default path to the labels for the atl
-        path_labels = ""  # "wordlists/wiki_categories.json"
-
         # Retrieve parameters for training.
         # These are dependent on the training algorithm
         if trainer == "mallet":
@@ -1907,7 +1904,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "doc_topic_thr": doc_topic_thr,
                 "thetas_thr": thetas_thr,
                 "token_regexp": token_regexp,
-                "labels": path_labels
             }
 
         elif trainer == "sparkLDA":
@@ -1945,7 +1941,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "optimizeDocConcentration": optimizeDocConcentration,
                 "subsamplingRate": subsamplingRate,
                 "thetas_thr": thetas_thr,
-                "labels": path_labels
             }
         
         elif trainer == "prodLDA":
@@ -2028,7 +2023,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "num_samples": num_samples,
                 "num_data_loader_workers": num_data_loader_workers,
                 "thetas_thr": thetas_thr,
-                "labels": path_labels
             }
 
         elif trainer == "ctm":
@@ -2118,7 +2112,6 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "num_data_loader_workers": num_data_loader_workers,
                 "thetas_thr": thetas_thr,
                 "sbert_model_to_load": sbert_model_to_load,
-                "labels": path_labels
             }
 
         return TMparam

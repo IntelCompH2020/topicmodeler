@@ -606,7 +606,7 @@ class MalletTrainer(Trainer):
 
     """
 
-    def __init__(self, mallet_path, ntopics=25, alpha=5.0, optimize_interval=10, num_threads=4, num_iterations=1000, doc_topic_thr=0.0, thetas_thr=0.003, token_regexp=None, labels=None, get_sims=False, logger=None):
+    def __init__(self, mallet_path, ntopics=25, alpha=5.0, optimize_interval=10, num_threads=4, num_iterations=1000, doc_topic_thr=0.0, thetas_thr=0.003, token_regexp=None, get_sims=False, logger=None):
         """
         Initilization Method
 
@@ -630,8 +630,6 @@ class MalletTrainer(Trainer):
             Min value for sparsification of topic proportions after training
         token_regexp: str
             Regular expression for mallet topic model trainer (java type)
-        labels: list(str)
-            Lists of labels to assign to topics
         get_sims: boolean
             Flag to detect if similarities are going to be calculated or not.
         logger: Logger object
@@ -649,7 +647,6 @@ class MalletTrainer(Trainer):
         self._doc_topic_thr = doc_topic_thr
         self._thetas_thr = thetas_thr
         self._token_regexp = token_regexp
-        self._labels = labels
         self._get_sims = get_sims
 
         if not self._mallet_path.is_file():
@@ -721,17 +718,10 @@ class MalletTrainer(Trainer):
              for el in zip(vocab, term_freq)]
         self._logger.debug('-- -- Mallet training: Vocabulary file generated')
 
-        # Load labels for AutoTM
-        lblFile = Path(self._labels)
-        labels = []
-        if lblFile.is_file():
-            with Path(lblFile).open('r', encoding='utf8') as fin:
-                labels += json.load(fin)['wordlist']
-
         tm = TMmodel(TMfolder=modelFolder.parent.joinpath('TMmodel'),
                      get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
-                  vocab=vocab, labels=labels)
+                  vocab=vocab)
 
         # Remove doc-topics file. It is no longer needed and takes a lot of space
         thetas_file.unlink()
@@ -885,8 +875,7 @@ class sparkLDATrainer(Trainer):
     """
 
     def __init__(self, ntopics=25, alpha=5.0, maxIter=20, optimizer='online',
-                 optimizeDocConcentration=True, subsamplingRate=0.05, thetas_thr=0.003,
-                 labels=None, get_sims=False, logger=None):
+                 optimizeDocConcentration=True, subsamplingRate=0.05, thetas_thr=0.003, get_sims=False, logger=None):
         """
         Initilization Method
 
@@ -906,8 +895,6 @@ class sparkLDATrainer(Trainer):
             percentage of documents that will be used for every minibatch
         thetas_thr: float
             Min value for sparsification of topic proportions after training
-        labels: list(str)
-            Lists of labels to assign to topics
         get_sims: boolean
             Flag to detect if similarities are going to be calculated or not.
         logger: Logger object
@@ -923,7 +910,6 @@ class sparkLDATrainer(Trainer):
         self._optimizeDocConcentration = optimizeDocConcentration
         self._subsamplingRate = subsamplingRate
         self._thetas_thr = thetas_thr
-        self._labels = labels
         self._get_sims = get_sims
 
     def _createTMmodel(self, modelFolder, ldaModel, df):
@@ -979,25 +965,13 @@ class sparkLDATrainer(Trainer):
         with Path(modelFolder.parent.joinpath('vocabulary.txt')).open('r', encoding='utf8') as fin:
             vocab = [el.strip() for el in fin.readlines()]
 
-        # Load labels for AutoTM
-        lblFile = Path(self._labels)
-        labels = []
-        if lblFile.is_file():
-            with Path(lblFile).open('r', encoding='utf8') as fin:
-                labels += json.load(fin)['wordlist']
-
         tm = TMmodel(modelFolder.parent.joinpath(
             'TMmodel'), get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
-                  vocab=vocab, labels=labels)
+                  vocab=vocab)
 
         return tm
 
-        """
-        auxfile = "/export/usuarios_ml4ds/jarenas/github/IntelComp/ITMT/topicmodeler/testproject/TMmodels/sparkkkk/aux.txt"
-        with Path(auxfile).open("w") as fout:
-            fout.write(str(self._thetas_thr))
-        """
 
     def fit(self, corpusFile):
         """
@@ -1058,8 +1032,7 @@ class ProdLDATrainer(Trainer):
                  learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99,
                  solver='adam', num_epochs=100, reduce_on_plateau=False,
                  topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10,
-                 num_data_loader_workers=0, thetas_thr=0.003,
-                 labels=None, get_sims=False, logger=None):
+                 num_data_loader_workers=0, thetas_thr=0.003, get_sims=False, logger=None):
         """
         Initilization Method
 
@@ -1102,8 +1075,6 @@ class ProdLDATrainer(Trainer):
             If True, additional logs are displayed
         thetas_thr: float
             Min value for sparsification of topic proportions after training
-        labels: list(str)
-            Lists of labels to assign to topics
         get_sims: boolean
             Flag to detect if similarities are going to be calculated or not.
         logger: Logger object
@@ -1129,7 +1100,6 @@ class ProdLDATrainer(Trainer):
         self._num_samples = num_samples
         self._num_data_loader_workers = num_data_loader_workers
         self._thetas_thr = thetas_thr
-        self._labels = labels
         self._get_sims = get_sims
 
         return
@@ -1173,19 +1143,12 @@ class ProdLDATrainer(Trainer):
         # Create vocabulary list and calculate beta matrix
         betas = avitm.get_topic_word_distribution()
         vocab = self._train_dataset.idx2token
-
-        # Load labels for AutoTM
-        lblFile = Path(self._labels)
-        labels = []
-        if lblFile.is_file():
-            with Path(lblFile).open('r', encoding='utf8') as fin:
-                labels += json.load(fin)['wordlist']
-
+        
         # Create TMmodel
         tm = TMmodel(modelFolder.parent.joinpath(
             'TMmodel'), get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
-                  vocab=vocab, labels=labels)
+                  vocab=vocab)
 
         return tm
 
@@ -1295,7 +1258,6 @@ class CTMTrainer(Trainer):
                  label_size=0,
                  loss_weights=None,
                  thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1',
-                 labels=None,
                  get_sims=False,
                  max_features=None,
                  logger=None):
@@ -1346,8 +1308,6 @@ class CTMTrainer(Trainer):
             Min value for sparsification of topic proportions after training
         sbert_model_to_load: str (default='paraphrase-distilroberta-base-v1')
             Model to be used for calculating the embeddings
-        labels: list(str)
-            Lists of labels to assign to topics
         get_sims: boolean
             Flag to detect if similarities are going to be calculated or not.
         logger: Logger object
@@ -1378,7 +1338,6 @@ class CTMTrainer(Trainer):
         self._sbert_model_to_load = sbert_model_to_load
         self._loss_weights = loss_weights
         self._thetas_thr = thetas_thr
-        self._labels = labels
         self._get_sims = get_sims
         self._max_features = max_features
 
@@ -1419,13 +1378,6 @@ class CTMTrainer(Trainer):
         betas = ctm.get_topic_word_distribution()
         vocab = self._qt.vocab
 
-        # Load labels for AutoTM
-        lblFile = Path(self._labels)
-        labels = []
-        if lblFile.is_file():
-            with Path(lblFile).open('r', encoding='utf8') as fin:
-                labels += json.load(fin)['wordlist']
-
         # TODO: This should be removed in final version
         # Data pyldavis
         # Get LDAVIS data format
@@ -1443,7 +1395,7 @@ class CTMTrainer(Trainer):
         tm = TMmodel(modelFolder.parent.joinpath(
             'TMmodel'), get_sims=self._get_sims)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
-                  vocab=vocab, labels=labels)
+                  vocab=vocab)
 
         return tm
 
@@ -2059,7 +2011,6 @@ if __name__ == "__main__":
                         doc_topic_thr=train_config['TMparam']['doc_topic_thr'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
                         token_regexp=train_config['TMparam']['token_regexp'],
-                        labels=train_config['TMparam']['labels'],
                         get_sims=get_sims)
 
                     # Train the Mallet topic model with the specified corpus
@@ -2081,7 +2032,6 @@ if __name__ == "__main__":
                         optimizeDocConcentration=train_config['TMparam']['optimizeDocConcentration'],
                         subsamplingRate=train_config['TMparam']['subsamplingRate'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        labels=train_config['TMparam']['labels'],
                         get_sims=get_sims)
 
                     sparkLDATr.fit(
@@ -2116,7 +2066,6 @@ if __name__ == "__main__":
                         num_samples=train_config['TMparam']['num_samples'],
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        labels=train_config['TMparam']['labels'],
                         get_sims=get_sims)
 
                     # Train the ProdLDA topic model with the specified corpus
@@ -2163,7 +2112,6 @@ if __name__ == "__main__":
                         topic_prior_variance=train_config['TMparam']['topic_prior_variance'],
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        labels=train_config['TMparam']['labels'],
                         get_sims=get_sims,
                         max_features=max_features)
 

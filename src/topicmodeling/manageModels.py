@@ -363,7 +363,7 @@ class TMmodel(object):
 
         self._get_sims = get_sims
 
-    def create(self, betas=None, thetas=None, alphas=None, vocab=None, labels=None):
+    def create(self, betas=None, thetas=None, alphas=None, vocab=None):
         """Creates the topic model from the relevant matrices that characterize it. In addition to the initialization of the corresponding object's variables, all the associated variables and visualizations which are computationally costly are calculated so they are available for the other methods.
 
         Parameters
@@ -376,8 +376,6 @@ class TMmodel(object):
             Vector of length n_topics containing the importance of each topic
         vocab: list
             List of words sorted according to betas matrix
-        labels: list
-            List of  labels for automatic topic labeling
         """
 
         # If folder already exists no further action is needed
@@ -413,7 +411,7 @@ class TMmodel(object):
         self._tpc_descriptions = [el[1]
                                   for el in self.get_tpc_word_descriptions()]
         self.calculate_topic_coherence()  # cohrs_aux
-        self._tpc_labels = [el[1] for el in self.get_tpc_labels(labels)]
+        self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
         if self._get_sims:
             self._calculate_sims()
 
@@ -912,15 +910,8 @@ class TMmodel(object):
             with self._TMfolder.joinpath('tpc_descriptions.txt').open('r', encoding='utf8') as fin:
                 self._tpc_descriptions = [el.strip() for el in fin.readlines()]
 
-    def get_tpc_labels(self, labels=None, use_cuda=True):
+    def get_tpc_labels(self):
         """returns the labels of the topics in the model
-
-        Parameters
-        ----------
-        labels: list
-            List of labels for automatic topic labeling
-        use_cuda: bool
-            If True, use cuda.
 
         Returns
         -------
