@@ -29,18 +29,18 @@ from subprocess import check_output
 import pandas as pd
 import pyarrow.parquet as pt
 # from sklearn.preprocessing import normalize
-#from PyQt6 import QtWidgets
-#from src.topicmodeling.topicmodeling import TMmodel
-#from PyQt6.QtCore import QUrl
-#from PyQt6.QtWebEngineWidgets import QWebEngineView
-#from PyQt6.QtWidgets import QMessageBox
-#from src.gui.utils import utils
-#from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
+# from PyQt6 import QtWidgets
+# from src.topicmodeling.topicmodeling import TMmodel
+# from PyQt6.QtCore import QUrl
+# from PyQt6.QtWebEngineWidgets import QWebEngineView
+# from PyQt6.QtWidgets import QMessageBox
+# from src.gui.utils import utils
+# from src.gui.utils.utils import clearQTreeWidget, get_model_xml, printTree
 from src.utils.misc import (printgr, printmag, printred, query_options,
                             request_confirmation, var_num_keyboard,
                             var_string_keyboard, var_arrnum_keyboard)
 
-#from ..gui.utils.constants import Constants
+# from ..gui.utils.constants import Constants
 from .base_task_manager import BaseTaskManager
 
 
@@ -467,7 +467,7 @@ class ITMTTaskManager(BaseTaskManager):
 
             if idx == 0:
                 # Store for later use
-                modeldir0 = modeldir 
+                modeldir0 = modeldir
                 # We carry out the preprocessing only for the first model
                 # Step 1: Preprocessing of Training Data
                 if self.cf.get('Spark', 'spark_available') == 'True':
@@ -493,15 +493,16 @@ class ITMTTaskManager(BaseTaskManager):
                     num_workers = self.cf.get('Dask', 'num_workers')
                     cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {configFile.as_posix()} --nw {num_workers}'
                     printred(cmd)
-                    
+
                     try:
                         self.logger.info(f'-- -- Running command {cmd}')
                         output = check_output(args=cmd, shell=True)
                     except:
                         self.logger.error('-- -- Command execution failed')
             else:
-                #Create symbolic links to all files and folders containing the preprocessed corpus
-                files_to_check = ['corpus.parquet', 'dictionary.gensim', 'corpus.txt', 'vocabulary.txt', 'CntVecModel']
+                # Create symbolic links to all files and folders containing the preprocessed corpus
+                files_to_check = ['corpus.parquet', 'dictionary.gensim',
+                                  'corpus.txt', 'vocabulary.txt', 'CntVecModel']
                 for el in files_to_check:
                     target = modeldir0.joinpath(el).resolve()
                     symbolic = modeldir.joinpath(el)
@@ -1077,9 +1078,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         filterCondition = filterCondition.replace(
             ' ', 'SsS').replace("'", "XxX")
 
-        #In case we want to sampling a dataset
+        # In case we want to sampling a dataset
         perc = var_num_keyboard('int', 100,
-                                   'If you wish to sample the dataset, indicate the percentage (an integer [1-100])')
+                                'If you wish to sample the dataset, indicate the percentage (an integer [1-100])')
 
         # We need a name for the dataset
         dtsName = ""
@@ -1127,7 +1128,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         cmd = script_spark + ' -C ' + token_spark + \
             ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
         printred(cmd)
-        
+
         try:
             self.logger.info(f'-- -- Running command {cmd}')
             check_output(args=cmd, shell=True)
@@ -1586,8 +1587,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         self.logger.info(f'-- Topic Model Training')
 
-        #In case sparkLDA is selected, make sure a Spark cluster is available
-        #to avoid requesting settings that will not be used
+        # In case sparkLDA is selected, make sure a Spark cluster is available
+        # to avoid requesting settings that will not be used
         if trainer == "sparkLDA":
             if not self.cf.get('Spark', 'spark_available') == 'True':
                 self.logger.error(
@@ -1610,7 +1611,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                          allTrDtsets[dts]['description'] for dts in dtSets]
         selection = query_options(displaydtSets, "Select Training Dataset")
         TrDtSet = dtSets[selection]
-        #ndocs = allTrDtsets[TrDtSet]['records']
+        # ndocs = allTrDtsets[TrDtSet]['records']
         self.logger.info(
             f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
 
@@ -1717,10 +1718,12 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         privacy = privacy[opt]
 
         if isinstance(TMparam["ntopics"], list):
-            # If we want to train for more than one number of topics, we need to 
+            # If we want to train for more than one number of topics, we need to
             # expand variables TMparam, ModelDesc, and modelname
-            modelname = [modelname + "_" + str(el) + "tpc" for el in TMparam["ntopics"]]
-            ModelDesc = [ModelDesc + " (" + str(el) + " topics)" for el in TMparam["ntopics"]]
+            modelname = [modelname + "_" +
+                         str(el) + "tpc" for el in TMparam["ntopics"]]
+            ModelDesc = [
+                ModelDesc + " (" + str(el) + " topics)" for el in TMparam["ntopics"]]
             # Crear una lista de diccionarios, manteniendo las entradas originales
             TMparam_aux = []
             for ntpc in TMparam["ntopics"]:
@@ -1760,7 +1763,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
 
         # Get first-level models are available for expansion
         allTMmodels = json.loads(self.allTMmodels)
-        models = [model for model in allTMmodels.keys() if allTMmodels[model]['hierarchy-level'] == 0]
+        models = [model for model in allTMmodels.keys(
+        ) if allTMmodels[model]['hierarchy-level'] == 0]
         displayModels = [allTMmodels[model]['name'] + ': ' +
                          allTMmodels[model]['description'] for model in models if allTMmodels[model]['hierarchy-level'] == 0]
 
@@ -1861,7 +1865,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # First the user must select/confirm number of topics
         ntopics = int(self.cf.get('TM', 'ntopics'))
         ntopics = var_arrnum_keyboard('int', ntopics,
-                                   'Please, select the number of topics')
+                                      'Please, select the number of topics')
 
         # Retrieve parameters for training.
         # These are dependent on the training algorithm
@@ -1912,7 +1916,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             alpha = float(self.cf.get('SparkLDA', 'alpha'))
             maxIter = int(self.cf.get('SparkLDA', 'maxIterations'))
             optimizer = self.cf.get('SparkLDA', 'optimizer')
-            optimizeDocConcentration = self.cf.get('SparkLDA', 'optimizeDocConcentration') == 'True'
+            optimizeDocConcentration = self.cf.get(
+                'SparkLDA', 'optimizeDocConcentration') == 'True'
             subsamplingRate = float(self.cf.get('SparkLDA', 'subsamplingRate'))
             thetas_thr = float(self.cf.get('TM', 'thetas_thr'))
 
@@ -1923,11 +1928,11 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 alpha = var_num_keyboard('float', alpha,
                                          'Prior parameter for the Dirichlet for doc generation')
                 maxIter = var_num_keyboard('int', maxIter,
-                                                  'Maximum Number of Iterations for the training')
+                                           'Maximum Number of Iterations for the training')
                 optimizer = var_string_keyboard(
-                                'str', optimizer, "Optimizer that will be used, 'online' or 'em'")
+                    'str', optimizer, "Optimizer that will be used, 'online' or 'em'")
                 subsamplingRate = var_num_keyboard('float', subsamplingRate,
-                                'Percentage of docs that will be used in every minibatch')
+                                                   'Percentage of docs that will be used in every minibatch')
                 optimizeDocConcentration = var_string_keyboard(
                     'bool', optimizeDocConcentration, 'If true, assymmetric prior for alpha will allowed')
                 thetas_thr = var_num_keyboard('float', thetas_thr,
@@ -1942,7 +1947,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "subsamplingRate": subsamplingRate,
                 "thetas_thr": thetas_thr,
             }
-        
+
         elif trainer == "prodLDA":
             model_type = str(self.cf.get('ProdLDA', 'model_type'))
             hidden_sizes = tuple(
@@ -2114,6 +2119,68 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 "sbert_model_to_load": sbert_model_to_load,
             }
 
+        elif trainer == "bertopic":
+
+            no_below = int(self.cf['bertopic']['no_below'])
+            no_above = int(self.cf['bertopic']['no_above'])
+            sbert_model = str(self.cf['bertopic']['sbert_model'])
+            umap_n_components = int(self.cf['bertopic']['umap_n_components'])
+            umap_n_neighbors = int(self.cf['bertopic']['umap_n_neighbors'])
+            umap_min_dist = float(self.cf['bertopic']['umap_min_dist'])
+            umap_metric = str(self.cf['bertopic']['umap_metric'])
+            hdbscan_min_cluster_size = int(
+                self.cf['bertopic']['hdbscan_min_cluster_size'])
+            hdbscan_metric = str(self.cf['bertopic']['hdbscan_metric'])
+            hdbscan_cluster_selection_method = str(
+                self.cf['bertopic']['hdbscan_cluster_selection_method'])
+            hbdsan_prediction_data = True if self.cf['bertopic']['hbdsan_prediction_data'] == "True" else False
+            thetas_thr = float(self.cf['TM']['thetas_thr'])
+
+            # Advanced settings
+            Y_or_N = input(
+                f"Do you wish to access the advanced settings panel [Y/N]?:")
+            if Y_or_N.upper() == "Y":
+                no_below = var_num_keyboard(
+                    'int', no_below, ' Ignore all words which appear in less than no_below documents')
+                no_above = var_num_keyboard(
+                    'float', no_above, 'Ignore all words which appear in more than no_above documents')
+                sbert_model = var_string_keyboard(
+                    'str', sbert_model, "Model to be used for calculating the embeddings. Available models can be checked here: 'https://huggingface.co/models?library=sentence-transformers'")
+                umap_n_components = var_num_keyboard(
+                    'int', umap_n_components, 'Number of components to be used for UMAP embedding')
+                umap_n_neighbors = var_num_keyboard(
+                    'int', umap_n_neighbors, 'Number of neighbors to be used for UMAP embedding')
+                umap_min_dist = var_num_keyboard(
+                    'float', umap_min_dist, 'Minimum distance to be used for UMAP embedding')
+                umap_metric = var_string_keyboard(
+                    'str', umap_metric, 'Metric to be used for UMAP embedding')
+                hdbscan_min_cluster_size = var_num_keyboard(
+                    'int', hdbscan_min_cluster_size, 'Minimum cluster size for HDBSCAN clustering')
+                hdbscan_metric = var_string_keyboard(
+                    'str', hdbscan_metric, "Metric to be used for HDBSCAN clustering. Available metrics can be checked here: 'https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html#metrics'")
+                hdbscan_cluster_selection_method = var_string_keyboard(
+                    'str', hdbscan_cluster_selection_method, "Method to be used for selecting the number of clusters. Available methods can be checked here: 'https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html#cluster-selection'")
+                hbdsan_prediction_data = var_string_keyboard(
+                    'bool', reduce_on_plateau, 'If true, the prediction data is used for HDBSCAN')
+                thetas_thr = var_num_keyboard(
+                    'float', thetas_thr, 'Threshold for topic activation in a doc (sparsification)')
+
+            TMparam = {
+                "ntopics": ntopics,
+                "no_below": no_below,
+                "no_above": no_above,
+                "sbert_model": sbert_model,
+                "umap_n_components": umap_n_components,
+                "umap_n_neighbors": umap_n_neighbors,
+                "umap_min_dist": umap_min_dist,
+                "umap_metric": umap_metric,
+                "hdbscan_min_cluster_size": hdbscan_min_cluster_size,
+                "hdbscan_metric": hdbscan_metric,
+                "hdbscan_cluster_selection_method": hdbscan_cluster_selection_method,
+                "hbdsan_prediction_data": hbdsan_prediction_data,
+                "thetas_thr": thetas_thr,
+            }
+
         return TMparam
 
     def editTM(self):
@@ -2170,7 +2237,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         *************************************************************************************
         """
         printgr(displaytext)
-        
+
         for tpc, tpc_info in enumerate(TopicInfo):
             print('=' * 5)
             print('Topic ID:', tpc)
@@ -2260,7 +2327,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             msg = 'Correlation between topics {0:d} and {1:d}: {2:.2f}%'.format(
                 pair[0], pair[1], 100 * pair[2])
             printgr(msg)
-            print(df.loc[[pair[0], pair[1]],['Label', 'Word Description']])
+            print(df.loc[[pair[0], pair[1]], ['Label', 'Word Description']])
         printgr(20 * '=')
 
         displaytext = """
@@ -2275,10 +2342,10 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             msg = 'Correlation between topics {0:d} and {1:d}: {2:.2f}%'.format(
                 pair[0], pair[1], 100 * pair[2])
             printgr(msg)
-            print(df.loc[[pair[0], pair[1]],['Label', 'Word Description']])
+            print(df.loc[[pair[0], pair[1]], ['Label', 'Word Description']])
         printgr(20 * '=')
 
-        return 
+        return
 
     def fuseTopics(self):
         self.logger.info(
@@ -2304,9 +2371,9 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         if len(r):
             try:
                 tpcs = [int(n) for n in r.split(',')]
-                if len(tpcs)>=2:
+                if len(tpcs) >= 2:
                     print('The following topics will be merged:', tpcs)
-                    print(df.loc[tpcs,['Label', 'Word Description']])
+                    print(df.loc[tpcs, ['Label', 'Word Description']])
                     if request_confirmation(msg='Do you wish to continue?'):
                         print("merging")
                         super().fuseTopics(tpcs)
@@ -2341,7 +2408,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         if request_confirmation(msg='Do you wish to continue?'):
             super().resetTM()
         return
-    
+
     def inference(self):
 
         # Ask user which model should be used for inference
@@ -2366,7 +2433,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         # Ask user to provide name for the inference model, description, and privacy level
         inference_name = ''
         while not len(inference_name):
-            inference_name = input('Enter a name to save the new inference model: ')
+            inference_name = input(
+                'Enter a name to save the new inference model: ')
 
         inference_desc = ""
         while not len(inference_desc):
@@ -2391,7 +2459,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
         if current_inferencedir.exists():
 
             # Remove current backup folder, if it exists
-            old_current_inferencedir = Path(str(current_inferencedir) + '_old/')
+            old_current_inferencedir = Path(
+                str(current_inferencedir) + '_old/')
             if old_current_inferencedir.exists():
                 shutil.rmtree(old_current_inferencedir)
 
@@ -2400,23 +2469,23 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             self.logger.info(
                 f'-- -- Creating backup of existing inference model in {old_current_inferencedir}')
         current_inferencedir.mkdir()
-        
+
         # 3. Save inference configuration
         infer_configFile = current_inferencedir.joinpath('inferconfig.json')
         train_configFile = modeldir.joinpath('trainconfig.json')
 
         with train_configFile.open('r', encoding='utf8') as fin:
-                train_config = json.load(fin)
+            train_config = json.load(fin)
 
         infer_config = {
             "name": inference_name,
             "description": inference_desc,
             "infer_path": current_inferencedir.as_posix(),
-            "model_for_infer_path": modeldir.as_posix(), 
+            "model_for_infer_path": modeldir.as_posix(),
             "visibility": privacy,
             "creator": "ITMT",
             "trainer": train_config['trainer'],
-            "TrDtSet": InfDtSet, #Save as TrDSet since the preprocessing script looks for this field
+            "TrDtSet": InfDtSet,  # Save as TrDSet since the preprocessing script looks for this field
             "Preproc": train_config['Preproc'],
             "TMparam": train_config['TMparam'],
             "creation_date": DT.datetime.now(),
@@ -2435,7 +2504,8 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             script_path = './src/topicmodeling/topicmodeling.py'
             machines = self.cf.get('Spark', 'machines')
             cores = self.cf.get('Spark', 'cores')
-            options = '"--spark --preproc --config ' + infer_configFile.resolve().as_posix() + '"'
+            options = '"--spark --preproc --config ' + \
+                infer_configFile.resolve().as_posix() + '"'
             cmd = script_spark + ' -C ' + token_spark + \
                 ' -c ' + cores + ' -N ' + machines + ' -S ' + script_path + ' -P ' + options
             printred(cmd)
@@ -2452,13 +2522,13 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             num_workers = self.cf.get('Dask', 'num_workers')
             cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {infer_configFile.as_posix()} --nw {num_workers}'
             printred(cmd)
-            
+
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
                 output = check_output(args=cmd, shell=True)
             except:
                 self.logger.error('-- -- Command execution failed')
-        
+
         # 5. Perform inference
         cmd = f'python src/topicmodeling/inferencer.py --infer --config {infer_configFile.as_posix()}'
         printred(cmd)
@@ -3234,7 +3304,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                         allWdLists[WdList]['name']))
                     table.setItem(row, 2, QtWidgets.QTableWidgetItem(
                         allWdLists[WdList]['description']))
-                    row += 1            
+                    row += 1
         return typeWdLists
 
     def NewWdList(self, listType, wds, lst_name, lst_privacy, lst_desc):
@@ -3360,7 +3430,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         self.logger.info(
             f'-- -- Selected corpus is {allTrDtsets[TrDtSet]["name"]}')
 
-        # Actual training of the topic model takes place
+        #  Actual training of the topic model takes place
         super().trainTM(modelname, ModelDesc, privacy, trainer,
                         TrDtSet, preproc_settings, training_params)
 
@@ -3450,7 +3520,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
             # Get dictionary with the information of all models
             allTMmodels = json.loads(self.allTMmodels)
-        
+
             # Get table where TMmodel information is going to be displayed
             table = gui.table_available_trained_models_desc
             table.setRowCount(1)
@@ -3483,7 +3553,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
 
                     self.selectedTM = model_name
                     gui.label_available_model_being_curated.setText(model_name)
-                    gui.label_available_model_being_curated2.setText(model_name)
+                    gui.label_available_model_being_curated2.setText(
+                        model_name)
 
                     self.loadTopicsDesc()
                     self.showTopics(gui)
@@ -3540,7 +3611,8 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
                     for dir in dirs:
                         if dir.endswith(self.selectedTM):
                             tm_path = Path(os.path.join(root, dir)).parent
-            model_path = tm_path.joinpath(self.selectedTM).joinpath('TMmodel').resolve().as_posix()
+            model_path = tm_path.joinpath(self.selectedTM).joinpath(
+                'TMmodel').resolve().as_posix()
             self.render_pyldavis(model_path, gui)
 
         return
@@ -3712,7 +3784,7 @@ class ITMTTaskManagerGUI(ITMTTaskManager):
         return int(status.decode('utf8'))
 
     def showSimilar(self, npairs):
-        
+
         TopicInfo = json.loads(self.TopicsDesc)
         df = pd.DataFrame(TopicInfo, columns=[
                           'Size', 'Label', 'Word Description', 'Ndocs Active'])

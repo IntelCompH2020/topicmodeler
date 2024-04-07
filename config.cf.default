@@ -98,6 +98,20 @@ loss_weights=None
 sbert_model_to_load=paraphrase-distilroberta-base-v1
 contextual_size=768
 
+[bertopic]
+no_below=1
+no_above=1
+get_sims=False
+sbert_model=paraphrase-distilroberta-base-v2
+umap_n_components=5
+umap_n_neighbors=15
+umap_min_dist=0.0
+umap_metric=cosine
+hdbscan_min_cluster_size=10
+hdbscan_metric=euclidean
+hdbscan_cluster_selection_method=eom
+hbdsan_prediction_data=True
+
 [Hierarchical]
 expansion_tpc=0
 htm_version=htm-ds

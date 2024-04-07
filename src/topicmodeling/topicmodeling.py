@@ -12,6 +12,7 @@ Provides several classes for Topic Modeling
         * sparkLDATrainer
         * ProdLDATrainer
         * CTMTrainer
+        * BERTopicTrainer
     - HierarchicalTMManager: Manages the creation of the corpus associated with a 2nd level hierarchical topic model
 """
 import argparse
@@ -22,13 +23,24 @@ import os
 import sys
 from abc import abstractmethod
 from pathlib import Path
+from typing import List, Union
 
-#import dask
-#dask.config.set({'dataframe.query-planning': True})
 import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 import pyarrow as pa
+
+
+def print_logs(message, do_logger=True, level="info", logger=None):
+    if do_logger and logger:
+        if level == "info":
+            logger.info(message)
+        elif level == "error":
+            logger.error(message)
+        elif level == "debug":
+            logger.debug(message)
+    else:
+        print(message)
 
 
 class textPreproc(object):
@@ -203,7 +215,8 @@ class textPreproc(object):
             # Gensim dictionary creation. It persists the created Dataframe
             # to accelerate dictionary calculation
             # Filtering of words is carried out according to provided values
-            self._logger.info('-- -- Gensim Dictionary Generation')
+            print_logs(f'-- -- Gensim Dictionary Generation',
+                       do_logger=DO_LOGGER, level="info", logger=self._logger)
 
             with ProgressBar():
                 DFtokens = trDF[['final_tokens']]
@@ -213,7 +226,7 @@ class textPreproc(object):
                 else:
                     # Use Dask default (i.e., number of available cores)
                     DFtokens = DFtokens.compute(scheduler='processes')
-            
+
             final_tokens = DFtokens['final_tokens'].values.tolist()
             if isinstance(final_tokens[0], str):
                 final_tokens = [ast.literal_eval(doc) for doc in final_tokens]
@@ -221,8 +234,8 @@ class textPreproc(object):
 
             # Remove words that appear in less than no_below documents, or in more than
             # no_above, and keep at most keep_n most frequent terms
-
-            self._logger.info('-- -- Gensim Filter Extremes')
+            print_logs(f'-- -- Gensim Filter Extremes',
+                       do_logger=DO_LOGGER, level="info", logger=self._logger)
 
             self._GensimDict.filter_extremes(no_below=self._no_below,
                                              no_above=self._no_above, keep_n=self._keep_n)
@@ -360,7 +373,8 @@ class textPreproc(object):
             A path containing the location of the training data in the indicated format
         """
 
-        self._logger.info(f'-- -- Exporting corpus to {tmTrainer} format')
+        print_logs(f'-- -- Exporting corpus to {tmTrainer} format',
+                   do_logger=DO_LOGGER, level="info", logger=self._logger)
 
         if isinstance(trDF, dd.DataFrame):
             # Dask dataframe
@@ -413,8 +427,8 @@ class textPreproc(object):
                                         compute_kwargs={'scheduler': 'processes'})
 
             elif tmTrainer == 'sparkLDA':
-                self._logger.error(
-                    '-- -- sparkLDA requires preprocessing with spark')
+                print_logs(f'-- -- sparkLDA requires preprocessing with spark',
+                           do_logger=DO_LOGGER, level="error", logger=self._logger)
                 return
 
             elif tmTrainer == "prodLDA":
@@ -434,29 +448,41 @@ class textPreproc(object):
                         DFparquet.to_parquet(outFile, write_index=False, compute_kwargs={
                             'scheduler': 'processes'})
 
-            elif tmTrainer == "ctm":
+            elif tmTrainer in ["ctm", "bertopic"]:
                 outFile = dirpath.joinpath('corpus.parquet')
                 if outFile.is_file():
                     outFile.unlink()
 
                 with ProgressBar():
-                    # DFparquet = trDF[['id', 'cleantext', 'all_rawtext']].rename(
-                    #    columns={"cleantext": "bow_text"})
                     DFparquet = trDF[['id', 'cleantext', 'embeddings']].rename(
                         columns={"cleantext": "bow_text"})
-                    schema = pa.schema([
-                        ('id', pa.int64()),
-                        ('bow_text', pa.string()),
-                        ('embeddings', pa.string())
-                        # ('embeddings', pa.list_(pa.float64()))
-                    ])
-                    if nw > 0:
-                        DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
-                            'scheduler': 'processes', 'num_workers': nw})
-                    else:
-                        # Use Dask default number of workers (i.e., number of cores)
-                        DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
-                            'scheduler': 'processes'})
+
+                    try:
+                        schema = pa.schema([
+                            ('id', pa.int64()),
+                            ('bow_text', pa.string()),
+                            ('embeddings', pa.list_(pa.float64()))
+                        ])
+                        if nw > 0:
+                            DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
+                                'scheduler': 'processes', 'num_workers': nw})
+                        else:
+                            # Use Dask default number of workers (i.e., number of cores)
+                            DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
+                                'scheduler': 'processes'})
+                    except:
+                        schema = pa.schema([
+                            ('id', pa.int64()),
+                            ('bow_text', pa.string()),
+                            ('embeddings', pa.string())
+                        ])
+                        if nw > 0:
+                            DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
+                                'scheduler': 'processes', 'num_workers': nw})
+                        else:
+                            # Use Dask default number of workers (i.e., number of cores)
+                            DFparquet.to_parquet(outFile, write_index=False, schema=schema, compute_kwargs={
+                                'scheduler': 'processes'})
 
         else:
             # Spark dataframe
@@ -650,8 +676,8 @@ class MalletTrainer(Trainer):
         self._get_sims = get_sims
 
         if not self._mallet_path.is_file():
-            self._logger.error(
-                f'-- -- Provided mallet path is not valid -- Stop')
+            print_logs(f'-- -- Provided mallet path is not valid -- Stop',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
             sys.exit()
 
         return
@@ -678,7 +704,8 @@ class MalletTrainer(Trainer):
         cols = [k for k in np.arange(2, self._ntopics + 2)]
 
         # Sparsification of thetas matrix
-        self._logger.debug('-- -- Sparsifying doc-topics matrix')
+        print_logs('-- -- Sparsifying doc-topics matrix',
+                   do_logger=DO_LOGGER, level="debug", logger=self._logger)
         thetas32 = np.loadtxt(thetas_file, delimiter='\t',
                               dtype=np.float32, usecols=cols)
         # thetas32 = np.loadtxt(thetas_file, delimiter='\t', dtype=np.float32)[:,2:]
@@ -716,7 +743,8 @@ class MalletTrainer(Trainer):
         with vocabfreq_file.open('w', encoding='utf8') as fout:
             [fout.write(el[0] + '\t' + str(int(el[1])) + '\n')
              for el in zip(vocab, term_freq)]
-        self._logger.debug('-- -- Mallet training: Vocabulary file generated')
+        print_logs('-- -- Mallet training: Vocabulary file generated',
+                   do_logger=DO_LOGGER, level="debug", logger=self._logger)
 
         tm = TMmodel(TMfolder=modelFolder.parent.joinpath('TMmodel'),
                      get_sims=self._get_sims)
@@ -741,8 +769,8 @@ class MalletTrainer(Trainer):
         # Get corpus file
         path_corpus = modelFolder.joinpath('corpus.mallet')
         if not path_corpus.is_file():
-            self._logger.error(
-                '-- Pipe extraction: Could not locate corpus file')
+            print_logs('-- Pipe extraction: Could not locate corpus file',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
             return
 
         # Create auxiliary file with only first line from the original corpus file
@@ -754,7 +782,8 @@ class MalletTrainer(Trainer):
             fout.write(first_line + '\n')
 
         # We perform the import with the only goal to keep a small file containing the pipe
-        self._logger.info('-- Extracting pipeline')
+        print_logs('-- Extracting pipeline', do_logger=DO_LOGGER,
+                   level="info", logger=self._logger)
         path_pipe = modelFolder.joinpath('import.pipe')
 
         cmd = self._mallet_path.as_posix() + \
@@ -762,10 +791,12 @@ class MalletTrainer(Trainer):
         cmd = cmd % (path_corpus, path_aux, path_pipe)
 
         try:
-            self._logger.info(f'-- Running command {cmd}')
+            print_logs(
+                f'-- Running command {cmd}', do_logger=DO_LOGGER, level="info", logger=self._logger)
             check_output(args=cmd, shell=True)
         except:
-            self._logger.error('-- Failed to extract pipeline. Revise command')
+            print_logs('-- Failed to extract pipeline. Revise command',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
 
         # Remove auxiliary file
         path_aux.unlink()
@@ -785,8 +816,8 @@ class MalletTrainer(Trainer):
 
         # Output model folder and training file for the corpus
         if not corpusFile.is_file():
-            self._logger.error(
-                f'-- -- Provided corpus Path does not exist -- Stop')
+            print_logs(f'-- -- Provided corpus Path does not exist -- Stop',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
             sys.exit()
 
         modelFolder = corpusFile.parent.joinpath('modelFiles')
@@ -794,7 +825,8 @@ class MalletTrainer(Trainer):
 
         ##################################################
         # Importing Data to mallet
-        self._logger.info('-- -- Mallet Corpus Generation: Mallet Data Import')
+        print_logs('-- -- Mallet Corpus Generation: Mallet Data Import',
+                   do_logger=DO_LOGGER, level="info", logger=self._logger)
 
         corpusMallet = modelFolder.joinpath('corpus.mallet')
 
@@ -805,11 +837,12 @@ class MalletTrainer(Trainer):
         cmd = cmd % (corpusFile, corpusMallet)
 
         try:
-            self._logger.info(f'-- -- Running command {cmd}')
+            print_logs(
+                f'-- -- Running command {cmd}', do_logger=DO_LOGGER, level="info", logger=self._logger)
             check_output(args=cmd, shell=True)
         except:
-            self._logger.error(
-                '-- -- Mallet failed to import data. Revise command')
+            print_logs(f'-- -- Mallet failed to import data. Revise command',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
 
         ##################################################
         # Mallet Topic model training
@@ -848,11 +881,12 @@ class MalletTrainer(Trainer):
             ' train-topics --config ' + str(configMallet)
 
         try:
-            self._logger.info(
-                f'-- -- Training mallet topic model. Command is {cmd}')
+            print_logs(
+                f'-- -- Training mallet topic model. Command is {cmd}', do_logger=DO_LOGGER, level="info", logger=self._logger)
             check_output(args=cmd, shell=True)
         except:
-            self._logger.error('-- -- Model training failed. Revise command')
+            print_logs('-- -- Model training failed. Revise command',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
             return
 
         ##################################################
@@ -933,7 +967,8 @@ class sparkLDATrainer(Trainer):
         """
 
         # Calculation and Sparsification of thetas matrix
-        self._logger.debug('-- -- Spark LDA Sparsifying doc-topics matrix')
+        print_logs('-- -- Spark LDA Sparsifying doc-topics matrix',
+                   do_logger=DO_LOGGER, level="debug", logger=self._logger)
 
         # We calculate the full matrix. We need to do the following
         # * Obtain topic representation of documents
@@ -972,7 +1007,6 @@ class sparkLDATrainer(Trainer):
 
         return tm
 
-
     def fit(self, corpusFile):
         """
         Training of Spark LDA Topic Model
@@ -985,15 +1019,16 @@ class sparkLDATrainer(Trainer):
 
         # Output model folder and training file for the corpus
         if not corpusFile.exists():
-            self._logger.error(
-                f'-- -- Provided corpus Path does not exist -- Stop')
+            print_logs(f'-- -- Provided corpus Path does not exist -- Stop',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
             sys.exit()
 
         # Train spark LDA model and obtain also the topic distribution of
         # documents
         ##################################################
         # Importing Data to mallet
-        self._logger.info('-- -- Training LDA model with Spark')
+        print_logs('-- -- Training LDA model with Spark',
+                   do_logger=DO_LOGGER, level="info", logger=self._logger)
 
         df = spark.read.parquet(f"file://{corpusFile.resolve().as_posix()}")
         lda = pysparkLDA(featuresCol="bow", maxIter=self._maxIter, k=self._ntopics,
@@ -1126,7 +1161,8 @@ class ProdLDATrainer(Trainer):
             avitm.get_doc_topic_distribution(avitm.train_data))  # .T
 
         # Sparsification of thetas matrix
-        self._logger.debug('-- -- Sparsifying doc-topics matrix')
+        print_logs('-- -- Sparsifying doc-topics matrix',
+                   do_logger=DO_LOGGER, level="info", logger=self._logger)
         # Create figure to check thresholding is correct
         self._SaveThrFig(thetas32, modelFolder.joinpath('thetasDist.pdf'))
         # Set to zeros all thetas below threshold, and renormalize
@@ -1143,7 +1179,7 @@ class ProdLDATrainer(Trainer):
         # Create vocabulary list and calculate beta matrix
         betas = avitm.get_topic_word_distribution()
         vocab = self._train_dataset.idx2token
-        
+
         # Create TMmodel
         tm = TMmodel(modelFolder.parent.joinpath(
             'TMmodel'), get_sims=self._get_sims)
@@ -1165,16 +1201,16 @@ class ProdLDATrainer(Trainer):
 
         # Output model folder and training file for the corpus
         if not os.path.exists(corpusFile):
-            self._logger.error(
-                f'-- -- Provided corpus Path does not exist -- Stop')
+            print_logs(f'-- -- Provided corpus Path does not exist -- Stop',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
             sys.exit()
 
         modelFolder = corpusFile.parent.joinpath('modelFiles')
         modelFolder.mkdir()
 
         # Generating the corpus in the input format required by ProdLDA
-        self._logger.info(
-            '-- -- ProdLDA Corpus Generation: BOW Dataset object')
+        print_logs('-- -- ProdLDA Corpus Generation: BOW Dataset object',
+                   do_logger=DO_LOGGER, level="info", logger=self._logger)
         df = pd.read_parquet(corpusFile)
         df_lemas = df[["bow_text"]].values.tolist()
         df_lemas = [doc[0].split() for doc in df_lemas]
@@ -1363,7 +1399,8 @@ class CTMTrainer(Trainer):
         thetas32 = np.asarray(ctm.get_doc_topic_distribution(ctm.train_data))
 
         # Sparsification of thetas matrix
-        self._logger.debug('-- -- Sparsifying doc-topics matrix')
+        print_logs('-- -- Sparsifying doc-topics matrix',
+                   do_logger=DO_LOGGER, level="debug", logger=self._logger)
         # Create figure to check thresholding is correct
         self._SaveThrFig(thetas32, modelFolder.joinpath('thetasDist.pdf'))
         # Set to zeros all thetas below threshold, and renormalize
@@ -1412,15 +1449,16 @@ class CTMTrainer(Trainer):
 
         # Output model folder and training file for the corpus
         if not os.path.exists(corpusFile):
-            self._logger.error(
-                f'-- -- Provided corpus Path does not exist -- Stop')
+            print_logs(f'-- -- Provided corpus Path does not exist -- Stop',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
             sys.exit()
 
         modelFolder = corpusFile.parent.joinpath('modelFiles')
         modelFolder.mkdir()
 
         # Generating the corpus in the input format required by CTM
-        self._logger.info('-- -- CTM Corpus Generation: BOW Dataset object')
+        print_logs('-- -- CTM Corpus Generation: BOW Dataset object',
+                   do_logger=DO_LOGGER, level="info", logger=self._logger)
         df = pd.read_parquet(corpusFile)
         df_lemas = df[["bow_text"]].values.tolist()
         df_lemas = [doc[0].split() for doc in df_lemas]
@@ -1440,8 +1478,8 @@ class CTMTrainer(Trainer):
                 self._unpreprocessed_corpus = None
         else:
             if not embeddingsFile.is_file():
-                self._logger.error(
-                    f'-- -- Provided embeddings Path does not exist -- Stop')
+                print_logs(f'-- -- Provided embeddings Path does not exist -- Stop',
+                           do_logger=DO_LOGGER, level="error", logger=self._logger)
                 sys.exit()
             self._embeddings = np.load(embeddingsFile, allow_pickle=True)
             self._unpreprocessed_corpus = None
@@ -1515,6 +1553,324 @@ class CTMTrainer(Trainer):
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, ctm)
+
+        return
+
+
+class BERTopicTrainer(Trainer):
+    """
+    Wrapper for the BERTopic Topic Model Training. Implements the
+    following functionalities
+    - Training of the model
+    - Creation and persistence of the TMmodel object for tm curation
+    - Execution of some other time consuming tasks (pyLDAvis, ..)
+
+    """
+
+    def __init__(
+        self,
+        stopwords=None,
+        no_below: int = 1,
+        no_above: float = 1,
+        ntopics=10,
+        thetas_thr=0.003,
+        get_sims=False,
+        sbert_model: str = "paraphrase-distilroberta-base-v2",
+        umap_n_components=5,
+        umap_n_neighbors=15,
+        umap_min_dist=0.0,
+        umap_metric='cosine',
+        hdbscan_min_cluster_size=10,
+        hdbscan_metric='euclidean',
+        hdbscan_cluster_selection_method='eom',
+        hbdsan_prediction_data=True,
+        logger=None
+    ):
+        """
+        Initilization Method
+
+        Parameters
+        ----------
+        stopwords: list
+            List of stopwords to be used for the model
+        no_below: int (default=1)
+            Ignore all words which appear in less than no_below documents
+        no_above: float (default=1)
+            Ignore all words which appear in more than no_above documents
+        ntopics : int (default=10)
+            Number of topics
+        thetas_thr: float
+            Min value for sparsification of topic proportions after training
+        get_sims: boolean
+            Flag to detect if similarities are going to be calculated or not.
+        sbert_model: str (default='paraphrase-distilroberta-base-v2')
+            Model to be used for calculating the embeddings
+        umap_n_components: int (default=5)
+            Number of components to reduce the embeddings to
+        umap_n_neighbors: int (default=15)
+            Number of neighbors to consider for UMAP
+        umap_min_dist: float (default=0.0)
+            Minimum distance between points in the UMAP space
+        umap_metric: str (default='cosine')
+            Metric to be used for UMAP
+        hdbscan_min_cluster_size: int (default=10)
+            Minimum number of samples in a cluster
+        hdbscan_metric: str (default='euclidean')
+            Metric to be used for HDBSCAN
+        hdbscan_cluster_selection_method: str (default='eom')
+            Method to select the number of clusters
+        hbdsan_prediction_data: bool (default=True)
+            If True, the prediction data is used for HDBSCAN
+        logger: Logger object
+            To log object activity
+        """
+
+        super().__init__(logger)
+        self.ntopics = ntopics
+        self._thetas_thr = thetas_thr
+        self._get_sims = get_sims
+
+        # Initialize specific parameters for BERTopic
+        self.sbert_model = sbert_model
+        self.stopwords = stopwords
+        self.no_below = no_below
+        self.no_above = no_above
+        self.umap_n_components = umap_n_components
+        self.umap_n_neighbors = umap_n_neighbors
+        self.umap_min_dist = umap_min_dist
+        self.umap_metric = umap_metric
+        self.hdbscan_min_cluster_size = hdbscan_min_cluster_size
+        self.hdbscan_metric = hdbscan_metric
+        self.hdbscan_cluster_selection_method = hdbscan_cluster_selection_method
+        self.hbdsan_prediction_data = hbdsan_prediction_data
+
+        word_min_len = 2
+        self.word_pattern = (
+            f"(?<![a-zA-Z\u00C0-\u024F\d\-\_])"
+            f"[a-zA-Z\u00C0-\u024F]"
+            f"(?:[a-zA-Z\u00C0-\u024F]|(?!\d{{4}})[\d]|[\-\_\·\.'](?![\-\_\·\.'])){{{word_min_len - 1},}}"
+            f"(?<![\-\_\·\.'])[a-zA-Z\u00C0-\u024F\d]?"
+            f"(?![a-zA-Z\u00C0-\u024F\d])"
+        )
+
+        return
+
+    def _createTMmodel(self, modelFolder):
+        """Creates an object of class TMmodel hosting the topic model
+        that has been trained using ProdLDA topic modeling and whose
+        output is available at the provided folder
+
+        Parameters
+        ----------
+        modelFolder: Path
+            the folder with the mallet output files
+
+        Returns
+        -------
+        tm: TMmodel
+            The topic model as an object of class TMmodel
+        """
+
+        # Sparsification of thetas matrix
+        print_logs('-- -- Sparsifying doc-topics matrix',
+                   do_logger=DO_LOGGER, level="debug", logger=self._logger)
+        # Create figure to check thresholding is correct
+        self._SaveThrFig(self._model.thetas,
+                         modelFolder.joinpath('thetasDist.pdf'))
+        # Set to zeros all thetas below threshold, and renormalize
+        thetas32 = self._model.thetas
+        thetas32[thetas32 < self._thetas_thr] = 0
+        thetas32 = normalize(thetas32, axis=1, norm='l1')
+        thetas32 = sparse.csr_matrix(thetas32, copy=True)
+
+        # Recalculate topic weights to avoid errors due to sparsification
+        alphas = np.asarray(np.mean(thetas32, axis=0)).ravel()
+
+        # Calculate beta matrix and vocab list
+        betas = self._model.betas
+        vocab = self._model.vocab
+
+        # Create TMmodel
+        tm = TMmodel(modelFolder.parent.joinpath(
+            'TMmodel'), get_sims=self._get_sims)
+        tm.create(betas=betas, thetas=thetas32, alphas=alphas,
+                  vocab=vocab)
+
+        return tm
+
+    def fit(
+        self,
+        corpusFile
+    ):
+        """
+        Training of BERTopic Topic Model
+
+        Parameters
+        ----------
+        corpusFile: Path
+            Path to txt file in mallet format
+            id 0 token1 token2 token3 ...
+        """
+
+        # Output model folder and training file for the corpus
+        if not os.path.exists(corpusFile):
+            print_logs(f'-- -- Provided corpus Path does not exist -- Stop',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
+            sys.exit()
+
+        modelFolder = corpusFile.parent.joinpath('modelFiles')
+        modelFolder.mkdir(exist_ok=True)
+
+        # Generating the corpus in the input format required by BERTopic
+        print_logs('-- -- BERTopic Corpus Generation: Reading documents from parquet file as list of strings',
+                   do_logger=DO_LOGGER, level="info", logger=self._logger)
+
+        df = pd.read_parquet(corpusFile)
+        # If the raw text is available, use it, otherwise use the bow text (the recommended option would be to use the raw text)
+        if "raw_text" in df.columns:
+            texts = [el[0] for el in df[["raw_text"]].values.tolist()]
+        else:
+            texts = [el[0] for el in df[["bow_text"]].values.tolist()]
+        embeddings = None
+        if "embeddings" in df.columns:
+            embeddings = df.embeddings.values.tolist()
+            if isinstance(embeddings[0], str):
+                embeddings = np.array(
+                    [np.array(el.split(), dtype=np.float32) for el in embeddings])
+            embeddings = np.array(embeddings)
+
+        # Save training corpus
+        corpus_file = modelFolder.joinpath('corpus.txt')
+        with open(corpus_file, 'w', encoding='utf-8') as fout:
+            id = 0
+            for el in texts:
+                fout.write(str(id) + ' 0 ' + el + '\n')
+                id += 1
+
+        # ------------------------------------------------
+        # Put components together to create BERTopic model
+        # ------------------------------------------------
+        ##################################################
+        # STEP 0 : Embedding model
+        ##################################################
+        if embeddings is not None:
+            print_logs(f"-- -- Using pre-trained embeddings from the dataset...",
+                       do_logger=DO_LOGGER, level="info", logger=self._logger)
+            self._embedding_model = None
+        else:
+            print_logs(
+                f"-- -- Creating SentenceTransformer model with {self.sbert_model}...", do_logger=DO_LOGGER, level="info", logger=self._logger)
+            self._embedding_model = SentenceTransformer(
+                self.sbert_model
+            )
+        ##################################################
+        # STEP 1: Reduce dimensionality of embeddings
+        ##################################################
+        self._umap_model = UMAP(
+            n_components=self.umap_n_components,
+            n_neighbors=self.umap_n_neighbors,
+            min_dist=self.umap_min_dist,
+            metric=self.umap_metric
+        )
+
+        ##################################################
+        # STEP 2: Cluster reduced embeddings
+        ##################################################
+        self._hdbscan_model = HDBSCAN(
+            min_cluster_size=self.hdbscan_min_cluster_size,
+            metric=self.hdbscan_metric,
+            cluster_selection_method=self.hdbscan_cluster_selection_method,
+            prediction_data=self.hbdsan_prediction_data
+        )
+
+        ##################################################
+        # STEP 3: Tokenize topics
+        ##################################################
+        self._vectorizer_model = CountVectorizer(
+            token_pattern=self.word_pattern,
+            stop_words=self.stopwords,
+            # max_df=self.no_below,
+            # min_df=self.no_above,
+        )
+
+        ##################################################
+        # STEP 4: Create topic representation
+        ##################################################
+        self._ctfidf_model = ClassTfidfTransformer(reduce_frequent_words=True)
+
+        ###################################################
+        # STEP 5 (Optional): Add additional representations
+        ###################################################
+        self._representation_model = {
+            "KeyBERT": KeyBERTInspired(),
+            "MMR": MaximalMarginalRelevance(
+                diversity=0.3,
+                top_n_words=15
+            )
+        }
+
+        self._model = BERTopic(
+            language="multilingual",
+            min_topic_size=1,
+            nr_topics=self.ntopics+1,
+            low_memory=False,
+            # calculate_probabilities=True,
+            embedding_model=self._embedding_model,
+            # umap_model=KMeans(n_clusters=self.num_topics),#self._umap_model,
+            hdbscan_model=self._hdbscan_model,
+            vectorizer_model=self._vectorizer_model,
+            # ctfidf_model=self._ctfidf_model,
+            # representation_model=self._representation_model,
+            verbose=True
+        )
+
+        # ------------------------------------------------
+        # Train model
+        # ------------------------------------------------
+        # probs = The probability of the assigned topic per document.
+        # If `calculate_probabilities` in BERTopic is set to True, then
+        # it calculates the probabilities of all topics across all documents
+        # instead of only the assigned topic.
+        if embeddings is not None:
+            _, probs = self._model.fit_transform(texts, embeddings)
+        else:
+            _, probs = self._model.fit_transform(texts)
+
+        # ------------------------------------------------
+        # Get distributions
+        # ------------------------------------------------
+        ##################################################
+        # THETAS
+        ##################################################
+        # topic_distr = D x K matrix containing the topic distributions
+        # for all input documents.
+        thetas_approx, _ = self._model.approximate_distribution(texts)
+        check_thetas = [(doc_id, thetas_approx[doc_id].shape) for doc_id in range(
+            len(thetas_approx)) if thetas_approx[doc_id].shape != (self.ntopics,)]
+        if len(check_thetas) > 0:
+            print_logs(
+                f"-- -- No all the thetas have the same shape: {check_thetas}", do_logger=DO_LOGGER, level="warning", logger=self._logger)
+        self._model.thetas = thetas_approx
+
+        ##################################################
+        # BETAS
+        ##################################################
+        self._model.betas = self._model.c_tf_idf_.toarray()
+        self._model.vocab = self._model.vectorizer_model.get_feature_names_out()
+
+        ##################################################
+        # TOPICS
+        ##################################################
+        # self._model.topics = dict()
+        # for k, v in self._model.get_topics().items():
+        #    self._model.topics[k] = [el[0] for el in v]
+
+        # Save BERTopic model for future inference
+        model_file = modelFolder.joinpath('model.pickle')
+        pickler(model_file, self._model)
+
+        # Create TMmodel object
+        self._createTMmodel(modelFolder)
 
         return
 
@@ -1599,8 +1955,8 @@ class HierarchicalTMManager(object):
         exp_tpc = int(tr_config_c['expansion_tpc'])
 
         if tr_config_c['htm-version'] == "htm-ws":
-            self._logger.info(
-                '-- -- -- Creating training corpus according to HTM-WS.')
+            print_logs('-- -- -- Creating training corpus according to HTM-WS.',
+                       do_logger=DO_LOGGER, level="info", logger=self._logger)
 
             def get_htm_ws_corpus_base(row, thetas, betas, vocab_id2w, vocab_w2id, exp_tpc):
                 """Function to carry out the selection of words according to HTM-WS.
@@ -1733,8 +2089,8 @@ class HierarchicalTMManager(object):
                         compute_kwargs={'scheduler': 'processes'})
 
         elif tr_config_c['htm-version'] == "htm-ds":
-            self._logger.info(
-                '-- -- -- Creating training corpus according to HTM-DS.')
+            print_logs('-- -- -- Creating training corpus according to HTM-DS.',
+                       do_logger=DO_LOGGER, level="info", logger=self._logger)
 
             # Get ids of documents that meet the condition of having a representation of the expansion topic larger than thr
             thr = float(tr_config_c['thr'])
@@ -1777,8 +2133,8 @@ class HierarchicalTMManager(object):
                 embeddings = embeddings[doc_ids_to_keep]
 
         else:
-            self._logger.error(
-                '-- -- -- The specified HTM version is not available.')
+            print_logs('-- -- -- The specified HTM version is not available.',
+                       do_logger=DO_LOGGER, level="error", logger=self._logger)
 
             # If the trainer is CTM, keep embeddings related to the selected documents t
 
@@ -1811,7 +2167,11 @@ if __name__ == "__main__":
                         help="path to configuration file")
     parser.add_argument('--config_child', type=str, default=None,
                         help="Path to submodel's config file", required=False)
+    parser.add_argument('--do_logger', type=bool, default=True, required=False)
+
     args = parser.parse_args()
+
+    DO_LOGGER = args.do_logger
 
     if args.spark:
         # Spark imports and session generation
@@ -1886,20 +2246,29 @@ if __name__ == "__main__":
                 tPreproc.saveCntVecModel(configFile.parent.resolve())
 
                 # If the trainer is CTM, we also need the embeddings
-                if train_config['trainer'] == "ctm":
+                if train_config['trainer'] in ["ctm", "bertopic"]:
                     # We get full df containing the embeddings
                     for idx, DtSet in enumerate(trDtSet['Dtsets']):
                         df = spark.read.parquet(f"file://{DtSet['parquet']}")
-                        df = df.select("id", "embeddings")
+                        
+                        # If the trainer is BERTopic, we would need the raw texts
+                        # To avoid an error here in case the raw texts are not available, we just try. If it fails, we continue
+                        if train_config["trainer"] == "bertopic":
+                            try:
+                                df = df.select("id", "embeddings", "raw_text")
+                            except:
+                                print_logs("-- -- -- -- Raw texts not available in the dataset", do_logger=False)
+                        else:
+                            df = df.select("id", "embeddings")
                         if idx == 0:
                             eDF = df
                         else:
                             eDF = eDF.union(df).distinct()
+                            
                     # We perform a left join to keep the embeddings of only those documents kept after preprocessing
-                    # TODO: Check that this is done properly in Spark
                     trDF = (trDF.join(eDF, trDF.id == eDF.id, "left")
                             .drop(df.id))
-
+                    
                 # For sparkLDA, we need also a corpus.txt file only for coherence calculation
                 if train_config['trainer'] == 'sparkLDA':
                     tPreproc.exportTrData(trDF=trDF,
@@ -1947,15 +2316,23 @@ if __name__ == "__main__":
                 tPreproc.saveGensimDict(configFile.parent.resolve())
 
                 # If the trainer is CTM, we also need the embeddings
-                if train_config['trainer'] == "ctm":
+                if train_config['trainer'] in ["ctm", "bertopic"]:
                     # We get full df containing the embeddings
                     for idx, DtSet in enumerate(trDtSet['Dtsets']):
                         df = dd.read_parquet(DtSet['parquet']).fillna("")
 
                         # Rename id column to "id"
                         df = df.rename(columns={DtSet['idfld']: 'id'})
-
-                        df = df[["id", "embeddings"]]
+                        
+                        # If the trainer is BERTopic, we would need the raw texts
+                        # To avoid an error here in case the raw texts are not available, we just try. If it fails, we continue
+                        if train_config["trainer"] == "bertopic":
+                            try:
+                                df = df[["id", "embeddings", "raw_text"]]
+                            except:
+                                print_logs("-- -- -- -- Raw texts not available in the dataset", do_logger=False)
+                        else:
+                            df = df[["id", "embeddings"]]
 
                         # Concatenate dataframes
                         if idx == 0:
@@ -1981,10 +2358,9 @@ if __name__ == "__main__":
 
         # Import modules only necessary for training
         import matplotlib.pyplot as plt
+        from manageModels import TMmodel
         from scipy import sparse
         from sklearn.preprocessing import normalize
-
-        from manageModels import TMmodel
         from tm_utils import file_lines
 
         configFile = Path(args.config)
@@ -2044,7 +2420,8 @@ if __name__ == "__main__":
                         AVITM
                     from neural_models.pytorchavitm.utils.data_preparation import \
                         prepare_dataset
-                    from tm_utils import pickler, pickler_avitm_for_ewb_inferencer
+                    from tm_utils import (pickler,
+                                          pickler_avitm_for_ewb_inferencer)
 
                     # Create a ProdLDATrainer object with the parameters specified in the configuration file
                     ProdLDATr = ProdLDATrainer(
@@ -2132,6 +2509,45 @@ if __name__ == "__main__":
                             else:
                                 CTMr.fit(corpusFile=corpusFile,
                                          embeddingsFile=embbeddingsFile)
+
+                elif train_config['trainer'] == 'bertopic':
+                    from bertopic import BERTopic
+                    from bertopic.representation import (
+                        KeyBERTInspired, MaximalMarginalRelevance)
+                    from bertopic.vectorizers import ClassTfidfTransformer
+                    from hdbscan import HDBSCAN
+                    from sentence_transformers import SentenceTransformer
+                    from sklearn.feature_extraction.text import (
+                        CountVectorizer, TfidfVectorizer)
+                    from umap import UMAP
+                    from tm_utils import pickler
+
+                    # Create a BERTopicTrainer object with the parameters specified in the configuration file
+                    BERTopicTr = BERTopicTrainer(
+                        # stopwords=train_config['TMparam']['stopwords'],
+                        no_below=train_config['TMparam']['no_below'],
+                        no_above=train_config['TMparam']['no_above'],
+                        ntopics=train_config['TMparam']['ntopics'],
+                        thetas_thr=train_config['TMparam']['thetas_thr'],
+                        sbert_model=train_config['TMparam']['sbert_model'],
+                        umap_n_components=train_config['TMparam']['umap_n_components'],
+                        umap_n_neighbors=train_config['TMparam']['umap_n_neighbors'],
+                        umap_min_dist=train_config['TMparam']['umap_min_dist'],
+                        umap_metric=train_config['TMparam']['umap_metric'],
+                        hdbscan_min_cluster_size=train_config['TMparam']['hdbscan_min_cluster_size'],
+                        hdbscan_metric=train_config['TMparam']['hdbscan_metric'],
+                        hdbscan_cluster_selection_method=train_config[
+                            'TMparam']['hdbscan_cluster_selection_method'],
+                        hbdsan_prediction_data=train_config['TMparam']['hbdsan_prediction_data'],
+                        get_sims=get_sims)
+
+                    # Train the Mallet topic model with the specified corpus
+                    corpusFile = configFile.parent.joinpath('corpus.parquet')
+                    if not corpusFile.is_dir() and not corpusFile.is_file():
+                        sys.exit(
+                            "The corpus file 'corpus.parquet' does not exist.")
+                    BERTopicTr.fit(corpusFile=corpusFile)
+
         else:
             sys.exit('You need to provide a valid configuration file')
 
@@ -2139,7 +2555,6 @@ if __name__ == "__main__":
 
         # Import necessary modules for the hierarchical manager
         from dask.diagnostics import ProgressBar
-
         from manageModels import TMmodel
 
         if not args.config_child:

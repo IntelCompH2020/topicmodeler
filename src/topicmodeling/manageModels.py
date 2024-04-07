@@ -649,7 +649,7 @@ class TMmodel(object):
                 self._TMfolder.joinpath('topic_entropy.npy'))
 
     def calculate_topic_coherence(self,
-                                  metrics=["c_v", "c_npmi"],
+                                  metrics=["c_npmi","c_v"],
                                   n_words=15,
                                   reference_text=None,
                                   only_one=True,

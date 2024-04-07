@@ -118,5 +118,19 @@ class TopicLabeller(object):
             A list of labels for the chemical descriptions.
         """
 
-        gpt_prompt = f"Give me a label for each of the following set of words and return it as a Python list with the labels: {chem_descs}"
-        return eval(self._promt(gpt_prompt))
+        def divide_list(input_list, chunk_size):
+            return [input_list[i:i + chunk_size] for i in range(0, len(input_list), chunk_size)]
+        
+        if len(chem_descs) > 10:
+            chunked_list = divide_list(chem_descs, 10)
+
+            labels = []
+            for labels_chunk in chunked_list:
+                gpt_prompt = f"Give me a label for each of the following set of words and return it as a Python list with the labels: {labels_chunk}"
+                labels.extend(eval(self._promt(gpt_prompt)))
+        else:
+            
+            gpt_prompt = f"Give me a label for each of the following set of words and return it as a Python list with the labels: {chem_descs}"
+            labels = eval(self._promt(gpt_prompt))
+            
+        return labels

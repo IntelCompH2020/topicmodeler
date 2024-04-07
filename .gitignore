@@ -162,3 +162,6 @@ aux_scripts/._fromHDFS
 generate_automatic.py
 prueba_inferencer
 test_inf.py
+bass
+pruebas_bert
+.qt_for_python

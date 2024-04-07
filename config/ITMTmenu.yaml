@@ -106,6 +106,7 @@ trainTM:
         sparkLDA: Spark MLLIB Topic Modeling
         prodLDA: ProdLDA Topic Modeling (deep learning)
         ctm: Contextualized Topic Model (deep learning)
+        bertopic: BERTopic
 
 train2ndTM:
   title: Train a second level Topic Model
