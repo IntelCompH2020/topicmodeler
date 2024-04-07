@@ -165,3 +165,6 @@ test_inf.py
 bass
 pruebas_bert
 .qt_for_python
+.venv_kumo
+.venv_kumo01
+scalability

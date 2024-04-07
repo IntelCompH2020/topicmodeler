@@ -23,13 +23,45 @@ import os
 import sys
 from abc import abstractmethod
 from pathlib import Path
-from typing import List, Union
-
+import time
+import matplotlib.pyplot as plt
+from scipy import sparse
+from sklearn.preprocessing import normalize
+from subprocess import check_output
 import dask.dataframe as dd
+from dask.diagnostics import ProgressBar
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-
+import shutil
+from gensim import corpora
+from bertopic import BERTopic
+from bertopic.representation import (KeyBERTInspired, MaximalMarginalRelevance)
+from bertopic.vectorizers import ClassTfidfTransformer
+from hdbscan import HDBSCAN
+from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import (CountVectorizer, TfidfVectorizer)
+from umap import UMAP
+try:
+    print(f"-- -- Importing from src")
+    from src.topicmodeling.neural_models.pytorchavitm.avitm_network.avitm import AVITM
+    from src.topicmodeling.neural_models.pytorchavitm.utils.data_preparation import prepare_dataset
+    from src.topicmodeling.tm_utils import (file_lines, pickler, pickler_avitm_for_ewb_inferencer)
+    from src.topicmodeling.neural_models.contextualized_topic_models.ctm_network.ctm import (
+        CombinedTM, ZeroShotTM)
+    from src.topicmodeling.neural_models.contextualized_topic_models.utils.data_preparation import \
+        prepare_ctm_dataset
+    from src.topicmodeling.manageModels import TMmodel
+    DO_LOGGER = True
+except:
+    print(f"-- -- Importing from topicmodeling")
+    from neural_models.pytorchavitm.avitm_network.avitm import AVITM
+    from tm_utils import (file_lines, pickler, pickler_avitm_for_ewb_inferencer)
+    from neural_models.contextualized_topic_models.ctm_network.ctm import (
+        CombinedTM, ZeroShotTM)
+    from neural_models.contextualized_topic_models.utils.data_preparation import \
+        prepare_ctm_dataset
+    from manageModels import TMmodel
 
 def print_logs(message, do_logger=True, level="info", logger=None):
     if do_logger and logger:
@@ -813,6 +845,8 @@ class MalletTrainer(Trainer):
             Path to txt file in mallet format
             id 0 token1 token2 token3 ...
         """
+        
+        t_start = time.perf_counter()
 
         # Output model folder and training file for the corpus
         if not corpusFile.is_file():
@@ -821,7 +855,7 @@ class MalletTrainer(Trainer):
             sys.exit()
 
         modelFolder = corpusFile.parent.joinpath('modelFiles')
-        modelFolder.mkdir()
+        modelFolder.mkdir(exist_ok=True)
 
         ##################################################
         # Importing Data to mallet
@@ -840,7 +874,8 @@ class MalletTrainer(Trainer):
             print_logs(
                 f'-- -- Running command {cmd}', do_logger=DO_LOGGER, level="info", logger=self._logger)
             check_output(args=cmd, shell=True)
-        except:
+        except Exception as e:
+            print(e)
             print_logs(f'-- -- Mallet failed to import data. Revise command',
                        do_logger=DO_LOGGER, level="error", logger=self._logger)
 
@@ -889,6 +924,8 @@ class MalletTrainer(Trainer):
                        do_logger=DO_LOGGER, level="error", logger=self._logger)
             return
 
+        t_end = time.perf_counter() - t_start
+        
         ##################################################
         # Create TMmodel object
 
@@ -897,7 +934,7 @@ class MalletTrainer(Trainer):
         # Create pipe for future inference tasks
         self._extract_pipe(modelFolder)
 
-        return
+        return t_end
 
 
 class sparkLDATrainer(Trainer):
@@ -1017,6 +1054,8 @@ class sparkLDATrainer(Trainer):
             Path to parquet file in mallet format
         """
 
+        t_start = time.perf_counter()
+        
         # Output model folder and training file for the corpus
         if not corpusFile.exists():
             print_logs(f'-- -- Provided corpus Path does not exist -- Stop',
@@ -1039,16 +1078,18 @@ class sparkLDATrainer(Trainer):
 
         # Save model for future use
         modelFolder = corpusFile.parent.joinpath('modelFiles')
-        modelFolder.mkdir()
+        modelFolder.mkdir(exist_ok=True)
         ldaModel.save(
             f"file://{modelFolder.joinpath('sparkLDAmodel').as_posix()}")
 
+        t_end = time.perf_counter() - t_start
+        
         ##################################################
         # Create TMmodel object
 
         tm = self._createTMmodel(modelFolder, ldaModel, df)
 
-        return
+        return t_end
 
 
 class ProdLDATrainer(Trainer):
@@ -1199,6 +1240,8 @@ class ProdLDATrainer(Trainer):
             id 0 token1 token2 token3 ...
         """
 
+        t_start = time.perf_counter()
+        
         # Output model folder and training file for the corpus
         if not os.path.exists(corpusFile):
             print_logs(f'-- -- Provided corpus Path does not exist -- Stop',
@@ -1206,7 +1249,7 @@ class ProdLDATrainer(Trainer):
             sys.exit()
 
         modelFolder = corpusFile.parent.joinpath('modelFiles')
-        modelFolder.mkdir()
+        modelFolder.mkdir(exist_ok=True)
 
         # Generating the corpus in the input format required by ProdLDA
         print_logs('-- -- ProdLDA Corpus Generation: BOW Dataset object',
@@ -1247,6 +1290,8 @@ class ProdLDATrainer(Trainer):
                       num_data_loader_workers=self._num_data_loader_workers)
 
         avitm.fit(self._train_dataset, self._val_dataset)
+        
+        t_end = time.perf_counter() - t_start
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, avitm)
@@ -1257,7 +1302,7 @@ class ProdLDATrainer(Trainer):
             path_model_infer=model_file,
             avitm_model=avitm)
 
-        return
+        return t_end
 
 
 class CTMTrainer(Trainer):
@@ -1447,6 +1492,8 @@ class CTMTrainer(Trainer):
             id 0 token1 token2 token3 ...
         """
 
+        t_start = time.perf_counter()
+        
         # Output model folder and training file for the corpus
         if not os.path.exists(corpusFile):
             print_logs(f'-- -- Provided corpus Path does not exist -- Stop',
@@ -1454,7 +1501,7 @@ class CTMTrainer(Trainer):
             sys.exit()
 
         modelFolder = corpusFile.parent.joinpath('modelFiles')
-        modelFolder.mkdir()
+        modelFolder.mkdir(exist_ok=True)
 
         # Generating the corpus in the input format required by CTM
         print_logs('-- -- CTM Corpus Generation: BOW Dataset object',
@@ -1550,11 +1597,13 @@ class CTMTrainer(Trainer):
         # Save ctm model for future inference
         model_file = modelFolder.joinpath('model.pickle')
         pickler(model_file, ctm)
+        
+        t_end = time.perf_counter() - t_start
 
         # Create TMmodel object
         tm = self._createTMmodel(modelFolder, ctm)
 
-        return
+        return t_end
 
 
 class BERTopicTrainer(Trainer):
@@ -1711,6 +1760,8 @@ class BERTopicTrainer(Trainer):
             Path to txt file in mallet format
             id 0 token1 token2 token3 ...
         """
+        
+        t_start = time.perf_counter()
 
         # Output model folder and training file for the corpus
         if not os.path.exists(corpusFile):
@@ -1869,10 +1920,12 @@ class BERTopicTrainer(Trainer):
         model_file = modelFolder.joinpath('model.pickle')
         pickler(model_file, self._model)
 
+        t_end = time.perf_counter() - t_start
+        
         # Create TMmodel object
         self._createTMmodel(modelFolder)
 
-        return
+        return t_end
 
 
 class HierarchicalTMManager(object):
@@ -2194,10 +2247,6 @@ if __name__ == "__main__":
     # configuration file, and run the preprocessing of the training data using
     # the textPreproc class
     if args.preproc:
-
-        # Import modules only necessary for preprocessing
-        import shutil
-
         configFile = Path(args.config)
         if configFile.is_file():
             with configFile.open('r', encoding='utf8') as fin:
@@ -2281,11 +2330,6 @@ if __name__ == "__main__":
                 sys.stdout.write(trDataFile.as_posix())
 
             else:
-
-                # Import necessary modules for Dask and its associated corpus preprocessing
-                from dask.diagnostics import ProgressBar
-                from gensim import corpora
-
                 # Read all training data and configure them as a dask dataframe
                 for idx, DtSet in enumerate(trDtSet['Dtsets']):
                     df = dd.read_parquet(DtSet['parquet']).fillna("")
@@ -2355,14 +2399,6 @@ if __name__ == "__main__":
     # If the training flag is activated, we need to check availability of
     # configuration file, and run the topic model training
     if args.train:
-
-        # Import modules only necessary for training
-        import matplotlib.pyplot as plt
-        from manageModels import TMmodel
-        from scipy import sparse
-        from sklearn.preprocessing import normalize
-        from tm_utils import file_lines
-
         configFile = Path(args.config)
         if configFile.is_file():
             with configFile.open('r', encoding='utf8') as fin:
@@ -2372,10 +2408,6 @@ if __name__ == "__main__":
                 ) else False
 
                 if train_config['trainer'] == 'mallet':
-
-                    # Import necessary libraries for Mallet
-                    from subprocess import check_output
-
                     # Create a MalletTrainer object with the parameters specified in the configuration file
                     MallTr = MalletTrainer(
                         mallet_path=train_config['TMparam']['mallet_path'],
@@ -2414,15 +2446,6 @@ if __name__ == "__main__":
                         corpusFile=configFile.parent.joinpath('corpus.parquet'))
 
                 elif train_config['trainer'] == 'prodLDA':
-
-                    # Import necessary libraries for prodLDA
-                    from neural_models.pytorchavitm.avitm_network.avitm import \
-                        AVITM
-                    from neural_models.pytorchavitm.utils.data_preparation import \
-                        prepare_dataset
-                    from tm_utils import (pickler,
-                                          pickler_avitm_for_ewb_inferencer)
-
                     # Create a ProdLDATrainer object with the parameters specified in the configuration file
                     ProdLDATr = ProdLDATrainer(
                         n_components=train_config['TMparam']['ntopics'],
@@ -2450,14 +2473,6 @@ if __name__ == "__main__":
                         corpusFile=configFile.parent.joinpath('corpus.parquet'))
 
                 elif train_config['trainer'] == 'ctm':
-
-                    # Import necessary libraries for CTM
-                    from neural_models.contextualized_topic_models.ctm_network.ctm import (
-                        CombinedTM, ZeroShotTM)
-                    from neural_models.contextualized_topic_models.utils.data_preparation import \
-                        prepare_ctm_dataset
-                    from tm_utils import pickler
-
                     # Create a CTMTrainer object with the parameters specified in the configuration file
                     if 'dropout_in' in train_config['TMparam'].keys() and 'dropout_out' in train_config['TMparam'].keys():
                         dropout_in_ = train_config['TMparam']['dropout_in']
@@ -2511,17 +2526,6 @@ if __name__ == "__main__":
                                          embeddingsFile=embbeddingsFile)
 
                 elif train_config['trainer'] == 'bertopic':
-                    from bertopic import BERTopic
-                    from bertopic.representation import (
-                        KeyBERTInspired, MaximalMarginalRelevance)
-                    from bertopic.vectorizers import ClassTfidfTransformer
-                    from hdbscan import HDBSCAN
-                    from sentence_transformers import SentenceTransformer
-                    from sklearn.feature_extraction.text import (
-                        CountVectorizer, TfidfVectorizer)
-                    from umap import UMAP
-                    from tm_utils import pickler
-
                     # Create a BERTopicTrainer object with the parameters specified in the configuration file
                     BERTopicTr = BERTopicTrainer(
                         # stopwords=train_config['TMparam']['stopwords'],
@@ -2552,11 +2556,6 @@ if __name__ == "__main__":
             sys.exit('You need to provide a valid configuration file')
 
     if args.hierarchical:
-
-        # Import necessary modules for the hierarchical manager
-        from dask.diagnostics import ProgressBar
-        from manageModels import TMmodel
-
         if not args.config_child:
             sys.exit('You need to provide a configuration file for the submodel')
         else:
