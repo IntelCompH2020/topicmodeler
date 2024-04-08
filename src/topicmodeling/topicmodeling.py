@@ -72,7 +72,7 @@ def print_logs(message, do_logger=True, level="info", logger=None):
         elif level == "debug":
             logger.debug(message)
     else:
-        print(message)
+        print(message, flush=True)
 
 
 class textPreproc(object):
