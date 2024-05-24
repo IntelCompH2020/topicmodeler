@@ -24,6 +24,7 @@ import sys
 from abc import abstractmethod
 from pathlib import Path
 import time
+from dotenv import load_dotenv
 import matplotlib.pyplot as plt
 from scipy import sparse
 from sklearn.preprocessing import normalize
@@ -73,7 +74,7 @@ def print_logs(message, do_logger=True, level="info", logger=None):
             logger.debug(message)
     else:
         print(message, flush=True)
-
+    print (message,flush=True)
 
 class textPreproc(object):
     """
@@ -664,7 +665,7 @@ class MalletTrainer(Trainer):
 
     """
 
-    def __init__(self, mallet_path, ntopics=25, alpha=5.0, optimize_interval=10, num_threads=4, num_iterations=1000, doc_topic_thr=0.0, thetas_thr=0.003, token_regexp=None, get_sims=False, logger=None):
+    def __init__(self, mallet_path, ntopics=25, alpha=5.0, optimize_interval=10, num_threads=4, num_iterations=1000, doc_topic_thr=0.0, thetas_thr=0.003, token_regexp=None, get_sims=False, open_api_key=None, do_labeller=True, logger=None):
         """
         Initilization Method
 
@@ -706,6 +707,8 @@ class MalletTrainer(Trainer):
         self._thetas_thr = thetas_thr
         self._token_regexp = token_regexp
         self._get_sims = get_sims
+        self._open_api_key = open_api_key
+        self._do_labeller = do_labeller
 
         if not self._mallet_path.is_file():
             print_logs(f'-- -- Provided mallet path is not valid -- Stop',
@@ -779,7 +782,7 @@ class MalletTrainer(Trainer):
                    do_logger=DO_LOGGER, level="debug", logger=self._logger)
 
         tm = TMmodel(TMfolder=modelFolder.parent.joinpath('TMmodel'),
-                     get_sims=self._get_sims)
+                     get_sims=self._get_sims, open_api_key=self._open_api_key, do_labeller=self._do_labeller)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab)
 
@@ -946,7 +949,7 @@ class sparkLDATrainer(Trainer):
     """
 
     def __init__(self, ntopics=25, alpha=5.0, maxIter=20, optimizer='online',
-                 optimizeDocConcentration=True, subsamplingRate=0.05, thetas_thr=0.003, get_sims=False, logger=None):
+                 optimizeDocConcentration=True, subsamplingRate=0.05, thetas_thr=0.003, get_sims=False, open_api_key=None, do_labeller=True, logger=None):
         """
         Initilization Method
 
@@ -982,6 +985,8 @@ class sparkLDATrainer(Trainer):
         self._subsamplingRate = subsamplingRate
         self._thetas_thr = thetas_thr
         self._get_sims = get_sims
+        self._open_api_key = open_api_key
+        self._do_labeller = do_labeller
 
     def _createTMmodel(self, modelFolder, ldaModel, df):
         """Creates an object of class TMmodel hosting the topic model
@@ -1038,7 +1043,7 @@ class sparkLDATrainer(Trainer):
             vocab = [el.strip() for el in fin.readlines()]
 
         tm = TMmodel(modelFolder.parent.joinpath(
-            'TMmodel'), get_sims=self._get_sims)
+            'TMmodel'), get_sims=self._get_sims, open_api_key=self._open_api_key, do_labeller=self._do_labeller)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab)
 
@@ -1108,7 +1113,7 @@ class ProdLDATrainer(Trainer):
                  learn_priors=True, batch_size=64, lr=2e-3, momentum=0.99,
                  solver='adam', num_epochs=100, reduce_on_plateau=False,
                  topic_prior_mean=0.0, topic_prior_variance=None, num_samples=10,
-                 num_data_loader_workers=0, thetas_thr=0.003, get_sims=False, logger=None):
+                 num_data_loader_workers=0, thetas_thr=0.003, get_sims=False, open_api_key=None, do_labeller=True, logger=None):
         """
         Initilization Method
 
@@ -1177,7 +1182,8 @@ class ProdLDATrainer(Trainer):
         self._num_data_loader_workers = num_data_loader_workers
         self._thetas_thr = thetas_thr
         self._get_sims = get_sims
-
+        self._open_api_key = open_api_key
+        self._do_labeller = do_labeller
         return
 
     def _createTMmodel(self, modelFolder, avitm):
@@ -1223,7 +1229,7 @@ class ProdLDATrainer(Trainer):
 
         # Create TMmodel
         tm = TMmodel(modelFolder.parent.joinpath(
-            'TMmodel'), get_sims=self._get_sims)
+            'TMmodel'), get_sims=self._get_sims, open_api_key=self._open_api_key, do_labeller=self._do_labeller)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab)
 
@@ -1341,6 +1347,8 @@ class CTMTrainer(Trainer):
                  thetas_thr=0.003, sbert_model_to_load='paraphrase-distilroberta-base-v1',
                  get_sims=False,
                  max_features=None,
+                 open_api_key=None,
+                 do_labeller=True,
                  logger=None):
         """
         Initilization Method
@@ -1421,6 +1429,8 @@ class CTMTrainer(Trainer):
         self._thetas_thr = thetas_thr
         self._get_sims = get_sims
         self._max_features = max_features
+        self._open_api_key = open_api_key
+        self._do_labeller = do_labeller
 
         return
 
@@ -1475,7 +1485,7 @@ class CTMTrainer(Trainer):
 
         # Create TMmodel
         tm = TMmodel(modelFolder.parent.joinpath(
-            'TMmodel'), get_sims=self._get_sims)
+            'TMmodel'), get_sims=self._get_sims, open_api_key=self._open_api_key, do_labeller=self._do_labeller)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab)
 
@@ -1633,6 +1643,8 @@ class BERTopicTrainer(Trainer):
         hdbscan_metric='euclidean',
         hdbscan_cluster_selection_method='eom',
         hbdsan_prediction_data=True,
+        open_api_key=None,
+        do_labeller=True,
         logger=None
     ):
         """
@@ -1678,6 +1690,8 @@ class BERTopicTrainer(Trainer):
         self.ntopics = ntopics
         self._thetas_thr = thetas_thr
         self._get_sims = get_sims
+        self._open_api_key = open_api_key 
+        self._do_labeller = do_labeller
 
         # Initialize specific parameters for BERTopic
         self.sbert_model = sbert_model
@@ -1741,7 +1755,7 @@ class BERTopicTrainer(Trainer):
 
         # Create TMmodel
         tm = TMmodel(modelFolder.parent.joinpath(
-            'TMmodel'), get_sims=self._get_sims)
+            'TMmodel'), get_sims=self._get_sims, open_api_key=self._open_api_key, do_labeller=self._do_labeller)
         tm.create(betas=betas, thetas=thetas32, alphas=alphas,
                   vocab=vocab)
 
@@ -1863,7 +1877,7 @@ class BERTopicTrainer(Trainer):
         self._model = BERTopic(
             language="multilingual",
             min_topic_size=1,
-            nr_topics=self.ntopics+1,
+            nr_topics=self.ntopics,
             low_memory=False,
             # calculate_probabilities=True,
             embedding_model=self._embedding_model,
@@ -2221,6 +2235,14 @@ if __name__ == "__main__":
     parser.add_argument('--config_child', type=str, default=None,
                         help="Path to submodel's config file", required=False)
     parser.add_argument('--do_logger', type=bool, default=True, required=False)
+    parser.add_argument('--open_ai_key', type=str, default=None, required=False)
+    parser.add_argument('--open_ai_key_path', type=str, required=False,
+                        default='/export/usuarios_ml4ds/lbartolome/Repos/my_repos/miniature-fishstick/.env')
+    parser.add_argument('--do_labeller', type=bool, default=True,
+                        help="Flag to active the labelling of the topics using OpenAI.", required=False)
+
+    args = parser.parse_args()
+
 
     args = parser.parse_args()
 
@@ -2399,6 +2421,38 @@ if __name__ == "__main__":
     # If the training flag is activated, we need to check availability of
     # configuration file, and run the topic model training
     if args.train:
+        
+        do_labeller = False
+        if args.do_labeller:
+            # Loading OpenAI API Key if given
+            if args.open_ai_key:
+                openai_api_key = args.open_ai_key
+                do_labeller = True
+                sys.stdout.write("#"*20)
+                sys.stdout.write("Loading OPENAI_API_KEY passed as argument...")
+                sys.stdout.write("#"*20)
+            elif args.open_ai_key_path:
+                try:
+                    load_dotenv(args.open_ai_key_path)
+                    openai_api_key = os.getenv("OPENAI_API_KEY")
+                    do_labeller = True
+                    sys.stdout.write("#"*20)
+                    sys.stdout.write("Loading OPENAI_API_KEY from .env file...")
+                    sys.stdout.write("#"*20)
+                except Exception as e:
+                    sys.stdout.write("#"*20)
+                    sys.stdout.write("OPENAI_API_KEY could not be set from given .env file. You need to specify a valid OPENAI_API_KEY to use the TopicLabeller functinality. The model will be trained, but no labels will be generated...")
+                    sys.stdout.write("#"*20)
+                    sys.stdout.write(f"This is the error that occurred:{e}")
+            else:
+                try:
+                    openai_api_key = os.environ["OPENAI_API_KEY"]
+                except Exception as e:
+                    sys.stdout.write("#"*20)
+                    sys.stdout.write("You need to specify an OPENAI_API_KEY to use the TopicLabeller functinality. The model will be trained, but no labels will be generated....")
+                    sys.stdout.write("#"*20)
+                    sys.stdout.write(f"This is the error that occurred:{e}")
+        
         configFile = Path(args.config)
         if configFile.is_file():
             with configFile.open('r', encoding='utf8') as fin:
@@ -2419,7 +2473,9 @@ if __name__ == "__main__":
                         doc_topic_thr=train_config['TMparam']['doc_topic_thr'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
                         token_regexp=train_config['TMparam']['token_regexp'],
-                        get_sims=get_sims)
+                        get_sims=get_sims,
+                        open_api_key=openai_api_key,
+                        do_labeller=do_labeller)
 
                     # Train the Mallet topic model with the specified corpus
                     MallTr.fit(
@@ -2440,7 +2496,9 @@ if __name__ == "__main__":
                         optimizeDocConcentration=train_config['TMparam']['optimizeDocConcentration'],
                         subsamplingRate=train_config['TMparam']['subsamplingRate'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        get_sims=get_sims)
+                        get_sims=get_sims,
+                        open_api_key=openai_api_key,
+                        do_labeller=do_labeller)
 
                     sparkLDATr.fit(
                         corpusFile=configFile.parent.joinpath('corpus.parquet'))
@@ -2466,7 +2524,9 @@ if __name__ == "__main__":
                         num_samples=train_config['TMparam']['num_samples'],
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
-                        get_sims=get_sims)
+                        get_sims=get_sims,
+                        open_api_key=openai_api_key,
+                        do_labeller=do_labeller)
 
                     # Train the ProdLDA topic model with the specified corpus
                     ProdLDATr.fit(
@@ -2505,7 +2565,9 @@ if __name__ == "__main__":
                         num_data_loader_workers=train_config['TMparam']['num_data_loader_workers'],
                         thetas_thr=train_config['TMparam']['thetas_thr'],
                         get_sims=get_sims,
-                        max_features=max_features)
+                        max_features=max_features,
+                        open_api_key=openai_api_key,
+                        do_labeller=do_labeller)
 
                     # Train the CTM topic model with the specified corpus
                     corpusFile = configFile.parent.joinpath('corpus.parquet')
@@ -2543,7 +2605,9 @@ if __name__ == "__main__":
                         hdbscan_cluster_selection_method=train_config[
                             'TMparam']['hdbscan_cluster_selection_method'],
                         hbdsan_prediction_data=train_config['TMparam']['hbdsan_prediction_data'],
-                        get_sims=get_sims)
+                        get_sims=get_sims,
+                        open_api_key=openai_api_key,
+                        do_labeller=do_labeller)
 
                     # Train the Mallet topic model with the specified corpus
                     corpusFile = configFile.parent.joinpath('corpus.parquet')

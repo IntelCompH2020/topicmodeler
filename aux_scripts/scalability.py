@@ -3,6 +3,7 @@ Compute some additional measures when creating models such as memory or cpu usag
 """
 
 
+
 import pandas as pd
 import datetime as DT
 import multiprocessing as mp
@@ -18,10 +19,10 @@ from random import choices
 from typing import Union
 
 sys.path.insert(0, Path(__file__).parent.parent.resolve().as_posix())
-from src.utils.mem_usage import Mem
+from src.topicmodeling.manageModels import TMmodel
 from src.topicmodeling.topicmodeling import (CTMTrainer, MalletTrainer,
                                              ProdLDATrainer, BERTopicTrainer)
-from src.topicmodeling.manageModels import TMmodel
+from src.utils.mem_usage import Mem
 
 warnings.filterwarnings(action="ignore")
 
@@ -107,6 +108,7 @@ def copy_sampled_corpus(
         df = pd.read_parquet(dataset_file)
         df.to_parquet(corpusFile)
 
+
 def get_model_config(trainer, TMparam):
     """Select model configuration based on trainer"""
     if trainer == 'mallet':
@@ -191,7 +193,8 @@ def train_model(train_config, corpusFile, embeddingsFile=None):
         trainer = BERTopicTrainer(**TMparam, logger=logger)
 
     if trainer == 'ctm' and train_config['hierarchy-level'] == 1:
-        t_train = trainer.fit(corpusFile=corpusFile, embeddingsFile=embeddingsFile)
+        t_train = trainer.fit(corpusFile=corpusFile,
+                              embeddingsFile=embeddingsFile)
     else:
         t_train = trainer.fit(corpusFile=corpusFile)
     return t_train
@@ -208,7 +211,7 @@ def main():
     coherences = ["c_npmi", "c_v"]  # c_npmi is computed by default
     ########################################
     # TODO:
-    number_topics = [5]#[5, 10, 15, 20, 30, 50, 75, 100, 150, 300]
+    number_topics = [5, 10, 15, 20, 30, 50, 75, 100, 150, 300]
     number_iterations = [1000]
     number_threads = [8]  # 2, 4,
     number_samples = [20]
@@ -216,22 +219,33 @@ def main():
     model_types = ["prodLDA"]  # , "LDA"
     ctm_model_types = ["CombinedTM"]  # "ZeroShotTM"
     ########################################
-    
-    path_datasets = Path("/export/usuarios_ml4ds/lbartolome/Repos/intelcomp_repos/topicmodeler/scalability/TMmodels")
-    datasets = [
-        path_datasets / "sample_cordis_1",
-        path_datasets / "sample_cordis_3"
-        
-    ]
-    
-    for dataset in datasets:
 
-        for trainer in topicModelTypes[:3]:
+    path_datasets = Path(
+        "/export/usuarios_ml4ds/lbartolome/Repos/intelcomp_repos/topicmodeler/scalability/TMmodels")
+    datasets_names = [
+        #"s2cs_01",
+        #"s2cs_03",
+        #"s2cs_1",
+        "s2cs_3",
+        #"s2cs_emb_lemmas_embeddings"
+    ]
+    datasets = [
+        (path_datasets / dtset_name) for dtset_name in datasets_names
+    ]
+
+    for dataset_name, dataset in zip(datasets_names,datasets):
+        logger.info("-" * 100)
+        logger.info(f"-- -- Dataset: {dataset}")
+        logger.info("-" * 100)
+        for trainer in topicModelTypes:
+            logger.info("*" * 100)
+            logger.info(f"-- -- Trainer: {trainer}")
+            logger.info("*" * 100)
             if trainer == "mallet":
                 param_conf = (
                     {"ntopics": n,
-                    "num_iterations": i,
-                    "num_threads": t}
+                     "num_iterations": i,
+                     "num_threads": t}
                     for n, i, t in product(number_topics, number_iterations, number_threads)
                 )
                 CFtype = "txt"
@@ -240,9 +254,9 @@ def main():
             elif trainer == "prodLDA":
                 param_conf = (
                     {"n_components": n,
-                    "num_samples": s,
-                    "num_epochs": e,
-                    "model_type": m}
+                     "num_samples": s,
+                     "num_epochs": e,
+                     "model_type": m}
                     for n, s, e, m in product(number_topics, number_samples, number_epochs, model_types)
                 )
                 CFtype = "parquet"
@@ -251,10 +265,10 @@ def main():
             elif trainer == "ctm":
                 param_conf = (
                     {"n_components": n,
-                    "num_samples": s,
-                    "num_epochs": e,
-                    "model_type": m,
-                    "ctm_model_type": t}
+                     "num_samples": s,
+                     "num_epochs": e,
+                     "model_type": m,
+                     "ctm_model_type": t}
                     for n, s, e, m, t in product(number_topics, number_samples, number_epochs, model_types, ctm_model_types)
                 )
                 CFtype = "parquet"
@@ -273,14 +287,18 @@ def main():
                 exit()
 
             for tuned_params in param_conf:
-                
+
                 # Set configuration
                 TMparam = {**fixed_params, **tuned_params}
                 train_config = get_model_config(trainer, TMparam)
 
                 # Save configuration
                 model_path = models.joinpath(
-                    f"{trainer}_{'_'.join(f'{i}' for i in tuned_params.values())}_{DT.datetime.now().strftime('%Y%m%d')}")
+                    f"{dataset_name}_{trainer}_{'_'.join(f'{i}' for i in tuned_params.values())}_{DT.datetime.now().strftime('%Y%m%d')}")
+                
+                model_path_no_date = models.joinpath(
+                    f"{dataset_name}_{trainer}_{'_'.join(f'{i}' for i in tuned_params.values())}")
+                
                 model_path.mkdir(parents=True, exist_ok=True)
                 model_stats = model_path.joinpath("stats")
                 model_stats.mkdir(parents=True, exist_ok=True)

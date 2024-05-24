@@ -20,28 +20,28 @@ import pandas as pd
 import rbo
 import scipy.sparse as sparse
 from sparse_dot_topn import awesome_cossim_topn
-import os
 from openai import OpenAI
 
 class TopicLabeller(object):
 
     def __init__(
         self,
-        model,
-        temperature=0.2,
+        openai_api_key,
+        model='gpt-3.5-turbo',
+        temperature=0.1,
         max_tokens=1000,
-        frequency_penalty=0.0
+        frequency_penalty=0.0,
     ) -> None:
+        
         try:
-            self._openai_api_key = os.environ["OPENAI_API_KEY"]
+            self._client = OpenAI(
+                api_key=openai_api_key
+        )
         except KeyError:
             raise Exception(
                 "Please set the OPENAI_API_KEY environment variable.")
 
-        self._client = OpenAI(
-            api_key=self._openai_api_key
-        )
-
+        
         example_1 = ('network, traffic, vehicle, energy, communication, service, deep, reinforcement, sensor, wireless, road, channel, management, node, UAV',
                      'Traffic Management and Autonomous Driving')
 
@@ -455,7 +455,7 @@ class TMmodel(object):
     _size_vocab = None
     _sims = None
 
-    def __init__(self, TMfolder, get_sims=False, logger=None):
+    def __init__(self, TMfolder, get_sims=False, open_api_key=None, do_labeller = True, logger=None):
         """Class initializer
 
         We just need to make sure that we have a folder where the
@@ -495,6 +495,8 @@ class TMmodel(object):
             '-- -- -- Topic model object (TMmodel) successfully created')
 
         self._get_sims = get_sims
+        self._open_api_key = open_api_key
+        self._do_labeller = do_labeller
 
     def create(self, betas=None, thetas=None, alphas=None, vocab=None):
         """Creates the topic model from the relevant matrices that characterize it. In addition to the initialization of the corresponding object's variables, all the associated variables and visualizations which are computationally costly are calculated so they are available for the other methods.
@@ -544,7 +546,8 @@ class TMmodel(object):
         self._tpc_descriptions = [el[1]
                                   for el in self.get_tpc_word_descriptions()]
         self.calculate_topic_coherence()  # cohrs_aux
-        self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
+        if self._do_labeller:
+            self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
         if self._get_sims:
             self._calculate_sims()
 
@@ -582,8 +585,9 @@ class TMmodel(object):
             'ndocs_active.npy'), self._ndocs_active)
         with self._TMfolder.joinpath('tpc_descriptions.txt').open('w', encoding='utf8') as fout:
             fout.write('\n'.join(self._tpc_descriptions))
-        with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
-            fout.write('\n'.join(self._tpc_labels))
+        if self._do_labeller:
+            with self._TMfolder.joinpath('tpc_labels.txt').open('w', encoding='utf8') as fout:
+                fout.write('\n'.join(self._tpc_labels))
 
         # Generate also pyLDAvisualization
         # pyLDAvis currently raises some Deprecation warnings
@@ -1080,7 +1084,7 @@ class TMmodel(object):
         self.load_tpc_descriptions()
         
         # Create a topic labeller object
-        tl = TopicLabeller(model="gpt-4")
+        tl = TopicLabeller(openai_api_key=self._open_api_key)
         
         # Get labels
         labels = tl.get_labels(self._tpc_descriptions)
