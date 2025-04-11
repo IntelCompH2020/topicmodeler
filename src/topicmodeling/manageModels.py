@@ -431,12 +431,12 @@ class TMmodel(object):
             self._calculate_sims()
         
         if self._do_labeller:
-            try:
-                self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
-            except Exception as e:
-                self._logger.warning(
-                    f"Error in labeller: {e}")
-                self._tpc_labels = ["Topic " + str(i) for i in range(self._ntopics)]
+            #try:
+            self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
+            #except Exception as e:
+            #    self._logger.warning(
+            #        f"Error in labeller: {e}")
+            #    self._tpc_labels = ["Topic " + str(i) for i in range(self.#_ntopics)]
 
         # We are ready to save all variables in the model
         self._save_all()
@@ -995,7 +995,7 @@ class TMmodel(object):
         self._load_s3()
             
         # Get documents from the model
-        path_data = self._TMfolder.parent('trainconfig.json')
+        path_data = self._TMfolder.parent / 'trainconfig.json'
         with open(path_data, 'r') as f:
             data = json.load(f)
         with open(data["TrDtSet"], 'r') as f:
@@ -1003,29 +1003,24 @@ class TMmodel(object):
             
         for idx, DtSet in enumerate(data['Dtsets']):
             df = pd.read_parquet(DtSet['parquet']).fillna("")
-
-            import pdb; pdb.set_trace()
-            """
+            
+            self._logger.info(f"these are the columns: {df.columns}")
+            
             # Concatenate text fields
-            for idx2, col in enumerate(DtSet['lemmasfld']):
+            for idx2, _ in enumerate(DtSet['lemmasfld']):
+                # @TODO: THIS IS A TEMPORARY FIX, NEEDS TO BE FIXED
+                # This only works when "raw_text" is in the parquet file, and which only applies if the data has been preprocessed with NLPipe
+                self._logger.warning(f"!!!!!!!!!!!! This is a temporary fix, needs to be fixed. We are assuming that the column 'raw_text' is in the parquet file...")
                 df = df.rename(columns={DtSet['idfld']: 'id'})
-                if idx2 == 0:
-                    df["all_lemmas"] = df[col]
-                else:
-                    df["all_lemmas"] += " " + df[col]
-            df["source"] = DtSet["source"]
-            df = df[["id", "source", "all_lemmas"]]
+            df = df[["id", "raw_text"]]
 
             # Concatenate dataframes
             if idx == 0:
                 trDF = df
             else:
-                trDF = dd.concat([trDF, df])
-            """
-
-        
-        df_all = pd.read_parquet(data[""])
-        corpusFile = self._TMfolder.parent.parent.joinpath('train_data/corpus.txt')
+                trDF = pd.concat([trDF, df])
+                
+        corpusFile = self._TMfolder.parent / 'corpus.txt'
         with corpusFile.open("r", encoding="utf-8") as f:
             lines = f.readlines()  
             f.seek(0)
@@ -1036,7 +1031,13 @@ class TMmodel(object):
                 documents_ids = [line.rsplit("\t0\t")[0].strip() for line in lines]
                 documents_texts = [line.rsplit("\t0\t")[1].strip().split() for line in lines]
         df_corpus_train = pd.DataFrame({'id': documents_ids, 'text': documents_texts})
-        df_corpus_train = pd.merge(df_corpus_train, df_all[['place_id', 'procurement_id','raw_text']], left_on='id', right_on = "place_id", how='inner')
+        
+        # make sure trDF["id"] and df_corpus_train["id"] are the datatype
+        trDF["id"] = trDF["id"].astype(str)
+        df_corpus_train["id"] = df_corpus_train["id"].astype(str)
+        df_corpus_train = pd.merge(df_corpus_train, trDF, on='id', how='inner')
+        
+        self._logger.info(f"this is a head of the dataframe: {df_corpus_train.head()}")
         
         # Get the most representative documents for each topic
         top_docs_per_topic = self.get_most_representative_per_tpc(self._s3, topn=3)
