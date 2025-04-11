@@ -153,7 +153,7 @@ class ITMTTaskManager(BaseTaskManager):
         the option 'listDownloaded'.
         """
 
-        cmd = 'python src/manageCorpus/manageCorpus.py --listDownloaded --path_downloaded '
+        cmd = 'python -m src.manageCorpus.manageCorpus --listDownloaded --path_downloaded '
         cmd = cmd + self.p2parquet.resolve().as_posix()
         printred(cmd)
         try:
@@ -176,7 +176,7 @@ class ITMTTaskManager(BaseTaskManager):
         the option 'listTrDtsets'.
         """
 
-        cmd = 'python src/manageCorpus/manageCorpus.py --listTrDtsets --path_datasets '
+        cmd = 'python -m src.manageCorpus.manageCorpus --listTrDtsets --path_datasets '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['datasets']).resolve().as_posix()
@@ -203,7 +203,7 @@ class ITMTTaskManager(BaseTaskManager):
         the option 'listWordLists'.
         """
 
-        cmd = 'python src/manageLists/manageLists.py --listWordLists --path_wordlists '
+        cmd = 'python -m src.manageLists.manageLists --listWordLists --path_wordlists '
         cmd = cmd + self.p2wdlist.resolve().as_posix()
         printred(cmd)
         try:
@@ -222,7 +222,7 @@ class ITMTTaskManager(BaseTaskManager):
         This method loads all the available Topic Models previously created by the user ITMTTaskManager's 'allTMmodels' attribute as a dictionary object, which is characterized by one dictionary entry per Topic Model, the key and the value being the absolute path to the model and a dictionary with the corresponding metadata, respectively. To do so, it invokes the script from the folder 'src topicmodeling' with the option 'listTMmodels'.
         """
 
-        cmd = 'python src/topicmodeling/manageModels.py --listTMmodels --path_TMmodels '
+        cmd = 'python -m src.topicmodeling.manageModels --listTMmodels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -258,7 +258,7 @@ class ITMTTaskManager(BaseTaskManager):
         """
 
         cmd = 'echo "' + json.dumps(dt_set).replace('"', '\\"') + '"'
-        cmd = cmd + '| python src/manageCorpus/manageCorpus.py --saveTrDtset --path_datasets '
+        cmd = cmd + '| python -m src.manageCorpus.manageCorpus --saveTrDtset --path_datasets '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['datasets']).resolve().as_posix()
@@ -293,7 +293,7 @@ class ITMTTaskManager(BaseTaskManager):
             - 1 if the dataset was deleted successfully
         """
 
-        cmd = 'python src/manageCorpus/manageCorpus.py --deleteTrDtset --path_TrDtset '
+        cmd = 'python -m src.manageCorpus.manageCorpus --deleteTrDtset --path_TrDtset '
         cmd = cmd + dt_set
         printred(cmd)
         try:
@@ -332,7 +332,7 @@ class ITMTTaskManager(BaseTaskManager):
         """
 
         cmd = 'echo "' + json.dumps(new_list).replace('"', '\\"') + '"'
-        cmd = cmd + '| python src/manageLists/manageLists.py --createWordList --path_wordlists '
+        cmd = cmd + '| python -m src.manageLists.manageLists --createWordList --path_wordlists '
         cmd = cmd + self.p2wdlist.resolve().as_posix()
 
         try:
@@ -366,7 +366,7 @@ class ITMTTaskManager(BaseTaskManager):
             - 1 if the wordlist was deleted successfully
         """
 
-        cmd = 'python src/manageLists/manageLists.py --deleteWordList '
+        cmd = 'python -m src.manageLists.manageLists --deleteWordList '
         cmd = cmd + wd_list + ' --path_wordlists ' + self.p2wdlist.as_posix()
         printred(cmd)
         try:
@@ -491,7 +491,7 @@ class ITMTTaskManager(BaseTaskManager):
                     # Preprocessing will be accelerated with Dask using the number of
                     # workers indicated in the configuration file for the project
                     num_workers = self.cf.get('Dask', 'num_workers')
-                    cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {configFile.as_posix()} --nw {num_workers}'
+                    cmd = f'python -m src.topicmodeling.topicmodeling --preproc --config {configFile.as_posix()} --nw {num_workers}'
                     printred(cmd)
 
                     try:
@@ -532,7 +532,7 @@ class ITMTTaskManager(BaseTaskManager):
 
             else:
                 # Other models do not require Spark
-                cmd = f'python src/topicmodeling/topicmodeling.py --train --config {configFile.as_posix()}'
+                cmd = f'python -m src.topicmodeling.topicmodeling --train --config {configFile.as_posix()}'
                 printred(cmd)
                 try:
                     self.logger.info(f'-- -- Running command {cmd}')
@@ -620,7 +620,7 @@ class ITMTTaskManager(BaseTaskManager):
                       ensure_ascii=False, indent=2, default=str)
 
         # 6. Create submodel training corpus
-        cmd = f'python src/topicmodeling/topicmodeling.py --hierarchical --config {configFile_f.as_posix()} --config_child {configFile_c.as_posix()}'
+        cmd = f'python -m src.topicmodeling.topicmodeling --hierarchical --config {configFile_f.as_posix()} --config_child {configFile_c.as_posix()}'
         printred(cmd)
         try:
             self.logger.info(f'-- -- Running command {cmd}')
@@ -652,7 +652,7 @@ class ITMTTaskManager(BaseTaskManager):
 
         else:
             # Other models do not require Spark
-            cmd = f'python src/topicmodeling/topicmodeling.py --train --config {configFile_c.as_posix()}'
+            cmd = f'python -m src.topicmodeling.topicmodeling --train --config {configFile_c.as_posix()}'
             printred(cmd)
             try:
                 self.logger.info(f'-- -- Running command {cmd}')
@@ -683,7 +683,7 @@ class ITMTTaskManager(BaseTaskManager):
             - 0 if the topic model could not be deleted
             - 1 if the topic model was deleted successfully
         """
-        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = 'python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -725,7 +725,7 @@ class ITMTTaskManager(BaseTaskManager):
             - 0 if the topic model could not be renamed
             - 1 if the topic model was renamed successfully
         """
-        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = 'python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -767,7 +767,7 @@ class ITMTTaskManager(BaseTaskManager):
             - 0 if the topic model could not be copied
             - 1 if the topic model was copied successfully
         """
-        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = 'python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -797,7 +797,7 @@ class ITMTTaskManager(BaseTaskManager):
 
         """
 
-        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = 'python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -833,7 +833,7 @@ class ITMTTaskManager(BaseTaskManager):
         """
 
         cmd = 'echo "' + json.dumps(TpcLabels).replace('"', '\\"') + '"'
-        cmd = cmd + '| python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + '| python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -863,7 +863,7 @@ class ITMTTaskManager(BaseTaskManager):
         """
 
         cmd = 'echo "' + json.dumps(tpcs).replace('"', '\\"') + '"'
-        cmd = cmd + '| python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + '| python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -895,7 +895,7 @@ class ITMTTaskManager(BaseTaskManager):
         """
 
         cmd = 'echo "' + json.dumps(npairs).replace('"', '\\"') + '"'
-        cmd = cmd + '| python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + '| python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -924,7 +924,7 @@ class ITMTTaskManager(BaseTaskManager):
         """
 
         cmd = 'echo "' + json.dumps(tpcs).replace('"', '\\"') + '"'
-        cmd = cmd + '| python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = cmd + '| python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -950,7 +950,7 @@ class ITMTTaskManager(BaseTaskManager):
         manual annotation of topics
         """
 
-        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = 'python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -975,7 +975,7 @@ class ITMTTaskManager(BaseTaskManager):
         Sort topics according to decreasing value of topic size
         """
 
-        cmd = 'python src/topicmodeling/manageModels.py --path_TMmodels '
+        cmd = 'python -m src.topicmodeling.manageModels --path_TMmodels '
         cmd = cmd + \
             self.p2p.joinpath(
                 self._dir_struct['TMmodels']).resolve().as_posix()
@@ -2520,7 +2520,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
             # Preprocessing will be accelerated with Dask using the number of
             # workers indicated in the configuration file for the project
             num_workers = self.cf.get('Dask', 'num_workers')
-            cmd = f'python src/topicmodeling/topicmodeling.py --preproc --config {infer_configFile.as_posix()} --nw {num_workers}'
+            cmd = f'python -m src.topicmodeling.topicmodeling --preproc --config {infer_configFile.as_posix()} --nw {num_workers}'
             printred(cmd)
 
             try:
@@ -2530,7 +2530,7 @@ class ITMTTaskManagerCMD(ITMTTaskManager):
                 self.logger.error('-- -- Command execution failed')
 
         # 5. Perform inference
-        cmd = f'python src/topicmodeling/inferencer.py --infer --config {infer_configFile.as_posix()}'
+        cmd = f'python -m src.topicmodeling.inferencer --infer --config {infer_configFile.as_posix()}'
         printred(cmd)
         try:
             self.logger.info(f'-- -- Running command {cmd}')

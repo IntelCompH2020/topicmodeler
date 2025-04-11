@@ -703,48 +703,118 @@ class TMmodel(object):
                 '\n'.join([dictionary[idx] for idx in range(len(dictionary))]))
 
         return
+    
+    def calculate_rbo(self,
+                      weight: float = 1.0,
+                      n_words: int = 15) -> float:
+        """Calculates the rank_biased_overlap over the topics in a topic model.
 
-    def calculate_topic_coherence(self, metrics=["c_v", "c_npmi"], n_words=15, only_one=True):
+        Parameters
+        ----------
+        weigth : float, optional
+            Weight of each agreement at depth d: p**(d-1). When set to 1.0, there is no weight, the rbo returns to average overlap. The defau>
+        n_words : int, optional
+            Number of words to be used for calculating the rbo. The default is 15.
+
+        Returns
+        -------
+        rbo : float
+            Rank_biased_overlap
+        """
 
         # Load topic information
         if self._tpc_descriptions is None:
-            self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
-        # Convert topic information into list of lists
+            self._tpc_descriptions = \
+                [el[1] for el in self.get_tpc_word_descriptions(n_words)]
+
+        collect = []
+        for list1, list2 in itertools.combinations(self._tpc_descriptions, 2):
+            rbo_val = rbo.RankingSimilarity(
+                list1.split(", "), list2.split(", ")).rbo(p=weight)
+            collect.append(rbo_val)
+
+        return 1 - np.mean(collect)
+
+    def calculate_topic_diversity(self,
+                                  n_words: int = 15) -> float:
+        """Calculates the percentage of unique words in the topn words of all topics. Diversity close to 0 indicates redundant topics; diversity close to 1 indicates more varied topics.
+
+        Parameters
+        ----------
+        n_words : int, optional
+            Number of words to be used for calculating the rbo. The default is 15.
+
+        Returns
+        -------
+        td : float
+            Topic diversity
+        """
+
+        # Load topic information
+        if self._tpc_descriptions is None:
+            self._tpc_descriptions = \
+                [el[1] for el in self.get_tpc_word_descriptions(n_words)]
+
+        unique_words = set()
+        for topic in self._tpc_descriptions:
+            unique_words = unique_words.union(set(topic.split(", ")))
+        td = len(unique_words) / (n_words * len(self._tpc_descriptions))
+        return td
+
+
+    def calculate_topic_coherence(self,
+                                  metrics=["c_npmi","c_v"],
+                                  n_words=15,
+                                  reference_text=None,
+                                  only_one=True,
+                                  aggregated=False) -> list:
+        """Calculates the per-topic coherence of a topic model, given as TMmodel, or its average coherence when aggregated is True.
+
+        If only_one is False and metrics is a list of different coherence metrics, the function returns a list of lists, where each sublist contains the coherence values for the respective metric.
+
+        If reference_text is given, the coherence is calculated with respect to this text. Otherwise, the coherence is calculated with respect to the corpus used to train the topic model.
+
+        Parameters
+        ----------
+        metrics : list of str, optional
+            List of coherence metrics to be calculated. Possible values are 'c_v', 'c_uci', 'c_npmi', 'u_mass'. 
+            The default is ["c_v", "c_npmi"].
+        n_words : int, optional
+            Number of words to be used for calculating the coherence. The default is 15.
+        reference_text : str, optional
+            Text to be used as reference for calculating the coherence. The default is None.
+        only_one : bool, optional
+            If True, only one coherence value is returned. If False, a list of coherence values is returned. The default is True.
+        aggregated : bool, optional
+            If True, the average coherence of the topic model is returned. If False, the coherence of each topic is returned. The default is False.
+        """
+
+        # Load topic information
+        if self._tpc_descriptions is None:
+            self._tpc_descriptions = \
+                [el[1] for el in self.get_tpc_word_descriptions()]
+
+        # Convert topic information into list of lists (Gensim's Coherence Model format)
         tpc_descriptions_ = \
             [tpc.split(', ') for tpc in self._tpc_descriptions]
 
-        # Get texts to calculate coherence
-        type = None
-        if self._TMfolder.parent.parent.joinpath('test_data/corpus.txt').is_file():
-            self._logger.info("--- Calculating coherence with test data.")
-            corpusFile = self._TMfolder.parent.parent.joinpath(
-                'test_data/corpus.txt')
-            type = "test"
-        else:
-            corpusFile = self._TMfolder.parent.parent.joinpath(
-                'train_data/corpus.txt')
-            type = "train"
-        with corpusFile.open("r", encoding="utf-8") as f:
-                lines = f.readlines()  # Read all lines into a list
-                f.seek(0)  # Reset the file pointer to the beginning
-                try:
-                    corpus = [line.rsplit(" 0 ")[1].strip().split() for line in lines]
-                except:
-                    corpus = [line.rsplit("\t0\t")[1].strip().split() for line in lines]
-        if len(corpus) == 0 and type == "test":
-            corpusFile = self._TMfolder.parent.parent.joinpath(
-                'train_data/corpus.txt')
+        if reference_text is None:
+            # Get text to calculate coherence
+            if self._TMfolder.parent.joinpath('modelFiles/corpus.txt').is_file():
+                corpusFile = self._TMfolder.parent.joinpath(
+                    'modelFiles/corpus.txt')
+            else:
+                corpusFile = self._TMfolder.parent.joinpath('corpus.txt')
             with corpusFile.open("r", encoding="utf-8") as f:
-                lines = f.readlines()  # Read all lines into a list
-                f.seek(0)  # Reset the file pointer to the beginning
-                try:
-                    corpus = [line.rsplit(" 0 ")[1].strip().split() for line in lines]
-                except:
-                    corpus = [line.rsplit("\t0\t")[1].strip().split() for line in lines]
+                corpus = [line.rsplit(" 0 ")[1].strip().split() for line in f.readlines(
+                ) if line.rsplit(" 0 ")[1].strip().split() != []]
+        else:
+            # Texts should be given as a list of lists of strings
+            corpus = reference_text
 
         # Import necessary modules for coherence calculation with Gensim
-        from gensim.corpora import Dictionary # type: ignore
-        from gensim.models.coherencemodel import CoherenceModel # type: ignore
+        from gensim.corpora import Dictionary
+        from gensim.models.coherencemodel import CoherenceModel
 
         # Get Gensim dictionary
         dictionary = None
@@ -762,6 +832,7 @@ class TMmodel(object):
         if n_words > len(tpc_descriptions_[0]):
             self._logger.error(
                 '-- -- -- Coherence calculation failed: The number of words per topic must be equal to n_words.')
+            return None
         else:
             if only_one:
                 metric = metrics[0]
@@ -771,9 +842,15 @@ class TMmodel(object):
                     cm = CoherenceModel(topics=tpc_descriptions_, texts=corpus,
                                         dictionary=dictionary, coherence=metric, topn=n_words)
                     self._topic_coherence = cm.get_coherence_per_topic()
+
+                    if aggregated:
+                        mean = cm.aggregate_measures(self._topic_coherence)
+                        return mean
+                    return self._topic_coherence
                 else:
-                    self.logger.error(
+                    self._logger.error(
                         '-- -- -- Coherence metric provided is not available.')
+                    return None
             else:
                 cohrs_aux = []
                 for metric in metrics:
@@ -786,9 +863,12 @@ class TMmodel(object):
                         cohrs_aux.extend(aux)
                         self._logger.info(cohrs_aux)
                     else:
-                        self.logger.error(
+                        self._logger.error(
                             '-- -- -- Coherence metric provided is not available.')
+                        return None
                 self._topic_coherence = cohrs_aux
+
+        return self._topic_coherence
                 
     def _load_topic_coherence(self):
         if self._topic_coherence is None:
