@@ -942,7 +942,7 @@ class TMmodel(object):
         
         t_start = time.perf_counter()
         
-        corpusFile = self._TMfolder.parent('corpus.txt')
+        corpusFile = self._TMfolder.parent  / 'corpus.txt'
         with corpusFile.open("r", encoding="utf-8") as f:
             lines = f.readlines()  
             f.seek(0)
