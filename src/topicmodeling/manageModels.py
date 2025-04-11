@@ -422,7 +422,6 @@ class TMmodel(object):
         self._logger.info("-- -- active")
         self._tpc_descriptions = [el[1] for el in self.get_tpc_word_descriptions()]
         self._logger.info("-- -- descriptions")
-        self.calculate_gensim_dic()
         self.calculate_topic_coherence()
         
         self._load_vocab_dicts()
@@ -676,34 +675,6 @@ class TMmodel(object):
             self._topic_entropy = np.load(
                 self._TMfolder.joinpath('topic_entropy.npy'))
 
-    def calculate_gensim_dic(self):
-
-        # TODO: Check this is working when Mallet is not being used
-        corpusFile = self._TMfolder.parent.parent.joinpath(
-            'train_data/corpus.txt')
-
-        with corpusFile.open("r", encoding="utf-8") as f:
-            corpus = [line.rsplit(" 0 ")[1].strip().split() for line in f.readlines(
-            ) if line.rsplit(" 0 ")[1].strip().split() != []]
-
-        # Import necessary modules for coherence calculation with Gensim
-        from gensim.corpora import Dictionary # type: ignore
-        from gensim.models.coherencemodel import CoherenceModel # type: ignore
-
-        # Create dictionary
-        dictionary = Dictionary(corpus)
-
-        # Save dictionary
-        GensimFile = self._TMfolder.parent.joinpath(
-            'dictionary.gensim')
-        dictionary.save_as_text(GensimFile)
-
-        with self._TMfolder.parent.joinpath('vocabulary.txt').open('w', encoding='utf8') as fout:
-            fout.write(
-                '\n'.join([dictionary[idx] for idx in range(len(dictionary))]))
-
-        return
-    
     def calculate_rbo(self,
                       weight: float = 1.0,
                       n_words: int = 15) -> float:
@@ -971,8 +942,7 @@ class TMmodel(object):
         
         t_start = time.perf_counter()
         
-        corpusFile = self._TMfolder.parent.parent.joinpath(
-                'train_data/corpus.txt')
+        corpusFile = self._TMfolder.parent('corpus.txt')
         with corpusFile.open("r", encoding="utf-8") as f:
             lines = f.readlines()  
             f.seek(0)
