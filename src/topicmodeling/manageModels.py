@@ -703,11 +703,20 @@ class TMmodel(object):
             rbo_val = rbo.RankingSimilarity(
                 list1.split(", "), list2.split(", ")).rbo(p=weight)
             collect.append(rbo_val)
+        
+        rbo = 1 - np.mean(collect)
+        # Save rbo
+        try:
+            with self._TMfolder.joinpath('rbo.txt').open('w', encoding='utf8') as fout:
+                fout.write(str(rbo))
+        except:
+            self._logger.warning(
+                "Rank-biased overlap could not be saved to file")
+        return rbo
 
-        return 1 - np.mean(collect)
-
-    def calculate_topic_diversity(self,
-                                  n_words: int = 15) -> float:
+    def calculate_topic_diversity(
+        self,
+        n_words: int = 15) -> float:
         """Calculates the percentage of unique words in the topn words of all topics. Diversity close to 0 indicates redundant topics; diversity close to 1 indicates more varied topics.
 
         Parameters
@@ -730,6 +739,16 @@ class TMmodel(object):
         for topic in self._tpc_descriptions:
             unique_words = unique_words.union(set(topic.split(", ")))
         td = len(unique_words) / (n_words * len(self._tpc_descriptions))
+        
+        # save topic diversity
+        try:
+            with self._TMfolder.joinpath('topic_diversity.txt').open('w', encoding='utf8') as fout:
+                fout.write(str(td))
+        except:
+            self._logger.warning(
+                "Topic diversity could not be saved to file")
+            return td 
+        
         return td
 
 
@@ -737,7 +756,7 @@ class TMmodel(object):
                                   metrics=["c_npmi","c_v"],
                                   n_words=15,
                                   reference_text=None,
-                                  only_one=True,
+                                  only_one=False,
                                   aggregated=False) -> list:
         """Calculates the per-topic coherence of a topic model, given as TMmodel, or its average coherence when aggregated is True.
 
