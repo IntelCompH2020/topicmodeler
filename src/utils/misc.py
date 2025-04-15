@@ -358,3 +358,13 @@ def log_or_print(
             logger.error(message)
     else:
         print(message)
+        
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('true', '1', 'yes', 'y'):
+        return True
+    elif v.lower() in ('false', '0', 'no', 'n'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')

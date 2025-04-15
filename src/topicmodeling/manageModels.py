@@ -711,12 +711,13 @@ class TMmodel(object):
             rbo_val = rbo.RankingSimilarity(
                 list1.split(", "), list2.split(", ")).rbo(p=weight)
             collect.append(rbo_val)
-        
-        rbo = 1 - np.mean(collect)
+
+        irbo = 1 - np.mean(collect)
+
         # Save rbo
         try:
             with self._TMfolder.joinpath('rbo.txt').open('w', encoding='utf8') as fout:
-                fout.write(str(rbo))
+                fout.write(str(irbo))
         except:
             self._logger.warning(
                 "Rank-biased overlap could not be saved to file")
@@ -756,9 +757,8 @@ class TMmodel(object):
             self._logger.warning(
                 "Topic diversity could not be saved to file")
             return td 
-        
-        return td
 
+        return td
 
     def calculate_topic_coherence(self,
                                   metrics=["c_npmi","c_v"],

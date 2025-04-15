@@ -42,6 +42,7 @@ from bertopic.vectorizers import ClassTfidfTransformer
 from hdbscan import HDBSCAN
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import (CountVectorizer, TfidfVectorizer)
+from src.utils.misc import str2bool
 from umap import UMAP
 try:
     print(f"-- -- Importing from src")
@@ -2238,8 +2239,8 @@ if __name__ == "__main__":
     parser.add_argument('--open_ai_key', type=str, default=None, required=False)
     parser.add_argument('--open_ai_key_path', type=str, required=False,
                         default='/export/usuarios_ml4ds/lbartolome/Repos/my_repos/miniature-fishstick/.env')
-    parser.add_argument('--do_labeller', type=bool, default=True,
-                        help="Flag to active the labelling of the topics using OpenAI.", required=False)
+    parser.add_argument('--do_labeller', type=str2bool, default=True,
+                        help="Flag to active the labelling of the topics using OpenAI.")
 
     args = parser.parse_args()
 
@@ -2423,6 +2424,7 @@ if __name__ == "__main__":
     if args.train:
         
         do_labeller = False
+        openai_api_key = ""
         if args.do_labeller:
             # Loading OpenAI API Key if given
             if args.open_ai_key:
