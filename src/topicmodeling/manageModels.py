@@ -431,12 +431,20 @@ class TMmodel(object):
             self._calculate_sims()
         
         if self._do_labeller:
-            #try:
-            self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
-            #except Exception as e:
-            #    self._logger.warning(
-            #        f"Error in labeller: {e}")
-            #    self._tpc_labels = ["Topic " + str(i) for i in range(self.#_ntopics)]
+            try:
+                self._tpc_labels = [el[1] for el in self.get_tpc_labels()]
+            except Exception as e:
+                self._logger.warning(
+                    f"Error in labeller: {e}")
+                self._tpc_labels = ["Topic " + str(i) for i in range(self._ntopics)]
+                
+        # calculate the rank-biased overlap and topic diversity
+        try:
+            self.calculate_rbo()
+            self.calculate_topic_diversity()
+        except Exception as e:
+            self._logger.warning(
+                f"Error in rbo or topic diversity: {e}")
 
         # We are ready to save all variables in the model
         self._save_all()

@@ -2453,6 +2453,10 @@ if __name__ == "__main__":
                     sys.stdout.write("#"*20)
                     sys.stdout.write(f"This is the error that occurred:{e}")
         
+        sys.stdout.write("#"*20)
+        sys.stdout.write(f"Doing labelling: {do_labeller}")
+        sys.stdout.write("#"*20)
+        
         configFile = Path(args.config)
         if configFile.is_file():
             with configFile.open('r', encoding='utf8') as fin:
